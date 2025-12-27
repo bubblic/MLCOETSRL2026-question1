@@ -2,8 +2,36 @@ import os
 import glob
 import shutil
 import csv
+import re
+from typing import Optional
+
+# Compute script directory early so we can configure Arelle before importing it.
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+
+
+def _configure_arelle_app_dirs() -> None:
+    """
+    Ensure Arelle uses writable directories.
+
+    In sandboxed environments (like Cursor's), writing to user-level app/config dirs
+    can fail with 'Operation not permitted'. For local runs, this is harmless.
+    """
+    arelle_home = os.path.join(SCRIPT_DIR, ".arelle")
+    os.makedirs(arelle_home, exist_ok=True)
+    # Arelle may append its own "arelle/cache/http" under the user app dir.
+    os.makedirs(os.path.join(arelle_home, "arelle", "cache", "http"), exist_ok=True)
+    # Many libraries respect these. Arelle uses platform app dirs derived from HOME on macOS.
+    os.environ.setdefault("HOME", SCRIPT_DIR)
+    os.environ.setdefault("XDG_CONFIG_HOME", arelle_home)
+    os.environ.setdefault("XDG_DATA_HOME", arelle_home)
+
+
+# Must run before importing Arelle (it may compute app dirs at import time).
+_configure_arelle_app_dirs()
+
 from sec_edgar_downloader import Downloader
 from arelle import Cntlr
+from arelle import WebCache as _ArelleWebCache
 
 # --- Configuration ---
 # COMPANY_TICKER = "WMT"  # Walmart
@@ -17,7 +45,6 @@ ORG_NAME = "Personal Research"  # <--- REQUIRED BY SEC: Change this to your orga
 DOWNLOAD_LIMIT = 30
 
 # Use absolute path for reliability
-SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 CUSTOM_BASE_DOWNLOAD_NAME = "xbrl_download_root"
 DOWNLOAD_FOLDER = os.path.join(SCRIPT_DIR, CUSTOM_BASE_DOWNLOAD_NAME)
 DOWNLOADER_SUBFOLDER_NAME = "sec-edgar-filings"
@@ -26,6 +53,138 @@ OUTPUT_CSV_FILE = os.path.join(
 )
 
 print(f"Target Download Root: {DOWNLOAD_FOLDER}")
+
+
+def _patch_arelle_cache_lock_dir_creation() -> None:
+    """
+    Arelle uses file locks for its HTTP cache downloads. For some Arelle versions,
+    the lock file is created before the cache subdirectories are created, which can
+    raise FileNotFoundError for paths like:
+      .../arelle/cache/http/xbrl.fasb.org/us-gaap/2016/elts/...xsd.lock
+
+    This patch ensures the parent directory exists before Arelle attempts to lock.
+    """
+    try:
+        original = _ArelleWebCache.WebCache._downloadFileWithLock
+    except Exception:
+        return
+
+    def _wrapped_downloadFileWithLock(
+        self, url, filepath, retrievingDueToRecheckInterval=False, retryCount=5
+    ):
+        try:
+            os.makedirs(os.path.dirname(filepath), exist_ok=True)
+        except Exception:
+            pass
+        return original(
+            self,
+            url,
+            filepath,
+            retrievingDueToRecheckInterval=retrievingDueToRecheckInterval,
+            retryCount=retryCount,
+        )
+
+    _ArelleWebCache.WebCache._downloadFileWithLock = _wrapped_downloadFileWithLock
+
+
+def _read_file_head(path: str, max_bytes: int = 250_000) -> str:
+    """Read first N bytes as text (best-effort) for quick content sniffing."""
+    try:
+        with open(path, "rb") as f:
+            b = f.read(max_bytes)
+        return b.decode("utf-8", errors="ignore")
+    except Exception:
+        return ""
+
+
+def _looks_like_inline_xbrl_html(path: str) -> bool:
+    """
+    Heuristic: Inline XBRL HTML usually includes ix namespace / tags.
+    We only need a cheap sniff, not full parsing.
+    """
+    head_lower = _read_file_head(path).lower()
+    return ("xmlns:ix=" in head_lower) or ("<ix:" in head_lower)
+
+
+def _extract_xbrl_package_from_full_submission(accession_path: str) -> Optional[str]:
+    """
+    For non-Inline XBRL filings (often pre-2018), `sec_edgar_downloader` may only save:
+      - primary-document.html (10-K HTML, not iXBRL)
+      - full-submission.txt (contains the XBRL instance + schema/linkbases embedded)
+
+    This function materializes the XBRL package files into the accession folder
+    so Arelle can load the instance and resolve relative schemaRef/linkbaseRefs.
+
+    Returns: path to extracted XBRL instance file, or None if not found.
+    """
+    full_submission = os.path.join(accession_path, "full-submission.txt")
+    if not os.path.exists(full_submission):
+        return None
+
+    try:
+        with open(full_submission, "r", encoding="utf-8", errors="ignore") as f:
+            txt = f.read()
+    except Exception:
+        return None
+
+    # Split into SEC <DOCUMENT> blocks; case-insensitive and tolerant.
+    blocks = re.split(r"(?i)<document>", txt)
+    if len(blocks) <= 1:
+        return None
+
+    desired_types = {
+        "EX-101.INS",
+        "EX-101.SCH",
+        "EX-101.CAL",
+        "EX-101.DEF",
+        "EX-101.LAB",
+        "EX-101.PRE",
+    }
+
+    instance_path: Optional[str] = None
+
+    for block in blocks[1:]:
+        # SEC full-submission.txt commonly uses tag-lines like "<TYPE>EX-101.INS" (no closing tag).
+        # But tolerate XML-style "<TYPE>...</TYPE>" too.
+        m_type = re.search(r"(?is)<type>\s*([^<\r\n]+)\s*</type>", block)
+        if not m_type:
+            m_type = re.search(r"(?im)^<type>\s*([^\r\n<]+)", block)
+        if not m_type:
+            continue
+        doc_type = m_type.group(1).strip().upper()
+        if doc_type not in desired_types:
+            continue
+
+        m_fn = re.search(r"(?is)<filename>\s*([^<\r\n]+)\s*</filename>", block)
+        if not m_fn:
+            m_fn = re.search(r"(?im)^<filename>\s*([^\r\n<]+)", block)
+        if not m_fn:
+            continue
+        filename = m_fn.group(1).strip()
+        out_path = os.path.join(accession_path, filename)
+
+        m_text = re.search(r"(?is)<text>\s*(.*?)\s*</text>", block)
+        if not m_text:
+            continue
+        payload = m_text.group(1)
+
+        # Some submissions wrap XBRL instance in <XBRL> ... </XBRL>
+        m_xbrl = re.search(r"(?is)<xbrl>\s*(.*?)\s*</xbrl>", payload)
+        if m_xbrl:
+            payload = m_xbrl.group(1)
+
+        # Avoid rewriting if file already exists and is non-trivial.
+        if not (os.path.exists(out_path) and os.path.getsize(out_path) > 200):
+            try:
+                with open(out_path, "w", encoding="utf-8", newline="") as out:
+                    out.write(payload)
+            except Exception:
+                continue
+
+        if doc_type == "EX-101.INS":
+            instance_path = out_path
+
+    return instance_path
 
 
 def clean_previous_downloads():
@@ -72,16 +231,27 @@ def find_all_filing_paths():
 
     for accession_folder_name in accession_folders:
         accession_path = os.path.join(base_dir, accession_folder_name)
-        all_candidates = glob.glob(os.path.join(accession_path, "*"))
+        primary_html = os.path.join(accession_path, "primary-document.html")
 
+        # Prefer Inline XBRL HTML when present (newer filings).
+        if os.path.exists(primary_html) and _looks_like_inline_xbrl_html(primary_html):
+            filing_paths.append((accession_folder_name, primary_html))
+            continue
+
+        # For older filings, materialize XBRL instance + schema/linkbases from full-submission.txt
+        instance = _extract_xbrl_package_from_full_submission(accession_path)
+        if instance and os.path.exists(instance):
+            filing_paths.append((accession_folder_name, instance))
+            continue
+
+        # Last-resort fallback: pick largest HTML/XML excluding full-submission.
+        all_candidates = glob.glob(os.path.join(accession_path, "*"))
         candidates = [
             f
             for f in all_candidates
-            # if (f.endswith(".txt"))
             if (f.endswith(".htm") or f.endswith(".xml") or f.endswith(".html"))
             and "full-submission.txt" not in f
         ]
-
         if candidates:
             primary_doc_path = max(candidates, key=os.path.getsize)
             filing_paths.append((accession_folder_name, primary_doc_path))
@@ -126,7 +296,15 @@ def extract_financial_data(filing_paths):
 
     # --- FIX 2: DISABLE CACHE/VALIDATION FOR ROBUSTNESS ---
     # This tells Arelle to skip some steps that might be causing the cache lock error.
-    ctrl = Cntlr.Cntlr(hasGui=False)
+    _configure_arelle_app_dirs()
+    _patch_arelle_cache_lock_dir_creation()
+    # Also disable persistent config so Arelle doesn't try to write to user-level app dirs.
+    ctrl = Cntlr.Cntlr(
+        hasGui=False,
+        logFileName=os.path.join(SCRIPT_DIR, "arelle.log"),
+        logFileMode="w",
+        disable_persistent_config=True,
+    )
 
     # --- UPDATED: Comprehensive list of requested US-GAAP tags ---
     target_tags = {
@@ -386,4 +564,7 @@ if __name__ == "__main__":
         save_to_csv(extracted_facts)
 
     except Exception as e:
+        import traceback
+
         print(f"\nCRITICAL ERROR: {e}")
+        traceback.print_exc()
