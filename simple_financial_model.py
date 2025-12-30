@@ -6,7 +6,6 @@ class SimpleFinancialModel(tf.Module):
         # --- Policy Parameters ---
         self.asset_growth = tf.constant(0.05, dtype=tf.float32)  # %AG
         self.tax_rate = tf.constant(0.35, dtype=tf.float32)
-        self.min_cash = tf.constant(10.0, dtype=tf.float32)
         self.interest_rate_st = tf.constant(0.06, dtype=tf.float32)
         self.depreciation_rate = tf.constant(0.10, dtype=tf.float32)  # %Depr
         self.advance_payments_sales_pct = tf.constant(
@@ -18,11 +17,11 @@ class SimpleFinancialModel(tf.Module):
         self.account_receivables_pct = tf.constant(0.159111366, dtype=tf.float32)  # %AR
         self.account_payables_pct = tf.constant(0.35014191, dtype=tf.float32)  # %AP
         self.inventory_pct = tf.constant(0.15, dtype=tf.float32)  # %Inv
-        self.total_liquidity_pct = tf.constant(0.20, dtype=tf.float32)  # %TL
+        self.total_liquidity_pct = tf.constant(0.16, dtype=tf.float32)  # %TL
         self.cash_pct_of_liquidity = tf.constant(0.25, dtype=tf.float32)  # %Cash
         self.income_tax_pct = tf.constant(0.25, dtype=tf.float32)  # %IT
         self.variable_opex_pct = tf.constant(0.60, dtype=tf.float32)  # %OR
-        self.baseline_opex = tf.constant(50.0, dtype=tf.float32)  # OBT_start
+        self.baseline_opex = tf.constant(54847000000, dtype=tf.float32)  # OBT_start
         self.avg_short_term_interest_pct = tf.constant(
             0.04, dtype=tf.float32
         )  # %AvgSTInt
