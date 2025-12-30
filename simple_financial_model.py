@@ -144,7 +144,7 @@ class SimpleFinancialModel(tf.Module):
         # Inflows: Sales | Outflows: Purchases, OpEx, Tax, Interest
 
         # Sales: cash flow from current year's sales + accounts receivable from previous year + advance payment for next year's sales
-        sales_curr = sales * (
+        sales_curr = sales_t * (
             1 - self.advance_payments_sales_pct - self.account_receivables_pct
         )
         advance_payments_sales_curr = sales_t_plus_1 * self.advance_payments_sales_pct
