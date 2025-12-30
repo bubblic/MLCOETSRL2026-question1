@@ -334,7 +334,7 @@ def run_forecast():
     inflation = [0.02, 0.02, 0.02, 0.02]
 
     print(
-        f"{'Year':<5} | {'Assets':<10} | {'L+E':<10} | {'Check (Plug)':<12} | {'Liquidity Check (Plug)':<12}"
+        f"{'Year':<5} | {'Assets':<10} | {'CLiab':<10} | {'NLiab':<10} | {'Equity':<10} | {'Check (Plug)':<12} | {'Liquidity Check (Plug)':<12}"
     )
     print("-" * 70)
 
@@ -362,6 +362,11 @@ def run_forecast():
             + state["cash"]
             + state["investment_in_market_securities"]
         )
+
+        current_liabilities = state["current_liabilities"]
+        non_current_liabilities = state["non_current_liabilities"]
+        equity = state["equity"]
+
         # L+E = Liabilities + Equity
         le = (
             state["accounts_payable"]
@@ -372,7 +377,7 @@ def run_forecast():
         )
 
         print(
-            f"{t+1:<5} | {assets.numpy():<10.2f} | {le.numpy():<10.2f} |  {state['check'].numpy():<12.2f} | {state['liquidity_check'].numpy():<12.2f} "
+            f"{t+1:<5} | {assets.numpy():<10.2f} | {current_liabilities.numpy():<10.2f} | {non_current_liabilities.numpy():<10.2f} | {equity.numpy():<10.2f} |  {state['check'].numpy():<12.2f} | {state['liquidity_check'].numpy():<12.2f} "
         )
 
 
