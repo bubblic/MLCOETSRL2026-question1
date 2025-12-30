@@ -43,11 +43,12 @@ class SimpleFinancialModel(tf.Module):
         # Unpack previous state (t-1)
         ## Assets
         nca_prev = state["nca"]  # Non-current assets
-        advance_payments_prev = state["advance_payments"]
+        advance_payments_purchases_prev = state["advance_payments_purchases"]
         accounts_receivable_prev = state["accounts_receivable"]
         inventory_prev = state["inventory"]
         cash_prev = state["cash"]
         investment_in_market_securities_prev = state["investment_in_market_securities"]
+        depreciation = nca_prev * self.depreciation_rate
 
         ## Liabilities and Equity
         accounts_payable_prev = state["accounts_payable"]
@@ -57,6 +58,11 @@ class SimpleFinancialModel(tf.Module):
 
         ## Equity
         equity_prev = state["equity"]  # Initial equity assumed to remain constant
+        stock_buyback = depreciation * self.stock_buyback_pct
+
+        ## Net Income
+        net_income_prev = state["net_income"]
+        dividends_prev = net_income_prev * self.dividend_payout_ratio_pct
 
         # Unpack current inputs (t)
         sales_t = inputs["sales_t"]
@@ -66,112 +72,224 @@ class SimpleFinancialModel(tf.Module):
         sales_t_minus_1 = inputs["sales_t_minus_1"]
         purchases_t_minus_1 = inputs["purchases_t_minus_1"]
         inflation = inputs["inflation"]
+        t = inputs["t"]
 
-        # --- 1. Non-current Assets (NCA) Evolution ---
+        # --- 1. Assets Evolution ---
+        # 1.1. Non-current Assets (NCA)
         # Policy: Maintain NCA + Growth (Simplified for this model)
         # Investment required to replace depreciation + grow
-        depreciation = nca_prev * self.depreciation_rate
         capex = depreciation + (sales_t * self.asset_growth)
         nca_curr = nca_prev + capex - depreciation
 
-        # --- 2. Advance Payments (AdvPP) ---
-        advance_payments_curr = sales * self.advance_payments_sales_pct
+        # 1.2. Advance Payments (AdvPP)
+        advance_payments_purchases_curr = (
+            purchases_t_plus_1 * self.advance_payments_purchases_pct
+        )
 
-        # --- 3. Accounts Receivable (AR) ---
-        accounts_receivable_curr = sales * self.account_receivables_pct
+        # 1.3. Accounts Receivable (AR)
+        accounts_receivable_curr = sales_t * self.account_receivables_pct
 
-        # --- 4. Inventory (Inv) ---
-        inventory_curr = sales * self.inventory_pct
+        # 1.4. Inventory (Inv)
+        inventory_curr = sales_t * self.inventory_pct
 
-        # --- 5. Total Liquidity Target (TL) ---
-        total_liquidity_curr = sales * self.total_liquidity_pct
+        # 1.5. Total Liquidity Target (TL)
+        total_liquidity_curr = sales_t * self.total_liquidity_pct
 
-        # --- 6. Cash Target (Cash) ---
+        # 1.6. Cash Target (Cash)
         cash_curr = total_liquidity_curr * self.cash_pct_of_liquidity
 
-        # --- 7. Investment in Market Securities Target (IMS) ---
+        # 1.7. Investment in Market Securities Target (IMS)
         investment_in_market_securities_curr = total_liquidity_curr * (
             1 - self.cash_pct_of_liquidity
         )
 
-        # --- 8. Liquidity Budget (LB) ---
-        # Operating Cash Flow (Proxy)
+        # --- 2. Income Statement (IS) ---
+        # Net income (NI) is calculated by first calculating EBITDA = Sales - COGS - OpEx
+        # Then, EBT is calculated by EBITDA - Depreciation - loan interest payments + return from market securities.
+        # Finally, NI is calculated by EBT - Tax.
+        cogs = inventory_prev + purchases_t - inventory_curr
+        opex = (
+            self.baseline_opex * (1 + inflation) ** t + sales_t * self.variable_opex_pct
+        )
+        ebitda = sales_t - cogs - opex
+
+        # Principals and interests are based on PREVIOUS debt (No Circularity)
+        ## Long-term portion of current liability from last year is found by:
+        ## last year's non-current liabilities / (Average maturity – 1)
+        principal_lt = non_current_liabilities_prev / (self.avg_maturity_years - 1)
+        interest_lt = (
+            self.avg_long_term_interest_pct
+            * non_current_liabilities_prev
+            / (1 - 1 / self.avg_maturity_years)
+        )
+
+        ## Short-term portion of current liability from last year is found by:
+        ## last year's current liabilities - last year's non-current liabilities / (Average maturity – 1)
+        principal_st = current_liabilities_prev - principal_lt
+        interest_st = self.interest_rate_st * principal_st
+
+        interest_payment = interest_st + interest_lt
+        ms_return = (
+            investment_in_market_securities_prev * self.market_securities_return_pct
+        )
+
+        ebt = ebitda - depreciation - interest_payment + ms_return
+        tax = ebt * self.tax_rate
+        net_income_curr = ebt - tax
+
+        # --- 3. Liquidity Budget (LB) ---
+        # We need quantities from Liquidity Budget calculations before proceeding to liabilities.
+
+        # 3.1. Operating Net Liquidity Balance (Operating NLB)
         # Inflows: Sales | Outflows: Purchases, OpEx, Tax, Interest
 
-        # Sales: cash flow from current year's sales + cash flow from previous year's sales + cash flow from next year's sales
+        # Sales: cash flow from current year's sales + accounts receivable from previous year + advance payment for next year's sales
         sales_curr = sales * (
             1 - self.advance_payments_sales_pct - self.account_receivables_pct
         )
-        sales_ar = sales_t_minus_1 * self.account_receivables_pct
-        sales_adv = sales_t_plus_1 * self.advance_payments_sales_pct
-        inflows = sales_curr + sales_ar + sales_adv
+        advance_payments_sales_curr = sales_t_plus_1 * self.advance_payments_sales_pct
+        inflows = sales_curr + accounts_receivable_prev + advance_payments_sales_curr
 
         # Purchases: cash flow from current year's purchases + cash flow from previous year's purchases + cash flow from next year's purchases
         purchases_curr = purchases_t * (
             1 - self.advance_payments_purchases_pct - self.account_payables_pct
         )
-        purchases_ap = purchases_t_minus_1 * self.account_payables_pct
-        purchases_adv = purchases_t_plus_1 * self.advance_payments_purchases_pct
 
-        opex = self.baseline_opex + purchases_curr * self.variable_opex_pct
-        outflows = purchases_curr + purchases_ap + purchases_adv
+        outflows = (
+            purchases_curr
+            + accounts_payable_prev
+            + advance_payments_purchases_curr
+            + opex
+            + tax
+        )
 
-        # Calculate raw cash flow before financing
-        operational_cf = sales - costs - tax - interest_payment
-        investing_cf = -capex
+        operating_nlb = inflows - outflows
 
-        # Cash available before new debt decisions
-        cash_available = cash_prev + operational_cf + investing_cf
+        # 3.2. Capital Expense Net Liquidity Balance (CapEx NLB)
+        capex_nlb = -capex
 
-        # Determine deficit
-        # If Cash < Min_Cash, we need to borrow.
-        # If Cash > Min_Cash, we pay down debt or hold excess.
-        deficit = self.min_cash - cash_available
+        # 3.3. Financing Net Liquidity Balance (Financing NLB)
+        ## First, we need to figure out how much new short-term loan and long-term loan to issue this year.
+        ## New short-term loan is found by:
+        cash_deficit_st = (
+            cash_curr
+            - cash_prev
+            - operating_nlb
+            + principal_st
+            + interest_st
+            - ms_return
+        )
+        new_short_term_loan = tf.maximum(0.0, cash_deficit_st)
 
-        # Logic: If deficit > 0, Borrow. If deficit < 0, Pay Debt/Save.
-        # This acts as the "No Plug" logic by explicitly calculating financing needs.
-        new_borrowing = tf.maximum(0.0, deficit)
+        ## New long-term loan is found by:
+        cash_deficit_lt = (
+            cash_deficit_st
+            - new_short_term_loan
+            - capex_nlb
+            + principal_lt
+            + interest_lt
+            + dividends_prev
+            + stock_buyback
+        )
 
-        # Update Debt State
-        debt_curr = debt_prev + new_borrowing
+        long_term_financing = tf.maximum(0.0, cash_deficit_lt)
+        new_long_term_loan = long_term_financing * (1 - self.equity_financing_pct)
+        equity_financing = long_term_financing * self.equity_financing_pct
 
-        # Update Cash State (Cash should equal Min Cash if we borrowed efficiently)
-        # Or be higher if we generated surplus
-        cash_curr = cash_available + new_borrowing
+        financing_nlb = (
+            new_short_term_loan
+            + new_long_term_loan
+            - principal_st
+            - principal_lt
+            - interest_st
+            - interest_lt
+        )
 
-        # Update Retained Earnings
-        # Assuming 0 dividends for simplicity in this step
-        re_curr = re_prev + net_income
+        # 3.4. External Investment Net Liquidity Balance (External Investment NLB)
+        external_investment_nlb = (
+            investment_in_market_securities_prev
+            + ms_return
+            - investment_in_market_securities_curr
+        )
 
-        # Assume same equity maintained
-        equity_curr = equity_prev
+        # 3.5. Transaction with Owners Net Liquidity Balance (Transaction with Owners NLB)
+        transaction_with_owners_nlb = (
+            new_long_term_loan
+            * self.equity_financing_pct
+            / (1 - self.equity_financing_pct)
+            - dividends_prev
+            - stock_buyback
+        )
 
-        # --- ????1. Income Statement (IS) Logic ---
-        # Interest is based on PREVIOUS debt (No Circularity)
-        interest_payment = debt_prev * self.interest_rate_st
+        # 3.6. Total Net Liquidity Balance (Total NLB)
+        total_nlb = (
+            operating_nlb
+            + capex_nlb
+            + financing_nlb
+            + external_investment_nlb
+            + transaction_with_owners_nlb
+        )
 
-        # Depreciation
-        depreciation = nca_prev * self.depreciation_rate
+        ## Check that the liquidity arrived in the Liquidity Budget matches the target liquidity
+        liquidity_check = total_nlb - total_liquidity_curr
 
-        # Taxable Income
-        ebit = sales - cogs - depreciation
-        ebt = ebit - interest_payment
-        tax = tf.maximum(0.0, ebt * self.tax_rate)
-        net_income = ebt - tax
+        # --- 4. Liabilities Evolution ---
+        # 4.1. Accounts Payable (AP)
+        accounts_payable_curr = purchases_t * self.account_payables_pct
 
-        # --- ????4. Balance Sheet Identity Check ---
-        # Assets = Cash + NCA
-        total_assets = cash_curr + nca_curr
-        # Liabilities + Equity = Debt + (Initial Equity + RE)
-        # Note: Assuming Initial Equity is constant (e.g., 50.0)
-        total_liab_equity = debt_curr + (equity_prev + re_curr)
+        # 4.2. Advance Payments Sales (AdvPS)
+        # Already calculated in Liquidity Budget
+        # advance_payments_sales_curr = sales_t_plus_1 * self.advance_payments_sales_pct
+
+        # 4.3. Non-current Liabilities (NLiab)
+        ## This is equal to the total long-term liabilities minus the effective principal due next year
+        non_current_liabilities_curr = (
+            (new_long_term_loan + non_current_liabilities_prev)
+            * (self.avg_maturity_years - 1)
+            / self.avg_maturity_years
+        )
+
+        # 4.4. Current Liabilities (CLiab)
+        # This is equal to the new short-term plus the long-term liabilities' effective principal due next year
+        current_liabilities_curr = (
+            new_short_term_loan
+            + non_current_liabilities_curr / (self.avg_maturity_years - 1)
+        )
+
+        # 4.5. Stockholders Equity (SE)
+        equity_curr = (
+            equity_prev
+            + equity_financing
+            + net_income_curr
+            - dividends_prev
+            - stock_buyback
+        )
+
+        # --- 5. Balance Sheet Identity Check ---
+        # Assets = NCA + Advance Payments Purchases + Accounts Receivable + Inventory + Cash + Investment in Market Securities
+        total_assets = (
+            nca_curr
+            + advance_payments_purchases_curr
+            + accounts_receivable_curr
+            + inventory_curr
+            + cash_curr
+            + investment_in_market_securities_curr
+        )
+        # Liabilities + Equity = Accounts Payable + Advance Payments Sales + Current Liabilities + Non-current Liabilities + Equity
+        total_liab_equity = (
+            accounts_payable_curr
+            + advance_payments_sales_curr
+            + current_liabilities_curr
+            + non_current_liabilities_curr
+            + equity_curr
+        )
 
         # Check mismatch (Should be near zero if logic is consistent)
         check = total_assets - total_liab_equity
 
         new_state = {
             "nca": nca_curr,
-            "advance_payments": advance_payments_curr,
+            "advance_payments_purchases": advance_payments_purchases_curr,
             "accounts_receivable": accounts_receivable_curr,
             "inventory": inventory_curr,
             "cash": cash_curr,
@@ -181,6 +299,8 @@ class SimpleFinancialModel(tf.Module):
             "current_liabilities": current_liabilities_curr,
             "non_current_liabilities": non_current_liabilities_curr,
             "equity": equity_curr,
+            "net_income": net_income_curr,
+            "liquidity_check": liquidity_check,
             "check": check,
         }
 
@@ -195,7 +315,7 @@ def run_forecast():
     # Initial State (t=0)
     state = {
         "nca": tf.constant(100.0),
-        "advance_payments": tf.constant(0.0),
+        "advance_payments_purchases": tf.constant(0.0),
         "accounts_receivable": tf.constant(0.0),
         "inventory": tf.constant(0.0),
         "cash": tf.constant(10.0),
@@ -206,6 +326,7 @@ def run_forecast():
         "non_current_liabilities": tf.constant(0.0),
         "equity": tf.constant(50.0),
         "net_income": tf.constant(0.0),
+        "liquidity_check": tf.constant(0.0),
         "check": tf.constant(0.0),
     }
 
@@ -232,17 +353,31 @@ def run_forecast():
             "sales_t_plus_1": tf.constant(sales_forecast[t + 2]),
             "purchases_t_plus_1": tf.constant(purchases_forecast[t + 2]),
             "inflation": tf.constant(inflation[t]),
+            "t": t + 1,
         }
 
         state = model.forecast_step(state, inputs)
 
         # Calculate totals for display
-        assets = state["cash"] + state["nca"]
-        # L+E = Debt + Initial Equity (50) + RE
-        le = state["debt"] + state["equity"] + state["re_earnings"]
+        assets = (
+            state["nca"]
+            + state["advance_payments_purchases"]
+            + state["accounts_receivable"]
+            + state["inventory"]
+            + state["cash"]
+            + state["investment_in_market_securities"]
+        )
+        # L+E = Liabilities + Equity
+        le = (
+            state["accounts_payable"]
+            + state["advance_payments_sales"]
+            + state["current_liabilities"]
+            + state["non_current_liabilities"]
+            + state["equity"]
+        )
 
         print(
-            f"{t+1:<5} | {assets.numpy():<10.2f} | {le.numpy():<10.2f} | {state['check'].numpy():<12.2f} | {state['debt'].numpy():<10.2f} | {state['cash'].numpy():<10.2f}"
+            f"{t+1:<5} | {assets.numpy():<10.2f} | {le.numpy():<10.2f} | {state['liquidity_check'].numpy():<12.2f} | {state['check'].numpy():<12.2f} | {state['debt'].numpy():<10.2f} | {state['cash'].numpy():<10.2f}"
         )
 
 
