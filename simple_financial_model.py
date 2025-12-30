@@ -312,28 +312,28 @@ class SimpleFinancialModel(tf.Module):
 def run_forecast():
     model = SimpleFinancialModel()
 
-    # Initial State (t=0)
+    # Initial State (t=0) 2023 Apple Balance Sheet
     state = {
-        "nca": tf.constant(100.0),
-        "advance_payments_purchases": tf.constant(0.0),
-        "accounts_receivable": tf.constant(0.0),
-        "inventory": tf.constant(0.0),
-        "cash": tf.constant(10.0),
-        "investment_in_market_securities": tf.constant(0.0),
-        "accounts_payable": tf.constant(0.0),
-        "advance_payments_sales": tf.constant(0.0),
-        "current_liabilities": tf.constant(0.0),
-        "non_current_liabilities": tf.constant(0.0),
-        "equity": tf.constant(50.0),
-        "net_income": tf.constant(0.0),
+        "nca": tf.constant(2.09017e11),
+        "advance_payments_purchases": tf.constant(14695000000),
+        "accounts_receivable": tf.constant(60985000000),
+        "inventory": tf.constant(6331000000),
+        "cash": tf.constant(29965000000),
+        "investment_in_market_securities": tf.constant(31590000000),
+        "accounts_payable": tf.constant(71430000000),
+        "advance_payments_sales": tf.constant(8061000000),
+        "current_liabilities": tf.constant(65817000000),
+        "non_current_liabilities": tf.constant(1.45129e11),
+        "equity": tf.constant(62146000000),
+        "net_income": tf.constant(96995000000),
         "liquidity_check": tf.constant(0.0),
         "check": tf.constant(0.0),
     }
 
     # time Series Inputs (Forecasted Sales/Costs)
     # Year 0 to 5. We are only interested in Year 1 to 4. The padding is needed for forecasting.
-    sales_forecast = [200.0, 220.0, 240.0, 260.0, 280.0, 300.0]
-    purchases_forecast = [140.0, 150.0, 165.0, 180.0, 195.0, 210.0]
+    sales_forecast = [3.94328E+11 3.83285E+11 3.91035E+11 4.16161E+11]
+    purchases_forecast = [2.07694E+11 1.99862E+11 2.04003E+11 2.10808E+11]
 
     # Year 1 to 4 inflation rate
     inflation = [0.02, 0.02, 0.02, 0.02]
