@@ -9,12 +9,14 @@ class SimpleFinancialModel(tf.Module):
         self.min_cash = tf.constant(10.0, dtype=tf.float32)
         self.interest_rate_st = tf.constant(0.06, dtype=tf.float32)
         self.depreciation_rate = tf.constant(0.10, dtype=tf.float32)  # %Depr
-        self.advance_payments_sales_pct = tf.constant(0.05, dtype=tf.float32)  # %AdvPS
+        self.advance_payments_sales_pct = tf.constant(
+            0.045653202, dtype=tf.float32
+        )  # %AdvPS
         self.advance_payments_purchases_pct = tf.constant(
-            0.03, dtype=tf.float32
+            0.073525733, dtype=tf.float32
         )  # %AdvPP
-        self.account_receivables_pct = tf.constant(0.10, dtype=tf.float32)  # %AR
-        self.account_payables_pct = tf.constant(0.08, dtype=tf.float32)  # %AP
+        self.account_receivables_pct = tf.constant(0.159111366, dtype=tf.float32)  # %AR
+        self.account_payables_pct = tf.constant(0.35014191, dtype=tf.float32)  # %AP
         self.inventory_pct = tf.constant(0.15, dtype=tf.float32)  # %Inv
         self.total_liquidity_pct = tf.constant(0.20, dtype=tf.float32)  # %TL
         self.cash_pct_of_liquidity = tf.constant(0.25, dtype=tf.float32)  # %Cash
