@@ -9,7 +9,7 @@ class SimpleFinancialModel(tf.Module):
         self.interest_rate_st = tf.constant(0.06, dtype=tf.float32)
         self.depreciation_rate = tf.constant(0.10, dtype=tf.float32)  # %Depr
         self.advance_payments_sales_pct = tf.constant(
-            0.045653202, dtype=tf.float32
+            0.020614523, dtype=tf.float32
         )  # %AdvPS
         self.advance_payments_purchases_pct = tf.constant(
             0.073525733, dtype=tf.float32
