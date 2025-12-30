@@ -339,7 +339,7 @@ def run_forecast():
     inflation = [0.02, 0.02, 0.02, 0.02]
 
     print(
-        f"{'Year':<5} | {'Assets':<10} | {'L+E':<10} | {'Check (Plug)':<12} | {'Debt':<10} | {'Cash':<10}"
+        f"{'Year':<5} | {'Assets':<10} | {'L+E':<10} | {'Check (Plug)':<12} | {'Liquidity Check (Plug)':<12}"
     )
     print("-" * 70)
 
@@ -377,7 +377,7 @@ def run_forecast():
         )
 
         print(
-            f"{t+1:<5} | {assets.numpy():<10.2f} | {le.numpy():<10.2f} | {state['liquidity_check'].numpy():<12.2f} | {state['check'].numpy():<12.2f} | {state['debt'].numpy():<10.2f} | {state['cash'].numpy():<10.2f}"
+            f"{t+1:<5} | {assets.numpy():<10.2f} | {le.numpy():<10.2f} |  {state['check'].numpy():<12.2f} | {state['liquidity_check'].numpy():<12.2f} "
         )
 
 
