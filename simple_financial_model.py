@@ -314,29 +314,29 @@ def run_forecast():
 
     # Initial State (t=0) 2023 Apple Balance Sheet
     state = {
-        "nca": tf.constant(2.09017e11),
-        "advance_payments_purchases": tf.constant(14695000000),
-        "accounts_receivable": tf.constant(60985000000),
-        "inventory": tf.constant(6331000000),
-        "cash": tf.constant(29965000000),
-        "investment_in_market_securities": tf.constant(31590000000),
-        "accounts_payable": tf.constant(71430000000),
-        "advance_payments_sales": tf.constant(8061000000),
-        "current_liabilities": tf.constant(65817000000),
-        "non_current_liabilities": tf.constant(1.45129e11),
-        "equity": tf.constant(62146000000),
-        "net_income": tf.constant(96995000000),
-        "liquidity_check": tf.constant(0.0),
-        "check": tf.constant(0.0),
+        "nca": tf.constant(2.09017e11, dtype=tf.float32),  # float number
+        "advance_payments_purchases": tf.constant(14695000000, dtype=tf.float32),
+        "accounts_receivable": tf.constant(60985000000, dtype=tf.float32),
+        "inventory": tf.constant(6331000000, dtype=tf.float32),
+        "cash": tf.constant(29965000000, dtype=tf.float32),
+        "investment_in_market_securities": tf.constant(31590000000, dtype=tf.float32),
+        "accounts_payable": tf.constant(71430000000, dtype=tf.float32),
+        "advance_payments_sales": tf.constant(8061000000, dtype=tf.float32),
+        "current_liabilities": tf.constant(65817000000, dtype=tf.float32),
+        "non_current_liabilities": tf.constant(1.45129e11, dtype=tf.float32),
+        "equity": tf.constant(62146000000, dtype=tf.float32),
+        "net_income": tf.constant(96995000000, dtype=tf.float32),
+        "liquidity_check": tf.constant(0.0, dtype=tf.float32),
+        "check": tf.constant(0.0, dtype=tf.float32),
     }
 
     # time Series Inputs (Forecasted Sales/Costs)
     # Year 0 to 5. We are only interested in Year 1 to 4. The padding is needed for forecasting.
-    sales_forecast = [3.94328e11, 3.83285e11, 3.91035e11, 4.16161e11]
-    purchases_forecast = [2.07694e11, 1.99862e11, 2.04003e11, 2.10808e11]
+    sales_forecast = [3.94328e11, 3.83285e11, 3.91035e11, 4.16161e11, dtype=tf.float32]
+    purchases_forecast = [2.07694e11, 1.99862e11, 2.04003e11, 2.10808e11, dtype=tf.float32]
 
     # Year 1 to 4 inflation rate
-    inflation = [0.02, 0.02, 0.02, 0.02]
+    inflation = [0.02, 0.02, 0.02, 0.02, dtype=tf.float32]
 
     print(
         f"{'Year':<5} | {'Assets':<10} | {'L+E':<10} | {'Check (Plug)':<12} | {'Liquidity Check (Plug)':<12}"
