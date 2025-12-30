@@ -332,8 +332,8 @@ def run_forecast():
 
     # time Series Inputs (Forecasted Sales/Costs)
     # Year 0 to 5. We are only interested in Year 1 to 4. The padding is needed for forecasting.
-    sales_forecast = [3.94328E+11 3.83285E+11 3.91035E+11 4.16161E+11]
-    purchases_forecast = [2.07694E+11 1.99862E+11 2.04003E+11 2.10808E+11]
+    sales_forecast = [3.94328e11, 3.83285e11, 3.91035e11, 4.16161e11]
+    purchases_forecast = [2.07694e11, 1.99862e11, 2.04003e11, 2.10808e11]
 
     # Year 1 to 4 inflation rate
     inflation = [0.02, 0.02, 0.02, 0.02]
