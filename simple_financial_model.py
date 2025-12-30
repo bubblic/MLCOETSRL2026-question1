@@ -214,13 +214,7 @@ class SimpleFinancialModel(tf.Module):
         )
 
         # 3.5. Transaction with Owners Net Liquidity Balance (Transaction with Owners NLB)
-        transaction_with_owners_nlb = (
-            new_long_term_loan
-            * self.equity_financing_pct
-            / (1 - self.equity_financing_pct)
-            - dividends_prev
-            - stock_buyback
-        )
+        transaction_with_owners_nlb = equity_financing - dividends_prev - stock_buyback
 
         # 3.6. Total Net Liquidity Balance (Total NLB)
         total_nlb = (
@@ -232,7 +226,7 @@ class SimpleFinancialModel(tf.Module):
         )
 
         ## Check that the liquidity arrived in the Liquidity Budget matches the target liquidity
-        liquidity_check = total_nlb - total_liquidity_curr
+        liquidity_check = cash_prev + total_nlb - total_liquidity_curr
 
         # --- 4. Liabilities Evolution ---
         # 4.1. Accounts Payable (AP)
