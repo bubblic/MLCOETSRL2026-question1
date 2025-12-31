@@ -295,6 +295,8 @@ class SimpleFinancialModel(tf.Module):
             "check": check,
             "stloan": new_short_term_loan,
             "ltloan": new_long_term_loan,
+            "st_principal_paid": principal_st,
+            "lt_principal_paid": principal_lt,
         }
 
         return new_state
@@ -323,6 +325,8 @@ def run_forecast():
         "check": tf.constant(0.0, dtype=tf.float32),
         "stloan": tf.constant(0.0, dtype=tf.float32),
         "ltloan": tf.constant(0.0, dtype=tf.float32),
+        "st_principal_paid": tf.constant(0.0, dtype=tf.float32),
+        "lt_principal_paid": tf.constant(0.0, dtype=tf.float32),
     }
 
     # time Series Inputs (Forecasted Sales/Costs)
@@ -334,7 +338,7 @@ def run_forecast():
     inflation = [0.0, 0.0, 0.0, 0.0]
 
     print(
-        f"{'Year':<5} | {'Assets':<15} | {'ST Loan':<15} | {'LT Loan':<15} | {'CLiab':<15} | {'NLiab':<15} | {'Equity':<15} | {'Check (Plug)':<15} | {'Liquidity Check (Plug)':<15}"
+        f"{'Year':<5} | {'Assets':<15} | {'ST principal paid':<15} | {'LT principal paid':<15} | {'ST Loan':<15} | {'LT Loan':<15} | {'CLiab':<15} | {'NLiab':<15} | {'Equity':<15} | {'Check (Plug)':<15} | {'Liquidity Check (Plug)':<15}"
     )
     print("-" * 70)
 
@@ -362,6 +366,8 @@ def run_forecast():
         )
         stloan = state["stloan"]
         ltloan = state["ltloan"]
+        st_principal_paid = state["st_principal_paid"]
+        lt_principal_paid = state["lt_principal_paid"]
         current_liabilities = state["current_liabilities"]
         non_current_liabilities = state["non_current_liabilities"]
         equity = state["equity"]
@@ -376,7 +382,7 @@ def run_forecast():
         )
 
         print(
-            f"{t+1:<5} | {assets.numpy():<15.2f} | {stloan.numpy():<15.2f} | {ltloan.numpy():<15.2f} | {current_liabilities.numpy():<15.2f} | {non_current_liabilities.numpy():<15.2f} | {equity.numpy():<15.2f} | {state['check'].numpy():<15.2f} | {state['liquidity_check'].numpy():<15.2f} "
+            f"{t+1:<5} | {assets.numpy():<15.2f} | {st_principal_paid.numpy():<15.2f} | {lt_principal_paid.numpy():<15.2f} | {stloan.numpy():<15.2f} | {ltloan.numpy():<15.2f} | {current_liabilities.numpy():<15.2f} | {non_current_liabilities.numpy():<15.2f} | {equity.numpy():<15.2f} | {state['check'].numpy():<15.2f} | {state['liquidity_check'].numpy():<15.2f} "
         )
 
 
