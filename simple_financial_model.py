@@ -16,7 +16,7 @@ class SimpleFinancialModel(tf.Module):
         self.account_payables_pct = tf.constant(0.35014191, dtype=tf.float32)  # %AP
         self.inventory_pct = tf.constant(0.0165, dtype=tf.float32)  # %Inv
         self.total_liquidity_pct = tf.constant(0.16, dtype=tf.float32)  # %TL
-        self.cash_pct_of_liquidity = tf.constant(0.513, dtype=tf.float32)  # %Cash
+        self.cash_pct_of_liquidity = tf.constant(0.487, dtype=tf.float32)  # %Cash
         self.income_tax_pct = tf.constant(0.147, dtype=tf.float32)  # %IT
         self.variable_opex_pct = tf.constant(0.222168147, dtype=tf.float32)  # %OR
         self.baseline_opex = tf.constant(-30306718214, dtype=tf.float32)  # OBT_start
@@ -69,8 +69,8 @@ class SimpleFinancialModel(tf.Module):
         purchases_t = inputs["purchases_t"]
         sales_t_plus_1 = inputs["sales_t_plus_1"]
         purchases_t_plus_1 = inputs["purchases_t_plus_1"]
-        sales_t_minus_1 = inputs["sales_t_minus_1"]
-        purchases_t_minus_1 = inputs["purchases_t_minus_1"]
+        # sales_t_minus_1 = inputs["sales_t_minus_1"]
+        # purchases_t_minus_1 = inputs["purchases_t_minus_1"]
         inflation = inputs["inflation"]
         t = inputs["t"]
 
@@ -144,16 +144,12 @@ class SimpleFinancialModel(tf.Module):
         # Inflows: Sales | Outflows: Purchases, OpEx, Tax, Interest
 
         # Sales: cash flow from current year's sales + accounts receivable from previous year + advance payment for next year's sales
-        sales_curr = sales_t * (
-            1 - self.advance_payments_sales_pct - self.account_receivables_pct
-        )
+        sales_curr = sales_t * (1 -  self.account_receivables_pct ) - advance_payments_sales_prev
         advance_payments_sales_curr = sales_t_plus_1 * self.advance_payments_sales_pct
         inflows = sales_curr + accounts_receivable_prev + advance_payments_sales_curr
 
         # Purchases: cash flow from current year's purchases + cash flow from previous year's purchases + cash flow from next year's purchases
-        purchases_curr = purchases_t * (
-            1 - self.advance_payments_purchases_pct - self.account_payables_pct
-        )
+        purchases_curr = purchases_t * (1  - self.account_payables_pct ) - advance_payments_purchases_prev
 
         outflows = (
             purchases_curr
@@ -310,18 +306,18 @@ def run_forecast():
 
     # Initial State (t=0) 2023 Apple Balance Sheet
     state = {
-        "nca": tf.constant(2.09017e11, dtype=tf.float32),  # float number
-        "advance_payments_purchases": tf.constant(14695000000, dtype=tf.float32),
-        "accounts_receivable": tf.constant(60985000000, dtype=tf.float32),
-        "inventory": tf.constant(6331000000, dtype=tf.float32),
-        "cash": tf.constant(29965000000, dtype=tf.float32),
-        "investment_in_market_securities": tf.constant(31590000000, dtype=tf.float32),
-        "accounts_payable": tf.constant(71430000000, dtype=tf.float32),
-        "advance_payments_sales": tf.constant(8061000000, dtype=tf.float32),
-        "current_liabilities": tf.constant(65817000000, dtype=tf.float32),
-        "non_current_liabilities": tf.constant(1.45129e11, dtype=tf.float32),
-        "equity": tf.constant(62146000000, dtype=tf.float32),
-        "net_income": tf.constant(96995000000, dtype=tf.float32),
+        "nca": tf.constant(2.1735E+11, dtype=tf.float32),  # float number
+        "advance_payments_purchases": tf.constant(21223000000, dtype=tf.float32),
+        "accounts_receivable": tf.constant(60932000000, dtype=tf.float32),
+        "inventory": tf.constant(4946000000, dtype=tf.float32),
+        "cash": tf.constant(23646000000, dtype=tf.float32),
+        "investment_in_market_securities": tf.constant(24658000000, dtype=tf.float32),
+        "accounts_payable": tf.constant(70667000000, dtype=tf.float32),
+        "advance_payments_sales": tf.constant(7912000000, dtype=tf.float32),
+        "current_liabilities": tf.constant(81955000000, dtype=tf.float32),
+        "non_current_liabilities": tf.constant(1.48101E+11, dtype=tf.float32),
+        "equity": tf.constant(50672000000, dtype=tf.float32),
+        "net_income": tf.constant(99803000000, dtype=tf.float32),
         "liquidity_check": tf.constant(0.0, dtype=tf.float32),
         "check": tf.constant(0.0, dtype=tf.float32),
         "stloan": tf.constant(0.0, dtype=tf.float32),
@@ -329,12 +325,12 @@ def run_forecast():
     }
 
     # time Series Inputs (Forecasted Sales/Costs)
-    # Year 0 to 5. We are only interested in Year 1 to 4. The padding is needed for forecasting.
+    # Year 1 to 4. We are only interested in Year 1 to 3. The padding is needed for forecasting.
     sales_forecast = [3.94328e11, 3.83285e11, 3.91035e11, 4.16161e11]
     purchases_forecast = [2.07694e11, 1.99862e11, 2.04003e11, 2.10808e11]
 
     # Year 1 to 4 inflation rate
-    inflation = [0.02, 0.02, 0.02, 0.02]
+    inflation = [0, 0, 0, 0]
 
     print(
         f"{'Year':<5} | {'Assets':<15} | {'ST Loan':<15} | {'LT Loan':<15} | {'CLiab':<15} | {'NLiab':<15} | {'Equity':<15} | {'Check (Plug)':<12} | {'Liquidity Check (Plug)':<12}"
@@ -342,16 +338,16 @@ def run_forecast():
     print("-" * 70)
 
     # Loop explicitly to handle the recursive dependency.
-    for t in range(len(sales_forecast) - 2):
+    for t in range(len(sales_forecast) - 1):
         inputs = {
-            "sales_t_minus_1": tf.constant(sales_forecast[t]),
-            "purchases_t_minus_1": tf.constant(purchases_forecast[t]),
-            "sales_t": tf.constant(sales_forecast[t + 1]),
-            "purchases_t": tf.constant(purchases_forecast[t + 1]),
-            "sales_t_plus_1": tf.constant(sales_forecast[t + 2]),
-            "purchases_t_plus_1": tf.constant(purchases_forecast[t + 2]),
+            # "sales_t_minus_1": tf.constant(sales_forecast[t]),
+            # "purchases_t_minus_1": tf.constant(purchases_forecast[t]),
+            "sales_t": tf.constant(sales_forecast[t ]),
+            "purchases_t": tf.constant(purchases_forecast[t]),
+            "sales_t_plus_1": tf.constant(sales_forecast[t]),
+            "purchases_t_plus_1": tf.constant(purchases_forecast[t]),
             "inflation": tf.constant(inflation[t]),
-            "t": t + 1,
+            "t": t+1,
         }
 
         state = model.forecast_step(state, inputs)
