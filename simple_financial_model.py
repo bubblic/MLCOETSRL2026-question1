@@ -368,8 +368,11 @@ def run_forecast():
         + state["equity"]
     )
 
+    check = assets - le
+    liquidity_check = assets - (current_liabilities + non_current_liabilities + equity)
+
     print(
-        f"{0:<5} | {assets.numpy():<15.2f} | {st_principal_paid.numpy():<20.2f} | {lt_principal_paid.numpy():<20.2f} | {stloan.numpy():<15.2f} | {ltloan.numpy():<15.2f} | {current_liabilities.numpy():<15.2f} | {non_current_liabilities.numpy():<15.2f} | {equity.numpy():<15.2f} | {state['check'].numpy():<15.2f} | {state['liquidity_check'].numpy():<15.2f} "
+        f"{0:<5} | {assets.numpy():<15.2f} | {st_principal_paid.numpy():<20.2f} | {lt_principal_paid.numpy():<20.2f} | {stloan.numpy():<15.2f} | {ltloan.numpy():<15.2f} | {current_liabilities.numpy():<15.2f} | {non_current_liabilities.numpy():<15.2f} | {equity.numpy():<15.2f} | {check.numpy():<15.2f} | {liquidity_check.numpy():<15.2f} "
     )
 
     # Loop explicitly to handle the recursive dependency.
