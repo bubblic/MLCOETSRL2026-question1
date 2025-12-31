@@ -21,18 +21,18 @@ class SimpleFinancialModel(tf.Module):
         self.variable_opex_pct = tf.constant(0.222168147, dtype=tf.float32)  # %OR
         self.baseline_opex = tf.constant(-30306718214, dtype=tf.float32)  # OBT_start
         self.avg_short_term_interest_pct = tf.constant(
-            0.04, dtype=tf.float32
+            0.6, dtype=tf.float32
         )  # %AvgSTInt
         self.avg_long_term_interest_pct = tf.constant(
             0.06, dtype=tf.float32
         )  # %AvgLTInt
-        self.avg_maturity_years = tf.constant(5.0, dtype=tf.float32)  # AvgM
+        self.avg_maturity_years = tf.constant(3.0, dtype=tf.float32)  # AvgM
         self.market_securities_return_pct = tf.constant(
             0.05, dtype=tf.float32
         )  # %MSReturn
         self.equity_financing_pct = tf.constant(0.15, dtype=tf.float32)  # %EF
         self.dividend_payout_ratio_pct = tf.constant(0.15, dtype=tf.float32)  # %PR
-        self.stock_buyback_pct = tf.constant(0.0, dtype=tf.float32)  # %BB
+        self.stock_buyback_pct = tf.constant(7.5, dtype=tf.float32)  # %BB
 
     def forecast_step(self, state, inputs):
         """
@@ -369,7 +369,7 @@ def run_forecast():
     )
 
     print(
-        f"{t+1:<5} | {assets.numpy():<15.2f} | {st_principal_paid.numpy():<20.2f} | {lt_principal_paid.numpy():<20.2f} | {stloan.numpy():<15.2f} | {ltloan.numpy():<15.2f} | {current_liabilities.numpy():<15.2f} | {non_current_liabilities.numpy():<15.2f} | {equity.numpy():<15.2f} | {state['check'].numpy():<15.2f} | {state['liquidity_check'].numpy():<15.2f} "
+        f"{0:<5} | {assets.numpy():<15.2f} | {st_principal_paid.numpy():<20.2f} | {lt_principal_paid.numpy():<20.2f} | {stloan.numpy():<15.2f} | {ltloan.numpy():<15.2f} | {current_liabilities.numpy():<15.2f} | {non_current_liabilities.numpy():<15.2f} | {equity.numpy():<15.2f} | {state['check'].numpy():<15.2f} | {state['liquidity_check'].numpy():<15.2f} "
     )
 
     # Loop explicitly to handle the recursive dependency.
