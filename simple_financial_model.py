@@ -330,7 +330,7 @@ def run_forecast():
     purchases_forecast = [2.07694e11, 1.99862e11, 2.04003e11, 2.10808e11]
 
     # Year 1 to 4 inflation rate
-    inflation = [0, 0, 0, 0]
+    inflation = [0.0, 0.0, 0.0, 0.0]
 
     print(
         f"{'Year':<5} | {'Assets':<15} | {'ST Loan':<15} | {'LT Loan':<15} | {'CLiab':<15} | {'NLiab':<15} | {'Equity':<15} | {'Check (Plug)':<12} | {'Liquidity Check (Plug)':<12}"
@@ -342,10 +342,10 @@ def run_forecast():
         inputs = {
             # "sales_t_minus_1": tf.constant(sales_forecast[t]),
             # "purchases_t_minus_1": tf.constant(purchases_forecast[t]),
-            "sales_t": tf.constant(sales_forecast[t ]),
+            "sales_t": tf.constant(sales_forecast[t]),
             "purchases_t": tf.constant(purchases_forecast[t]),
-            "sales_t_plus_1": tf.constant(sales_forecast[t]),
-            "purchases_t_plus_1": tf.constant(purchases_forecast[t]),
+            "sales_t_plus_1": tf.constant(sales_forecast[t+1]),
+            "purchases_t_plus_1": tf.constant(purchases_forecast[t+1]),
             "inflation": tf.constant(inflation[t]),
             "t": t+1,
         }
