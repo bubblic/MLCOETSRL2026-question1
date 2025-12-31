@@ -311,6 +311,133 @@ class TrainableFinancialModel(tf.Module):
         print(f"Final %BB: {self.stock_buyback_pct.numpy():.5f}")
         print("-" * 50)
 
+    def train_structural_parameters(
+        self,
+        historical_sales,
+        historical_purchases,
+        historical_nca,
+        historical_adv_pay_sales,
+        historical_adv_pay_purch,
+        historical_ar,
+        historical_ap,
+        historical_inventory,
+        historical_cash,
+        historical_ims,
+        historical_net_income,
+        historical_dividends,
+        historical_stock_buyback,
+        historical_opex,
+        historical_tax,
+        historical_current_liabilities,
+        historical_non_current_liabilities,
+        historical_equity,
+        historical_inflation=None,
+        learning_rate=0.0001,
+        epochs=5000,
+    ):
+        """
+        Trains structural parameters (interest rates, maturity, financing)
+        using historical state transitions.
+        """
+        # Convert inputs to tensors and ensure float64
+        sales_t = tf.convert_to_tensor(historical_sales, dtype=tf.float64)
+        purch_t = tf.convert_to_tensor(historical_purchases, dtype=tf.float64)
+        nca_t = tf.convert_to_tensor(historical_nca, dtype=tf.float64)
+        adv_ps_t = tf.convert_to_tensor(historical_adv_pay_sales, dtype=tf.float64)
+        adv_pp_t = tf.convert_to_tensor(historical_adv_pay_purch, dtype=tf.float64)
+        ar_t = tf.convert_to_tensor(historical_ar, dtype=tf.float64)
+        ap_t = tf.convert_to_tensor(historical_ap, dtype=tf.float64)
+        inv_t = tf.convert_to_tensor(historical_inventory, dtype=tf.float64)
+        cash_t = tf.convert_to_tensor(historical_cash, dtype=tf.float64)
+        ims_t = tf.convert_to_tensor(historical_ims, dtype=tf.float64)
+        ni_t = tf.convert_to_tensor(historical_net_income, dtype=tf.float64)
+        div_t = tf.convert_to_tensor(historical_dividends, dtype=tf.float64)
+        bb_t = tf.convert_to_tensor(historical_stock_buyback, dtype=tf.float64)
+        opex_t = tf.convert_to_tensor(historical_opex, dtype=tf.float64)
+        tax_t = tf.convert_to_tensor(historical_tax, dtype=tf.float64)
+        cl_t = tf.convert_to_tensor(historical_current_liabilities, dtype=tf.float64)
+        ncl_t = tf.convert_to_tensor(
+            historical_non_current_liabilities, dtype=tf.float64
+        )
+        equity_t = tf.convert_to_tensor(historical_equity, dtype=tf.float64)
+
+        if historical_inflation is None:
+            historical_inflation = tf.zeros_like(sales_t)
+        inf_t = tf.convert_to_tensor(historical_inflation, dtype=tf.float64)
+
+        optimizer = tf.optimizers.Adam(learning_rate=learning_rate)
+        vars_to_train = [
+            self.avg_short_term_interest_pct,
+            self.avg_long_term_interest_pct,
+            self.avg_maturity_years,
+            self.market_securities_return_pct,
+            self.equity_financing_pct,
+        ]
+
+        print(
+            f"Training structural parameters on {len(historical_sales)-2} transitions..."
+        )
+
+        for i in range(epochs):
+            with tf.GradientTape() as tape:
+                total_loss = 0.0
+                # We need t+1 for the target and t+2 for the lookahead inputs in forecast_step
+                num_transitions = len(historical_sales) - 2
+
+                for t in range(num_transitions):
+                    # State at t
+                    state_prev = {
+                        "nca": nca_t[t],
+                        "advance_payments_purchases": adv_pp_t[t],
+                        "accounts_receivable": ar_t[t],
+                        "inventory": inv_t[t],
+                        "cash": cash_t[t],
+                        "investment_in_market_securities": ims_t[t],
+                        "accounts_payable": ap_t[t],
+                        "advance_payments_sales": adv_ps_t[t],
+                        "current_liabilities": cl_t[t],
+                        "non_current_liabilities": ncl_t[t],
+                        "equity": equity_t[t],
+                        "net_income": ni_t[t],
+                    }
+
+                    # Inputs for predicting state at t+1
+                    inputs_curr = {
+                        "sales_t": sales_t[t + 1],
+                        "purchases_t": purch_t[t + 1],
+                        "sales_t_plus_1": sales_t[t + 2],
+                        "purchases_t_plus_1": purch_t[t + 2],
+                        "inflation": inf_t[t + 1],
+                        "t": tf.cast(t + 2, dtype=tf.float64),  # OpEx time index
+                    }
+
+                    state_pred = self.forecast_step(state_prev, inputs_curr)
+
+                    # Targets are values at t+1
+                    loss_ni = tf.square(state_pred["net_income"] - ni_t[t + 1])
+                    loss_cl = tf.square(state_pred["current_liabilities"] - cl_t[t + 1])
+                    loss_ncl = tf.square(
+                        state_pred["non_current_liabilities"] - ncl_t[t + 1]
+                    )
+                    loss_equity = tf.square(state_pred["equity"] - equity_t[t + 1])
+
+                    # Heuristic normalization
+                    total_loss += (loss_ni + loss_cl + loss_ncl + loss_equity) / 1e18
+
+            grads = tape.gradient(total_loss, vars_to_train)
+            optimizer.apply_gradients(zip(grads, vars_to_train))
+
+            if i % 1000 == 0:
+                print(f"Epoch {i}: Structural Loss={total_loss.numpy():.4e}")
+
+        print("Structural Training Complete.")
+        print(f"Final %AvgSTInt: {self.avg_short_term_interest_pct.numpy():.5f}")
+        print(f"Final %AvgLTInt: {self.avg_long_term_interest_pct.numpy():.5f}")
+        print(f"Final AvgM: {self.avg_maturity_years.numpy():.5f}")
+        print(f"Final %MSReturn: {self.market_securities_return_pct.numpy():.5f}")
+        print(f"Final %EF: {self.equity_financing_pct.numpy():.5f}")
+        print("-" * 50)
+
     def forecast_step(self, state, inputs):
         """
         Calculate t based on t-1 state and t inputs.
@@ -692,7 +819,31 @@ def run_training_and_forecast():
         historical_inflation=inflation_hist[:-1],
     )
 
-    # --- 3. RUN FORECAST (Using new parameters) ---
+    # --- 3. TRAIN STRUCTURAL PARAMETERS ---
+    # We still only feed in the historical arrays from 2022-2024, and leave 2025 for forecast testing.
+    model.train_structural_parameters(
+        historical_sales=sales_hist[:-1],
+        historical_purchases=purchases_hist[:-1],
+        historical_nca=nca_hist[:-1],
+        historical_adv_pay_sales=advance_payments_sales_hist[:-1],
+        historical_adv_pay_purch=advance_payments_purchases_hist[:-1],
+        historical_ar=accounts_receivable_hist[:-1],
+        historical_ap=accounts_payable_hist[:-1],
+        historical_inventory=inventory_hist[:-1],
+        historical_cash=cash_hist[:-1],
+        historical_ims=investment_in_market_securities_hist[:-1],
+        historical_net_income=net_income_hist[:-1],
+        historical_dividends=dividends_hist[:-1],
+        historical_stock_buyback=stock_buyback_hist[:-1],
+        historical_opex=opex_hist[:-1],
+        historical_tax=tax_hist[:-1],
+        historical_current_liabilities=current_liabilities_hist[:-1],
+        historical_non_current_liabilities=non_current_liabilities_hist[:-1],
+        historical_equity=equity_hist[:-1],
+        historical_inflation=inflation_hist[:-1],
+    )
+
+    # --- 4. RUN FORECAST (Using new parameters) ---
     # Initial State (t=0) 2024 Apple Balance Sheet
     state = {
         "nca": tf.constant(nca_hist[-2], dtype=tf.float64),  # float number
