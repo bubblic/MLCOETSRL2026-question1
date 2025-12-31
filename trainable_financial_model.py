@@ -290,6 +290,31 @@ class TrainableFinancialModel(tf.Module):
             # Apply Gradients
             optimizer.apply_gradients(zip(grads, vars_to_train))
 
+            # --- Constraints ---
+            self.asset_growth.assign(tf.maximum(0.0, self.asset_growth))
+            self.depreciation_rate.assign(tf.maximum(0.0, self.depreciation_rate))
+            self.advance_payments_sales_pct.assign(
+                tf.maximum(0.0, self.advance_payments_sales_pct)
+            )
+            self.advance_payments_purchases_pct.assign(
+                tf.maximum(0.0, self.advance_payments_purchases_pct)
+            )
+            self.account_receivables_pct.assign(
+                tf.maximum(0.0, self.account_receivables_pct)
+            )
+            self.account_payables_pct.assign(tf.maximum(0.0, self.account_payables_pct))
+            self.inventory_pct.assign(tf.maximum(0.0, self.inventory_pct))
+            self.total_liquidity_pct.assign(tf.maximum(0.0, self.total_liquidity_pct))
+            self.cash_pct_of_liquidity.assign(
+                tf.clip_by_value(self.cash_pct_of_liquidity, 0.0, 1.0)
+            )
+            self.income_tax_pct.assign(tf.clip_by_value(self.income_tax_pct, 0.0, 1.0))
+            self.variable_opex_pct.assign(tf.maximum(0.0, self.variable_opex_pct))
+            self.dividend_payout_ratio_pct.assign(
+                tf.clip_by_value(self.dividend_payout_ratio_pct, 0.0, 1.0)
+            )
+            self.stock_buyback_pct.assign(tf.maximum(0.0, self.stock_buyback_pct))
+
             if i % 1000 == 0:
                 print(f"Epoch {i}: Loss={total_loss.numpy():.4e}")
 
@@ -426,6 +451,23 @@ class TrainableFinancialModel(tf.Module):
 
             grads = tape.gradient(total_loss, vars_to_train)
             optimizer.apply_gradients(zip(grads, vars_to_train))
+
+            # --- Constraints ---
+            self.avg_short_term_interest_pct.assign(
+                tf.maximum(0.0, self.avg_short_term_interest_pct)
+            )
+            self.avg_long_term_interest_pct.assign(
+                tf.maximum(0.0, self.avg_long_term_interest_pct)
+            )
+            # Maturity must be > 1 to avoid division by zero in (AvgM - 1)
+            self.avg_maturity_years.assign(tf.maximum(1.001, self.avg_maturity_years))
+            self.market_securities_return_pct.assign(
+                tf.maximum(0.0, self.market_securities_return_pct)
+            )
+            # Financing percentage should be between 0 and 1
+            self.equity_financing_pct.assign(
+                tf.clip_by_value(self.equity_financing_pct, 0.0, 1.0)
+            )
 
             if i % 1000 == 0:
                 print(f"Epoch {i}: Structural Loss={total_loss.numpy():.4e}")
