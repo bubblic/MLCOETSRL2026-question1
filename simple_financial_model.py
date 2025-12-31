@@ -4,7 +4,7 @@ import tensorflow as tf
 class SimpleFinancialModel(tf.Module):
     def __init__(self):
         # --- Policy Parameters ---
-        self.asset_growth = tf.constant(0.05, dtype=tf.float32)  # %AG
+        self.asset_growth = tf.constant(0.001, dtype=tf.float32)  # %AG
         self.depreciation_rate = tf.constant(0.055, dtype=tf.float32)  # %Depr
         self.advance_payments_sales_pct = tf.constant(
             0.020614523, dtype=tf.float32
@@ -69,8 +69,6 @@ class SimpleFinancialModel(tf.Module):
         purchases_t = inputs["purchases_t"]
         sales_t_plus_1 = inputs["sales_t_plus_1"]
         purchases_t_plus_1 = inputs["purchases_t_plus_1"]
-        # sales_t_minus_1 = inputs["sales_t_minus_1"]
-        # purchases_t_minus_1 = inputs["purchases_t_minus_1"]
         inflation = inputs["inflation"]
         t = inputs["t"]
 
@@ -144,12 +142,17 @@ class SimpleFinancialModel(tf.Module):
         # Inflows: Sales | Outflows: Purchases, OpEx, Tax, Interest
 
         # Sales: cash flow from current year's sales + accounts receivable from previous year + advance payment for next year's sales
-        sales_curr = sales_t * (1 -  self.account_receivables_pct ) - advance_payments_sales_prev
+        sales_curr = (
+            sales_t * (1 - self.account_receivables_pct) - advance_payments_sales_prev
+        )
         advance_payments_sales_curr = sales_t_plus_1 * self.advance_payments_sales_pct
         inflows = sales_curr + accounts_receivable_prev + advance_payments_sales_curr
 
         # Purchases: cash flow from current year's purchases + cash flow from previous year's purchases + cash flow from next year's purchases
-        purchases_curr = purchases_t * (1  - self.account_payables_pct ) - advance_payments_purchases_prev
+        purchases_curr = (
+            purchases_t * (1 - self.account_payables_pct)
+            - advance_payments_purchases_prev
+        )
 
         outflows = (
             purchases_curr
@@ -306,7 +309,7 @@ def run_forecast():
 
     # Initial State (t=0) 2023 Apple Balance Sheet
     state = {
-        "nca": tf.constant(2.1735E+11, dtype=tf.float32),  # float number
+        "nca": tf.constant(2.1735e11, dtype=tf.float32),  # float number
         "advance_payments_purchases": tf.constant(21223000000, dtype=tf.float32),
         "accounts_receivable": tf.constant(60932000000, dtype=tf.float32),
         "inventory": tf.constant(4946000000, dtype=tf.float32),
@@ -315,7 +318,7 @@ def run_forecast():
         "accounts_payable": tf.constant(70667000000, dtype=tf.float32),
         "advance_payments_sales": tf.constant(7912000000, dtype=tf.float32),
         "current_liabilities": tf.constant(81955000000, dtype=tf.float32),
-        "non_current_liabilities": tf.constant(1.48101E+11, dtype=tf.float32),
+        "non_current_liabilities": tf.constant(1.48101e11, dtype=tf.float32),
         "equity": tf.constant(50672000000, dtype=tf.float32),
         "net_income": tf.constant(99803000000, dtype=tf.float32),
         "liquidity_check": tf.constant(0.0, dtype=tf.float32),
@@ -340,14 +343,12 @@ def run_forecast():
     # Loop explicitly to handle the recursive dependency.
     for t in range(len(sales_forecast) - 1):
         inputs = {
-            # "sales_t_minus_1": tf.constant(sales_forecast[t]),
-            # "purchases_t_minus_1": tf.constant(purchases_forecast[t]),
             "sales_t": tf.constant(sales_forecast[t]),
             "purchases_t": tf.constant(purchases_forecast[t]),
-            "sales_t_plus_1": tf.constant(sales_forecast[t+1]),
-            "purchases_t_plus_1": tf.constant(purchases_forecast[t+1]),
+            "sales_t_plus_1": tf.constant(sales_forecast[t + 1]),
+            "purchases_t_plus_1": tf.constant(purchases_forecast[t + 1]),
             "inflation": tf.constant(inflation[t]),
-            "t": t+1,
+            "t": t + 1,
         }
 
         state = model.forecast_step(state, inputs)
