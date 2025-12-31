@@ -343,9 +343,15 @@ def run_forecast():
     inflation = np.array([0.0, 0.0, 0.0, 0.0], dtype=np.float64)
 
     print(
-        f"{'Year':<5} | {'Assets':<15} | {'ST principal paid':<20} | {'LT principal paid':<20} | {'ST Loan':<15} | {'LT Loan':<15} | {'CLiab':<15} | {'NLiab':<15} | {'Equity':<15} | {'Check (Plug)':<15} | {'Liquidity Check (Plug)':<15}"
+        f"{'Year':<5} | {'Assets':<15} | {'Liabilities':<20} | {'Equity':<15} | {'Check (Plug)':<15}"
     )
-    print("-" * 200)
+    print("-" * 100)
+
+    ## For testing:
+    # print(
+    #     f"{'Year':<5} | {'Assets':<15} | {'ST principal paid':<20} | {'LT principal paid':<20} | {'ST Loan':<15} | {'LT Loan':<15} | {'CLiab':<15} | {'NLiab':<15} | {'Equity':<15} | {'Check (Plug)':<15} | {'Liquidity Check (Plug)':<15}"
+    # )
+    # print("-" * 200)
 
     # Print initial state as well
     assets = (
@@ -388,7 +394,7 @@ def run_forecast():
     )
 
     print(
-        f"{0:<5} | {assets.numpy():<15.2f} | {liabilities.numpy():<15.2f} | {equity.numpy():<15.2f} | {check.numpy():<15.2f}"
+        f"{t+1:<5} | {assets.numpy():<15.2f} | {liabilities.numpy():<15.2f} | {equity.numpy():<15.2f} | {state['check'].numpy():<15.2f}"
     )
 
     ## For testing:
