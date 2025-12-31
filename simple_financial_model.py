@@ -4,35 +4,35 @@ import tensorflow as tf
 class SimpleFinancialModel(tf.Module):
     def __init__(self):
         # --- Policy Parameters ---
-        self.asset_growth = tf.constant(0.0076, dtype=tf.float32)  # %AG
-        self.depreciation_rate = tf.constant(0.055, dtype=tf.float32)  # %Depr
+        self.asset_growth = tf.constant(0.0076, dtype=tf.float64)  # %AG
+        self.depreciation_rate = tf.constant(0.055, dtype=tf.float64)  # %Depr
         self.advance_payments_sales_pct = tf.constant(
-            0.020614523, dtype=tf.float32
+            0.020614523, dtype=tf.float64
         )  # %AdvPS
         self.advance_payments_purchases_pct = tf.constant(
-            0.073525733, dtype=tf.float32
+            0.073525733, dtype=tf.float64
         )  # %AdvPP
-        self.account_receivables_pct = tf.constant(0.159111366, dtype=tf.float32)  # %AR
-        self.account_payables_pct = tf.constant(0.35014191, dtype=tf.float32)  # %AP
-        self.inventory_pct = tf.constant(0.0165, dtype=tf.float32)  # %Inv
-        self.total_liquidity_pct = tf.constant(0.16, dtype=tf.float32)  # %TL
-        self.cash_pct_of_liquidity = tf.constant(0.487, dtype=tf.float32)  # %Cash
-        self.income_tax_pct = tf.constant(0.147, dtype=tf.float32)  # %IT
-        self.variable_opex_pct = tf.constant(0.222168147, dtype=tf.float32)  # %OR
-        self.baseline_opex = tf.constant(-30306718214, dtype=tf.float32)  # OBT_start
+        self.account_receivables_pct = tf.constant(0.159111366, dtype=tf.float64)  # %AR
+        self.account_payables_pct = tf.constant(0.35014191, dtype=tf.float64)  # %AP
+        self.inventory_pct = tf.constant(0.0165, dtype=tf.float64)  # %Inv
+        self.total_liquidity_pct = tf.constant(0.16, dtype=tf.float64)  # %TL
+        self.cash_pct_of_liquidity = tf.constant(0.487, dtype=tf.float64)  # %Cash
+        self.income_tax_pct = tf.constant(0.147, dtype=tf.float64)  # %IT
+        self.variable_opex_pct = tf.constant(0.222168147, dtype=tf.float64)  # %OR
+        self.baseline_opex = tf.constant(-30306718214, dtype=tf.float64)  # OBT_start
         self.avg_short_term_interest_pct = tf.constant(
-            0.6, dtype=tf.float32
+            0.6, dtype=tf.float64
         )  # %AvgSTInt
         self.avg_long_term_interest_pct = tf.constant(
-            0.06, dtype=tf.float32
+            0.06, dtype=tf.float64
         )  # %AvgLTInt
-        self.avg_maturity_years = tf.constant(3.0, dtype=tf.float32)  # AvgM
+        self.avg_maturity_years = tf.constant(3.0, dtype=tf.float64)  # AvgM
         self.market_securities_return_pct = tf.constant(
-            0.05, dtype=tf.float32
+            0.05, dtype=tf.float64
         )  # %MSReturn
-        self.equity_financing_pct = tf.constant(0.15, dtype=tf.float32)  # %EF
-        self.dividend_payout_ratio_pct = tf.constant(0.15, dtype=tf.float32)  # %PR
-        self.stock_buyback_pct = tf.constant(7.5, dtype=tf.float32)  # %BB
+        self.equity_financing_pct = tf.constant(0.15, dtype=tf.float64)  # %EF
+        self.dividend_payout_ratio_pct = tf.constant(0.15, dtype=tf.float64)  # %PR
+        self.stock_buyback_pct = tf.constant(7.5, dtype=tf.float64)  # %BB
 
     def forecast_step(self, state, inputs):
         """
@@ -309,24 +309,24 @@ def run_forecast():
 
     # Initial State (t=0) 2023 Apple Balance Sheet
     state = {
-        "nca": tf.constant(2.1735e11, dtype=tf.float32),  # float number
-        "advance_payments_purchases": tf.constant(21223000000, dtype=tf.float32),
-        "accounts_receivable": tf.constant(60932000000, dtype=tf.float32),
-        "inventory": tf.constant(4946000000, dtype=tf.float32),
-        "cash": tf.constant(23646000000, dtype=tf.float32),
-        "investment_in_market_securities": tf.constant(24658000000, dtype=tf.float32),
-        "accounts_payable": tf.constant(64115000000, dtype=tf.float32),
-        "advance_payments_sales": tf.constant(7912000000, dtype=tf.float32),
-        "current_liabilities": tf.constant(81955000000, dtype=tf.float32),
-        "non_current_liabilities": tf.constant(1.48101e11, dtype=tf.float32),
-        "equity": tf.constant(50672000000, dtype=tf.float32),
-        "net_income": tf.constant(99803000000, dtype=tf.float32),
-        "liquidity_check": tf.constant(0.0, dtype=tf.float32),
-        "check": tf.constant(0.0, dtype=tf.float32),
-        "stloan": tf.constant(0.0, dtype=tf.float32),
-        "ltloan": tf.constant(0.0, dtype=tf.float32),
-        "st_principal_paid": tf.constant(0.0, dtype=tf.float32),
-        "lt_principal_paid": tf.constant(0.0, dtype=tf.float32),
+        "nca": tf.constant(2.1735e11, dtype=tf.float64),  # float number
+        "advance_payments_purchases": tf.constant(21223000000, dtype=tf.float64),
+        "accounts_receivable": tf.constant(60932000000, dtype=tf.float64),
+        "inventory": tf.constant(4946000000, dtype=tf.float64),
+        "cash": tf.constant(23646000000, dtype=tf.float64),
+        "investment_in_market_securities": tf.constant(24658000000, dtype=tf.float64),
+        "accounts_payable": tf.constant(64115000000, dtype=tf.float64),
+        "advance_payments_sales": tf.constant(7912000000, dtype=tf.float64),
+        "current_liabilities": tf.constant(81955000000, dtype=tf.float64),
+        "non_current_liabilities": tf.constant(1.48101e11, dtype=tf.float64),
+        "equity": tf.constant(50672000000, dtype=tf.float64),
+        "net_income": tf.constant(99803000000, dtype=tf.float64),
+        "liquidity_check": tf.constant(0.0, dtype=tf.float64),
+        "check": tf.constant(0.0, dtype=tf.float64),
+        "stloan": tf.constant(0.0, dtype=tf.float64),
+        "ltloan": tf.constant(0.0, dtype=tf.float64),
+        "st_principal_paid": tf.constant(0.0, dtype=tf.float64),
+        "lt_principal_paid": tf.constant(0.0, dtype=tf.float64),
     }
 
     # time Series Inputs (Forecasted Sales/Costs)
