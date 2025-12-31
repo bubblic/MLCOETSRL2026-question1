@@ -4,7 +4,7 @@ import tensorflow as tf
 class SimpleFinancialModel(tf.Module):
     def __init__(self):
         # --- Policy Parameters ---
-        self.asset_growth = tf.constant(0.001, dtype=tf.float32)  # %AG
+        self.asset_growth = tf.constant(0.0076, dtype=tf.float32)  # %AG
         self.depreciation_rate = tf.constant(0.055, dtype=tf.float32)  # %Depr
         self.advance_payments_sales_pct = tf.constant(
             0.020614523, dtype=tf.float32
@@ -77,7 +77,7 @@ class SimpleFinancialModel(tf.Module):
         # Policy: Maintain NCA + Growth (Simplified for this model)
         # Investment required to replace depreciation + grow
         capex = depreciation + (sales_t * self.asset_growth)
-        nca_curr = nca_prev + capex - depreciation
+        nca_curr = nca_prev - depreciation + capex
 
         # 1.2. Advance Payments (AdvPP)
         advance_payments_purchases_curr = (
@@ -181,7 +181,7 @@ class SimpleFinancialModel(tf.Module):
         new_short_term_loan = tf.maximum(0.0, liquidity_deficit_st)
 
         ## New long-term loan is found by:
-        cash_deficit_lt = (
+        liquidity_deficit_lt = (
             liquidity_deficit_st
             - new_short_term_loan
             - capex_nlb
@@ -191,7 +191,7 @@ class SimpleFinancialModel(tf.Module):
             + stock_buyback
         )
 
-        long_term_financing = tf.maximum(0.0, cash_deficit_lt)
+        long_term_financing = tf.maximum(0.0, liquidity_deficit_lt)
         new_long_term_loan = long_term_financing * (1 - self.equity_financing_pct)
         equity_financing = long_term_financing * self.equity_financing_pct
 
@@ -205,11 +205,8 @@ class SimpleFinancialModel(tf.Module):
         )
 
         # 3.4. External Investment Net Liquidity Balance (External Investment NLB)
-        external_investment_nlb = (
-            investment_in_market_securities_prev
-            + ms_return
-            - investment_in_market_securities_curr
-        )
+        ## Note: The investment in and out of market securities are not here because it is determined as a ratio of total liquidity balance.
+        external_investment_nlb = ms_return
 
         # 3.5. Transaction with Owners Net Liquidity Balance (Transaction with Owners NLB)
         transaction_with_owners_nlb = equity_financing - dividends_prev - stock_buyback
