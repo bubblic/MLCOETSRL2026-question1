@@ -5,9 +5,7 @@ class SimpleFinancialModel(tf.Module):
     def __init__(self):
         # --- Policy Parameters ---
         self.asset_growth = tf.constant(0.05, dtype=tf.float32)  # %AG
-        self.tax_rate = tf.constant(0.35, dtype=tf.float32)
-        self.interest_rate_st = tf.constant(0.06, dtype=tf.float32)
-        self.depreciation_rate = tf.constant(0.10, dtype=tf.float32)  # %Depr
+        self.depreciation_rate = tf.constant(0.055, dtype=tf.float32)  # %Depr
         self.advance_payments_sales_pct = tf.constant(
             0.020614523, dtype=tf.float32
         )  # %AdvPS
@@ -16,10 +14,10 @@ class SimpleFinancialModel(tf.Module):
         )  # %AdvPP
         self.account_receivables_pct = tf.constant(0.159111366, dtype=tf.float32)  # %AR
         self.account_payables_pct = tf.constant(0.35014191, dtype=tf.float32)  # %AP
-        self.inventory_pct = tf.constant(0.15, dtype=tf.float32)  # %Inv
+        self.inventory_pct = tf.constant(0.0165, dtype=tf.float32)  # %Inv
         self.total_liquidity_pct = tf.constant(0.16, dtype=tf.float32)  # %TL
-        self.cash_pct_of_liquidity = tf.constant(0.25, dtype=tf.float32)  # %Cash
-        self.income_tax_pct = tf.constant(0.25, dtype=tf.float32)  # %IT
+        self.cash_pct_of_liquidity = tf.constant(0.513, dtype=tf.float32)  # %Cash
+        self.income_tax_pct = tf.constant(0.147, dtype=tf.float32)  # %IT
         self.variable_opex_pct = tf.constant(0.222168147, dtype=tf.float32)  # %OR
         self.baseline_opex = tf.constant(-30306718214, dtype=tf.float32)  # OBT_start
         self.avg_short_term_interest_pct = tf.constant(
@@ -34,7 +32,7 @@ class SimpleFinancialModel(tf.Module):
         )  # %MSReturn
         self.equity_financing_pct = tf.constant(0.15, dtype=tf.float32)  # %EF
         self.dividend_payout_ratio_pct = tf.constant(0.15, dtype=tf.float32)  # %PR
-        self.stock_buyback_pct = tf.constant(0.10, dtype=tf.float32)  # %BB
+        self.stock_buyback_pct = tf.constant(0.0, dtype=tf.float32)  # %BB
 
     def forecast_step(self, state, inputs):
         """
@@ -49,6 +47,7 @@ class SimpleFinancialModel(tf.Module):
         inventory_prev = state["inventory"]
         cash_prev = state["cash"]
         investment_in_market_securities_prev = state["investment_in_market_securities"]
+        total_liquidity_prev = cash_prev + investment_in_market_securities_prev
         depreciation = nca_prev * self.depreciation_rate
 
         ## Liabilities and Equity
@@ -127,7 +126,7 @@ class SimpleFinancialModel(tf.Module):
         ## Short-term portion of current liability from last year is found by:
         ## last year's current liabilities - last year's non-current liabilities / (Average maturity – 1)
         principal_st = current_liabilities_prev - principal_lt
-        interest_st = self.interest_rate_st * principal_st
+        interest_st = self.avg_short_term_interest_pct * principal_st
 
         interest_payment = interest_st + interest_lt
         ms_return = (
@@ -135,7 +134,7 @@ class SimpleFinancialModel(tf.Module):
         )
 
         ebt = ebitda - depreciation - interest_payment + ms_return
-        tax = ebt * self.tax_rate
+        tax = ebt * self.income_tax_pct
         net_income_curr = ebt - tax
 
         # --- 3. Liquidity Budget (LB) ---
@@ -172,19 +171,19 @@ class SimpleFinancialModel(tf.Module):
         # 3.3. Financing Net Liquidity Balance (Financing NLB)
         ## First, we need to figure out how much new short-term loan and long-term loan to issue this year.
         ## New short-term loan is found by:
-        cash_deficit_st = (
-            cash_curr
-            - cash_prev
+        liquidity_deficit_st = (
+            total_liquidity_curr
+            - total_liquidity_prev
             - operating_nlb
             + principal_st
             + interest_st
             - ms_return
         )
-        new_short_term_loan = tf.maximum(0.0, cash_deficit_st)
+        new_short_term_loan = tf.maximum(0.0, liquidity_deficit_st)
 
         ## New long-term loan is found by:
         cash_deficit_lt = (
-            cash_deficit_st
+            liquidity_deficit_st
             - new_short_term_loan
             - capex_nlb
             + principal_lt
@@ -226,7 +225,7 @@ class SimpleFinancialModel(tf.Module):
         )
 
         ## Check that the liquidity arrived in the Liquidity Budget matches the target liquidity
-        liquidity_check = cash_prev + total_nlb - total_liquidity_curr
+        liquidity_check = total_liquidity_prev + total_nlb - total_liquidity_curr
 
         # --- 4. Liabilities Evolution ---
         # 4.1. Accounts Payable (AP)
@@ -297,6 +296,8 @@ class SimpleFinancialModel(tf.Module):
             "net_income": net_income_curr,
             "liquidity_check": liquidity_check,
             "check": check,
+            "stloan": new_short_term_loan,
+            "ltloan": new_long_term_loan,
         }
 
         return new_state
@@ -323,6 +324,8 @@ def run_forecast():
         "net_income": tf.constant(96995000000, dtype=tf.float32),
         "liquidity_check": tf.constant(0.0, dtype=tf.float32),
         "check": tf.constant(0.0, dtype=tf.float32),
+        "stloan": tf.constant(0.0, dtype=tf.float32),
+        "ltloan": tf.constant(0.0, dtype=tf.float32),
     }
 
     # time Series Inputs (Forecasted Sales/Costs)
@@ -334,7 +337,7 @@ def run_forecast():
     inflation = [0.02, 0.02, 0.02, 0.02]
 
     print(
-        f"{'Year':<5} | {'Assets':<10} | {'CLiab':<10} | {'NLiab':<10} | {'Equity':<10} | {'Check (Plug)':<12} | {'Liquidity Check (Plug)':<12}"
+        f"{'Year':<5} | {'Assets':<15} | {'ST Loan':<15} | {'LT Loan':<15} | {'CLiab':<15} | {'NLiab':<15} | {'Equity':<15} | {'Check (Plug)':<12} | {'Liquidity Check (Plug)':<12}"
     )
     print("-" * 70)
 
@@ -362,7 +365,8 @@ def run_forecast():
             + state["cash"]
             + state["investment_in_market_securities"]
         )
-
+        stloan = state["stloan"]
+        ltloan = state["ltloan"]
         current_liabilities = state["current_liabilities"]
         non_current_liabilities = state["non_current_liabilities"]
         equity = state["equity"]
@@ -377,7 +381,7 @@ def run_forecast():
         )
 
         print(
-            f"{t+1:<5} | {assets.numpy():<10.2f} | {current_liabilities.numpy():<10.2f} | {non_current_liabilities.numpy():<10.2f} | {equity.numpy():<10.2f} |  {state['check'].numpy():<12.2f} | {state['liquidity_check'].numpy():<12.2f} "
+            f"{t+1:<5} | {assets.numpy():<15.2f} |  {stloan.numpy():<15.2f} |  {ltloan.numpy():<15.2f} | {current_liabilities.numpy():<15.2f} | {non_current_liabilities.numpy():<15.2f} | {equity.numpy():<15.2f} |  {state['check'].numpy():<12.2f} | {state['liquidity_check'].numpy():<12.2f} "
         )
 
 
