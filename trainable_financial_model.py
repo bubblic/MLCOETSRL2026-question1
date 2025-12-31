@@ -172,11 +172,11 @@ class TrainableFinancialModel(tf.Module):
         tax_true = tax_tensor
         ni_aligned_tax = ni_tensor
 
-        # 11. OpEx: opex_t = baseline_opex * (1+inf)**t + variable_opex_pct * sales_t
+        # 11. OpEx: opex_t = baseline_opex * product(1+inf_i) + variable_opex_pct * sales_t
         opex_true = opex_tensor
         sales_aligned_opex = sales_tensor
-        # time index for opex (t=1, 2, 3...)
-        t_indices = tf.range(1, len(historical_sales) + 1, dtype=tf.float64)
+        # cumulative inflation: (1+inf_1), (1+inf_1)(1+inf_2), ...
+        cum_inf_tensor = tf.math.cumprod(1 + inf_tensor)
 
         # 12. Dividends: div_t = ni_{t-1} * div_pct
         div_true = div_tensor[1:]
@@ -250,9 +250,9 @@ class TrainableFinancialModel(tf.Module):
                 loss_tax = tf.reduce_mean(
                     tf.square(tax_true - ni_aligned_tax * self.income_tax_pct)
                 )
-                # opex = baseline * (1+inf)**t + var * sales
+                # opex = baseline * product(1+inf_i) + var * sales
                 pred_opex = (
-                    self.baseline_opex * (1 + inf_tensor) ** t_indices
+                    self.baseline_opex * cum_inf_tensor
                     + self.variable_opex_pct * sales_aligned_opex
                 )
                 loss_opex = tf.reduce_mean(tf.square(opex_true - pred_opex))
@@ -389,6 +389,7 @@ class TrainableFinancialModel(tf.Module):
         if historical_inflation is None:
             historical_inflation = tf.zeros_like(sales_t)
         inf_t = tf.convert_to_tensor(historical_inflation, dtype=tf.float64)
+        cum_inf_t = tf.math.cumprod(1 + inf_t)
 
         optimizer = tf.optimizers.Adam(learning_rate=learning_rate)
         vars_to_train = [
@@ -432,8 +433,7 @@ class TrainableFinancialModel(tf.Module):
                         "purchases_t": purch_t[t + 1],
                         "sales_t_plus_1": sales_t[t + 2],
                         "purchases_t_plus_1": purch_t[t + 2],
-                        "inflation": inf_t[t + 1],
-                        "t": tf.cast(t + 2, dtype=tf.float64),  # OpEx time index
+                        "cum_inflation": cum_inf_t[t + 1],
                     }
 
                     state_pred = self.forecast_step(state_prev, inputs_curr)
@@ -515,8 +515,7 @@ class TrainableFinancialModel(tf.Module):
         purchases_t = inputs["purchases_t"]
         sales_t_plus_1 = inputs["sales_t_plus_1"]
         purchases_t_plus_1 = inputs["purchases_t_plus_1"]
-        inflation = inputs["inflation"]
-        t = inputs["t"]
+        cum_inflation = inputs["cum_inflation"]
 
         # --- 1. Assets Evolution ---
         # 1.1. Non-current Assets (NCA)
@@ -553,9 +552,7 @@ class TrainableFinancialModel(tf.Module):
         # Then, EBT is calculated by EBITDA - Depreciation - loan interest payments + return from market securities.
         # Finally, NI is calculated by EBT - Tax.
         cogs = inventory_prev + purchases_t - inventory_curr
-        opex = (
-            self.baseline_opex * (1 + inflation) ** t + sales_t * self.variable_opex_pct
-        )
+        opex = self.baseline_opex * cum_inflation + sales_t * self.variable_opex_pct
         ebitda = sales_t - cogs - opex
 
         # Principals and interests are based on PREVIOUS debt (No Circularity)
@@ -930,7 +927,8 @@ def run_training_and_forecast():
     )
 
     # Year 1 to 4 inflation rate (2025-2028)
-    inflation = np.array([0.0, 0.0, 0.0, 0.0], dtype=np.float64)
+    inflation_forecast = np.array([0.0, 0.0, 0.0, 0.0], dtype=np.float64)
+    cum_inf_forecast = np.cumprod(1 + inflation_forecast)
 
     print("\n--- Running Forecast with TRAINED parameters ---")
     print(
@@ -945,8 +943,7 @@ def run_training_and_forecast():
             "purchases_t": tf.constant(purchases_forecast[t]),
             "sales_t_plus_1": tf.constant(sales_forecast[t + 1]),
             "purchases_t_plus_1": tf.constant(purchases_forecast[t + 1]),
-            "inflation": tf.constant(inflation[t]),
-            "t": t + 1,
+            "cum_inflation": tf.constant(cum_inf_forecast[t]),
         }
 
         state = model.forecast_step(state, inputs)
