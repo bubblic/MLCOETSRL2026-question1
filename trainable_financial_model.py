@@ -834,7 +834,7 @@ def run_training_and_forecast():
         [19300000000, 16741000000, 29749000000, 20719000000], dtype=np.float64
     )
     # Inflation hist
-    inflation_hist = np.array([0.0, 0.0, 0.0, 0.0], dtype=np.float64)
+    inflation_hist = np.array([0.08, 0.041, 0.029, 0.027], dtype=np.float64)
 
     # --- 2. TRAIN THE MODEL ---
     # We feed in the historical arrays from 2022-2024, and leave 2025 for forecast testing.
