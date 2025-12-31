@@ -1,4 +1,5 @@
 import tensorflow as tf
+import numpy as np
 
 
 class SimpleFinancialModel(tf.Module):
@@ -331,13 +332,15 @@ def run_forecast():
 
     # time Series Inputs (Forecasted Sales/Costs)
     # Year 1 to 4. We are only interested in Year 1 to 3. The padding is needed for forecasting. Use float64
-    sales_forecast = [3.94328e11, 3.83285e11, 3.91035e11, 4.16161e11].astype(tf.float64)
-    purchases_forecast = [2.07694e11, 1.99862e11, 2.04003e11, 2.10808e11].astype(
-        tf.float64
+    sales_forecast = np.array(
+        [3.94328e11, 3.83285e11, 3.91035e11, 4.16161e11], dtype=np.float64
+    )
+    purchases_forecast = np.array(
+        [2.07694e11, 1.99862e11, 2.04003e11, 2.10808e11], dtype=np.float64
     )
 
     # Year 1 to 4 inflation rate
-    inflation = [0.0, 0.0, 0.0, 0.0].astype(tf.float64)
+    inflation = np.array([0.0, 0.0, 0.0, 0.0], dtype=np.float64)
 
     print(
         f"{'Year':<5} | {'Assets':<15} | {'ST principal paid':<20} | {'LT principal paid':<20} | {'ST Loan':<15} | {'LT Loan':<15} | {'CLiab':<15} | {'NLiab':<15} | {'Equity':<15} | {'Check (Plug)':<15} | {'Liquidity Check (Plug)':<15}"
