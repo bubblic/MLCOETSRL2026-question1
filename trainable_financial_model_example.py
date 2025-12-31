@@ -13,44 +13,8 @@ class TrainableFinancialModel(tf.Module):
         )  # %Cash (as % of total liquidity)
 
         # Additional policy parameters
-        self.asset_growth_rate = tf.Variable(0.02, name="asset_growth_rate")  # %AG
-        self.advance_payments_sales_pct = tf.Variable(
-            0.05, name="advance_payments_sales_pct"
-        )  # %AdvPS
-        self.advance_payments_purchases_pct = tf.Variable(
-            0.03, name="advance_payments_purchases_pct"
-        )  # %AdvPP
-        self.account_receivables_pct = tf.Variable(
-            0.10, name="account_receivables_pct"
-        )  # %AR
-        self.account_payables_pct = tf.Variable(
-            0.08, name="account_payables_pct"
-        )  # %AP
         self.inventory_pct = tf.Variable(0.15, name="inventory_pct")  # %Inv
         self.total_liquidity_pct = tf.Variable(0.20, name="total_liquidity_pct")  # %TL
-        self.cash_pct_of_liquidity = tf.Variable(
-            0.25, name="cash_pct_of_liquidity"
-        )  # %Cash
-        self.income_tax_pct = tf.Variable(0.25, name="income_tax_pct")  # %IT
-        self.variable_opex_pct = tf.Variable(0.60, name="variable_opex_pct")  # %OR
-        self.baseline_opex = tf.Variable(50.0, name="baseline_opex")  # OBT_start
-        self.avg_short_term_interest_pct = tf.Variable(
-            0.04, name="avg_short_term_interest_pct"
-        )  # %AvgSTInt
-        self.avg_long_term_interest_pct = tf.Variable(
-            0.06, name="avg_long_term_interest_pct"
-        )  # %AvgLTInt
-        self.avg_maturity_years = tf.Variable(5.0, name="avg_maturity_years")  # AvgM
-        self.market_securities_return_pct = tf.Variable(
-            0.05, name="market_securities_return_pct"
-        )  # %MSReturn
-        self.equity_financing_pct = tf.Variable(
-            0.30, name="equity_financing_pct"
-        )  # %EF
-        self.dividend_payout_ratio_pct = tf.Variable(
-            0.40, name="dividend_payout_ratio_pct"
-        )  # %PR
-        self.stock_buyback_pct = tf.Variable(0.10, name="stock_buyback_pct")  # %BB
 
         # These are set constant for now (keeping original ones for backward compatibility)
         self.debt_rate = tf.constant(0.05, name="debt_rate")
@@ -144,7 +108,7 @@ def train_model(model, actual_assets, sales_data, cost_data, epochs=100):
 
         if epoch % 20 == 0:
             print(
-                f"{epoch:<10} | {loss.numpy():<10.2f} | {model.min_cash_ratio.numpy():<10.2f} | {model.tax_rate.numpy():<10.2f} | {model.depreciation_rate.numpy():<10.2f} | {model.asset_growth_rate.numpy():<10.2f} | {model.inventory_pct.numpy():<10.2f} | {model.total_liquidity_pct.numpy():<10.2f}"
+                f"{epoch:<10} | {loss.numpy():<10.2f} | {model.min_cash_ratio.numpy():<10.2f} | {model.tax_rate.numpy():<10.2f} | {model.depreciation_rate.numpy():<10.2f} | {model.growth_rate.numpy():<10.2f} | {model.inventory_pct.numpy():<10.2f} | {model.total_liquidity_pct.numpy():<10.2f}"
             )
 
 

@@ -2,40 +2,67 @@ import tensorflow as tf
 import numpy as np
 
 
+# --- 1. Define the Trainable Model ---
 class TrainableFinancialModel(tf.Module):
     def __init__(self):
         # --- Policy Parameters ---
         self.asset_growth = tf.Variable(
             0.0076, name="asset_growth", dtype=tf.float64
         )  # %AG
-        self.depreciation_rate = tf.Variable(0.055, dtype=tf.float64)  # %Depr
+        self.depreciation_rate = tf.Variable(
+            0.055, name="depr_rate", dtype=tf.float64
+        )  # %Depr
         self.advance_payments_sales_pct = tf.Variable(
-            0.020614523, dtype=tf.float64
+            0.020614523, name="advance_payments_sales_pct", dtype=tf.float64
         )  # %AdvPS
         self.advance_payments_purchases_pct = tf.Variable(
-            0.073525733, dtype=tf.float64
+            0.073525733, name="advance_payments_purchases_pct", dtype=tf.float64
         )  # %AdvPP
-        self.account_receivables_pct = tf.Variable(0.159111366, dtype=tf.float64)  # %AR
-        self.account_payables_pct = tf.Variable(0.35014191, dtype=tf.float64)  # %AP
-        self.inventory_pct = tf.Variable(0.0165, dtype=tf.float64)  # %Inv
-        self.total_liquidity_pct = tf.Variable(0.16, dtype=tf.float64)  # %TL
-        self.cash_pct_of_liquidity = tf.Variable(0.487, dtype=tf.float64)  # %Cash
-        self.income_tax_pct = tf.Variable(0.147, dtype=tf.float64)  # %IT
-        self.variable_opex_pct = tf.Variable(0.222168147, dtype=tf.float64)  # %OR
-        self.baseline_opex = tf.Variable(-30306718214, dtype=tf.float64)  # OBT_start
+        self.account_receivables_pct = tf.Variable(
+            0.159111366, name="account_receivables_pct", dtype=tf.float64
+        )  # %AR
+        self.account_payables_pct = tf.Variable(
+            0.35014191, name="account_payables_pct", dtype=tf.float64
+        )  # %AP
+        self.inventory_pct = tf.Variable(
+            0.0165, name="inventory_pct", dtype=tf.float64
+        )  # %Inv
+        self.total_liquidity_pct = tf.Variable(
+            0.16, name="total_liquidity_pct", dtype=tf.float64
+        )  # %TL
+        self.cash_pct_of_liquidity = tf.Variable(
+            0.487, name="cash_pct_of_liquidity", dtype=tf.float64
+        )  # %Cash
+        self.income_tax_pct = tf.Variable(
+            0.147, name="income_tax_pct", dtype=tf.float64
+        )  # %IT
+        self.variable_opex_pct = tf.Variable(
+            0.222168147, name="variable_opex_pct", dtype=tf.float64
+        )  # %OR
+        self.baseline_opex = tf.Variable(
+            -30306718214, name="baseline_opex", dtype=tf.float64
+        )  # OBT_start
         self.avg_short_term_interest_pct = tf.Variable(
-            0.6, dtype=tf.float64
+            0.6, name="avg_short_term_interest_pct", dtype=tf.float64
         )  # %AvgSTInt
         self.avg_long_term_interest_pct = tf.Variable(
-            0.06, dtype=tf.float64
+            0.06, name="avg_long_term_interest_pct", dtype=tf.float64
         )  # %AvgLTInt
-        self.avg_maturity_years = tf.Variable(3.0, dtype=tf.float64)  # AvgM
+        self.avg_maturity_years = tf.Variable(
+            3.0, name="avg_maturity_years", dtype=tf.float64
+        )  # AvgM
         self.market_securities_return_pct = tf.Variable(
-            0.05, dtype=tf.float64
+            0.05, name="market_securities_return_pct", dtype=tf.float64
         )  # %MSReturn
-        self.equity_financing_pct = tf.Variable(0.15, dtype=tf.float64)  # %EF
-        self.dividend_payout_ratio_pct = tf.Variable(0.15, dtype=tf.float64)  # %PR
-        self.stock_buyback_pct = tf.Variable(7.5, dtype=tf.float64)  # %BB
+        self.equity_financing_pct = tf.Variable(
+            0.15, name="equity_financing_pct", dtype=tf.float64
+        )  # %EF
+        self.dividend_payout_ratio_pct = tf.Variable(
+            0.15, name="dividend_payout_ratio_pct", dtype=tf.float64
+        )  # %PR
+        self.stock_buyback_pct = tf.Variable(
+            7.5, name="stock_buyback_pct", dtype=tf.float64
+        )  # %BB
 
     def forecast_step(self, state, inputs):
         """
