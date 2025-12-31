@@ -753,19 +753,60 @@ def run_training_and_forecast():
     # --- 1. HISTORICAL DATA FROM APPLE (2022-2025)---
     # Revenues from Income Statement
     sales_hist = np.array(
-        [3.94328e11, 3.83285e11, 3.91035e11, 4.16161e11], dtype=np.float64
+        [
+            2.65595e11,
+            2.60174e11,
+            2.74515e11,
+            3.65817e11,
+            3.94328e11,
+            3.83285e11,
+            3.91035e11,
+            4.16161e11,
+        ],
+        dtype=np.float64,
     )
     # Inventory from Balance Sheet, includes one additional year at the beginning to determine purchases history
     inventory_hist_plus_one = np.array(
-        [6580000000, 4946000000, 6331000000, 7286000000, 5718000000], dtype=np.float64
+        [
+            4855000000,
+            3956000000,
+            4106000000,
+            4061000000,
+            6580000000,
+            4946000000,
+            6331000000,
+            7286000000,
+            5718000000,
+        ],
+        dtype=np.float64,
     )
     # Depreciation from Reconciled Depreciation in Income Statement
     depr_hist = np.array(
-        [11698000000, 11445000000, 11519000000, 11104000000], dtype=np.float64
+        [
+            10903000000,
+            12547000000,
+            11056000000,
+            11284000000,
+            11104000000,
+            11519000000,
+            11445000000,
+            11698000000,
+        ],
+        dtype=np.float64,
     )
     # COGS from Cost of Revenue - Depreciation in Income Statement
     cogs_hist = np.array(
-        [2.12442e11, 2.02618e11, 1.98907e11, 2.09262e11], dtype=np.float64
+        [
+            1.52853e11,
+            1.49235e11,
+            1.58503e11,
+            2.01697e11,
+            2.12442e11,
+            2.02618e11,
+            1.98907e11,
+            2.09262e11,
+        ],
+        dtype=np.float64,
     )
     # Purchases from COGS + Inventory_t - Inventory_t-1
     purchases_hist = (
@@ -775,66 +816,218 @@ def run_training_and_forecast():
     inventory_hist = inventory_hist_plus_one[1:]
     # Non-current Assets from Balance Sheet
     nca_hist = np.array(
-        [2.1735e11, 2.09017e11, 2.11993e11, 2.11284e11], dtype=np.float64
+        [
+            2.34386e11,
+            1.75697e11,
+            1.80175e11,
+            2.16166e11,
+            2.1735e11,
+            2.09017e11,
+            2.11993e11,
+            2.11284e11,
+        ],
+        dtype=np.float64,
     )
     # Advance Payments for Purchases from Other Current Assets in Balance Sheet
     advance_payments_purchases_hist = np.array(
-        [21223000000, 14695000000, 14287000000, 14585000000], dtype=np.float64
+        [
+            12087000000,
+            12352000000,
+            11264000000,
+            14111000000,
+            21223000000,
+            14695000000,
+            14287000000,
+            14585000000,
+        ],
+        dtype=np.float64,
     )
     # Accounts Receivable from Receivables in Balance Sheet
     accounts_receivable_hist = np.array(
-        [60932000000, 60985000000, 66243000000, 72957000000], dtype=np.float64
+        [
+            48995000000,
+            45804000000,
+            37445000000,
+            51506000000,
+            60932000000,
+            60985000000,
+            66243000000,
+            72957000000,
+        ],
+        dtype=np.float64,
     )
     # Cash from Cash and Cash Equivalents in Balance Sheet
     cash_hist = np.array(
-        [23646000000, 29965000000, 29943000000, 35934000000], dtype=np.float64
+        [
+            25913000000,
+            48844000000,
+            38016000000,
+            34940000000,
+            23646000000,
+            29965000000,
+            29943000000,
+            35934000000,
+        ],
+        dtype=np.float64,
     )
     # Investment in Market Securities from Other Short Term Investments in Balance Sheet
     investment_in_market_securities_hist = np.array(
-        [24658000000, 31590000000, 35228000000, 18763000000], dtype=np.float64
+        [
+            40388000000,
+            51713000000,
+            52927000000,
+            27699000000,
+            24658000000,
+            31590000000,
+            35228000000,
+            18763000000,
+        ],
+        dtype=np.float64,
     )
     # Accounts Payable from Balance Sheet
     accounts_payable_hist = np.array(
-        [64115000000, 62611000000, 68960000000, 69860000000], dtype=np.float64
+        [
+            55888000000,
+            46236000000,
+            42296000000,
+            54763000000,
+            64115000000,
+            62611000000,
+            68960000000,
+            69860000000,
+        ],
+        dtype=np.float64,
     )
     # Advance Payments Sales from Current Deferred Revenue in Balance Sheet
     advance_payments_sales_hist = np.array(
-        [7912000000, 8061000000, 8249000000, 9055000000], dtype=np.float64
+        [
+            5966000000,
+            5522000000,
+            6643000000,
+            7612000000,
+            7912000000,
+            8061000000,
+            8249000000,
+            9055000000,
+        ],
+        dtype=np.float64,
     )
     # Current Liabilities from Total Current Liabilities - Accounts Payable - Current Deferred Revenue in Balance Sheet
     current_liabilities_hist = np.array(
-        [81955000000, 74636000000, 99183000000, 86716000000], dtype=np.float64
+        [
+            55012000000,
+            53960000000,
+            56453000000,
+            63106000000,
+            81955000000,
+            74636000000,
+            99183000000,
+            86716000000,
+        ],
+        dtype=np.float64,
     )
     # Non-current Liabilities from Total Non Current Liabilities Net Minority Interest in Balance Sheet
     non_current_liabilities_hist = np.array(
-        [1.48101e11, 1.45129e11, 1.31638e11, 1.19877e11], dtype=np.float64
+        [
+            1.41712e11,
+            1.4231e11,
+            1.53157e11,
+            1.62431e11,
+            1.48101e11,
+            1.45129e11,
+            1.31638e11,
+            1.19877e11,
+        ],
+        dtype=np.float64,
     )
     # Equity from Stockholders Equity in Balance Sheet
     equity_hist = np.array(
-        [50672000000, 62146000000, 56950000000, 73733000000], dtype=np.float64
+        [
+            1.07147e11,
+            90488000000,
+            65339000000,
+            63090000000,
+            50672000000,
+            62146000000,
+            56950000000,
+            73733000000,
+        ],
+        dtype=np.float64,
     )
     # Net Income from Income Statement
     net_income_hist = np.array(
-        [99803000000, 96995000000, 93736000000, 112012000000], dtype=np.float64
+        [
+            59531000000,
+            55256000000,
+            57411000000,
+            94680000000,
+            99803000000,
+            96995000000,
+            93736000000,
+            1.1201e11,
+        ],
+        dtype=np.float64,
     )
     # Dividends paid this year from Common Stock Dividends Paid in Cash Flow
     dividends_hist = np.array(
-        [14841000000, 15025000000, 15234000000, 15421000000], dtype=np.float64
+        [
+            13712000000,
+            14119000000,
+            14081000000,
+            14467000000,
+            14841000000,
+            15025000000,
+            15234000000,
+            15421000000,
+        ],
+        dtype=np.float64,
     )
     # Stock Buyback from Repurchase of Capital Stock in Cash Flow
     stock_buyback_hist = np.array(
-        [89402000000, 77550000000, 94949000000, 90711000000], dtype=np.float64
+        [
+            72738000000,
+            66897000000,
+            72358000000,
+            85971000000,
+            89402000000,
+            77550000000,
+            94949000000,
+            90711000000,
+        ],
+        dtype=np.float64,
     )
     # OpEx from Operating Expenses in Income Statement
     opex_hist = np.array(
-        [51345000000, 54847000000, 57467000000, 62151000000], dtype=np.float64
+        [
+            30941000000,
+            34462000000,
+            38668000000,
+            43887000000,
+            51345000000,
+            54847000000,
+            57467000000,
+            62151000000,
+        ],
+        dtype=np.float64,
     )
     # Tax Provision from Income Statement
     tax_hist = np.array(
-        [19300000000, 16741000000, 29749000000, 20719000000], dtype=np.float64
+        [
+            13372000000,
+            10481000000,
+            9680000000,
+            14527000000,
+            19300000000,
+            16741000000,
+            29749000000,
+            20719000000,
+        ],
+        dtype=np.float64,
     )
     # Inflation hist
-    inflation_hist = np.array([0.08, 0.041, 0.029, 0.027], dtype=np.float64)
+    inflation_hist = np.array(
+        [0.024, 0.018, 0.012, 0.047, 0.08, 0.041, 0.029, 0.027], dtype=np.float64
+    )
 
     # --- 2. TRAIN THE MODEL ---
     # We feed in the historical arrays from 2022-2024, and leave 2025 for forecast testing.

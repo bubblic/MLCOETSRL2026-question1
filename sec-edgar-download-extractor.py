@@ -35,9 +35,9 @@ from arelle import WebCache as _ArelleWebCache
 
 # --- Configuration ---
 # COMPANY_TICKER = "WMT"  # Walmart
-# COMPANY_TICKER = "0000320193"  # Apple
+COMPANY_TICKER = "0000320193"  # Apple
 # COMPANY_TICKER = "KO"  # Coca Cola
-COMPANY_TICKER = "GM"  # General Motors
+# COMPANY_TICKER = "GM"  # General Motors
 EMAIL_ADDRESS = (
     "your.email@example.com"  # <--- REQUIRED BY SEC: Change this to your actual email
 )
@@ -333,7 +333,7 @@ def extract_financial_data(filing_paths):
         "Invested Capital": "us-gaap:TotalEquityAndLiabilities",  # Often calculated, but this is a broad proxy
         # --- Debt and Liabilities ---
         "Total Liabilities Net Minority Interest": "us-gaap:Liabilities",
-        "Total Non Current Liabilities Net Minority Interest": "us-gaap:NoncurrentLiabilities",
+        "Total Non Current Liabilities Net Minority Interest": "us-gaap:LiabilitiesNoncurrent",
         "Long Term Debt And Capital Lease Obligation": "us-gaap:LongTermDebtAndCapitalLeaseObligation",
         "Long Term Debt": "us-gaap:LongTermDebt",
         "Current Liabilities": "us-gaap:CurrentLiabilities",
@@ -352,6 +352,7 @@ def extract_financial_data(filing_paths):
         "Current Operating Lease Liability": "us-gaap:OperatingLeaseLiabilityCurrent",
         "Current Finance Lease Liability": "us-gaap:FinanceLeaseLiabilityCurrent",
         "Deferred Revenue": "us-gaap:ContractWithCustomerLiability",
+        "Current Deferred Revenue": "us-gaap:ContractWithCustomerLiabilityCurrent",
         "Other Non-Current Liabilities": "us-gaap:OtherLiabilitiesNoncurrent",
         # --- Debt Maturity Schedule ---
         "Debt Due Year 1": "us-gaap:LongTermDebtMaturityObligationsDueInNextTwelveMonths",
@@ -369,6 +370,7 @@ def extract_financial_data(filing_paths):
         "Current Assets": "us-gaap:AssetsCurrent",
         "Inventory": "us-gaap:InventoryNet",
         "Accounts Receivable": "us-gaap:AccountsReceivableNetCurrent",
+        "Receivables": "us-gaap:ReceivablesNetCurrent",
         "Cash Cash Equivalents And Short Term Investments": "us-gaap:CashCashEquivalentsAndShortTermInvestments",
         "Cash And Cash Equivalents": "us-gaap:CashAndCashEquivalentsAtCarryingValue",
         "Working Capital": "us-gaap:WorkingCapital",
