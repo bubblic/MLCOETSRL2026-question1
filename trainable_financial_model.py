@@ -4,14 +4,11 @@ import numpy as np
 
 class TrainableFinancialModel(tf.Module):
     def __init__(self):
-        # --- Policy Parameters to be trained ---
-        ## These can be trained simply with linear regression
+        # --- Policy Parameters ---
         self.asset_growth = tf.Variable(
             0.0076, name="asset_growth", dtype=tf.float64
         )  # %AG
-        self.depreciation_rate = tf.Variable(
-            0.055, name="depr_rate", dtype=tf.float64
-        )  # %Depr
+        self.depreciation_rate = tf.Variable(0.055, dtype=tf.float64)  # %Depr
         self.advance_payments_sales_pct = tf.Variable(
             0.020614523, dtype=tf.float64
         )  # %AdvPS
@@ -348,9 +345,9 @@ def run_forecast():
     inflation = np.array([0.0, 0.0, 0.0, 0.0], dtype=np.float64)
 
     print(
-        f"{'Year':<5} | {'Assets':<15} | {'Liabilities':<20} | {'Equity':<15} | {'Check (Plug)':<15}"
+        f"{'Year':<5} | {'Assets':<15} | {'Liabilities':<15} | {'Equity':<15} | {'Check (Plug)':<15}"
     )
-    print("-" * 100)
+    print("-" * 70)
 
     ## For testing:
     # print(
@@ -399,7 +396,7 @@ def run_forecast():
     )
 
     print(
-        f"{t+1:<5} | {assets.numpy():<15.2f} | {liabilities.numpy():<15.2f} | {equity.numpy():<15.2f} | {state['check'].numpy():<15.2f}"
+        f"{0:<5} | {assets.numpy():<15.2f} | {liabilities.numpy():<15.2f} | {equity.numpy():<15.2f} | {state['check'].numpy():<15.2f}"
     )
 
     ## For testing:
