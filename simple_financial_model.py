@@ -343,9 +343,9 @@ def run_forecast():
     inflation = np.array([0.0, 0.0, 0.0, 0.0], dtype=np.float64)
 
     print(
-        f"{'Year':<5} | {'Assets':<15} | {'Liabilities':<20} | {'Equity':<15} | {'Check (Plug)':<15}"
+        f"{'Year':<5} | {'Assets':<15} | {'Liabilities':<15} | {'Equity':<15} | {'Check (Plug)':<15}"
     )
-    print("-" * 100)
+    print("-" * 70)
 
     ## For testing:
     # print(
@@ -394,7 +394,7 @@ def run_forecast():
     )
 
     print(
-        f"{t+1:<5} | {assets.numpy():<15.2f} | {liabilities.numpy():<15.2f} | {equity.numpy():<15.2f} | {state['check'].numpy():<15.2f}"
+        f"{0:<5} | {assets.numpy():<15.2f} | {liabilities.numpy():<15.2f} | {equity.numpy():<15.2f} | {state['check'].numpy():<15.2f}"
     )
 
     ## For testing:
