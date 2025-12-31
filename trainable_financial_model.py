@@ -6,6 +6,7 @@ import numpy as np
 class TrainableFinancialModel(tf.Module):
     def __init__(self):
         # --- Policy Parameters ---
+        ## These are trainable with simple linear regression
         self.asset_growth = tf.Variable(
             0.0076, name="asset_growth", dtype=tf.float64
         )  # %AG
@@ -42,6 +43,14 @@ class TrainableFinancialModel(tf.Module):
         self.baseline_opex = tf.Variable(
             -30306718214, name="baseline_opex", dtype=tf.float64
         )  # OBT_start
+        self.dividend_payout_ratio_pct = tf.Variable(
+            0.15, name="dividend_payout_ratio_pct", dtype=tf.float64
+        )  # %PR
+        self.stock_buyback_pct = tf.Variable(
+            7.5, name="stock_buyback_pct", dtype=tf.float64
+        )  # %BB
+
+        ## These are trained with gradient descent with the trained variables from above and other data (sales, purchases, equity, liabilities, etc.) as inputs
         self.avg_short_term_interest_pct = tf.Variable(
             0.6, name="avg_short_term_interest_pct", dtype=tf.float64
         )  # %AvgSTInt
@@ -57,12 +66,17 @@ class TrainableFinancialModel(tf.Module):
         self.equity_financing_pct = tf.Variable(
             0.15, name="equity_financing_pct", dtype=tf.float64
         )  # %EF
-        self.dividend_payout_ratio_pct = tf.Variable(
-            0.15, name="dividend_payout_ratio_pct", dtype=tf.float64
-        )  # %PR
-        self.stock_buyback_pct = tf.Variable(
-            7.5, name="stock_buyback_pct", dtype=tf.float64
-        )  # %BB
+
+    def __call__(self, initial_state, sales_series, purchases_series):
+        # Run the full forecast loop
+        state = initial_state
+        outputs = []
+        for t in range(len(sales_series)):
+            inputs = {
+                "sales_t": sales_series[t],
+                "purchases_t": purchases_series[t],
+            }
+        return outputs
 
     def forecast_step(self, state, inputs):
         """

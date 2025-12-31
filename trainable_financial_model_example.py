@@ -21,7 +21,7 @@ class TrainableFinancialModel(tf.Module):
         self.growth_rate = tf.constant(0.02, name="growth_rate")
 
     def __call__(self, initial_state, sales_series, cost_series):
-        # Run the full forecast loop (same logic ans previous answer)
+        # Run the full forecast loop (same logic as previous answer)
         state = initial_state
         outputs = []
 
