@@ -379,6 +379,7 @@ class TrainableFinancialModel(tf.Module):
         )
 
         # --- 2. Income Statement (IS) ---
+        # Before we move on to Liabilities, we need to calculate Income Statement quantities and Liquidity Budget quantities, as they connect the assets to liabilities and equity.
         # Net income (NI) is calculated by first calculating EBITDA = Sales - COGS - OpEx
         # Then, EBT is calculated by EBITDA - Depreciation - loan interest payments + return from market securities.
         # Finally, NI is calculated by EBT - Tax.
