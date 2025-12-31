@@ -78,6 +78,90 @@ class TrainableFinancialModel(tf.Module):
             }
         return outputs
 
+    def train_simple_policies(
+        self,
+        historical_sales,
+        historical_nca,
+        historical_depreciation,
+        learning_rate=0.0001,  # Lower LR for stability with large numbers
+        epochs=5000,
+    ):
+        """
+        Trains 'asset_growth' and 'depreciation_rate' using historical data.
+
+        Data Alignment Logic based on Pareja (09):
+        1. Asset Growth:
+           Calculation: nca_curr - nca_prev = sales_t * asset_growth
+           Target (Y): (NCA_t - NCA_{t-1})
+           Feature (X): Sales_t
+
+        2. Depreciation Rate:
+           Calculation: depreciation = nca_prev * depreciation_rate
+           Target (Y): Depreciation_t
+           Feature (X): NCA_{t-1}
+        """
+
+        # Convert inputs to tensors and ensure float64
+        # Input arrays are aligned by year (Year 0, Year 1, Year 2...)
+        sales_tensor = tf.convert_to_tensor(historical_sales, dtype=tf.float64)
+        nca_tensor = tf.convert_to_tensor(historical_nca, dtype=tf.float64)
+        depr_tensor = tf.convert_to_tensor(historical_depreciation, dtype=tf.float64)
+
+        # --- Prepare Training Data ---
+        # We need at least 2 years of data to calculate growth (Year 1 - Year 0)
+
+        # 1. Data for Asset Growth
+        # Y: Change in NCA from t-1 to t
+        delta_nca_true = nca_tensor[1:] - nca_tensor[:-1]
+        # X: Revenue at time t (corresponding to the change)
+        sales_aligned = sales_tensor[1:]
+
+        # 2. Data for Depreciation
+        # Y: Depreciation expense at time t
+        depr_true = depr_tensor[1:]
+        # X: NCA at time t-1 (Previous year's asset base drives this year's depreciation)
+        nca_prev_aligned = nca_tensor[:-1]
+
+        # Optimizer
+        optimizer = tf.optimizers.Adam(learning_rate=learning_rate)
+
+        print(f"Training on {len(sales_aligned)} years of historical data...")
+
+        # --- Training Loop ---
+        for i in range(epochs):
+            with tf.GradientTape() as tape:
+                # A. Asset Growth Prediction
+                # Model: Delta_NCA = Sales * Rate
+                pred_delta_nca = sales_aligned * self.asset_growth
+                loss_growth = tf.reduce_mean(tf.square(delta_nca_true - pred_delta_nca))
+
+                # B. Depreciation Prediction
+                # Model: Depr = NCA_prev * Rate
+                pred_depr = nca_prev_aligned * self.depreciation_rate
+                loss_depr = tf.reduce_mean(tf.square(depr_true - pred_depr))
+
+                # Combined Loss
+                total_loss = loss_growth + loss_depr
+
+            # Compute Gradients
+            vars_to_train = [self.asset_growth, self.depreciation_rate]
+            grads = tape.gradient(total_loss, vars_to_train)
+
+            # Apply Gradients
+            optimizer.apply_gradients(zip(grads, vars_to_train))
+
+            if i % 1000 == 0:
+                print(
+                    f"Epoch {i}: Loss={total_loss.numpy():.4e} | "
+                    f"%AG={self.asset_growth.numpy():.4f}, %Depr={self.depreciation_rate.numpy():.4f}"
+                )
+
+        print("-" * 50)
+        print("Training Complete.")
+        print(f"Final Asset Growth Rate: {self.asset_growth.numpy():.5f}")
+        print(f"Final Depreciation Rate: {self.depreciation_rate.numpy():.5f}")
+        print("-" * 50)
+
     def forecast_step(self, state, inputs):
         """
         Calculate t based on t-1 state and t inputs.
@@ -345,26 +429,110 @@ class TrainableFinancialModel(tf.Module):
 
         return new_state
 
-    # --- Simulation Execution ---
 
-
-def run_forecast():
+# --- Training and Forecast Execution ---
+def run_training_and_forecast():
     model = TrainableFinancialModel()
 
-    # Initial State (t=0) 2023 Apple Balance Sheet
+    # --- 1. HISTORICAL DATA FROM APPLE (2022-2025)---
+    # Revenues from Income Statement
+    sales_hist = np.array(
+        [3.94328e11, 3.83285e11, 3.91035e11, 4.16161e11], dtype=np.float64
+    )
+    # Inventory from Balance Sheet, includes one additional year at the beginning to determine purchases history
+    inventory_hist_plus_one = np.array(
+        [6580000000, 4946000000, 6331000000, 7286000000, 5718000000], dtype=np.float64
+    )
+    # Depreciation from Reconciled Depreciation in Income Statement
+    depr_hist = np.array(
+        [11698000000, 11445000000, 11519000000, 11104000000], dtype=np.float64
+    )
+    # COGS from Cost of Revenue - Depreciation in Income Statement
+    cogs_hist = np.array(
+        [2.12442e11, 2.02618e11, 1.98907e11, 2.09262e11], dtype=np.float64
+    )
+    # Purchases from COGS + Inventory_t - Inventory_t-1
+    purchases_hist = (
+        cogs_hist + inventory_hist_plus_one[1:] - inventory_hist_plus_one[:-1]
+    )
+    # Inventory with matched length
+    inventory_hist = inventory_hist_plus_one[1:]
+    # Non-current Assets from Balance Sheet
+    nca_hist = np.array(
+        [2.1735e11, 2.09017e11, 2.11993e11, 2.11284e11], dtype=np.float64
+    )
+    # Advance Payments for Purchases from Other Current Assets in Balance Sheet
+    advance_payments_purchases_hist = np.array(
+        [21223000000, 14695000000, 14287000000, 14585000000], dtype=np.float64
+    )
+    # Accounts Receivable from Receivables in Balance Sheet
+    accounts_receivable_hist = np.array(
+        [60932000000, 60985000000, 66243000000, 72957000000], dtype=np.float64
+    )
+    # Cash from Cash and Cash Equivalents in Balance Sheet
+    cash_hist = np.array(
+        [23646000000, 29965000000, 29943000000, 35934000000], dtype=np.float64
+    )
+    # Investment in Market Securities from Other Short Term Investments in Balance Sheet
+    investment_in_market_securities_hist = np.array(
+        [24658000000, 31590000000, 35228000000, 18763000000], dtype=np.float64
+    )
+    # Accounts Payable from Balance Sheet
+    accounts_payable_hist = np.array(
+        [64115000000, 62611000000, 68960000000, 69860000000], dtype=np.float64
+    )
+    # Advance Payments Sales from Current Deferred Revenue in Balance Sheet
+    advance_payments_sales_hist = np.array(
+        [7912000000, 8061000000, 8249000000, 9055000000], dtype=np.float64
+    )
+    # Current Liabilities from Total Current Liabilities - Accounts Payable - Current Deferred Revenue in Balance Sheet
+    current_liabilities_hist = np.array(
+        [81955000000, 74636000000, 99183000000, 86716000000], dtype=np.float64
+    )
+    # Non-current Liabilities from Total Non Current Liabilities Net Minority Interest in Balance Sheet
+    non_current_liabilities_hist = np.array(
+        [1.48101e11, 1.45129e11, 1.31638e11, 1.19877e11], dtype=np.float64
+    )
+    # Equity from Stockholders Equity in Balance Sheet
+    equity_hist = np.array(
+        [50672000000, 62146000000, 56950000000, 73733000000], dtype=np.float64
+    )
+    # Net Income from Income Statement
+    net_income_hist = np.array(
+        [99803000000, 96995000000, 93736000000, 112012000000], dtype=np.float64
+    )
+
+    # --- 2. TRAIN THE MODEL ---
+    # We feed in the historical arrays from 2022-2024, and leave 2025 for forecast testing.
+    model.train_simple_policies(sales_hist[:-1], nca_hist[:-1], depr_hist[:-1])
+
+    # --- 3. RUN FORECAST (Using new parameters) ---
+    # Initial State (t=0) 2024 Apple Balance Sheet
     state = {
-        "nca": tf.constant(2.1735e11, dtype=tf.float64),  # float number
-        "advance_payments_purchases": tf.constant(21223000000, dtype=tf.float64),
-        "accounts_receivable": tf.constant(60932000000, dtype=tf.float64),
-        "inventory": tf.constant(4946000000, dtype=tf.float64),
-        "cash": tf.constant(23646000000, dtype=tf.float64),
-        "investment_in_market_securities": tf.constant(24658000000, dtype=tf.float64),
-        "accounts_payable": tf.constant(64115000000, dtype=tf.float64),
-        "advance_payments_sales": tf.constant(7912000000, dtype=tf.float64),
-        "current_liabilities": tf.constant(81955000000, dtype=tf.float64),
-        "non_current_liabilities": tf.constant(1.48101e11, dtype=tf.float64),
-        "equity": tf.constant(50672000000, dtype=tf.float64),
-        "net_income": tf.constant(99803000000, dtype=tf.float64),
+        "nca": tf.constant(nca_hist[-2], dtype=tf.float64),  # float number
+        "advance_payments_purchases": tf.constant(
+            advance_payments_purchases_hist[-2], dtype=tf.float64
+        ),
+        "accounts_receivable": tf.constant(
+            accounts_receivable_hist[-2], dtype=tf.float64
+        ),
+        "inventory": tf.constant(inventory_hist[-2], dtype=tf.float64),
+        "cash": tf.constant(cash_hist[-2], dtype=tf.float64),
+        "investment_in_market_securities": tf.constant(
+            investment_in_market_securities_hist[-2], dtype=tf.float64
+        ),
+        "accounts_payable": tf.constant(accounts_payable_hist[-2], dtype=tf.float64),
+        "advance_payments_sales": tf.constant(
+            advance_payments_sales_hist[-2], dtype=tf.float64
+        ),
+        "current_liabilities": tf.constant(
+            current_liabilities_hist[-2], dtype=tf.float64
+        ),
+        "non_current_liabilities": tf.constant(
+            non_current_liabilities_hist[-2], dtype=tf.float64
+        ),
+        "equity": tf.constant(equity_hist[-2], dtype=tf.float64),
+        "net_income": tf.constant(net_income_hist[-2], dtype=tf.float64),
         "liquidity_check": tf.constant(0.0, dtype=tf.float64),
         "check": tf.constant(0.0, dtype=tf.float64),
         "stloan": tf.constant(0.0, dtype=tf.float64),
@@ -373,7 +541,7 @@ def run_forecast():
         "lt_principal_paid": tf.constant(0.0, dtype=tf.float64),
     }
 
-    # time Series Inputs (Forecasted Sales/Costs)
+    # Forecast Drivers (Sales/Purchases) for 2025-2028
     # Year 1 to 4. We are only interested in Year 1 to 3. The padding is needed for forecasting. Use float64
     sales_forecast = np.array(
         [3.94328e11, 3.83285e11, 3.91035e11, 4.16161e11], dtype=np.float64
@@ -382,68 +550,14 @@ def run_forecast():
         [2.07694e11, 1.99862e11, 2.04003e11, 2.10808e11], dtype=np.float64
     )
 
-    # Year 1 to 4 inflation rate
+    # Year 1 to 4 inflation rate (2025-2028)
     inflation = np.array([0.0, 0.0, 0.0, 0.0], dtype=np.float64)
 
+    print("\n--- Running Forecast with TRAINED parameters ---")
     print(
         f"{'Year':<5} | {'Assets':<15} | {'Liabilities':<15} | {'Equity':<15} | {'Check (Plug)':<15}"
     )
     print("-" * 70)
-
-    ## For testing:
-    # print(
-    #     f"{'Year':<5} | {'Assets':<15} | {'ST principal paid':<20} | {'LT principal paid':<20} | {'ST Loan':<15} | {'LT Loan':<15} | {'CLiab':<15} | {'NLiab':<15} | {'Equity':<15} | {'Check (Plug)':<15} | {'Liquidity Check (Plug)':<15}"
-    # )
-    # print("-" * 200)
-
-    # Print initial state as well
-    assets = (
-        state["nca"]
-        + state["advance_payments_purchases"]
-        + state["accounts_receivable"]
-        + state["inventory"]
-        + state["cash"]
-        + state["investment_in_market_securities"]
-    )
-    stloan = state["stloan"]
-    ltloan = state["ltloan"]
-    st_principal_paid = state["st_principal_paid"]
-    lt_principal_paid = state["lt_principal_paid"]
-    current_liabilities = state["current_liabilities"]
-    non_current_liabilities = state["non_current_liabilities"]
-    equity = state["equity"]
-
-    liabilities = (
-        state["accounts_payable"]
-        + state["advance_payments_sales"]
-        + state["current_liabilities"]
-        + state["non_current_liabilities"]
-    )
-
-    # L+E = Liabilities + Equity
-    le = liabilities + state["equity"]
-
-    check = assets - le
-    liquidity_check = (
-        assets
-        - (
-            state["nca"]
-            + state["advance_payments_purchases"]
-            + state["accounts_receivable"]
-            + state["inventory"]
-        )
-        - state["cash"]
-        - state["investment_in_market_securities"]
-    )
-
-    print(
-        f"{0:<5} | {assets.numpy():<15.2f} | {liabilities.numpy():<15.2f} | {equity.numpy():<15.2f} | {state['check'].numpy():<15.2f}"
-    )
-
-    ## For testing:
-    # print(
-    #     f"{0:<5} | {assets.numpy():<15.2f} | {st_principal_paid.numpy():<20.2f} | {lt_principal_paid.numpy():<20.2f} | {stloan.numpy():<15.2f} | {ltloan.numpy():<15.2f} | {current_liabilities.numpy():<15.2f} | {non_current_liabilities.numpy():<15.2f} | {equity.numpy():<15.2f} | {check.numpy():<15.2f} | {liquidity_check.numpy():<15.2f} "
-    # )
 
     # Loop explicitly to handle the recursive dependency.
     for t in range(len(sales_forecast) - 1):
@@ -467,32 +581,18 @@ def run_forecast():
             + state["cash"]
             + state["investment_in_market_securities"]
         )
-        stloan = state["stloan"]
-        ltloan = state["ltloan"]
-        st_principal_paid = state["st_principal_paid"]
-        lt_principal_paid = state["lt_principal_paid"]
-        current_liabilities = state["current_liabilities"]
-        non_current_liabilities = state["non_current_liabilities"]
-        equity = state["equity"]
 
-        # L+E = Liabilities + Equity
-        le = (
+        liabilities = (
             state["accounts_payable"]
             + state["advance_payments_sales"]
             + state["current_liabilities"]
             + state["non_current_liabilities"]
-            + state["equity"]
         )
 
         print(
-            f"{t+1:<5} | {assets.numpy():<15.2f} | {liabilities.numpy():<15.2f} | {equity.numpy():<15.2f} | {state['check'].numpy():<15.2f}"
+            f"{t+1:<5} | {assets.numpy():<15.2f} | {liabilities.numpy():<15.2f} | {state['equity'].numpy():<15.2f} | {state['check'].numpy():<15.2f}"
         )
-
-        ## For testing:
-        # print(
-        #     f"{t+1:<5} | {assets.numpy():<15.2f} | {st_principal_paid.numpy():<20.2f} | {lt_principal_paid.numpy():<20.2f} | {stloan.numpy():<15.2f} | {ltloan.numpy():<15.2f} | {current_liabilities.numpy():<15.2f} | {non_current_liabilities.numpy():<15.2f} | {equity.numpy():<15.2f} | {state['check'].numpy():<15.2f} | {state['liquidity_check'].numpy():<15.2f} "
-        # )
 
 
 if __name__ == "__main__":
-    run_forecast()
+    run_training_and_forecast()
