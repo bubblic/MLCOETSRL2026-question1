@@ -501,6 +501,14 @@ def run_training_and_forecast():
     net_income_hist = np.array(
         [99803000000, 96995000000, 93736000000, 112012000000], dtype=np.float64
     )
+    # Dividends paid this year from Common Stock Dividends Paid in Cash Flow
+    dividends_hist = np.array(
+        [14841000000, 15025000000, 15234000000, 15421000000], dtype=np.float64
+    )
+    # Stock Buyback from Repurchase of Capital Stock in Cash Flow
+    stock_buyback_hist = np.array(
+        [89402000000, 77550000000, 94949000000, 90711000000], dtype=np.float64
+    )
 
     # --- 2. TRAIN THE MODEL ---
     # We feed in the historical arrays from 2022-2024, and leave 2025 for forecast testing.
