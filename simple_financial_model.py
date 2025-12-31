@@ -316,7 +316,7 @@ def run_forecast():
         "cash": tf.constant(23646000000, dtype=tf.float32),
         "investment_in_market_securities": tf.constant(24658000000, dtype=tf.float32),
         "accounts_payable": tf.constant(70667000000, dtype=tf.float32),
-        "advance_payments_sales": tf.constant(7912000000, dtype=tf.float32),
+        "advance_payments_sales": tf.constant(64115000000, dtype=tf.float32),
         "current_liabilities": tf.constant(81955000000, dtype=tf.float32),
         "non_current_liabilities": tf.constant(1.48101e11, dtype=tf.float32),
         "equity": tf.constant(50672000000, dtype=tf.float32),
