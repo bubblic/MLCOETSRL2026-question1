@@ -169,14 +169,14 @@ class SimpleFinancialModel(tf.Module):
 
         # 3.3. Financing Net Liquidity Balance (Financing NLB)
         ## First, we need to figure out how much new short-term loan and long-term loan to issue this year.
+        ## Note: The return from market securities investment is added to previous total liquidity balance because we always allocate a portion of total liquidity to market securities, instead of excess cash balance.
         ## New short-term loan is found by:
         liquidity_deficit_st = (
             total_liquidity_curr
-            - total_liquidity_prev
+            - (total_liquidity_prev + ms_return)
             - operating_nlb
             + principal_st
             + interest_st
-            - ms_return
         )
         new_short_term_loan = tf.maximum(0.0, liquidity_deficit_st)
 
@@ -205,8 +205,8 @@ class SimpleFinancialModel(tf.Module):
         )
 
         # 3.4. External Investment Net Liquidity Balance (External Investment NLB)
-        ## Note: The investment in and out of market securities are not here because it is determined as a ratio of total liquidity balance.
-        external_investment_nlb = ms_return
+        ## Note: This was already accounted for when calculating short term loan because investment in and out of market securities are determined as a ratio of total liquidity balance.
+        external_investment_nlb = 0.0
 
         # 3.5. Transaction with Owners Net Liquidity Balance (Transaction with Owners NLB)
         transaction_with_owners_nlb = equity_financing - dividends_prev - stock_buyback
