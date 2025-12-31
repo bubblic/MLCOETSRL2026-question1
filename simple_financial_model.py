@@ -369,7 +369,17 @@ def run_forecast():
     )
 
     check = assets - le
-    liquidity_check = assets - (current_liabilities + non_current_liabilities + equity)
+    liquidity_check = (
+        assets
+        - (
+            state["nca"]
+            + state["advance_payments_purchases"]
+            + state["accounts_receivable"]
+            + state["inventory"]
+        )
+        - state["cash"]
+        - state["investment_in_market_securities"]
+    )
 
     print(
         f"{0:<5} | {assets.numpy():<15.2f} | {st_principal_paid.numpy():<20.2f} | {lt_principal_paid.numpy():<20.2f} | {stloan.numpy():<15.2f} | {ltloan.numpy():<15.2f} | {current_liabilities.numpy():<15.2f} | {non_current_liabilities.numpy():<15.2f} | {equity.numpy():<15.2f} | {check.numpy():<15.2f} | {liquidity_check.numpy():<15.2f} "
