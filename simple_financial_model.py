@@ -342,6 +342,36 @@ def run_forecast():
     )
     print("-" * 200)
 
+    # Print initial state as well
+    assets = (
+        state["nca"]
+        + state["advance_payments_purchases"]
+        + state["accounts_receivable"]
+        + state["inventory"]
+        + state["cash"]
+        + state["investment_in_market_securities"]
+    )
+    stloan = state["stloan"]
+    ltloan = state["ltloan"]
+    st_principal_paid = state["st_principal_paid"]
+    lt_principal_paid = state["lt_principal_paid"]
+    current_liabilities = state["current_liabilities"]
+    non_current_liabilities = state["non_current_liabilities"]
+    equity = state["equity"]
+
+    # L+E = Liabilities + Equity
+    le = (
+        state["accounts_payable"]
+        + state["advance_payments_sales"]
+        + state["current_liabilities"]
+        + state["non_current_liabilities"]
+        + state["equity"]
+    )
+
+    print(
+        f"{t+1:<5} | {assets.numpy():<15.2f} | {st_principal_paid.numpy():<20.2f} | {lt_principal_paid.numpy():<20.2f} | {stloan.numpy():<15.2f} | {ltloan.numpy():<15.2f} | {current_liabilities.numpy():<15.2f} | {non_current_liabilities.numpy():<15.2f} | {equity.numpy():<15.2f} | {state['check'].numpy():<15.2f} | {state['liquidity_check'].numpy():<15.2f} "
+    )
+
     # Loop explicitly to handle the recursive dependency.
     for t in range(len(sales_forecast) - 1):
         inputs = {
