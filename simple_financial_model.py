@@ -20,8 +20,8 @@ class SimpleFinancialModel(tf.Module):
         self.total_liquidity_pct = tf.constant(0.16, dtype=tf.float32)  # %TL
         self.cash_pct_of_liquidity = tf.constant(0.25, dtype=tf.float32)  # %Cash
         self.income_tax_pct = tf.constant(0.25, dtype=tf.float32)  # %IT
-        self.variable_opex_pct = tf.constant(0.60, dtype=tf.float32)  # %OR
-        self.baseline_opex = tf.constant(54847000000, dtype=tf.float32)  # OBT_start
+        self.variable_opex_pct = tf.constant(0.222168147, dtype=tf.float32)  # %OR
+        self.baseline_opex = tf.constant(-30306718214, dtype=tf.float32)  # OBT_start
         self.avg_short_term_interest_pct = tf.constant(
             0.04, dtype=tf.float32
         )  # %AvgSTInt
@@ -32,8 +32,8 @@ class SimpleFinancialModel(tf.Module):
         self.market_securities_return_pct = tf.constant(
             0.05, dtype=tf.float32
         )  # %MSReturn
-        self.equity_financing_pct = tf.constant(0.30, dtype=tf.float32)  # %EF
-        self.dividend_payout_ratio_pct = tf.constant(0.40, dtype=tf.float32)  # %PR
+        self.equity_financing_pct = tf.constant(0.15, dtype=tf.float32)  # %EF
+        self.dividend_payout_ratio_pct = tf.constant(0.15, dtype=tf.float32)  # %PR
         self.stock_buyback_pct = tf.constant(0.10, dtype=tf.float32)  # %BB
 
     def forecast_step(self, state, inputs):
