@@ -81,85 +81,234 @@ class TrainableFinancialModel(tf.Module):
     def train_simple_policies(
         self,
         historical_sales,
+        historical_purchases,
         historical_nca,
         historical_depreciation,
+        historical_adv_pay_sales,
+        historical_adv_pay_purch,
+        historical_ar,
+        historical_ap,
+        historical_inventory,
+        historical_cash,
+        historical_ims,
+        historical_net_income,
+        historical_dividends,
+        historical_stock_buyback,
+        historical_opex,
+        historical_tax,
+        historical_inflation=None,
         learning_rate=0.0001,  # Lower LR for stability with large numbers
         epochs=5000,
     ):
         """
-        Trains 'asset_growth' and 'depreciation_rate' using historical data.
-
-        Data Alignment Logic based on Pareja (09):
-        1. Asset Growth:
-           Calculation: nca_curr - nca_prev = sales_t * asset_growth
-           Target (Y): (NCA_t - NCA_{t-1})
-           Feature (X): Sales_t
-
-        2. Depreciation Rate:
-           Calculation: depreciation = nca_prev * depreciation_rate
-           Target (Y): Depreciation_t
-           Feature (X): NCA_{t-1}
+        Trains simple policy parameters using historical data.
         """
 
         # Convert inputs to tensors and ensure float64
-        # Input arrays are aligned by year (Year 0, Year 1, Year 2...)
         sales_tensor = tf.convert_to_tensor(historical_sales, dtype=tf.float64)
+        purchases_tensor = tf.convert_to_tensor(historical_purchases, dtype=tf.float64)
         nca_tensor = tf.convert_to_tensor(historical_nca, dtype=tf.float64)
         depr_tensor = tf.convert_to_tensor(historical_depreciation, dtype=tf.float64)
+        adv_pay_sales_tensor = tf.convert_to_tensor(
+            historical_adv_pay_sales, dtype=tf.float64
+        )
+        adv_pay_purch_tensor = tf.convert_to_tensor(
+            historical_adv_pay_purch, dtype=tf.float64
+        )
+        ar_tensor = tf.convert_to_tensor(historical_ar, dtype=tf.float64)
+        ap_tensor = tf.convert_to_tensor(historical_ap, dtype=tf.float64)
+        inv_tensor = tf.convert_to_tensor(historical_inventory, dtype=tf.float64)
+        cash_tensor = tf.convert_to_tensor(historical_cash, dtype=tf.float64)
+        ims_tensor = tf.convert_to_tensor(historical_ims, dtype=tf.float64)
+        ni_tensor = tf.convert_to_tensor(historical_net_income, dtype=tf.float64)
+        div_tensor = tf.convert_to_tensor(historical_dividends, dtype=tf.float64)
+        bb_tensor = tf.convert_to_tensor(historical_stock_buyback, dtype=tf.float64)
+        opex_tensor = tf.convert_to_tensor(historical_opex, dtype=tf.float64)
+        tax_tensor = tf.convert_to_tensor(historical_tax, dtype=tf.float64)
 
-        # --- Prepare Training Data ---
-        # We need at least 2 years of data to calculate growth (Year 1 - Year 0)
+        if historical_inflation is None:
+            historical_inflation = tf.zeros_like(sales_tensor)
+        inf_tensor = tf.convert_to_tensor(historical_inflation, dtype=tf.float64)
 
-        # 1. Data for Asset Growth
-        # Y: Change in NCA from t-1 to t
+        # --- Prepare Training Data & Alignment ---
+
+        # 1. Asset Growth: (NCA_t - NCA_{t-1}) = sales_t * asset_growth
         delta_nca_true = nca_tensor[1:] - nca_tensor[:-1]
-        # X: Revenue at time t (corresponding to the change)
-        sales_aligned = sales_tensor[1:]
+        sales_aligned_growth = sales_tensor[1:]
 
-        # 2. Data for Depreciation
-        # Y: Depreciation expense at time t
+        # 2. Depreciation: depr_t = nca_{t-1} * depr_rate
         depr_true = depr_tensor[1:]
-        # X: NCA at time t-1 (Previous year's asset base drives this year's depreciation)
         nca_prev_aligned = nca_tensor[:-1]
+
+        # 3. Advance Payments Sales: adv_ps_t = sales_{t+1} * adv_ps_pct
+        adv_ps_true = adv_pay_sales_tensor[:-1]
+        sales_next_aligned = sales_tensor[1:]
+
+        # 4. Advance Payments Purchases: adv_pp_t = purchases_{t+1} * adv_pp_pct
+        adv_pp_true = adv_pay_purch_tensor[:-1]
+        purchases_next_aligned = purchases_tensor[1:]
+
+        # 5. Accounts Receivable: ar_t = sales_t * ar_pct
+        ar_true = ar_tensor
+        sales_aligned_ar = sales_tensor
+
+        # 6. Accounts Payable: ap_t = purchases_t * ap_pct
+        ap_true = ap_tensor
+        purchases_aligned_ap = purchases_tensor
+
+        # 7. Inventory: inv_t = sales_t * inv_pct
+        inv_true = inv_tensor
+        sales_aligned_inv = sales_tensor
+
+        # 8. Total Liquidity: (cash_t + ims_t) = sales_t * tl_pct
+        tl_true = cash_tensor + ims_tensor
+        sales_aligned_tl = sales_tensor
+
+        # 9. Cash as % of Liquidity: cash_t = (cash_t + ims_t) * cash_pct
+        cash_true = cash_tensor
+        tl_aligned_cash = cash_tensor + ims_tensor
+
+        # 10. Income Tax: tax_t = ni_t * it_pct (as requested by user)
+        tax_true = tax_tensor
+        ni_aligned_tax = ni_tensor
+
+        # 11. OpEx: opex_t = baseline_opex * (1+inf)**t + variable_opex_pct * sales_t
+        opex_true = opex_tensor
+        sales_aligned_opex = sales_tensor
+        # time index for opex (t=1, 2, 3...)
+        t_indices = tf.range(1, len(historical_sales) + 1, dtype=tf.float64)
+
+        # 12. Dividends: div_t = ni_{t-1} * div_pct
+        div_true = div_tensor[1:]
+        ni_prev_aligned = ni_tensor[:-1]
+
+        # 13. Stock Buyback: bb_t = depr_t * bb_pct
+        bb_true = bb_tensor
+        depr_aligned_bb = depr_tensor
 
         # Optimizer
         optimizer = tf.optimizers.Adam(learning_rate=learning_rate)
 
-        print(f"Training on {len(sales_aligned)} years of historical data...")
+        print(f"Training on {len(historical_sales)} years of historical data...")
 
         # --- Training Loop ---
+        vars_to_train = [
+            self.asset_growth,
+            self.depreciation_rate,
+            self.advance_payments_sales_pct,
+            self.advance_payments_purchases_pct,
+            self.account_receivables_pct,
+            self.account_payables_pct,
+            self.inventory_pct,
+            self.total_liquidity_pct,
+            self.cash_pct_of_liquidity,
+            self.income_tax_pct,
+            self.variable_opex_pct,
+            self.baseline_opex,
+            self.dividend_payout_ratio_pct,
+            self.stock_buyback_pct,
+        ]
+
         for i in range(epochs):
             with tf.GradientTape() as tape:
-                # A. Asset Growth Prediction
-                # Model: Delta_NCA = Sales * Rate
-                pred_delta_nca = sales_aligned * self.asset_growth
-                loss_growth = tf.reduce_mean(tf.square(delta_nca_true - pred_delta_nca))
+                # Losses
+                loss_growth = tf.reduce_mean(
+                    tf.square(delta_nca_true - sales_aligned_growth * self.asset_growth)
+                )
+                loss_depr = tf.reduce_mean(
+                    tf.square(depr_true - nca_prev_aligned * self.depreciation_rate)
+                )
+                loss_adv_ps = tf.reduce_mean(
+                    tf.square(
+                        adv_ps_true
+                        - sales_next_aligned * self.advance_payments_sales_pct
+                    )
+                )
+                loss_adv_pp = tf.reduce_mean(
+                    tf.square(
+                        adv_pp_true
+                        - purchases_next_aligned * self.advance_payments_purchases_pct
+                    )
+                )
+                loss_ar = tf.reduce_mean(
+                    tf.square(ar_true - sales_aligned_ar * self.account_receivables_pct)
+                )
+                loss_ap = tf.reduce_mean(
+                    tf.square(
+                        ap_true - purchases_aligned_ap * self.account_payables_pct
+                    )
+                )
+                loss_inv = tf.reduce_mean(
+                    tf.square(inv_true - sales_aligned_inv * self.inventory_pct)
+                )
+                loss_tl = tf.reduce_mean(
+                    tf.square(tl_true - sales_aligned_tl * self.total_liquidity_pct)
+                )
+                loss_cash = tf.reduce_mean(
+                    tf.square(cash_true - tl_aligned_cash * self.cash_pct_of_liquidity)
+                )
+                loss_tax = tf.reduce_mean(
+                    tf.square(tax_true - ni_aligned_tax * self.income_tax_pct)
+                )
+                # opex = baseline * (1+inf)**t + var * sales
+                pred_opex = (
+                    self.baseline_opex * (1 + inf_tensor) ** t_indices
+                    + self.variable_opex_pct * sales_aligned_opex
+                )
+                loss_opex = tf.reduce_mean(tf.square(opex_true - pred_opex))
 
-                # B. Depreciation Prediction
-                # Model: Depr = NCA_prev * Rate
-                pred_depr = nca_prev_aligned * self.depreciation_rate
-                loss_depr = tf.reduce_mean(tf.square(depr_true - pred_depr))
+                loss_div = tf.reduce_mean(
+                    tf.square(
+                        div_true - ni_prev_aligned * self.dividend_payout_ratio_pct
+                    )
+                )
+                loss_bb = tf.reduce_mean(
+                    tf.square(bb_true - depr_aligned_bb * self.stock_buyback_pct)
+                )
 
-                # Combined Loss
-                total_loss = loss_growth + loss_depr
+                # Combined Loss (Heuristic: Normalize by scale to help Adam)
+                # But for simplicity, we'll just sum them up for now.
+                total_loss = (
+                    loss_growth
+                    + loss_depr
+                    + loss_adv_ps
+                    + loss_adv_pp
+                    + loss_ar
+                    + loss_ap
+                    + loss_inv
+                    + loss_tl
+                    + loss_cash
+                    + loss_tax
+                    + loss_opex
+                    + loss_div
+                    + loss_bb
+                )
 
             # Compute Gradients
-            vars_to_train = [self.asset_growth, self.depreciation_rate]
             grads = tape.gradient(total_loss, vars_to_train)
 
             # Apply Gradients
             optimizer.apply_gradients(zip(grads, vars_to_train))
 
             if i % 1000 == 0:
-                print(
-                    f"Epoch {i}: Loss={total_loss.numpy():.4e} | "
-                    f"%AG={self.asset_growth.numpy():.4f}, %Depr={self.depreciation_rate.numpy():.4f}"
-                )
+                print(f"Epoch {i}: Loss={total_loss.numpy():.4e}")
 
         print("-" * 50)
         print("Training Complete.")
-        print(f"Final Asset Growth Rate: {self.asset_growth.numpy():.5f}")
-        print(f"Final Depreciation Rate: {self.depreciation_rate.numpy():.5f}")
+        print(f"Final %AG: {self.asset_growth.numpy():.5f}")
+        print(f"Final %Depr: {self.depreciation_rate.numpy():.5f}")
+        print(f"Final %AdvPS: {self.advance_payments_sales_pct.numpy():.5f}")
+        print(f"Final %AdvPP: {self.advance_payments_purchases_pct.numpy():.5f}")
+        print(f"Final %AR: {self.account_receivables_pct.numpy():.5f}")
+        print(f"Final %AP: {self.account_payables_pct.numpy():.5f}")
+        print(f"Final %Inv: {self.inventory_pct.numpy():.5f}")
+        print(f"Final %TL: {self.total_liquidity_pct.numpy():.5f}")
+        print(f"Final %Cash: {self.cash_pct_of_liquidity.numpy():.5f}")
+        print(f"Final %IT: {self.income_tax_pct.numpy():.5f}")
+        print(f"Final %OR: {self.variable_opex_pct.numpy():.5f}")
+        print(f"Final Baseline OpEx: {self.baseline_opex.numpy():.2f}")
+        print(f"Final %PR: {self.dividend_payout_ratio_pct.numpy():.5f}")
+        print(f"Final %BB: {self.stock_buyback_pct.numpy():.5f}")
         print("-" * 50)
 
     def forecast_step(self, state, inputs):
@@ -509,10 +658,38 @@ def run_training_and_forecast():
     stock_buyback_hist = np.array(
         [89402000000, 77550000000, 94949000000, 90711000000], dtype=np.float64
     )
+    # OpEx from Operating Expenses in Income Statement
+    opex_hist = np.array(
+        [51345000000, 54847000000, 57467000000, 62151000000], dtype=np.float64
+    )
+    # Tax Provision from Income Statement
+    tax_hist = np.array(
+        [19300000000, 16741000000, 29749000000, 20719000000], dtype=np.float64
+    )
+    # Inflation hist
+    inflation_hist = np.array([0.0, 0.0, 0.0, 0.0], dtype=np.float64)
 
     # --- 2. TRAIN THE MODEL ---
     # We feed in the historical arrays from 2022-2024, and leave 2025 for forecast testing.
-    model.train_simple_policies(sales_hist[:-1], nca_hist[:-1], depr_hist[:-1])
+    model.train_simple_policies(
+        historical_sales=sales_hist[:-1],
+        historical_purchases=purchases_hist[:-1],
+        historical_nca=nca_hist[:-1],
+        historical_depreciation=depr_hist[:-1],
+        historical_adv_pay_sales=advance_payments_sales_hist[:-1],
+        historical_adv_pay_purch=advance_payments_purchases_hist[:-1],
+        historical_ar=accounts_receivable_hist[:-1],
+        historical_ap=accounts_payable_hist[:-1],
+        historical_inventory=inventory_hist[:-1],
+        historical_cash=cash_hist[:-1],
+        historical_ims=investment_in_market_securities_hist[:-1],
+        historical_net_income=net_income_hist[:-1],
+        historical_dividends=dividends_hist[:-1],
+        historical_stock_buyback=stock_buyback_hist[:-1],
+        historical_opex=opex_hist[:-1],
+        historical_tax=tax_hist[:-1],
+        historical_inflation=inflation_hist[:-1],
+    )
 
     # --- 3. RUN FORECAST (Using new parameters) ---
     # Initial State (t=0) 2024 Apple Balance Sheet
