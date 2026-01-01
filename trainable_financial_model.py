@@ -454,44 +454,51 @@ class TrainableFinancialModel(tf.Module):
                     ),
                     tf.reduce_mean(
                         tf.square(
-                            data["adv_ps"][:-1]
+                            data["advance_payments_sales"][:-1]
                             - data["sales"][1:] * self.advance_payments_sales_pct
                         )
                     ),
                     tf.reduce_mean(
                         tf.square(
-                            data["adv_pp"][:-1]
+                            data["advance_payments_purchases"][:-1]
                             - data["purchases"][1:]
                             * self.advance_payments_purchases_pct
                         )
                     ),
                     tf.reduce_mean(
                         tf.square(
-                            data["ar"] - data["sales"] * self.account_receivables_pct
+                            data["accounts_receivable"]
+                            - data["sales"] * self.account_receivables_pct
                         )
                     ),
                     tf.reduce_mean(
                         tf.square(
-                            data["ap"] - data["purchases"] * self.account_payables_pct
+                            data["accounts_payable"]
+                            - data["purchases"] * self.account_payables_pct
                         )
                     ),
                     tf.reduce_mean(
-                        tf.square(data["inv"] - data["sales"] * self.inventory_pct)
+                        tf.square(
+                            data["inventory"] - data["sales"] * self.inventory_pct
+                        )
                     ),
                     tf.reduce_mean(
                         tf.square(
-                            (data["cash"] + data["ims"])
+                            (data["cash"] + data["investment_in_market_securities"])
                             - data["sales"] * self.total_liquidity_pct
                         )
                     ),
                     tf.reduce_mean(
                         tf.square(
                             data["cash"]
-                            - (data["cash"] + data["ims"]) * self.cash_pct_of_liquidity
+                            - (data["cash"] + data["investment_in_market_securities"])
+                            * self.cash_pct_of_liquidity
                         )
                     ),
                     tf.reduce_mean(
-                        tf.square(data["tax"] - data["ni"] * self.income_tax_pct)
+                        tf.square(
+                            data["tax"] - data["net_income"] * self.income_tax_pct
+                        )
                     ),
                     tf.reduce_mean(
                         tf.square(
@@ -504,12 +511,15 @@ class TrainableFinancialModel(tf.Module):
                     ),
                     tf.reduce_mean(
                         tf.square(
-                            data["div"][1:]
-                            - data["ni"][:-1] * self.dividend_payout_ratio_pct
+                            data["dividends"][1:]
+                            - data["net_income"][:-1] * self.dividend_payout_ratio_pct
                         )
                     ),
                     tf.reduce_mean(
-                        tf.square(data["bb"] - data["depr"] * self.stock_buyback_pct)
+                        tf.square(
+                            data["stock_buyback"]
+                            - data["depr"] * self.stock_buyback_pct
+                        )
                     ),
                 ]
                 total_loss = tf.add_n(losses)
@@ -552,17 +562,21 @@ class TrainableFinancialModel(tf.Module):
                     # Construct state with full descriptive names
                     prev_state = {
                         "nca": data["nca"][t],
-                        "advance_payments_purchases": data["adv_pp"][t],
-                        "accounts_receivable": data["ar"][t],
-                        "inventory": data["inv"][t],
+                        "advance_payments_purchases": data[
+                            "advance_payments_purchases"
+                        ][t],
+                        "accounts_receivable": data["accounts_receivable"][t],
+                        "inventory": data["inventory"][t],
                         "cash": data["cash"][t],
-                        "investment_in_market_securities": data["ims"][t],
-                        "accounts_payable": data["ap"][t],
-                        "advance_payments_sales": data["adv_ps"][t],
-                        "current_liabilities": data["cl"][t],
-                        "non_current_liabilities": data["ncl"][t],
+                        "investment_in_market_securities": data[
+                            "investment_in_market_securities"
+                        ][t],
+                        "accounts_payable": data["accounts_payable"][t],
+                        "advance_payments_sales": data["advance_payments_sales"][t],
+                        "current_liabilities": data["current_liabilities"][t],
+                        "non_current_liabilities": data["non_current_liabilities"][t],
                         "equity": data["equity"][t],
-                        "net_income": data["ni"][t],
+                        "net_income": data["net_income"][t],
                     }
                     inputs = EconomicInputs(
                         sales_t=data["sales"][t + 1],
@@ -574,9 +588,15 @@ class TrainableFinancialModel(tf.Module):
                     pred = self.forecast_step(prev_state, inputs)
 
                     losses = [
-                        tf.square(pred.net_income - data["ni"][t + 1]),
-                        tf.square(pred.current_liabilities - data["cl"][t + 1]),
-                        tf.square(pred.non_current_liabilities - data["ncl"][t + 1]),
+                        tf.square(pred.net_income - data["net_income"][t + 1]),
+                        tf.square(
+                            pred.current_liabilities
+                            - data["current_liabilities"][t + 1]
+                        ),
+                        tf.square(
+                            pred.non_current_liabilities
+                            - data["non_current_liabilities"][t + 1]
+                        ),
                         tf.square(pred.equity - data["equity"][t + 1]),
                     ]
                     total_loss += tf.add_n(losses) / 1e18  # Normalization
@@ -675,7 +695,7 @@ def run_training_and_forecast():
     historical_data = {
         "sales": sales,
         "purchases": purchases,
-        "inv": inv_raw[1:],
+        "inventory": inv_raw[1:],
         "depr": np.array(
             [10903e6, 12547e6, 11056e6, 11284e6, 11104e6, 11519e6, 11445e6, 11698e6]
         ),
@@ -691,28 +711,28 @@ def run_training_and_forecast():
                 2.11284e11,
             ]
         ),
-        "adv_pp": np.array(
+        "advance_payments_purchases": np.array(
             [12087e6, 12352e6, 11264e6, 14111e6, 21223e6, 14695e6, 14287e6, 14585e6]
         ),
-        "ar": np.array(
+        "accounts_receivable": np.array(
             [48995e6, 45804e6, 37445e6, 51506e6, 60932e6, 60985e6, 66243e6, 72957e6]
         ),
         "cash": np.array(
             [25913e6, 48844e6, 38016e6, 34940e6, 23646e6, 29965e6, 29943e6, 35934e6]
         ),
-        "ims": np.array(
+        "investment_in_market_securities": np.array(
             [40388e6, 51713e6, 52927e6, 27699e6, 24658e6, 31590e6, 35228e6, 18763e6]
         ),
-        "ap": np.array(
+        "accounts_payable": np.array(
             [55888e6, 46236e6, 42296e6, 54763e6, 64115e6, 62611e6, 68960e6, 69860e6]
         ),
-        "adv_ps": np.array(
+        "advance_payments_sales": np.array(
             [5966e6, 5522e6, 6643e6, 7612e6, 7912e6, 8061e6, 8249e6, 9055e6]
         ),
-        "cl": np.array(
+        "current_liabilities": np.array(
             [55012e6, 53960e6, 56453e6, 63106e6, 81955e6, 74636e6, 99183e6, 86716e6]
         ),
-        "ncl": np.array(
+        "non_current_liabilities": np.array(
             [
                 1.41712e11,
                 1.4231e11,
@@ -727,13 +747,13 @@ def run_training_and_forecast():
         "equity": np.array(
             [1.07147e11, 90488e6, 65339e6, 63090e6, 50672e6, 62146e6, 56950e6, 73733e6]
         ),
-        "ni": np.array(
+        "net_income": np.array(
             [59531e6, 55256e6, 57411e6, 94680e6, 99803e6, 96995e6, 93736e6, 112010e6]
         ),
-        "div": np.array(
+        "dividends": np.array(
             [13712e6, 14119e6, 14081e6, 14467e6, 14841e6, 15025e6, 15234e6, 15421e6]
         ),
-        "bb": np.array(
+        "stock_buyback": np.array(
             [72738e6, 66897e6, 72358e6, 85971e6, 89402e6, 77550e6, 94949e6, 90711e6]
         ),
         "opex": np.array(
