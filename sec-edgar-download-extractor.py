@@ -552,8 +552,8 @@ if __name__ == "__main__":
         # 1. Clean up old data and download the new detailed files
         # NOTE: If you have already downloaded the files, you can comment out the next two lines
         # to save time, but it's safest to run them.
-        # clean_previous_downloads()
-        # download_10k()
+        clean_previous_downloads()
+        download_10k()
 
         # 2. Locate all the primary documents
         filing_paths = find_all_filing_paths()
