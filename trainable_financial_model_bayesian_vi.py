@@ -1,11 +1,15 @@
 import tensorflow as tf
+import tensorflow_probability as tfp
 import numpy as np
+
+tfd = tfp.distributions
+tfb = tfp.bijectors
 
 
 # --- 1. Define the Trainable Model ---
 class TrainableFinancialModel(tf.Module):
     def __init__(self):
-        # --- Policy Parameters ---
+        # --- Policy Parameters (Deterministic) ---
         ## These are trainable with simple linear regression
         self.asset_growth = tf.Variable(
             0.0076, name="asset_growth", dtype=tf.float64
@@ -14,42 +18,68 @@ class TrainableFinancialModel(tf.Module):
             0.055, name="depr_rate", dtype=tf.float64
         )  # %Depr
         self.advance_payments_sales_pct = tf.Variable(
-            0.020614523, name="advance_payments_sales_pct", dtype=tf.float64
+            0.0206, name="adv_ps", dtype=tf.float64
         )  # %AdvPS
         self.advance_payments_purchases_pct = tf.Variable(
-            0.073525733, name="advance_payments_purchases_pct", dtype=tf.float64
+            0.0735, name="adv_pp", dtype=tf.float64
         )  # %AdvPP
         self.account_receivables_pct = tf.Variable(
-            0.159111366, name="account_receivables_pct", dtype=tf.float64
+            0.1591, name="ar_pct", dtype=tf.float64
         )  # %AR
         self.account_payables_pct = tf.Variable(
-            0.35014191, name="account_payables_pct", dtype=tf.float64
+            0.3501, name="ap_pct", dtype=tf.float64
         )  # %AP
         self.inventory_pct = tf.Variable(
-            0.0165, name="inventory_pct", dtype=tf.float64
+            0.0165, name="inv_pct", dtype=tf.float64
         )  # %Inv
         self.total_liquidity_pct = tf.Variable(
-            0.16, name="total_liquidity_pct", dtype=tf.float64
+            0.16, name="tl_pct", dtype=tf.float64
         )  # %TL
         self.cash_pct_of_liquidity = tf.Variable(
-            0.487, name="cash_pct_of_liquidity", dtype=tf.float64
+            0.487, name="cash_pct", dtype=tf.float64
         )  # %Cash
         self.income_tax_pct = tf.Variable(
-            0.147, name="income_tax_pct", dtype=tf.float64
+            0.147, name="tax_pct", dtype=tf.float64
         )  # %IT
-        self.variable_opex_pct = tf.Variable(
-            0.222168147, name="variable_opex_pct", dtype=tf.float64
-        )  # %OR
-        self.baseline_opex = tf.Variable(
-            -30306718214, name="baseline_opex", dtype=tf.float64
-        )  # OBT_start
         self.dividend_payout_ratio_pct = tf.Variable(
-            0.15, name="dividend_payout_ratio_pct", dtype=tf.float64
+            0.15, name="div_pct", dtype=tf.float64
         )  # %PR
         self.stock_buyback_pct = tf.Variable(
-            7.5, name="stock_buyback_pct", dtype=tf.float64
+            7.5, name="bb_pct", dtype=tf.float64
         )  # %BB
 
+        # --- BAYESIAN OPEX PARAMETERS (Variational Inference) ---
+        # We learn a distribution (Normal) defined by a Mean (loc) and StdDev (scale)
+
+        # 1. Variable OpEx %
+        self.q_var_opex_loc = tf.Variable(0.22, dtype=tf.float64, name="q_var_opex_loc")
+        self.q_var_opex_scale = tfp.util.TransformedVariable(
+            initial_value=0.01,
+            bijector=tfb.Softplus(),  # Ensures scale is always positive
+            dtype=tf.float64,
+            name="q_var_opex_scale",
+        )
+
+        # 2. Baseline OpEx (Large negative number)
+        self.q_base_opex_loc = tf.Variable(
+            -3.0e10, dtype=tf.float64, name="q_base_opex_loc"
+        )
+        self.q_base_opex_scale = tfp.util.TransformedVariable(
+            initial_value=1.0e9,
+            bijector=tfb.Softplus(),
+            dtype=tf.float64,
+            name="q_base_opex_scale",
+        )
+
+        # 3. Aleatoric Uncertainty (The inherent noise in the OpEx data)
+        self.noise_sigma = tfp.util.TransformedVariable(
+            initial_value=1.0e9,
+            bijector=tfb.Softplus(),
+            dtype=tf.float64,
+            name="noise_sigma",
+        )
+
+        # --- Structural Parameters ---
         ## These are trained with gradient descent with the trained variables from above and other data (sales, purchases, equity, liabilities, etc.) as inputs
         self.avg_short_term_interest_pct = tf.Variable(
             0.6, name="avg_short_term_interest_pct", dtype=tf.float64
@@ -67,16 +97,31 @@ class TrainableFinancialModel(tf.Module):
             0.15, name="equity_financing_pct", dtype=tf.float64
         )  # %EF
 
-    def __call__(self, initial_state, sales_series, purchases_series):
-        # Run the full forecast loop
-        state = initial_state
-        outputs = []
-        for t in range(len(sales_series)):
-            inputs = {
-                "sales_t": sales_series[t],
-                "purchases_t": purchases_series[t],
-            }
-        return outputs
+    def sample_opex_params(self):
+        """Samples from the variational posterior using Reparameterization Trick"""
+        # Create distributions
+        q_var_dist = tfd.Normal(loc=self.q_var_opex_loc, scale=self.q_var_opex_scale)
+        q_base_dist = tfd.Normal(loc=self.q_base_opex_loc, scale=self.q_base_opex_scale)
+
+        return q_var_dist.sample(), q_base_dist.sample()
+
+    def get_opex_kl_divergence(self):
+        """Calculates KL Divergence between Posterior (q) and Prior (p)"""
+        # Define Priors (Fixed beliefs)
+        # Prior: Variable OpEx is around 20% with some wiggle room
+        prior_var = tfd.Normal(loc=tf.constant(0.20, dtype=tf.float64), scale=0.1)
+        # Prior: Baseline OpEx is around -30B with large wiggle room
+        prior_base = tfd.Normal(
+            loc=tf.constant(-3.0e10, dtype=tf.float64), scale=1.0e10
+        )
+
+        # Define Posteriors
+        q_var = tfd.Normal(loc=self.q_var_opex_loc, scale=self.q_var_opex_scale)
+        q_base = tfd.Normal(loc=self.q_base_opex_loc, scale=self.q_base_opex_scale)
+
+        return tfd.kl_divergence(q_var, prior_var) + tfd.kl_divergence(
+            q_base, prior_base
+        )
 
     def train_simple_policies(
         self,
@@ -97,7 +142,7 @@ class TrainableFinancialModel(tf.Module):
         historical_opex,
         historical_tax,
         historical_inflation=None,
-        learning_rate=0.0001,  # Lower LR for stability with large numbers
+        learning_rate=0.0001,
         epochs=5000,
     ):
         """
@@ -129,6 +174,7 @@ class TrainableFinancialModel(tf.Module):
         if historical_inflation is None:
             historical_inflation = tf.zeros_like(sales_tensor)
         inf_tensor = tf.convert_to_tensor(historical_inflation, dtype=tf.float64)
+        cum_inf_tensor = tf.math.cumprod(1 + inf_tensor)
 
         # --- Prepare Training Data & Alignment ---
 
@@ -147,48 +193,11 @@ class TrainableFinancialModel(tf.Module):
         # 4. Advance Payments Purchases: adv_pp_t = purchases_{t+1} * adv_pp_pct
         adv_pp_true = adv_pay_purch_tensor[:-1]
         purchases_next_aligned = purchases_tensor[1:]
-
-        # 5. Accounts Receivable: ar_t = sales_t * ar_pct
-        ar_true = ar_tensor
-        sales_aligned_ar = sales_tensor
-
-        # 6. Accounts Payable: ap_t = purchases_t * ap_pct
-        ap_true = ap_tensor
-        purchases_aligned_ap = purchases_tensor
-
-        # 7. Inventory: inv_t = sales_t * inv_pct
-        inv_true = inv_tensor
-        sales_aligned_inv = sales_tensor
-
-        # 8. Total Liquidity: (cash_t + ims_t) = sales_t * tl_pct
-        tl_true = cash_tensor + ims_tensor
-        sales_aligned_tl = sales_tensor
-
-        # 9. Cash as % of Liquidity: cash_t = (cash_t + ims_t) * cash_pct
-        cash_true = cash_tensor
-        tl_aligned_cash = cash_tensor + ims_tensor
-
-        # 10. Income Tax: tax_t = ni_t * it_pct
-        tax_true = tax_tensor
-        ni_aligned_tax = ni_tensor
-
-        # 11. OpEx: opex_t = baseline_opex * product(1+inf_i) + variable_opex_pct * sales_t
-        opex_true = opex_tensor
-        sales_aligned_opex = sales_tensor
-        # cumulative inflation: (1+inf_1), (1+inf_1)(1+inf_2), ...
-        cum_inf_tensor = tf.math.cumprod(1 + inf_tensor)
-
-        # 12. Dividends: div_t = ni_{t-1} * div_pct
+        # 5. Dividends: div_t = ni_{t-1} * div_pct
         div_true = div_tensor[1:]
         ni_prev_aligned = ni_tensor[:-1]
 
-        # 13. Stock Buyback: bb_t = depr_t * bb_pct
-        bb_true = bb_tensor
-        depr_aligned_bb = depr_tensor
-
-        # Optimizer
         optimizer = tf.optimizers.Adam(learning_rate=learning_rate)
-
         print(f"Training on {len(historical_sales)} years of historical data...")
 
         # --- Training Loop ---
@@ -203,15 +212,19 @@ class TrainableFinancialModel(tf.Module):
             self.total_liquidity_pct,
             self.cash_pct_of_liquidity,
             self.income_tax_pct,
-            self.variable_opex_pct,
-            self.baseline_opex,
             self.dividend_payout_ratio_pct,
             self.stock_buyback_pct,
+            # Bayesian Params
+            self.q_var_opex_loc,
+            self.q_var_opex_scale.trainable_variables[0],
+            self.q_base_opex_loc,
+            self.q_base_opex_scale.trainable_variables[0],
+            self.noise_sigma.trainable_variables[0],
         ]
 
         for i in range(epochs):
             with tf.GradientTape() as tape:
-                # Losses
+                # --- Deterministic Losses (MSE) ---
                 loss_growth = tf.reduce_mean(
                     tf.square(delta_nca_true - sales_aligned_growth * self.asset_growth)
                 )
@@ -231,40 +244,65 @@ class TrainableFinancialModel(tf.Module):
                     )
                 )
                 loss_ar = tf.reduce_mean(
-                    tf.square(ar_true - sales_aligned_ar * self.account_receivables_pct)
+                    tf.square(ar_tensor - sales_tensor * self.account_receivables_pct)
                 )
                 loss_ap = tf.reduce_mean(
-                    tf.square(
-                        ap_true - purchases_aligned_ap * self.account_payables_pct
-                    )
+                    tf.square(ap_tensor - purchases_tensor * self.account_payables_pct)
                 )
                 loss_inv = tf.reduce_mean(
-                    tf.square(inv_true - sales_aligned_inv * self.inventory_pct)
+                    tf.square(inv_tensor - sales_tensor * self.inventory_pct)
                 )
                 loss_tl = tf.reduce_mean(
-                    tf.square(tl_true - sales_aligned_tl * self.total_liquidity_pct)
+                    tf.square(
+                        (cash_tensor + ims_tensor)
+                        - sales_tensor * self.total_liquidity_pct
+                    )
                 )
                 loss_cash = tf.reduce_mean(
-                    tf.square(cash_true - tl_aligned_cash * self.cash_pct_of_liquidity)
+                    tf.square(
+                        cash_tensor
+                        - (cash_tensor + ims_tensor) * self.cash_pct_of_liquidity
+                    )
                 )
                 loss_tax = tf.reduce_mean(
-                    tf.square(tax_true - ni_aligned_tax * self.income_tax_pct)
+                    tf.square(tax_tensor - ni_tensor * self.income_tax_pct)
                 )
-                # opex = baseline * product(1+inf_i) + var * sales
-                pred_opex = (
-                    self.baseline_opex * cum_inf_tensor
-                    + self.variable_opex_pct * sales_aligned_opex
-                )
-                loss_opex = tf.reduce_mean(tf.square(opex_true - pred_opex))
-
                 loss_div = tf.reduce_mean(
                     tf.square(
                         div_true - ni_prev_aligned * self.dividend_payout_ratio_pct
                     )
                 )
                 loss_bb = tf.reduce_mean(
-                    tf.square(bb_true - depr_aligned_bb * self.stock_buyback_pct)
+                    tf.square(bb_tensor - depr_tensor * self.stock_buyback_pct)
                 )
+
+                # --- Bayesian OpEx Loss (Negative ELBO) ---
+                # 1. Sample from Posterior
+                var_opex_sample, base_opex_sample = self.sample_opex_params()
+
+                # 2. Predict OpEx using samples
+                # opex = baseline * product(1+inf) + var * sales
+                pred_opex_mean = (base_opex_sample * cum_inf_tensor) + (
+                    var_opex_sample * sales_tensor
+                )
+
+                # 3. Calculate Negative Log Likelihood
+                # We assume the Observed OpEx comes from N(pred_mean, noise_sigma)
+                likelihood_dist = tfd.Normal(loc=pred_opex_mean, scale=self.noise_sigma)
+                neg_log_likelihood = -tf.reduce_sum(
+                    likelihood_dist.log_prob(opex_tensor)
+                )
+
+                # 4. Calculate KL Divergence
+                kl = self.get_opex_kl_divergence()
+
+                # Weighting: Scale down likelihood or up KL?
+                # Since we have few data points and large numbers, simple summation is risky.
+                # Heuristic: Scale KL by 1.0 (standard) and treat NegLL as usual.
+                # Note: Because financial numbers are ~1e10, NegLL will be huge.
+                # We normalize the NegLL by a factor to make gradients stable relative to MSE losses.
+                scale_factor = 1e-20  # Empirically helps with large numbers
+                loss_opex_bayes = (neg_log_likelihood + kl) * scale_factor
 
                 # Combined Loss (Heuristic: Normalize by scale to help Adam)
                 # But for simplicity, we'll just sum them up for now.
@@ -279,9 +317,9 @@ class TrainableFinancialModel(tf.Module):
                     + loss_tl
                     + loss_cash
                     + loss_tax
-                    + loss_opex
                     + loss_div
                     + loss_bb
+                    + loss_opex_bayes
                 )
 
             # Compute Gradients
@@ -290,7 +328,7 @@ class TrainableFinancialModel(tf.Module):
             # Apply Gradients
             optimizer.apply_gradients(zip(grads, vars_to_train))
 
-            # --- Constraints ---
+            # --- Constraints (Clipping)
             self.asset_growth.assign(tf.maximum(0.0, self.asset_growth))
             self.depreciation_rate.assign(tf.maximum(0.0, self.depreciation_rate))
             self.advance_payments_sales_pct.assign(
@@ -309,14 +347,15 @@ class TrainableFinancialModel(tf.Module):
                 tf.clip_by_value(self.cash_pct_of_liquidity, 0.0, 1.0)
             )
             self.income_tax_pct.assign(tf.clip_by_value(self.income_tax_pct, 0.0, 1.0))
-            self.variable_opex_pct.assign(tf.maximum(0.0, self.variable_opex_pct))
             self.dividend_payout_ratio_pct.assign(
                 tf.clip_by_value(self.dividend_payout_ratio_pct, 0.0, 1.0)
             )
             self.stock_buyback_pct.assign(tf.maximum(0.0, self.stock_buyback_pct))
 
             if i % 1000 == 0:
-                print(f"Epoch {i}: Loss={total_loss.numpy():.4e}")
+                print(
+                    f"Epoch {i}: Loss={total_loss.numpy():.4e} | OpEx Noise={self.noise_sigma.numpy():.2e}"
+                )
 
         print("-" * 50)
         print("Training Complete.")
@@ -330,10 +369,15 @@ class TrainableFinancialModel(tf.Module):
         print(f"Final %TL: {self.total_liquidity_pct.numpy():.5f}")
         print(f"Final %Cash: {self.cash_pct_of_liquidity.numpy():.5f}")
         print(f"Final %IT: {self.income_tax_pct.numpy():.5f}")
-        print(f"Final %OR: {self.variable_opex_pct.numpy():.5f}")
-        print(f"Final Baseline OpEx: {self.baseline_opex.numpy():.2f}")
         print(f"Final %PR: {self.dividend_payout_ratio_pct.numpy():.5f}")
         print(f"Final %BB: {self.stock_buyback_pct.numpy():.5f}")
+        print(
+            f"Bayesian OpEx Variable %: Mean={self.q_var_opex_loc.numpy():.4f}, Std={self.q_var_opex_scale.numpy():.4f}"
+        )
+        print(
+            f"Bayesian OpEx Baseline:   Mean={self.q_base_opex_loc.numpy():.2e}, Std={self.q_base_opex_scale.numpy():.2e}"
+        )
+
         print("-" * 50)
 
     def train_structural_parameters(
@@ -364,7 +408,8 @@ class TrainableFinancialModel(tf.Module):
         Trains structural parameters (interest rates, maturity, financing)
         using historical state transitions.
         """
-        # Convert inputs to tensors and ensure float64
+        # NOTE: When calling forecast_step inside here, we need to pass use_mean_opex=True
+        # because we want to learn structural parameters based on the "most likely" OpEx, not noisy samples.
         sales_t = tf.convert_to_tensor(historical_sales, dtype=tf.float64)
         purch_t = tf.convert_to_tensor(historical_purchases, dtype=tf.float64)
         nca_t = tf.convert_to_tensor(historical_nca, dtype=tf.float64)
@@ -376,10 +421,6 @@ class TrainableFinancialModel(tf.Module):
         cash_t = tf.convert_to_tensor(historical_cash, dtype=tf.float64)
         ims_t = tf.convert_to_tensor(historical_ims, dtype=tf.float64)
         ni_t = tf.convert_to_tensor(historical_net_income, dtype=tf.float64)
-        div_t = tf.convert_to_tensor(historical_dividends, dtype=tf.float64)
-        bb_t = tf.convert_to_tensor(historical_stock_buyback, dtype=tf.float64)
-        opex_t = tf.convert_to_tensor(historical_opex, dtype=tf.float64)
-        tax_t = tf.convert_to_tensor(historical_tax, dtype=tf.float64)
         cl_t = tf.convert_to_tensor(historical_current_liabilities, dtype=tf.float64)
         ncl_t = tf.convert_to_tensor(
             historical_non_current_liabilities, dtype=tf.float64
@@ -400,10 +441,7 @@ class TrainableFinancialModel(tf.Module):
             self.equity_financing_pct,
         ]
 
-        print(
-            f"Training structural parameters on {len(historical_sales)-2} transitions..."
-        )
-
+        print(f"Training structural parameters...")
         for i in range(epochs):
             with tf.GradientTape() as tape:
                 total_loss = 0.0
@@ -436,7 +474,10 @@ class TrainableFinancialModel(tf.Module):
                         "cum_inflation": cum_inf_t[t + 1],
                     }
 
-                    state_pred = self.forecast_step(state_prev, inputs_curr)
+                    # IMPORTANT: Use mean (deterministic) OpEx for structural training
+                    state_pred = self.forecast_step(
+                        state_prev, inputs_curr, use_mean_opex=True
+                    )
 
                     # Targets are values at t+1
                     loss_ni = tf.square(state_pred["net_income"] - ni_t[t + 1])
@@ -480,7 +521,7 @@ class TrainableFinancialModel(tf.Module):
         print(f"Final %EF: {self.equity_financing_pct.numpy():.5f}")
         print("-" * 50)
 
-    def forecast_step(self, state, inputs):
+    def forecast_step(self, state, inputs, use_mean_opex=False):
         """
         Calculate t based on t-1 state and t inputs.
         Implements the logic of Pareja (09) Cash Budget construction
@@ -493,8 +534,6 @@ class TrainableFinancialModel(tf.Module):
         inventory_prev = state["inventory"]
         cash_prev = state["cash"]
         investment_in_market_securities_prev = state["investment_in_market_securities"]
-        total_liquidity_prev = cash_prev + investment_in_market_securities_prev
-        depreciation = nca_prev * self.depreciation_rate
 
         ## Liabilities and Equity
         accounts_payable_prev = state["accounts_payable"]
@@ -504,10 +543,11 @@ class TrainableFinancialModel(tf.Module):
 
         ## Equity
         equity_prev = state["equity"]
-        stock_buyback = depreciation * self.stock_buyback_pct
-
         ## Net Income
         net_income_prev = state["net_income"]
+
+        depreciation = nca_prev * self.depreciation_rate
+        stock_buyback = depreciation * self.stock_buyback_pct
         dividends_prev = net_income_prev * self.dividend_payout_ratio_pct
 
         # Unpack current inputs (t)
@@ -552,7 +592,20 @@ class TrainableFinancialModel(tf.Module):
         # Then, EBT is calculated by EBITDA - Depreciation - loan interest payments + return from market securities.
         # Finally, NI is calculated by EBT - Tax.
         cogs = inventory_prev + purchases_t - inventory_curr
-        opex = self.baseline_opex * cum_inflation + sales_t * self.variable_opex_pct
+
+        # --- BAYESIAN OPEX CALCULATION ---
+        if use_mean_opex:
+            # For deterministic paths or structural training
+            var_opex = self.q_var_opex_loc
+            base_opex = self.q_base_opex_loc
+            noise = 0.0
+        else:
+            # Sample for Monte Carlo forecasting
+            var_opex, base_opex = self.sample_opex_params()
+            noise = tfd.Normal(0.0, self.noise_sigma).sample()
+
+        opex = (base_opex * cum_inflation + sales_t * var_opex) + noise
+
         ebitda = sales_t - cogs - opex
 
         # Principals and interests are based on PREVIOUS debt (No Circularity)
@@ -570,12 +623,10 @@ class TrainableFinancialModel(tf.Module):
         principal_st = current_liabilities_prev - principal_lt
         interest_st = self.avg_short_term_interest_pct * principal_st
 
-        interest_payment = interest_st + interest_lt
         ms_return = (
             investment_in_market_securities_prev * self.market_securities_return_pct
         )
-
-        ebt = ebitda - depreciation - interest_payment + ms_return
+        ebt = ebitda - depreciation - (interest_st + interest_lt) + ms_return
         tax = ebt * self.income_tax_pct
         net_income_curr = ebt - tax
 
@@ -597,7 +648,6 @@ class TrainableFinancialModel(tf.Module):
             purchases_t * (1 - self.account_payables_pct)
             - advance_payments_purchases_prev
         )
-
         outflows = (
             purchases_curr
             + accounts_payable_prev
@@ -605,12 +655,10 @@ class TrainableFinancialModel(tf.Module):
             + opex
             + tax
         )
-
         operating_nlb = inflows - outflows
 
         # 3.2. Capital Expense Net Liquidity Balance (CapEx NLB)
         capex_nlb = -capex
-
         # 3.3. External Investment Net Liquidity Balance (External Investment NLB)
         ## Note: This only accounts for the return generated from the previous year's investment in market securities. It does not account for the investment in and out of market securities because that is done as a ratio of total liquidity balance.
         external_investment_nlb = ms_return
@@ -621,7 +669,7 @@ class TrainableFinancialModel(tf.Module):
         ## New short-term loan is found by:
         liquidity_deficit_st = (
             total_liquidity_curr
-            - total_liquidity_prev
+            - (cash_prev + investment_in_market_securities_prev)
             - external_investment_nlb
             - operating_nlb
             + principal_st
@@ -639,7 +687,6 @@ class TrainableFinancialModel(tf.Module):
             + dividends_prev
             + stock_buyback
         )
-
         long_term_financing = tf.maximum(0.0, liquidity_deficit_lt)
         new_long_term_loan = long_term_financing * (1 - self.equity_financing_pct)
         equity_financing = long_term_financing * self.equity_financing_pct
@@ -679,16 +726,13 @@ class TrainableFinancialModel(tf.Module):
         # 4.3. Non-current Liabilities (NLiab)
         ## This is equal to the total long-term liabilities minus the effective principal due next year
         non_current_liabilities_curr = (
-            (new_long_term_loan + non_current_liabilities_prev)
-            * (self.avg_maturity_years - 1)
-            / self.avg_maturity_years
-        )
+            new_long_term_loan + non_current_liabilities_prev
+        ) * ((self.avg_maturity_years - 1) / self.avg_maturity_years)
 
         # 4.4. Current Liabilities (CLiab)
         # This is equal to the new short-term plus the long-term liabilities' effective principal due next year
-        current_liabilities_curr = (
-            new_short_term_loan
-            + non_current_liabilities_curr / (self.avg_maturity_years - 1)
+        current_liabilities_curr = new_short_term_loan + (
+            non_current_liabilities_curr / (self.avg_maturity_years - 1)
         )
 
         # 4.5. Stockholders Equity (SE)
@@ -718,11 +762,10 @@ class TrainableFinancialModel(tf.Module):
             + non_current_liabilities_curr
             + equity_curr
         )
-
         # Check mismatch (Should be near zero if logic is consistent)
         check = total_assets - total_liab_equity
 
-        new_state = {
+        return {
             "nca": nca_curr,
             "advance_payments_purchases": advance_payments_purchases_curr,
             "accounts_receivable": accounts_receivable_curr,
@@ -737,16 +780,64 @@ class TrainableFinancialModel(tf.Module):
             "net_income": net_income_curr,
             "liquidity_check": liquidity_check,
             "check": check,
-            "stloan": new_short_term_loan,
-            "ltloan": new_long_term_loan,
-            "st_principal_paid": principal_st,
-            "lt_principal_paid": principal_lt,
         }
 
-        return new_state
+
+# --- Monte Carlo Forecast Execution ---
+def run_monte_carlo_forecast(
+    model,
+    initial_state,
+    sales_forecast,
+    purchases_forecast,
+    cum_inf_forecast,
+    n_samples=1000,
+):
+    print(f"\n--- Running Monte Carlo Forecast ({n_samples} samples) ---")
+
+    # Store trajectories
+    # Shape: [Samples, Years]
+    ni_trajectories = []
+    equity_trajectories = []
+
+    for i in range(n_samples):
+        current_state = initial_state.copy()
+        sample_ni = []
+        sample_equity = []
+
+        for t in range(len(sales_forecast) - 1):
+            inputs = {
+                "sales_t": tf.constant(sales_forecast[t]),
+                "purchases_t": tf.constant(purchases_forecast[t]),
+                "sales_t_plus_1": tf.constant(sales_forecast[t + 1]),
+                "purchases_t_plus_1": tf.constant(purchases_forecast[t + 1]),
+                "cum_inflation": tf.constant(cum_inf_forecast[t]),
+            }
+            # use_mean_opex=False triggers sampling
+            current_state = model.forecast_step(
+                current_state, inputs, use_mean_opex=False
+            )
+
+            sample_ni.append(current_state["net_income"].numpy())
+            sample_equity.append(current_state["equity"].numpy())
+
+        ni_trajectories.append(sample_ni)
+        equity_trajectories.append(sample_equity)
+
+    ni_trajectories = np.array(ni_trajectories)
+
+    # Calculate Statistics
+    mean_ni = np.mean(ni_trajectories, axis=0)
+    lower_bound = np.percentile(ni_trajectories, 2.5, axis=0)
+    upper_bound = np.percentile(ni_trajectories, 97.5, axis=0)
+
+    print(f"{'Year':<5} | {'Mean NI':<15} | {'2.5% CI':<15} | {'97.5% CI':<15}")
+    print("-" * 60)
+    for t in range(len(mean_ni)):
+        print(
+            f"{t+1:<5} | {mean_ni[t]:<15.2e} | {lower_bound[t]:<15.2e} | {upper_bound[t]:<15.2e}"
+        )
 
 
-# --- Training and Forecast Execution ---
 def run_training_and_forecast():
     model = TrainableFinancialModel()
 
@@ -1032,53 +1123,53 @@ def run_training_and_forecast():
     # --- 2. TRAIN THE MODEL ---
     # We feed in the historical arrays from 2022-2024, and leave 2025 for forecast testing.
     model.train_simple_policies(
-        historical_sales=sales_hist[:-1],
-        historical_purchases=purchases_hist[:-1],
-        historical_nca=nca_hist[:-1],
-        historical_depreciation=depr_hist[:-1],
-        historical_adv_pay_sales=advance_payments_sales_hist[:-1],
-        historical_adv_pay_purch=advance_payments_purchases_hist[:-1],
-        historical_ar=accounts_receivable_hist[:-1],
-        historical_ap=accounts_payable_hist[:-1],
-        historical_inventory=inventory_hist[:-1],
-        historical_cash=cash_hist[:-1],
-        historical_ims=investment_in_market_securities_hist[:-1],
-        historical_net_income=net_income_hist[:-1],
-        historical_dividends=dividends_hist[:-1],
-        historical_stock_buyback=stock_buyback_hist[:-1],
-        historical_opex=opex_hist[:-1],
-        historical_tax=tax_hist[:-1],
-        historical_inflation=inflation_hist[:-1],
+        sales_hist[:-1],
+        purchases_hist[:-1],
+        nca_hist[:-1],
+        depr_hist[:-1],
+        advance_payments_sales_hist[:-1],
+        advance_payments_purchases_hist[:-1],
+        accounts_receivable_hist[:-1],
+        accounts_payable_hist[:-1],
+        inventory_hist[:-1],
+        cash_hist[:-1],
+        investment_in_market_securities_hist[:-1],
+        net_income_hist[:-1],
+        dividends_hist[:-1],
+        stock_buyback_hist[:-1],
+        opex_hist[:-1],
+        tax_hist[:-1],
+        inflation_hist[:-1],
     )
 
     # --- 3. TRAIN STRUCTURAL PARAMETERS ---
     # We still only feed in the historical arrays from 2022-2024, and leave 2025 for forecast testing.
     model.train_structural_parameters(
-        historical_sales=sales_hist[:-1],
-        historical_purchases=purchases_hist[:-1],
-        historical_nca=nca_hist[:-1],
-        historical_adv_pay_sales=advance_payments_sales_hist[:-1],
-        historical_adv_pay_purch=advance_payments_purchases_hist[:-1],
-        historical_ar=accounts_receivable_hist[:-1],
-        historical_ap=accounts_payable_hist[:-1],
-        historical_inventory=inventory_hist[:-1],
-        historical_cash=cash_hist[:-1],
-        historical_ims=investment_in_market_securities_hist[:-1],
-        historical_net_income=net_income_hist[:-1],
-        historical_dividends=dividends_hist[:-1],
-        historical_stock_buyback=stock_buyback_hist[:-1],
-        historical_opex=opex_hist[:-1],
-        historical_tax=tax_hist[:-1],
-        historical_current_liabilities=current_liabilities_hist[:-1],
-        historical_non_current_liabilities=non_current_liabilities_hist[:-1],
-        historical_equity=equity_hist[:-1],
-        historical_inflation=inflation_hist[:-1],
+        sales_hist[:-1],
+        purchases_hist[:-1],
+        nca_hist[:-1],
+        advance_payments_sales_hist[:-1],
+        advance_payments_purchases_hist[:-1],
+        accounts_receivable_hist[:-1],
+        accounts_payable_hist[:-1],
+        inventory_hist[:-1],
+        cash_hist[:-1],
+        investment_in_market_securities_hist[:-1],
+        net_income_hist[:-1],
+        dividends_hist[:-1],
+        stock_buyback_hist[:-1],
+        opex_hist[:-1],
+        tax_hist[:-1],
+        current_liabilities_hist[:-1],
+        non_current_liabilities_hist[:-1],
+        equity_hist[:-1],
+        inflation_hist[:-1],
     )
 
     # --- 4. RUN FORECAST (Using new parameters) ---
     # Initial State (t=0) 2024 Apple Balance Sheet
     state = {
-        "nca": tf.constant(nca_hist[-2], dtype=tf.float64),  # float number
+        "nca": tf.constant(nca_hist[-2], dtype=tf.float64),
         "advance_payments_purchases": tf.constant(
             advance_payments_purchases_hist[-2], dtype=tf.float64
         ),
@@ -1102,12 +1193,6 @@ def run_training_and_forecast():
         ),
         "equity": tf.constant(equity_hist[-2], dtype=tf.float64),
         "net_income": tf.constant(net_income_hist[-2], dtype=tf.float64),
-        "liquidity_check": tf.constant(0.0, dtype=tf.float64),
-        "check": tf.constant(0.0, dtype=tf.float64),
-        "stloan": tf.constant(0.0, dtype=tf.float64),
-        "ltloan": tf.constant(0.0, dtype=tf.float64),
-        "st_principal_paid": tf.constant(0.0, dtype=tf.float64),
-        "lt_principal_paid": tf.constant(0.0, dtype=tf.float64),
     }
 
     # Forecast Drivers (Sales/Purchases) for 2025-2028
@@ -1123,44 +1208,15 @@ def run_training_and_forecast():
     inflation_forecast = np.array([0.0, 0.0, 0.0, 0.0], dtype=np.float64)
     cum_inf_forecast = np.cumprod(1 + inflation_forecast)
 
-    print("\n--- Running Forecast with TRAINED parameters ---")
-    print(
-        f"{'Year':<5} | {'Assets':<15} | {'Liabilities':<15} | {'Equity':<15} | {'Check (Plug)':<15}"
+    # --- Execute Monte Carlo Forecast ---
+    run_monte_carlo_forecast(
+        model,
+        state,
+        sales_forecast,
+        purchases_forecast,
+        cum_inf_forecast,
+        n_samples=1000,
     )
-    print("-" * 70)
-
-    # Loop explicitly to handle the recursive dependency.
-    for t in range(len(sales_forecast) - 1):
-        inputs = {
-            "sales_t": tf.constant(sales_forecast[t]),
-            "purchases_t": tf.constant(purchases_forecast[t]),
-            "sales_t_plus_1": tf.constant(sales_forecast[t + 1]),
-            "purchases_t_plus_1": tf.constant(purchases_forecast[t + 1]),
-            "cum_inflation": tf.constant(cum_inf_forecast[t]),
-        }
-
-        state = model.forecast_step(state, inputs)
-
-        # Calculate totals for display
-        assets = (
-            state["nca"]
-            + state["advance_payments_purchases"]
-            + state["accounts_receivable"]
-            + state["inventory"]
-            + state["cash"]
-            + state["investment_in_market_securities"]
-        )
-
-        liabilities = (
-            state["accounts_payable"]
-            + state["advance_payments_sales"]
-            + state["current_liabilities"]
-            + state["non_current_liabilities"]
-        )
-
-        print(
-            f"{t+1:<5} | {assets.numpy():<15.2f} | {liabilities.numpy():<15.2f} | {state['equity'].numpy():<15.2f} | {state['check'].numpy():<15.2f}"
-        )
 
 
 if __name__ == "__main__":

@@ -58,7 +58,7 @@ class SimpleFinancialModel(tf.Module):
         non_current_liabilities_prev = state["non_current_liabilities"]
 
         ## Equity
-        equity_prev = state["equity"]  # Initial equity assumed to remain constant
+        equity_prev = state["equity"]
         stock_buyback = depreciation * self.stock_buyback_pct
 
         ## Net Income
