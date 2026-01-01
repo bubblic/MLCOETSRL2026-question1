@@ -771,7 +771,7 @@ def run_training_and_forecast():
     model.train_structural_parameters(train_data)
 
     # Backtesting 2025
-    print("\\n" + "=" * 90)
+    print("\n" + "=" * 90)
     print("BACKTESTING: Forecasted 2025 vs Actual 2025 Balance Sheet")
     print("=" * 90)
 
@@ -812,7 +812,7 @@ def run_training_and_forecast():
 
     # Metrics comparison
     print(
-        f"\\n{'Item':<35} | {'Actual (B)':>12} | {'Forecast (B)':>12} | {'Error %':>10}"
+        f"\n{'Item':<35} | {'Actual (B)':>12} | {'Forecast (B)':>12} | {'Error %':>10}"
     )
     print("-" * 80)
 
