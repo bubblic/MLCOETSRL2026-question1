@@ -779,17 +779,21 @@ def run_training_and_forecast():
     idx_2024 = -2
     initial_state = FinancialState(
         nca=historical_data["nca"][idx_2024],
-        advance_payments_purchases=historical_data["adv_pp"][idx_2024],
-        accounts_receivable=historical_data["ar"][idx_2024],
-        inventory=historical_data["inv"][idx_2024],
+        advance_payments_purchases=historical_data["advance_payments_purchases"][
+            idx_2024
+        ],
+        accounts_receivable=historical_data["accounts_receivable"][idx_2024],
+        inventory=historical_data["inventory"][idx_2024],
         cash=historical_data["cash"][idx_2024],
-        investment_in_market_securities=historical_data["ims"][idx_2024],
-        accounts_payable=historical_data["ap"][idx_2024],
-        advance_payments_sales=historical_data["adv_ps"][idx_2024],
-        current_liabilities=historical_data["cl"][idx_2024],
-        non_current_liabilities=historical_data["ncl"][idx_2024],
+        investment_in_market_securities=historical_data[
+            "investment_in_market_securities"
+        ][idx_2024],
+        accounts_payable=historical_data["accounts_payable"][idx_2024],
+        advance_payments_sales=historical_data["advance_payments_sales"][idx_2024],
+        current_liabilities=historical_data["current_liabilities"][idx_2024],
+        non_current_liabilities=historical_data["non_current_liabilities"][idx_2024],
         equity=historical_data["equity"][idx_2024],
-        net_income=historical_data["ni"][idx_2024],
+        net_income=historical_data["net_income"][idx_2024],
     )
 
     # Inputs for 2025
@@ -822,12 +826,12 @@ def run_training_and_forecast():
     ]
     actuals = historical_data
     for item in items_to_show:
-        actual_val = actuals[item if item != "ims" else "ims"][-1]
-        forecast_val = (
-            getattr(forecast_2025, item).numpy()
-            if hasattr(getattr(forecast_2025, item), "numpy")
-            else getattr(forecast_2025, item)
-        )
+        actual_val = actuals[item][-1]
+        forecast_val = getattr(forecast_2025, item)
+        # Handle both tensor and float
+        if hasattr(forecast_val, "numpy"):
+            forecast_val = forecast_val.numpy()
+
         err = (forecast_val - actual_val) / abs(actual_val) * 100
         print(
             f"{item:<35} | {actual_val/1e9:>12.2f} | {forecast_val/1e9:>12.2f} | {err:>9.1f}%"
