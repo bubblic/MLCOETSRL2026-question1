@@ -797,7 +797,7 @@ def run_training_and_forecast():
 
     # Backtesting 2025
     print("\n" + "=" * 90)
-    print("BACKTESTING: Forecasted 2025 vs Actual 2025 Balance Sheet & NET INCOME")
+    print("BACKTESTING: Forecasted 2025 vs Actual 2025 Balance Sheet & Net Income")
     print("=" * 90)
 
     # Initial state (2024)
