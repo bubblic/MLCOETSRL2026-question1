@@ -276,9 +276,8 @@ class TrainableFinancialModel(tf.Module):
                     tf.square(bb_tensor - depr_tensor * self.stock_buyback_pct)
                 )
 
-                # --- Bayesian OpEx Loss (Negative ELBO) ---
-                # --- NEW (Fixed) ---
-
+                # --- Bayesian OpEx Loss ---
+                # --- NEW (Attempting to fix so the noise_sigma (aleatoric uncertainty) will update) ---
                 # 1. Define a scaling factor for numerical stability (e.g., 10 Billion)
                 scale_normalization = 1e10
 

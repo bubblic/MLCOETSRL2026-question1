@@ -1075,10 +1075,10 @@ def run_training_and_forecast():
         historical_inflation=inflation_hist[:-1],
     )
 
-    # --- 4. RUN FORECAST (Using new parameters) ---
-    # Initial State (t=0) 2024 Apple Balance Sheet
+    # --- 4. BACKTEST: Forecast 2025 and Compare to Actuals ---
+    # Initial State (t=0) 2024 Apple Balance Sheet (index -2 since we have 2025 data at -1)
     state = {
-        "nca": tf.constant(nca_hist[-2], dtype=tf.float64),  # float number
+        "nca": tf.constant(nca_hist[-2], dtype=tf.float64),
         "advance_payments_purchases": tf.constant(
             advance_payments_purchases_hist[-2], dtype=tf.float64
         ),
@@ -1110,57 +1110,277 @@ def run_training_and_forecast():
         "lt_principal_paid": tf.constant(0.0, dtype=tf.float64),
     }
 
-    # Forecast Drivers (Sales/Purchases) for 2025-2028
-    # Year 1 to 4. We are only interested in Year 1 to 3. The padding is needed for forecasting. Use float64
-    sales_forecast = np.array(
-        [3.94328e11, 3.83285e11, 3.91035e11, 4.16161e11], dtype=np.float64
-    )
-    purchases_forecast = np.array(
-        [2.07694e11, 1.99862e11, 2.04003e11, 2.10808e11], dtype=np.float64
-    )
+    # Use actual 2025 data for forecasting (sales_hist[-1] is 2025)
+    # We need sales_t+1 for advance payments, so we estimate it with growth
+    sales_growth_rate = sales_hist[-1] / sales_hist[-2]
+    purchases_growth_rate = purchases_hist[-1] / purchases_hist[-2]
 
-    # Year 1 to 4 inflation rate (2025-2028)
-    inflation_forecast = np.array([0.0, 0.0, 0.0, 0.0], dtype=np.float64)
-    cum_inf_forecast = np.cumprod(1 + inflation_forecast)
+    inputs = {
+        "sales_t": tf.constant(sales_hist[-1], dtype=tf.float64),
+        "purchases_t": tf.constant(purchases_hist[-1], dtype=tf.float64),
+        "sales_t_plus_1": tf.constant(
+            sales_hist[-1] * sales_growth_rate, dtype=tf.float64
+        ),
+        "purchases_t_plus_1": tf.constant(
+            purchases_hist[-1] * purchases_growth_rate, dtype=tf.float64
+        ),
+        "cum_inflation": tf.constant(np.prod(1 + inflation_hist), dtype=tf.float64),
+    }
 
-    print("\n--- Running Forecast with TRAINED parameters ---")
+    # Run forecast for 2025
+    forecast_state = model.forecast_step(state, inputs)
+
+    # --- 5. COMPARE FORECAST VS ACTUALS ---
+    print("\n" + "=" * 90)
+    print("BACKTESTING: Forecasted 2025 vs Actual 2025 Balance Sheet")
+    print("=" * 90)
+
+    # Actual 2025 values (index -1)
+    actuals = {
+        "nca": nca_hist[-1],
+        "advance_payments_purchases": advance_payments_purchases_hist[-1],
+        "accounts_receivable": accounts_receivable_hist[-1],
+        "inventory": inventory_hist[-1],
+        "cash": cash_hist[-1],
+        "investment_in_market_securities": investment_in_market_securities_hist[-1],
+        "accounts_payable": accounts_payable_hist[-1],
+        "advance_payments_sales": advance_payments_sales_hist[-1],
+        "current_liabilities": current_liabilities_hist[-1],
+        "non_current_liabilities": non_current_liabilities_hist[-1],
+        "equity": equity_hist[-1],
+        "net_income": net_income_hist[-1],
+    }
+
+    # Calculate and display comparison
     print(
-        f"{'Year':<5} | {'Assets':<15} | {'Liabilities':<15} | {'Equity':<15} | {'Check (Plug)':<15}"
+        f"\n{'Item':<35} | {'Actual':>18} | {'Forecast':>18} | {'Error %':>10} | {'Abs Error':>18}"
     )
-    print("-" * 70)
+    print("-" * 105)
 
-    # Loop explicitly to handle the recursive dependency.
-    for t in range(len(sales_forecast) - 1):
-        inputs = {
-            "sales_t": tf.constant(sales_forecast[t]),
-            "purchases_t": tf.constant(purchases_forecast[t]),
-            "sales_t_plus_1": tf.constant(sales_forecast[t + 1]),
-            "purchases_t_plus_1": tf.constant(purchases_forecast[t + 1]),
-            "cum_inflation": tf.constant(cum_inf_forecast[t]),
+    total_abs_pct_error = 0
+    num_items = 0
+    errors = {}
+
+    for key in actuals:
+        actual = actuals[key]
+        forecast = forecast_state[key].numpy()
+
+        if actual != 0:
+            pct_error = (forecast - actual) / abs(actual) * 100
+        else:
+            pct_error = 0 if forecast == 0 else float("inf")
+
+        abs_error = abs(forecast - actual)
+        errors[key] = {
+            "actual": actual,
+            "forecast": forecast,
+            "pct_error": pct_error,
+            "abs_error": abs_error,
         }
 
-        state = model.forecast_step(state, inputs)
+        total_abs_pct_error += abs(pct_error)
+        num_items += 1
 
-        # Calculate totals for display
-        assets = (
-            state["nca"]
-            + state["advance_payments_purchases"]
-            + state["accounts_receivable"]
-            + state["inventory"]
-            + state["cash"]
-            + state["investment_in_market_securities"]
+        # Format for display
+        actual_str = f"{actual/1e9:,.2f}B"
+        forecast_str = f"{forecast/1e9:,.2f}B"
+        abs_error_str = f"{abs_error/1e9:,.2f}B"
+
+        # Color-code based on error magnitude (using symbols)
+        if abs(pct_error) < 5:
+            status = "✓"
+        elif abs(pct_error) < 15:
+            status = "~"
+        else:
+            status = "✗"
+
+        print(
+            f"{key:<35} | {actual_str:>18} | {forecast_str:>18} | {pct_error:>9.1f}% | {abs_error_str:>18} {status}"
         )
 
-        liabilities = (
-            state["accounts_payable"]
-            + state["advance_payments_sales"]
-            + state["current_liabilities"]
-            + state["non_current_liabilities"]
+    # Calculate aggregate metrics
+    mape = total_abs_pct_error / num_items
+
+    # Calculate total assets and liabilities
+    actual_total_assets = (
+        actuals["nca"]
+        + actuals["advance_payments_purchases"]
+        + actuals["accounts_receivable"]
+        + actuals["inventory"]
+        + actuals["cash"]
+        + actuals["investment_in_market_securities"]
+    )
+    forecast_total_assets = (
+        forecast_state["nca"].numpy()
+        + forecast_state["advance_payments_purchases"].numpy()
+        + forecast_state["accounts_receivable"].numpy()
+        + forecast_state["inventory"].numpy()
+        + forecast_state["cash"].numpy()
+        + forecast_state["investment_in_market_securities"].numpy()
+    )
+
+    actual_total_liabilities = (
+        actuals["accounts_payable"]
+        + actuals["advance_payments_sales"]
+        + actuals["current_liabilities"]
+        + actuals["non_current_liabilities"]
+    )
+    forecast_total_liabilities = (
+        forecast_state["accounts_payable"].numpy()
+        + forecast_state["advance_payments_sales"].numpy()
+        + forecast_state["current_liabilities"].numpy()
+        + forecast_state["non_current_liabilities"].numpy()
+    )
+
+    print("-" * 105)
+
+    # Totals
+    assets_pct_error = (
+        (forecast_total_assets - actual_total_assets) / actual_total_assets * 100
+    )
+    liab_pct_error = (
+        (forecast_total_liabilities - actual_total_liabilities)
+        / actual_total_liabilities
+        * 100
+    )
+    equity_pct_error = errors["equity"]["pct_error"]
+
+    print(
+        f"{'TOTAL ASSETS':<35} | {actual_total_assets/1e9:>17.2f}B | {forecast_total_assets/1e9:>17.2f}B | {assets_pct_error:>9.1f}%"
+    )
+    print(
+        f"{'TOTAL LIABILITIES':<35} | {actual_total_liabilities/1e9:>17.2f}B | {forecast_total_liabilities/1e9:>17.2f}B | {liab_pct_error:>9.1f}%"
+    )
+    print(
+        f"{'EQUITY':<35} | {actuals['equity']/1e9:>17.2f}B | {forecast_state['equity'].numpy()/1e9:>17.2f}B | {equity_pct_error:>9.1f}%"
+    )
+
+    print("\n" + "=" * 90)
+    print("SUMMARY METRICS")
+    print("=" * 90)
+    print(f"Mean Absolute Percentage Error (MAPE): {mape:.2f}%")
+    print(
+        f"Balance Sheet Check (should be ~0):    {forecast_state['check'].numpy():.2f}"
+    )
+    print(
+        f"Liquidity Check (should be ~0):        {forecast_state['liquidity_check'].numpy():.2f}"
+    )
+
+    # Interpretation
+    print("\n--- Interpretation ---")
+    if mape < 10:
+        print("✓ EXCELLENT: MAPE < 10% - Model has strong predictive accuracy")
+    elif mape < 20:
+        print("~ GOOD: MAPE 10-20% - Model has reasonable predictive accuracy")
+    elif mape < 30:
+        print("~ FAIR: MAPE 20-30% - Model may need parameter tuning")
+    else:
+        print("✗ POOR: MAPE > 30% - Model needs significant improvement")
+
+    # Identify best and worst predictions
+    sorted_errors = sorted(errors.items(), key=lambda x: abs(x[1]["pct_error"]))
+    print(
+        f"\nBest predictions:  {sorted_errors[0][0]} ({sorted_errors[0][1]['pct_error']:.1f}%), {sorted_errors[1][0]} ({sorted_errors[1][1]['pct_error']:.1f}%)"
+    )
+    print(
+        f"Worst predictions: {sorted_errors[-1][0]} ({sorted_errors[-1][1]['pct_error']:.1f}%), {sorted_errors[-2][0]} ({sorted_errors[-2][1]['pct_error']:.1f}%)"
+    )
+
+    # --- 6. MULTI-YEAR BACKTEST (Rolling) ---
+    print("\n" + "=" * 90)
+    print("MULTI-YEAR ROLLING BACKTEST")
+    print("=" * 90)
+
+    # Test on multiple years by using earlier years as test sets
+    # We'll test forecasting from year t to year t+1 for all available years
+    print(
+        f"\n{'From Year':<12} | {'To Year':<10} | {'Equity Error %':>15} | {'NCA Error %':>15} | {'Net Income Error %':>18}"
+    )
+    print("-" * 80)
+
+    yearly_errors = []
+    for t in range(len(sales_hist) - 2):  # Need t, t+1, and t+2 (for sales_t+1)
+        # State at year t
+        test_state = {
+            "nca": tf.constant(nca_hist[t], dtype=tf.float64),
+            "advance_payments_purchases": tf.constant(
+                advance_payments_purchases_hist[t], dtype=tf.float64
+            ),
+            "accounts_receivable": tf.constant(
+                accounts_receivable_hist[t], dtype=tf.float64
+            ),
+            "inventory": tf.constant(inventory_hist[t], dtype=tf.float64),
+            "cash": tf.constant(cash_hist[t], dtype=tf.float64),
+            "investment_in_market_securities": tf.constant(
+                investment_in_market_securities_hist[t], dtype=tf.float64
+            ),
+            "accounts_payable": tf.constant(accounts_payable_hist[t], dtype=tf.float64),
+            "advance_payments_sales": tf.constant(
+                advance_payments_sales_hist[t], dtype=tf.float64
+            ),
+            "current_liabilities": tf.constant(
+                current_liabilities_hist[t], dtype=tf.float64
+            ),
+            "non_current_liabilities": tf.constant(
+                non_current_liabilities_hist[t], dtype=tf.float64
+            ),
+            "equity": tf.constant(equity_hist[t], dtype=tf.float64),
+            "net_income": tf.constant(net_income_hist[t], dtype=tf.float64),
+            "liquidity_check": tf.constant(0.0, dtype=tf.float64),
+            "check": tf.constant(0.0, dtype=tf.float64),
+            "stloan": tf.constant(0.0, dtype=tf.float64),
+            "ltloan": tf.constant(0.0, dtype=tf.float64),
+            "st_principal_paid": tf.constant(0.0, dtype=tf.float64),
+            "lt_principal_paid": tf.constant(0.0, dtype=tf.float64),
+        }
+
+        # Cumulative inflation up to year t+1
+        cum_inf = np.prod(1 + inflation_hist[: t + 2])
+
+        test_inputs = {
+            "sales_t": tf.constant(sales_hist[t + 1], dtype=tf.float64),
+            "purchases_t": tf.constant(purchases_hist[t + 1], dtype=tf.float64),
+            "sales_t_plus_1": tf.constant(sales_hist[t + 2], dtype=tf.float64),
+            "purchases_t_plus_1": tf.constant(purchases_hist[t + 2], dtype=tf.float64),
+            "cum_inflation": tf.constant(cum_inf, dtype=tf.float64),
+        }
+
+        predicted = model.forecast_step(test_state, test_inputs)
+
+        # Calculate errors for key items
+        equity_err = (
+            (predicted["equity"].numpy() - equity_hist[t + 1])
+            / equity_hist[t + 1]
+            * 100
+        )
+        nca_err = (predicted["nca"].numpy() - nca_hist[t + 1]) / nca_hist[t + 1] * 100
+        ni_err = (
+            (predicted["net_income"].numpy() - net_income_hist[t + 1])
+            / net_income_hist[t + 1]
+            * 100
+        )
+
+        yearly_errors.append(
+            {"equity": equity_err, "nca": nca_err, "net_income": ni_err}
         )
 
         print(
-            f"{t+1:<5} | {assets.numpy():<15.2f} | {liabilities.numpy():<15.2f} | {state['equity'].numpy():<15.2f} | {state['check'].numpy():<15.2f}"
+            f"Year {t+1:<6} | Year {t+2:<5} | {equity_err:>14.1f}% | {nca_err:>14.1f}% | {ni_err:>17.1f}%"
         )
+
+    # Average errors across years
+    avg_equity_err = np.mean([abs(e["equity"]) for e in yearly_errors])
+    avg_nca_err = np.mean([abs(e["nca"]) for e in yearly_errors])
+    avg_ni_err = np.mean([abs(e["net_income"]) for e in yearly_errors])
+
+    print("-" * 80)
+    print(
+        f"{'Avg Abs Error':<12} | {'':<10} | {avg_equity_err:>14.1f}% | {avg_nca_err:>14.1f}% | {avg_ni_err:>17.1f}%"
+    )
+
+    print("\n" + "=" * 90)
+    print("BACKTEST COMPLETE")
+    print("=" * 90)
 
 
 if __name__ == "__main__":
