@@ -749,6 +749,36 @@ def run_training_and_forecast():
     model.train_simple_policies(train_data)
     model.train_structural_parameters(train_data)
 
+    print("-" * 50)
+    print("Training Complete.")
+    print(f"Final %AG: {self.asset_growth.numpy():.5f}")
+    print(f"Final %Depr: {self.depreciation_rate.numpy():.5f}")
+    print(f"Final %AdvPS: {self.advance_payments_sales_pct.numpy():.5f}")
+    print(f"Final %AdvPP: {self.advance_payments_purchases_pct.numpy():.5f}")
+    print(f"Final %AR: {self.account_receivables_pct.numpy():.5f}")
+    print(f"Final %AP: {self.account_payables_pct.numpy():.5f}")
+    print(f"Final %Inv: {self.inventory_pct.numpy():.5f}")
+    print(f"Final %TL: {self.total_liquidity_pct.numpy():.5f}")
+    print(f"Final %Cash: {self.cash_pct_of_liquidity.numpy():.5f}")
+    print(f"Final %IT: {self.income_tax_pct.numpy():.5f}")
+    print(f"Final %PR: {self.dividend_payout_ratio_pct.numpy():.5f}")
+    print(f"Final %BB: {self.stock_buyback_pct.numpy():.5f}")
+    print(
+        f"Bayesian OpEx Variable %: Mean={self.q_var_opex_loc.numpy():.4f}, Std={self.q_var_opex_scale.numpy():.4f}"
+    )
+    print(
+        f"Bayesian OpEx Baseline:   Mean={self.q_base_opex_loc.numpy():.2e}, Std={self.q_base_opex_scale.numpy():.2e}"
+    )
+
+    print("-" * 50)
+    print("Structural Training Complete.")
+    print(f"Final %AvgSTInt: {self.avg_short_term_interest_pct.numpy():.5f}")
+    print(f"Final %AvgLTInt: {self.avg_long_term_interest_pct.numpy():.5f}")
+    print(f"Final AvgM: {self.avg_maturity_years.numpy():.5f}")
+    print(f"Final %MSReturn: {self.market_securities_return_pct.numpy():.5f}")
+    print(f"Final %EF: {self.equity_financing_pct.numpy():.5f}")
+    print("-" * 50)
+
     # Forecasting
     idx_2024 = -2
     state_2024 = FinancialState.from_dict(
