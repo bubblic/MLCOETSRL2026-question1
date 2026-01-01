@@ -1242,15 +1242,29 @@ def run_training_and_forecast():
 
     # Forecast Drivers (Sales/Purchases) for 2025-2028
     # Year 1 to 4. We are only interested in Year 1 to 3. The padding is needed for forecasting. Use float64
+    sales_growth_rate = sales_hist[-1] / sales_hist[-2]
+    purchases_growth_rate = purchases_hist[-1] / purchases_hist[-2]
     sales_forecast = np.array(
-        [3.94328e11, 3.83285e11, 3.91035e11, 4.16161e11], dtype=np.float64
+        [
+            sales_hist[-1],
+            sales_hist[-1] * sales_growth_rate,
+            sales_hist[-1] * sales_growth_rate**2,
+            sales_hist[-1] * sales_growth_rate**3,
+        ],
+        dtype=np.float64,
     )
     purchases_forecast = np.array(
-        [2.07694e11, 1.99862e11, 2.04003e11, 2.10808e11], dtype=np.float64
+        [
+            purchases_hist[-1],
+            purchases_hist[-1] * purchases_growth_rate,
+            purchases_hist[-1] * purchases_growth_rate**2,
+            purchases_hist[-1] * purchases_growth_rate**3,
+        ],
+        dtype=np.float64,
     )
 
     # Year 1 to 4 inflation rate (2025-2028)
-    inflation_forecast = np.array([0.0, 0.0, 0.0, 0.0], dtype=np.float64)
+    inflation_forecast = np.array([0.03, 0.03, 0.03, 0.03], dtype=np.float64)
     cum_inf_forecast = np.cumprod(1 + inflation_forecast)
 
     # --- Execute Monte Carlo Forecast ---
