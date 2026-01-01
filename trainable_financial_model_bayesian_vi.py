@@ -277,32 +277,74 @@ class TrainableFinancialModel(tf.Module):
                 )
 
                 # --- Bayesian OpEx Loss (Negative ELBO) ---
-                # 1. Sample from Posterior
+                # --- NEW (Fixed) ---
+
+                # 1. Define a scaling factor for numerical stability (e.g., 10 Billion)
+                scale_normalization = 1e10
+
+                # 2. Sample parameters
                 var_opex_sample, base_opex_sample = self.sample_opex_params()
 
-                # 2. Predict OpEx using samples
-                # opex = baseline * product(1+inf) + var * sales
-                pred_opex_mean = (base_opex_sample * cum_inf_tensor) + (
+                # 3. Calculate the Raw Prediction (in Dollars)
+                pred_opex_raw = (base_opex_sample * cum_inf_tensor) + (
                     var_opex_sample * sales_tensor
                 )
 
-                # 3. Calculate Negative Log Likelihood
-                # We assume the Observed OpEx comes from N(pred_mean, noise_sigma)
-                likelihood_dist = tfd.Normal(loc=pred_opex_mean, scale=self.noise_sigma)
+                # 4. Calculate Residuals (The Error)
+                residuals = opex_tensor - pred_opex_raw
+
+                # 5. SCALE DOWN the residuals
+                # We convert the error from "Dollars" to "Units of 10B"
+                # Example: An error of $5B becomes 0.5
+                residuals_scaled = residuals / scale_normalization
+
+                # 6. We define a "Scaled Sigma" variable just for this loss calculation
+                # We want self.noise_sigma to still represent DOLLARS, so we divide it here.
+                sigma_scaled = self.noise_sigma / scale_normalization
+
+                # 7. Calculate Likelihood on the SCALED values
+                # This generates gradients ~1.0 instead of ~1e-10
+                likelihood_dist = tfd.Normal(loc=0.0, scale=sigma_scaled)
                 neg_log_likelihood = -tf.reduce_sum(
-                    likelihood_dist.log_prob(opex_tensor)
+                    likelihood_dist.log_prob(residuals_scaled)
                 )
 
-                # 4. Calculate KL Divergence
+                # 8. KL Divergence
+                # We also scale this up slightly so it doesn't get drowned out
                 kl = self.get_opex_kl_divergence()
 
-                # Weighting: Scale down likelihood or up KL?
-                # Since we have few data points and large numbers, simple summation is risky.
-                # Heuristic: Scale KL by 1.0 (standard) and treat NegLL as usual.
-                # Note: Because financial numbers are ~1e10, NegLL will be huge.
-                # We normalize the NegLL by a factor to make gradients stable relative to MSE losses.
-                scale_factor = 1e-20  # Empirically helps with large numbers
-                loss_opex_bayes = (neg_log_likelihood + kl) * scale_factor
+                # 9. Final Sum
+                # We no longer need the extreme 1e-20 factor from before.
+                # We just add them up. Since NLL is now based on small numbers, it will be approx 10-20.
+                loss_opex_bayes = neg_log_likelihood + kl
+
+                # --- OLD (Broken due to large numbers)
+                #  # 1. Sample from Posterior
+                # var_opex_sample, base_opex_sample = self.sample_opex_params()
+
+                # # 2. Predict OpEx using samples
+                # # opex = baseline * product(1+inf) + var * sales
+                # pred_opex_mean = (base_opex_sample * cum_inf_tensor) + (
+                #     var_opex_sample * sales_tensor
+                # )
+
+                # # 3. Calculate Negative Log Likelihood
+                # # We assume the Observed OpEx comes from N(pred_mean, noise_sigma)
+                # likelihood_dist = tfd.Normal(loc=pred_opex_mean, scale=self.noise_sigma)
+                # neg_log_likelihood = -tf.reduce_sum(
+                #     likelihood_dist.log_prob(opex_tensor)
+                # )
+
+                # # 4. Calculate KL Divergence
+                # kl = self.get_opex_kl_divergence()
+
+                # # Weighting: Scale down likelihood or up KL?
+                # # Since we have few data points and large numbers, simple summation is risky.
+                # # Heuristic: Scale KL by 1.0 (standard) and treat NegLL as usual.
+                # # Note: Because financial numbers are ~1e10, NegLL will be huge.
+                # # We normalize the NegLL by a factor to make gradients stable relative to MSE losses.
+                # scale_factor = 1e-20  # Empirically helps with large numbers
+                # loss_opex_bayes = (neg_log_likelihood + kl) * scale_factor
 
                 # Combined Loss (Heuristic: Normalize by scale to help Adam)
                 # But for simplicity, we'll just sum them up for now.
