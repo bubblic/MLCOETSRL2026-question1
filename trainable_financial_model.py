@@ -797,7 +797,7 @@ def run_training_and_forecast():
 
     # Backtesting 2025
     print("\n" + "=" * 90)
-    print("BACKTESTING: Forecasted 2025 vs Actual 2025 Balance Sheet")
+    print("BACKTESTING: Forecasted 2025 vs Actual 2025 Balance Sheet & NET INCOME")
     print("=" * 90)
 
     # Initial state (2024)
@@ -843,11 +843,17 @@ def run_training_and_forecast():
 
     items_to_show = [
         "nca",
+        "advance_payments_purchases",
+        "accounts_receivable",
         "inventory",
+        "investment_in_market_securities",
         "cash",
+        "accounts_payable",
+        "advance_payments_sales",
+        "current_liabilities",
+        "non_current_liabilities",
         "equity",
         "net_income",
-        "current_liabilities",
     ]
     actuals = historical_data
     for item in items_to_show:
