@@ -155,20 +155,10 @@ class TrainableFinancialModel(tf.Module):
         """
         # Ensure state is a FinancialState object for easier access
         if isinstance(state, dict):
-            # Map legacy/abbreviated keys to dataclass field names
-            mapping = {
-                "adv_pp": "advance_payments_purchases",
-                "adv_ps": "advance_payments_sales",
-                "ar": "accounts_receivable",
-                "inv": "inventory",
-                "ap": "accounts_payable",
-                "cl": "current_liabilities",
-                "ncl": "non_current_liabilities",
-                "ni": "net_income",
-                "ims": "investment_in_market_securities",
-            }
-            mapped_state = {mapping.get(k, k): v for k, v in state.items()}
-            state = FinancialState.from_dict(mapped_state)
+            # Map legacy keys if necessary
+            if "investment_in_market_securities" not in state and "ims" in state:
+                state["investment_in_market_securities"] = state.pop("ims")
+            state = FinancialState.from_dict(state)
 
         # 1. Assets Evolution
         asset_updates = self._evolve_assets(state, inputs)
@@ -549,20 +539,22 @@ class TrainableFinancialModel(tf.Module):
             with tf.GradientTape() as tape:
                 total_loss = 0.0
                 for t in range(num_transitions):
-                    # Construct state with full descriptive names
                     prev_state = {
-                        "nca": data["nca"][t],
-                        "advance_payments_purchases": data["adv_pp"][t],
-                        "accounts_receivable": data["ar"][t],
-                        "inventory": data["inv"][t],
-                        "cash": data["cash"][t],
-                        "investment_in_market_securities": data["ims"][t],
-                        "accounts_payable": data["ap"][t],
-                        "advance_payments_sales": data["adv_ps"][t],
-                        "current_liabilities": data["cl"][t],
-                        "non_current_liabilities": data["ncl"][t],
-                        "equity": data["equity"][t],
-                        "net_income": data["ni"][t],
+                        k: data[k][t]
+                        for k in [
+                            "nca",
+                            "adv_pp",
+                            "ar",
+                            "inv",
+                            "cash",
+                            "ims",
+                            "ap",
+                            "adv_ps",
+                            "cl",
+                            "ncl",
+                            "equity",
+                            "ni",
+                        ]
                     }
                     inputs = EconomicInputs(
                         sales_t=data["sales"][t + 1],
