@@ -713,7 +713,11 @@ class TrainableFinancialModel(tf.Module):
         )
 
         ## Check that the liquidity arrived in the Liquidity Budget matches the target liquidity
-        liquidity_check = total_liquidity_prev + total_nlb - total_liquidity_curr
+        liquidity_check = (
+            (cash_prev + investment_in_market_securities_prev)
+            + total_nlb
+            - total_liquidity_curr
+        )
 
         # --- 4. Liabilities Evolution ---
         # 4.1. Accounts Payable (AP)
