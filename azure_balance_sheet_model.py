@@ -182,7 +182,7 @@ class AzureBalanceSheetPredictor:
             except (TypeError, ValueError) as exc:
                 raise ValueError(f"Invalid value for {field}: {value}") from exc
 
-        return BalanceSheetPrediction(
+        prediction = BalanceSheetPrediction(
             current_assets=safe_float(data.get("current_assets"), "current_assets"),
             non_current_assets=safe_float(
                 data.get("non_current_assets"), "non_current_assets"
@@ -211,6 +211,34 @@ class AzureBalanceSheetPredictor:
             goodwill_intangibles=safe_float(
                 data.get("goodwill_intangibles"), "goodwill_intangibles"
             ),
+        )
+        self._validate_identities(prediction)
+        return prediction
+
+    def _validate_identities(self, prediction: BalanceSheetPrediction) -> None:
+        def close_enough(a: float, b: float, label: str) -> None:
+            if a == b:
+                return
+            raise ValueError(f"Identity check failed for {label}: {a} vs {b}")
+            # denom = max(1.0, abs(a), abs(b))
+            # rel_err = abs(a - b) / denom
+            # if rel_err > 1e-3:
+            #     raise ValueError(f"Identity check failed for {label}: {a} vs {b}")
+
+        close_enough(
+            prediction.total_assets,
+            prediction.current_assets + prediction.non_current_assets,
+            "total_assets = current_assets + non_current_assets",
+        )
+        close_enough(
+            prediction.total_liabilities,
+            prediction.current_liabilities + prediction.non_current_liabilities,
+            "total_liabilities = current_liabilities + non_current_liabilities",
+        )
+        close_enough(
+            prediction.total_assets,
+            prediction.total_liabilities + prediction.total_equity,
+            "total_assets = total_liabilities + total_equity",
         )
 
 
@@ -241,7 +269,7 @@ def run_azure_balance_sheet_example() -> None:
         },
     )
 
-    parameters = {"temperature": 0, "max_tokens": 10000, "top_p": 1}
+    parameters = {"temperature": 0, "max_tokens": 10000, "top_k": 1}
 
     prediction = predictor.predict(
         inputs, message="gen-ai-response", parameters=parameters
