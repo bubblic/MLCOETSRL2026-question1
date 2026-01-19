@@ -54,13 +54,11 @@ class AzureBalanceSheetPredictor:
         endpoint: Optional[str] = None,
         timeout_seconds: int = 60,
     ) -> None:
-        self.endpoint = (
-            endpoint or os.getenv("AZURE_BALANCE_SHEET_ENDPOINT", "")
-        ).strip()
+        self.endpoint = (endpoint or os.getenv("AZURE_DEEPSEEK_ENDPOINT", "")).strip()
         self.timeout_seconds = timeout_seconds
 
         if not self.endpoint:
-            raise ValueError("Missing Azure config. Set AZURE_BALANCE_SHEET_ENDPOINT.")
+            raise ValueError("Missing Azure config. Set AZURE_DEEPSEEK_ENDPOINT.")
 
     def predict(
         self,

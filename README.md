@@ -7,7 +7,7 @@ JP Morgan MLCOE TSRL 2026 Internship Question 1 by Jaebum (Albert) Chung
 `azure_balance_sheet_model.py` adds a balance sheet prediction workflow that calls
 an Azure API endpoint. Configure the following environment variable:
 
-- `AZURE_BALANCE_SHEET_ENDPOINT`
+- `AZURE_DEEPSEEK_ENDPOINT`
 
 Run:
 `python azure_balance_sheet_model.py`
