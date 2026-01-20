@@ -1,6 +1,7 @@
 import argparse
 import json
 import math
+import re
 from pathlib import Path
 
 from sentence_transformers import SentenceTransformer
@@ -75,6 +76,12 @@ def parse_args() -> argparse.Namespace:
         default='{"temperature": 0, "max_tokens": 10000, "top_k": 1}',
         help="JSON string of parameters to send to DeepSeek.",
     )
+    parser.add_argument(
+        "--rewrite-queries",
+        action=argparse.BooleanOptionalAction,
+        default=True,
+        help="Rewrite queries for retrieval using DeepSeek.",
+    )
     return parser.parse_args()
 
 
@@ -113,10 +120,127 @@ def cosine_similarity(vec_a: list[float], vec_b: list[float]) -> float:
     return dot / (norm_a * norm_b)
 
 
+def parse_parameters(raw: str | None) -> dict[str, object]:
+    if raw is None:
+        return {}
+    loaded = json.loads(raw)
+    if not isinstance(loaded, dict):
+        raise ValueError("Parameters must decode to a JSON object.")
+    return loaded
+
+
+def detect_language_heuristic(pages: dict[int, str | None]) -> str:
+    sample_texts = []
+    for page_num in sorted(pages)[:10]:
+        text = (pages[page_num] or "").strip()
+        if text:
+            sample_texts.append(text)
+    if not sample_texts:
+        return "unknown"
+
+    combined = " ".join(sample_texts)
+    cjk_count = len(re.findall(r"[\u4e00-\u9fff]", combined))
+    latin_count = len(re.findall(r"[A-Za-z]", combined))
+    total = cjk_count + latin_count
+    if total == 0:
+        return "unknown"
+    if cjk_count / total >= 0.2:
+        return "zh"
+    if latin_count / total >= 0.6:
+        return "en"
+    return "unknown"
+
+
+def detect_language(
+    pages: dict[int, str | None],
+    client: AzureDeepSeekClient,
+    message: str,
+    parameters: dict[str, object],
+) -> str:
+    sample_texts = []
+    for page_num in sorted(pages):
+        text = (pages[page_num] or "").strip()
+        if text:
+            sample_texts.append(text)
+        if len(sample_texts) >= 10:
+            break
+    if not sample_texts:
+        return "unknown"
+
+    combined = "\n\n".join(sample_texts)
+    combined = combined[:4000]
+    prompt = (
+        "Detect the primary language of the provided text. "
+        'Return ONLY JSON like {"language": "en"}.\n'
+        "Use ISO 639-1 codes when possible (e.g., en, zh, ja, ko). "
+        'If mixed or unclear, return {"language": "unknown"}.\n\n'
+        f"Text:\n{combined}"
+    )
+    try:
+        response = client.ask_json(
+            message=message, prompt=prompt, parameters=parameters
+        )
+        raw_language = response.get("language", "unknown")
+        if isinstance(raw_language, str):
+            normalized = raw_language.strip().lower()
+            if re.fullmatch(r"[a-z]{2}", normalized):
+                return normalized
+            if normalized == "unknown":
+                return "unknown"
+    except Exception as exc:
+        print(f"Language detection failed, using heuristic. Error: {exc}")
+    return detect_language_heuristic(pages)
+
+
+def rewrite_query_with_llm(
+    client: AzureDeepSeekClient,
+    query: str,
+    document_language: str,
+    toc_context: str,
+    message: str,
+    parameters: dict[str, object],
+) -> str:
+    prompt = (
+        "You are helping find the exact heading keywords used in this document. "
+        "Use the provided table-of-contents context to return the exact phrase "
+        "used in the document for the requested query.\n"
+        f"Query: {query}\n"
+        "If the query language and document language are different, find the best translation that matches the exact "
+        "document wording from the TOC/context. If no matching heading is found, "
+        "return the best translation used in similar financial reports. Return only the rewritten query.\n\n"
+        f"TOC/context:\n{toc_context}\n\n"
+    )
+    print(f"Rewrite query prompt: {prompt}")
+    try:
+        rewritten = client.ask_text(
+            message=message, prompt=prompt, parameters=parameters
+        )
+    except Exception as exc:
+        print(f"Query rewrite failed, using original query. Error: {exc}")
+        return query
+    cleaned = rewritten.strip().strip('"')
+    return cleaned or query
+
+
+def build_toc_context(pages: dict[int, str | None], max_pages: int = 5) -> str:
+    sample_texts = []
+    for page_num in sorted(pages)[:max_pages]:
+        text = (pages[page_num] or "").strip()
+        if text:
+            sample_texts.append(text)
+    if not sample_texts:
+        return ""
+    return "\n\n".join(sample_texts)[:6000]
+
+
 def rank_pages_by_query(
-    pages: dict[int, str | None], model: SentenceTransformer, query: str
+    pages: dict[int, str | None],
+    model: SentenceTransformer,
+    query: str,
+    rewritten_query: str | None = None,
 ) -> list[tuple[int, float]]:
-    query_embedding = model.encode([query])[0].tolist()
+    query_text = rewritten_query or query
+    query_embedding = model.encode([query_text])[0].tolist()
     page_items = embed_pages(pages, model)
     ranked = []
     for item in page_items:
@@ -132,8 +256,9 @@ def rank_pages_by_query(
     return ranked
 
 
-def deepseek_page_contains_balance_sheet(
+def deepseek_page_contains_query(
     client: AzureDeepSeekClient,
+    query: str,
     page_text: str,
     message: str,
     parameters: dict[str, object],
@@ -141,7 +266,7 @@ def deepseek_page_contains_balance_sheet(
     prompt = (
         "You are given a single page of a financial report.\n"
         'Return ONLY valid JSON like {"contains": true} or {"contains": false}.\n'
-        "The value must be true only if the page contains a Consolidated Balance Sheet "
+        f"The value must be true only if the page contains {query} "
         "table or line items. If unsure, return false.\n\n"
         f"Page text:\n{page_text}"
     )
@@ -173,6 +298,8 @@ def run_balance_sheet_pipeline(
     azure_endpoint: str | None,
     deepseek_message: str,
     deepseek_parameters: dict[str, object],
+    rewrite_queries: bool,
+    query: str,
 ) -> str:
     extractor = EXTRACTORS[extractor_name]
     pdf_path = Path(input_file)
@@ -181,7 +308,32 @@ def run_balance_sheet_pipeline(
 
     pages = extractor(str(pdf_path))
     model = SentenceTransformer(embedding_model)
-    ranked = rank_pages_by_query(pages, model, "Consolidated Balance Sheet")
+    client = AzureDeepSeekClient(endpoint=azure_endpoint)
+    document_language = detect_language(
+        pages,
+        client=client,
+        message=deepseek_message,
+        parameters=deepseek_parameters,
+    )
+    toc_context = build_toc_context(pages)
+
+    rewritten_query = None
+    if rewrite_queries:
+        rewritten_query = rewrite_query_with_llm(
+            client=client,
+            query=query,
+            document_language=document_language,
+            toc_context=toc_context,
+            message=deepseek_message,
+            parameters=deepseek_parameters,
+        )
+        print(f"Rewritten query: {rewritten_query}")
+    ranked = rank_pages_by_query(
+        pages,
+        model,
+        query,
+        rewritten_query=rewritten_query,
+    )
     # ranked = rank_pages_by_query(pages, model, "合併資產負債表")
 
     if not ranked:
@@ -194,12 +346,12 @@ def run_balance_sheet_pipeline(
         raise ValueError("Top-ranked page not found in extracted pages.")
 
     start_index = page_numbers.index(top_page)
-    client = AzureDeepSeekClient(endpoint=azure_endpoint)
     balance_sheet_pages: list[int] = []
     for page_num in page_numbers[start_index:]:
         page_text = pages[page_num] or ""
-        if deepseek_page_contains_balance_sheet(
+        if deepseek_page_contains_query(
             client,
+            query=query,
             page_text=page_text,
             message=deepseek_message,
             parameters=deepseek_parameters,
@@ -263,7 +415,8 @@ def extract_reports(
 
 def main() -> None:
     args = parse_args()
-    deepseek_parameters = json.loads(args.deepseek_parameters)
+    deepseek_parameters = parse_parameters(args.deepseek_parameters)
+    query = "Consolidated Income Statement"
 
     if args.run_balance_sheet:
         if not args.input_file:
@@ -275,7 +428,9 @@ def main() -> None:
             embedding_model=args.embedding_model,
             azure_endpoint=args.azure_endpoint,
             deepseek_message=args.deepseek_message,
-            deepseek_parameters=args.deepseek_parameters,
+            deepseek_parameters=deepseek_parameters,
+            rewrite_queries=args.rewrite_queries,
+            query=query,
         )
     else:
         print(f"Extracting reports for {args.input_dir}...")
