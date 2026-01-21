@@ -229,19 +229,37 @@ class AzureDeepSeekClient:
             raise ValueError("Missing Azure config. Set AZURE_DEEPSEEK_ENDPOINT.")
 
     def ask_json(
-        self, message: str, prompt: str, parameters: Dict[str, Any]
+        self,
+        message: str,
+        prompt: str,
+        parameters: Dict[str, Any],
+        reasoning: bool = True,
     ) -> Dict[str, Any]:
         payload = {
             "message": message,
-            "body": {"prompt": prompt, "parameters": parameters},
+            "body": {
+                "prompt": prompt,
+                "parameters": parameters,
+                "reasoning": reasoning,
+            },
         }
         response_text = self._post_json(payload)
         return self._extract_json(response_text)
 
-    def ask_text(self, message: str, prompt: str, parameters: Dict[str, Any]) -> str:
+    def ask_text(
+        self,
+        message: str,
+        prompt: str,
+        parameters: Dict[str, Any],
+        reasoning: bool = True,
+    ) -> str:
         payload = {
             "message": message,
-            "body": {"prompt": prompt, "parameters": parameters},
+            "body": {
+                "prompt": prompt,
+                "parameters": parameters,
+                "reasoning": reasoning,
+            },
         }
         response_text = self._post_json(payload)
         extracted = self._extract_json(response_text)
