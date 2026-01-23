@@ -9,6 +9,7 @@ and `body`, mirroring a Flutter HTTP request pattern.
 import json
 import os
 import re
+import time
 import urllib.request
 from dataclasses import dataclass
 from typing import Any, Dict, Optional
@@ -119,6 +120,7 @@ class AzureBalanceSheetPredictor:
 
     def _post_json(self, payload: Dict[str, Any]) -> str:
         data = json.dumps(payload).encode("utf-8")
+        ## Sometimes, the azureapi returns 503: Service Unavailable error. So, try this multiple times if it fails, with exponential backoff from 1 second to 10 seconds, up to 10 times.
         request = urllib.request.Request(
             self.endpoint,
             data=data,
@@ -127,11 +129,24 @@ class AzureBalanceSheetPredictor:
             },
             method="POST",
         )
-        try:
-            with urllib.request.urlopen(request, timeout=self.timeout_seconds) as resp:
-                return resp.read().decode("utf-8")
-        except Exception as exc:
-            raise RuntimeError(f"Azure API request failed: {exc}") from exc
+        max_attempts = 10
+        backoff_seconds = 1.0
+        last_exc: Optional[Exception] = None
+
+        for attempt in range(1, max_attempts + 1):
+            try:
+                with urllib.request.urlopen(
+                    request, timeout=self.timeout_seconds
+                ) as resp:
+                    return resp.read().decode("utf-8")
+            except Exception as exc:
+                last_exc = exc
+                if attempt == max_attempts:
+                    break
+                time.sleep(backoff_seconds)
+                backoff_seconds = min(backoff_seconds * 2, 10.0)
+
+        raise RuntimeError(f"Azure API request failed: {last_exc}") from last_exc
 
     def _extract_json(self, response_text: str) -> Dict[str, Any]:
         try:
@@ -277,11 +292,25 @@ class AzureDeepSeekClient:
             },
             method="POST",
         )
-        try:
-            with urllib.request.urlopen(request, timeout=self.timeout_seconds) as resp:
-                return resp.read().decode("utf-8")
-        except Exception as exc:
-            raise RuntimeError(f"Azure API request failed: {exc}") from exc
+        ## Sometimes, the azureapi returns 50: Service Unavailable error. So, try this multiple times if it fails, with exponential backoff from 1 second to 10 seconds, up to 10 times.
+        max_attempts = 10
+        backoff_seconds = 1.0
+        last_exc: Optional[Exception] = None
+
+        for attempt in range(1, max_attempts + 1):
+            try:
+                with urllib.request.urlopen(
+                    request, timeout=self.timeout_seconds
+                ) as resp:
+                    return resp.read().decode("utf-8")
+            except Exception as exc:
+                last_exc = exc
+                if attempt == max_attempts:
+                    break
+                time.sleep(backoff_seconds)
+                backoff_seconds = min(backoff_seconds * 2, 10.0)
+
+        raise RuntimeError(f"Azure API request failed: {last_exc}") from last_exc
 
     def _extract_json(self, response_text: str) -> Dict[str, Any]:
         try:

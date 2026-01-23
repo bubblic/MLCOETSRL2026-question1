@@ -1,0 +1,1711 @@
+Ticker,Accession Number,Fact Label,XBRL Tag,Dimension(s),Fact Value,Fact Date,Context Type,Unit
+JPM,0000950123-10-016029,Changes In Cash,us-gaap:CashAndCashEquivalentsPeriodIncreaseDecrease,None,-268000000,1/1/08,Unknown,unit
+JPM,0000950123-11-019773,Share Issued,us-gaap:CommonStockSharesIssued,None,3657700000,1/1/08,Unknown,unit
+JPM,0000950123-10-016029,Deferred Tax,us-gaap:DeferredIncomeTaxExpenseBenefit,None,1307000000,1/1/08,Unknown,unit
+JPM,0000950123-10-016029,Basic EPS,us-gaap:EarningsPerShareBasic,None,4.38,1/1/08,Unknown,unit
+JPM,0000950123-10-016029,Diluted EPS,us-gaap:EarningsPerShareDiluted,None,4.33,1/1/08,Unknown,unit
+JPM,0000950123-10-016029,Effect Of Exchange Rate Changes,us-gaap:EffectOfExchangeRateOnCashAndCashEquivalents,None,424000000,1/1/08,Unknown,unit
+JPM,0000950123-11-019773,Goodwill,us-gaap:Goodwill,None,45270000000,1/1/08,Unknown,unit
+JPM,0000950123-10-016029,Income Tax Paid Supplemental Data,us-gaap:IncomeTaxesPaid,None,7472000000,1/1/08,Unknown,unit
+JPM,0000950123-10-016029,Tax Provision,us-gaap:IncomeTaxExpenseBenefit,None,7440000000,1/1/08,Unknown,unit
+JPM,0000950123-10-016029,Interest Paid Supplemental Data,us-gaap:InterestPaid,None,43472000000,1/1/08,Unknown,unit
+JPM,0000950123-10-016029,Financing Cash Flow,us-gaap:NetCashProvidedByUsedInFinancingActivities,None,1.84056E+11,1/1/08,Unknown,unit
+JPM,0000950123-10-016029,Investing Cash Flow,us-gaap:NetCashProvidedByUsedInInvestingActivities,None,-74188000000,1/1/08,Unknown,unit
+JPM,0000950123-10-016029,Operating Cash Flow,us-gaap:NetCashProvidedByUsedInOperatingActivities,None,-1.1056E+11,1/1/08,Unknown,unit
+JPM,0000950123-10-016029,Free Cash Flow,us-gaap:NetCashProvidedByUsedInOperatingActivities,None,-1.1056E+11,1/1/08,Unknown,unit
+JPM,0000950123-10-016029,Net Income,us-gaap:NetIncomeLoss,None,15365000000,1/1/08,Unknown,unit
+JPM,0000950123-10-016029,Net Income Including Noncontrolling Interests,us-gaap:NetIncomeLoss,None,15365000000,1/1/08,Unknown,unit
+JPM,0000950123-10-016029,Repurchase Of Capital Stock,us-gaap:PaymentsForRepurchaseOfCommonStock,None,8178000000,1/1/08,Unknown,unit
+JPM,0000950123-10-016029,Cash Dividends Paid,us-gaap:PaymentsOfDividends,None,5051000000,1/1/08,Unknown,unit
+JPM,0000950123-10-016029,Total Revenue,us-gaap:Revenues,None,71372000000,1/1/08,Unknown,unit
+JPM,0000950123-10-016029,Share-based compensation,us-gaap:ShareBasedCompensation,None,2025000000,1/1/08,Unknown,unit
+JPM,0000950123-10-016029,Basic Average Shares,us-gaap:WeightedAverageNumberOfSharesOutstandingBasic,None,3404000000,1/1/08,Unknown,unit
+JPM,0000950123-10-016029,Additional Paid In Capital,us-gaap:AdditionalPaidInCapital,None,92143000000,1/1/09,Unknown,unit
+JPM,0000950123-10-016029,Total Assets,us-gaap:Assets,None,2.17505E+12,1/1/09,Unknown,unit
+JPM,0000950123-10-016029,Changes In Cash,us-gaap:CashAndCashEquivalentsPeriodIncreaseDecrease,None,-13249000000,1/1/09,Unknown,unit
+JPM,0000950123-11-019773,Changes In Cash,us-gaap:CashAndCashEquivalentsPeriodIncreaseDecrease,None,-13249000000,1/1/09,Unknown,unit
+JPM,0000950123-10-016029,CommercialPaper(ST debt),us-gaap:CommercialPaper,None,37845000000,1/1/09,Unknown,unit
+JPM,0000950123-10-016029,Share Issued,us-gaap:CommonStockSharesIssued,None,3941633895,1/1/09,Unknown,unit
+JPM,0000019617-12-000163,Share Issued,us-gaap:CommonStockSharesIssued,None,3941600000,1/1/09,Unknown,unit
+JPM,0000950123-11-019773,Share Issued,us-gaap:CommonStockSharesIssued,None,3941600000,1/1/09,Unknown,unit
+JPM,0000950123-11-019773,Ordinary Shares Number,us-gaap:CommonStockSharesOutstanding,None,3732800000,1/1/09,Unknown,unit
+JPM,0000950123-10-016029,Common Stock,us-gaap:CommonStockValue,None,3942000000,1/1/09,Unknown,unit
+JPM,0000950123-10-016029,Deferred Tax,us-gaap:DeferredIncomeTaxExpenseBenefit,None,-2637000000,1/1/09,Unknown,unit
+JPM,0000950123-11-019773,Deferred Tax,us-gaap:DeferredIncomeTaxExpenseBenefit,None,-2637000000,1/1/09,Unknown,unit
+JPM,0000950123-10-016029,Basic EPS,us-gaap:EarningsPerShareBasic,None,1.35,1/1/09,Unknown,unit
+JPM,0000950123-11-019773,Basic EPS,us-gaap:EarningsPerShareBasic,None,1.35,1/1/09,Unknown,unit
+JPM,0000950123-10-016029,Diluted EPS,us-gaap:EarningsPerShareDiluted,None,1.35,1/1/09,Unknown,unit
+JPM,0000950123-11-019773,Diluted EPS,us-gaap:EarningsPerShareDiluted,None,1.35,1/1/09,Unknown,unit
+JPM,0000950123-10-016029,Effect Of Exchange Rate Changes,us-gaap:EffectOfExchangeRateOnCashAndCashEquivalents,None,-507000000,1/1/09,Unknown,unit
+JPM,0000950123-11-019773,Effect Of Exchange Rate Changes,us-gaap:EffectOfExchangeRateOnCashAndCashEquivalents,None,-507000000,1/1/09,Unknown,unit
+JPM,0000950123-10-016029,Goodwill,us-gaap:Goodwill,None,48027000000,1/1/09,Unknown,unit
+JPM,0000019617-12-000163,Goodwill,us-gaap:Goodwill,None,48027000000,1/1/09,Unknown,unit
+JPM,0000950123-11-019773,Goodwill,us-gaap:Goodwill,None,48027000000,1/1/09,Unknown,unit
+JPM,0000950123-10-016029,Income Tax Paid Supplemental Data,us-gaap:IncomeTaxesPaid,None,2280000000,1/1/09,Unknown,unit
+JPM,0000950123-11-019773,Income Tax Paid Supplemental Data,us-gaap:IncomeTaxesPaid,None,2280000000,1/1/09,Unknown,unit
+JPM,0000950123-10-016029,Tax Provision,us-gaap:IncomeTaxExpenseBenefit,None,-926000000,1/1/09,Unknown,unit
+JPM,0000950123-11-019773,Tax Provision,us-gaap:IncomeTaxExpenseBenefit,None,-926000000,1/1/09,Unknown,unit
+JPM,0000950123-10-016029,Interest Paid Supplemental Data,us-gaap:InterestPaid,None,37267000000,1/1/09,Unknown,unit
+JPM,0000950123-11-019773,Interest Paid Supplemental Data,us-gaap:InterestPaid,None,37267000000,1/1/09,Unknown,unit
+JPM,0000950123-10-016029,Total Liabilities Net Minority Interest,us-gaap:Liabilities,None,2.00817E+12,1/1/09,Unknown,unit
+JPM,0000950123-10-016029,Long Term Debt,us-gaap:LongTermDebt,None,2.70683E+11,1/1/09,Unknown,unit
+JPM,0000950123-10-016029,Financing Cash Flow,us-gaap:NetCashProvidedByUsedInFinancingActivities,None,2.47831E+11,1/1/09,Unknown,unit
+JPM,0000950123-11-019773,Financing Cash Flow,us-gaap:NetCashProvidedByUsedInFinancingActivities,None,2.46999E+11,1/1/09,Unknown,unit
+JPM,0000950123-10-016029,Investing Cash Flow,us-gaap:NetCashProvidedByUsedInInvestingActivities,None,-2.83671E+11,1/1/09,Unknown,unit
+JPM,0000950123-11-019773,Investing Cash Flow,us-gaap:NetCashProvidedByUsedInInvestingActivities,None,-2.83671E+11,1/1/09,Unknown,unit
+JPM,0000950123-10-016029,Operating Cash Flow,us-gaap:NetCashProvidedByUsedInOperatingActivities,None,23098000000,1/1/09,Unknown,unit
+JPM,0000950123-10-016029,Free Cash Flow,us-gaap:NetCashProvidedByUsedInOperatingActivities,None,23098000000,1/1/09,Unknown,unit
+JPM,0000950123-11-019773,Operating Cash Flow,us-gaap:NetCashProvidedByUsedInOperatingActivities,None,23930000000,1/1/09,Unknown,unit
+JPM,0000950123-11-019773,Free Cash Flow,us-gaap:NetCashProvidedByUsedInOperatingActivities,None,23930000000,1/1/09,Unknown,unit
+JPM,0000950123-10-016029,Net Income,us-gaap:NetIncomeLoss,None,5605000000,1/1/09,Unknown,unit
+JPM,0000950123-10-016029,Net Income Including Noncontrolling Interests,us-gaap:NetIncomeLoss,None,5605000000,1/1/09,Unknown,unit
+JPM,0000950123-11-019773,Net Income,us-gaap:NetIncomeLoss,None,5605000000,1/1/09,Unknown,unit
+JPM,0000950123-11-019773,Net Income Including Noncontrolling Interests,us-gaap:NetIncomeLoss,None,5605000000,1/1/09,Unknown,unit
+JPM,0000950123-10-016029,Repurchase Of Capital Stock,us-gaap:PaymentsForRepurchaseOfCommonStock,None,0,1/1/09,Unknown,unit
+JPM,0000950123-10-016029,Cash Dividends Paid,us-gaap:PaymentsOfDividends,None,5911000000,1/1/09,Unknown,unit
+JPM,0000950123-11-019773,Cash Dividends Paid,us-gaap:PaymentsOfDividends,None,5911000000,1/1/09,Unknown,unit
+JPM,0000950123-10-016029,Net PPE,us-gaap:PropertyPlantAndEquipmentNet,None,10045000000,1/1/09,Unknown,unit
+JPM,0000950123-10-016029,Total Revenue,us-gaap:Revenues,None,67252000000,1/1/09,Unknown,unit
+JPM,0000950123-11-019773,Total Revenue,us-gaap:Revenues,None,67252000000,1/1/09,Unknown,unit
+JPM,0000950123-10-016029,Share-based compensation,us-gaap:ShareBasedCompensation,None,2637000000,1/1/09,Unknown,unit
+JPM,0000950123-11-019773,Share-based compensation,us-gaap:ShareBasedCompensation,None,2637000000,1/1/09,Unknown,unit
+JPM,0000950123-10-016029,Common Stock Equity,us-gaap:StockholdersEquity,None,1.66884E+11,1/1/09,Unknown,unit
+JPM,0000950123-10-016029,Stockholders Equity,us-gaap:StockholdersEquity,None,1.66884E+11,1/1/09,Unknown,unit
+JPM,0000950123-10-016029,Basic Average Shares,us-gaap:WeightedAverageNumberOfSharesOutstandingBasic,None,3501000000,1/1/09,Unknown,unit
+JPM,0000950123-11-019773,Basic Average Shares,us-gaap:WeightedAverageNumberOfSharesOutstandingBasic,None,3501100000,1/1/09,Unknown,unit
+JPM,0000950123-10-016029,Additional Paid In Capital,us-gaap:AdditionalPaidInCapital,None,97982000000,1/1/10,Unknown,unit
+JPM,0000950123-10-016029,Total Assets,us-gaap:Assets,None,2.03199E+12,1/1/10,Unknown,unit
+JPM,0000019617-12-000163,Total Assets,us-gaap:Assets,None,2.11967E+12,1/1/10,Unknown,unit
+JPM,0000950123-11-019773,Total Assets,us-gaap:Assets,None,2.11967E+12,1/1/10,Unknown,unit
+JPM,0000950123-10-016029,Changes In Cash,us-gaap:CashAndCashEquivalentsPeriodIncreaseDecrease,None,-689000000,1/1/10,Unknown,unit
+JPM,0000019617-12-000163,Changes In Cash,us-gaap:CashAndCashEquivalentsPeriodIncreaseDecrease,None,-689000000,1/1/10,Unknown,unit
+JPM,0000950123-11-019773,Changes In Cash,us-gaap:CashAndCashEquivalentsPeriodIncreaseDecrease,None,-689000000,1/1/10,Unknown,unit
+JPM,0000950123-10-016029,CommercialPaper(ST debt),us-gaap:CommercialPaper,None,41794000000,1/1/10,Unknown,unit
+JPM,0000950123-11-019773,CommercialPaper(ST debt),us-gaap:CommercialPaper,None,41794000000,1/1/10,Unknown,unit
+JPM,0000950123-10-016029,Share Issued,us-gaap:CommonStockSharesIssued,None,4104933895,1/1/10,Unknown,unit
+JPM,0000019617-13-000221,Share Issued,us-gaap:CommonStockSharesIssued,None,4104933895,1/1/10,Unknown,unit
+JPM,0000019617-12-000163,Share Issued,us-gaap:CommonStockSharesIssued,None,4104900000,1/1/10,Unknown,unit
+JPM,0000950123-11-019773,Share Issued,us-gaap:CommonStockSharesIssued,None,4104933895,1/1/10,Unknown,unit
+JPM,0000019617-12-000163,Ordinary Shares Number,us-gaap:CommonStockSharesOutstanding,None,3942000000,1/1/10,Unknown,unit
+JPM,0000950123-11-019773,Ordinary Shares Number,us-gaap:CommonStockSharesOutstanding,None,3942000000,1/1/10,Unknown,unit
+JPM,0000950123-10-016029,Common Stock,us-gaap:CommonStockValue,None,4105000000,1/1/10,Unknown,unit
+JPM,0000950123-11-019773,Common Stock,us-gaap:CommonStockValue,None,4105000000,1/1/10,Unknown,unit
+JPM,0000950123-10-016029,Deferred Tax,us-gaap:DeferredIncomeTaxExpenseBenefit,None,-3622000000,1/1/10,Unknown,unit
+JPM,0000019617-12-000163,Deferred Tax,us-gaap:DeferredIncomeTaxExpenseBenefit,None,-3622000000,1/1/10,Unknown,unit
+JPM,0000950123-11-019773,Deferred Tax,us-gaap:DeferredIncomeTaxExpenseBenefit,None,-3622000000,1/1/10,Unknown,unit
+JPM,0000950123-10-016029,Basic EPS,us-gaap:EarningsPerShareBasic,None,2.27,1/1/10,Unknown,unit
+JPM,0000019617-12-000163,Basic EPS,us-gaap:EarningsPerShareBasic,None,2.27,1/1/10,Unknown,unit
+JPM,0000950123-11-019773,Basic EPS,us-gaap:EarningsPerShareBasic,None,2.27,1/1/10,Unknown,unit
+JPM,0000950123-10-016029,Diluted EPS,us-gaap:EarningsPerShareDiluted,None,2.26,1/1/10,Unknown,unit
+JPM,0000019617-12-000163,Diluted EPS,us-gaap:EarningsPerShareDiluted,None,2.26,1/1/10,Unknown,unit
+JPM,0000950123-11-019773,Diluted EPS,us-gaap:EarningsPerShareDiluted,None,2.26,1/1/10,Unknown,unit
+JPM,0000950123-10-016029,Effect Of Exchange Rate Changes,us-gaap:EffectOfExchangeRateOnCashAndCashEquivalents,None,238000000,1/1/10,Unknown,unit
+JPM,0000019617-12-000163,Effect Of Exchange Rate Changes,us-gaap:EffectOfExchangeRateOnCashAndCashEquivalents,None,238000000,1/1/10,Unknown,unit
+JPM,0000950123-11-019773,Effect Of Exchange Rate Changes,us-gaap:EffectOfExchangeRateOnCashAndCashEquivalents,None,238000000,1/1/10,Unknown,unit
+JPM,0000950123-10-016029,Goodwill,us-gaap:Goodwill,None,48357000000,1/1/10,Unknown,unit
+JPM,0000019617-13-000221,Goodwill,us-gaap:Goodwill,None,48357000000,1/1/10,Unknown,unit
+JPM,0000019617-12-000163,Goodwill,us-gaap:Goodwill,None,48357000000,1/1/10,Unknown,unit
+JPM,0000950123-11-019773,Goodwill,us-gaap:Goodwill,None,48357000000,1/1/10,Unknown,unit
+JPM,0000950123-10-016029,Income Tax Paid Supplemental Data,us-gaap:IncomeTaxesPaid,None,5434000000,1/1/10,Unknown,unit
+JPM,0000019617-12-000163,Income Tax Paid Supplemental Data,us-gaap:IncomeTaxesPaid,None,5434000000,1/1/10,Unknown,unit
+JPM,0000950123-11-019773,Income Tax Paid Supplemental Data,us-gaap:IncomeTaxesPaid,None,5434000000,1/1/10,Unknown,unit
+JPM,0000950123-10-016029,Tax Provision,us-gaap:IncomeTaxExpenseBenefit,None,4415000000,1/1/10,Unknown,unit
+JPM,0000019617-12-000163,Tax Provision,us-gaap:IncomeTaxExpenseBenefit,None,4415000000,1/1/10,Unknown,unit
+JPM,0000950123-11-019773,Tax Provision,us-gaap:IncomeTaxExpenseBenefit,None,4415000000,1/1/10,Unknown,unit
+JPM,0000950123-10-016029,Interest Paid Supplemental Data,us-gaap:InterestPaid,None,16875000000,1/1/10,Unknown,unit
+JPM,0000019617-12-000163,Interest Paid Supplemental Data,us-gaap:InterestPaid,None,16875000000,1/1/10,Unknown,unit
+JPM,0000950123-11-019773,Interest Paid Supplemental Data,us-gaap:InterestPaid,None,16875000000,1/1/10,Unknown,unit
+JPM,0000950123-10-016029,Total Liabilities Net Minority Interest,us-gaap:Liabilities,None,1.86662E+12,1/1/10,Unknown,unit
+JPM,0000019617-12-000163,Total Liabilities Net Minority Interest,us-gaap:Liabilities,None,1.95883E+12,1/1/10,Unknown,unit
+JPM,0000950123-11-019773,Total Liabilities Net Minority Interest,us-gaap:Liabilities,None,1.95883E+12,1/1/10,Unknown,unit
+JPM,0000950123-10-016029,Long Term Debt,us-gaap:LongTermDebt,None,2.66318E+11,1/1/10,Unknown,unit
+JPM,0000950123-11-019773,Long Term Debt,us-gaap:LongTermDebt,None,2.66318E+11,1/1/10,Unknown,unit
+JPM,0000950123-10-016029,Financing Cash Flow,us-gaap:NetCashProvidedByUsedInFinancingActivities,None,-1.52179E+11,1/1/10,Unknown,unit
+JPM,0000019617-12-000163,Financing Cash Flow,us-gaap:NetCashProvidedByUsedInFinancingActivities,None,-1.53079E+11,1/1/10,Unknown,unit
+JPM,0000950123-11-019773,Financing Cash Flow,us-gaap:NetCashProvidedByUsedInFinancingActivities,None,-1.53079E+11,1/1/10,Unknown,unit
+JPM,0000950123-10-016029,Investing Cash Flow,us-gaap:NetCashProvidedByUsedInInvestingActivities,None,29355000000,1/1/10,Unknown,unit
+JPM,0000019617-12-000163,Investing Cash Flow,us-gaap:NetCashProvidedByUsedInInvestingActivities,None,29355000000,1/1/10,Unknown,unit
+JPM,0000950123-11-019773,Investing Cash Flow,us-gaap:NetCashProvidedByUsedInInvestingActivities,None,29355000000,1/1/10,Unknown,unit
+JPM,0000950123-10-016029,Operating Cash Flow,us-gaap:NetCashProvidedByUsedInOperatingActivities,None,1.21897E+11,1/1/10,Unknown,unit
+JPM,0000950123-10-016029,Free Cash Flow,us-gaap:NetCashProvidedByUsedInOperatingActivities,None,1.21897E+11,1/1/10,Unknown,unit
+JPM,0000019617-12-000163,Operating Cash Flow,us-gaap:NetCashProvidedByUsedInOperatingActivities,None,1.22797E+11,1/1/10,Unknown,unit
+JPM,0000019617-12-000163,Free Cash Flow,us-gaap:NetCashProvidedByUsedInOperatingActivities,None,1.22797E+11,1/1/10,Unknown,unit
+JPM,0000950123-11-019773,Operating Cash Flow,us-gaap:NetCashProvidedByUsedInOperatingActivities,None,1.22797E+11,1/1/10,Unknown,unit
+JPM,0000950123-11-019773,Free Cash Flow,us-gaap:NetCashProvidedByUsedInOperatingActivities,None,1.22797E+11,1/1/10,Unknown,unit
+JPM,0000950123-10-016029,Net Income,us-gaap:NetIncomeLoss,None,11728000000,1/1/10,Unknown,unit
+JPM,0000950123-10-016029,Net Income Including Noncontrolling Interests,us-gaap:NetIncomeLoss,None,11728000000,1/1/10,Unknown,unit
+JPM,0000019617-12-000163,Net Income,us-gaap:NetIncomeLoss,None,11728000000,1/1/10,Unknown,unit
+JPM,0000019617-12-000163,Net Income Including Noncontrolling Interests,us-gaap:NetIncomeLoss,None,11728000000,1/1/10,Unknown,unit
+JPM,0000950123-11-019773,Net Income,us-gaap:NetIncomeLoss,None,11728000000,1/1/10,Unknown,unit
+JPM,0000950123-11-019773,Net Income Including Noncontrolling Interests,us-gaap:NetIncomeLoss,None,11728000000,1/1/10,Unknown,unit
+JPM,0000950123-10-016029,Repurchase Of Capital Stock,us-gaap:PaymentsForRepurchaseOfCommonStock,None,0,1/1/10,Unknown,unit
+JPM,0000950123-10-016029,Cash Dividends Paid,us-gaap:PaymentsOfDividends,None,3422000000,1/1/10,Unknown,unit
+JPM,0000019617-12-000163,Cash Dividends Paid,us-gaap:PaymentsOfDividends,None,3422000000,1/1/10,Unknown,unit
+JPM,0000950123-11-019773,Cash Dividends Paid,us-gaap:PaymentsOfDividends,None,3422000000,1/1/10,Unknown,unit
+JPM,0000950123-10-016029,Net PPE,us-gaap:PropertyPlantAndEquipmentNet,None,11118000000,1/1/10,Unknown,unit
+JPM,0000950123-11-019773,Net PPE,us-gaap:PropertyPlantAndEquipmentNet,None,11118000000,1/1/10,Unknown,unit
+JPM,0000950123-10-016029,Total Revenue,us-gaap:Revenues,None,1.00434E+11,1/1/10,Unknown,unit
+JPM,0000019617-12-000163,Total Revenue,us-gaap:Revenues,None,1.00434E+11,1/1/10,Unknown,unit
+JPM,0000950123-11-019773,Total Revenue,us-gaap:Revenues,None,1.00434E+11,1/1/10,Unknown,unit
+JPM,0000950123-10-016029,Share-based compensation,us-gaap:ShareBasedCompensation,None,3355000000,1/1/10,Unknown,unit
+JPM,0000019617-12-000163,Share-based compensation,us-gaap:ShareBasedCompensation,None,3355000000,1/1/10,Unknown,unit
+JPM,0000950123-11-019773,Share-based compensation,us-gaap:ShareBasedCompensation,None,3355000000,1/1/10,Unknown,unit
+JPM,0000950123-10-016029,Common Stock Equity,us-gaap:StockholdersEquity,None,1.65365E+11,1/1/10,Unknown,unit
+JPM,0000950123-10-016029,Stockholders Equity,us-gaap:StockholdersEquity,None,1.65365E+11,1/1/10,Unknown,unit
+JPM,0000019617-12-000163,Common Stock Equity,us-gaap:StockholdersEquity,None,1.60845E+11,1/1/10,Unknown,unit
+JPM,0000019617-12-000163,Stockholders Equity,us-gaap:StockholdersEquity,None,1.60845E+11,1/1/10,Unknown,unit
+JPM,0000950123-11-019773,Common Stock Equity,us-gaap:StockholdersEquity,None,1.60845E+11,1/1/10,Unknown,unit
+JPM,0000950123-11-019773,Stockholders Equity,us-gaap:StockholdersEquity,None,1.60845E+11,1/1/10,Unknown,unit
+JPM,0000950123-10-016029,Basic Average Shares,us-gaap:WeightedAverageNumberOfSharesOutstandingBasic,None,3863000000,1/1/10,Unknown,unit
+JPM,0000019617-12-000163,Basic Average Shares,us-gaap:WeightedAverageNumberOfSharesOutstandingBasic,None,3862800000,1/1/10,Unknown,unit
+JPM,0000950123-11-019773,Basic Average Shares,us-gaap:WeightedAverageNumberOfSharesOutstandingBasic,None,3862800000,1/1/10,Unknown,unit
+JPM,0000019617-13-000221,Total Assets,us-gaap:Assets,None,2.11761E+12,1/1/11,Unknown,unit
+JPM,0000019617-12-000163,Total Assets,us-gaap:Assets,None,2.11761E+12,1/1/11,Unknown,unit
+JPM,0000950123-11-019773,Total Assets,us-gaap:Assets,None,2.11761E+12,1/1/11,Unknown,unit
+JPM,0000019617-13-000221,Changes In Cash,us-gaap:CashAndCashEquivalentsPeriodIncreaseDecrease,None,1361000000,1/1/11,Unknown,unit
+JPM,0000019617-12-000163,Changes In Cash,us-gaap:CashAndCashEquivalentsPeriodIncreaseDecrease,None,1361000000,1/1/11,Unknown,unit
+JPM,0000950123-11-019773,Changes In Cash,us-gaap:CashAndCashEquivalentsPeriodIncreaseDecrease,None,1361000000,1/1/11,Unknown,unit
+JPM,0000019617-12-000163,CommercialPaper(ST debt),us-gaap:CommercialPaper,None,35363000000,1/1/11,Unknown,unit
+JPM,0000950123-11-019773,CommercialPaper(ST debt),us-gaap:CommercialPaper,None,35363000000,1/1/11,Unknown,unit
+JPM,0000019617-14-000289,Share Issued,us-gaap:CommonStockSharesIssued,None,4104933895,1/1/11,Unknown,unit
+JPM,0000019617-13-000221,Share Issued,us-gaap:CommonStockSharesIssued,None,4104933895,1/1/11,Unknown,unit
+JPM,0000019617-12-000163,Share Issued,us-gaap:CommonStockSharesIssued,None,4104933895,1/1/11,Unknown,unit
+JPM,0000950123-11-019773,Share Issued,us-gaap:CommonStockSharesIssued,None,4104933895,1/1/11,Unknown,unit
+JPM,0000019617-13-000221,Ordinary Shares Number,us-gaap:CommonStockSharesOutstanding,None,3910300000,1/1/11,Unknown,unit
+JPM,0000019617-12-000163,Ordinary Shares Number,us-gaap:CommonStockSharesOutstanding,None,3910300000,1/1/11,Unknown,unit
+JPM,0000950123-11-019773,Ordinary Shares Number,us-gaap:CommonStockSharesOutstanding,None,3910300000,1/1/11,Unknown,unit
+JPM,0000019617-12-000163,Common Stock,us-gaap:CommonStockValue,None,4105000000,1/1/11,Unknown,unit
+JPM,0000950123-11-019773,Common Stock,us-gaap:CommonStockValue,None,4105000000,1/1/11,Unknown,unit
+JPM,0000019617-13-000221,Deferred Tax,us-gaap:DeferredIncomeTaxExpenseBenefit,None,-968000000,1/1/11,Unknown,unit
+JPM,0000019617-12-000163,Deferred Tax,us-gaap:DeferredIncomeTaxExpenseBenefit,None,-968000000,1/1/11,Unknown,unit
+JPM,0000950123-11-019773,Deferred Tax,us-gaap:DeferredIncomeTaxExpenseBenefit,None,-968000000,1/1/11,Unknown,unit
+JPM,0000019617-13-000221,Basic EPS,us-gaap:EarningsPerShareBasic,None,3.98,1/1/11,Unknown,unit
+JPM,0000019617-12-000163,Basic EPS,us-gaap:EarningsPerShareBasic,None,3.98,1/1/11,Unknown,unit
+JPM,0000950123-11-019773,Basic EPS,us-gaap:EarningsPerShareBasic,None,3.98,1/1/11,Unknown,unit
+JPM,0000019617-13-000221,Diluted EPS,us-gaap:EarningsPerShareDiluted,None,3.96,1/1/11,Unknown,unit
+JPM,0000019617-12-000163,Diluted EPS,us-gaap:EarningsPerShareDiluted,None,3.96,1/1/11,Unknown,unit
+JPM,0000950123-11-019773,Diluted EPS,us-gaap:EarningsPerShareDiluted,None,3.96,1/1/11,Unknown,unit
+JPM,0000019617-13-000221,Effect Of Exchange Rate Changes,us-gaap:EffectOfExchangeRateOnCashAndCashEquivalents,None,328000000,1/1/11,Unknown,unit
+JPM,0000019617-12-000163,Effect Of Exchange Rate Changes,us-gaap:EffectOfExchangeRateOnCashAndCashEquivalents,None,328000000,1/1/11,Unknown,unit
+JPM,0000950123-11-019773,Effect Of Exchange Rate Changes,us-gaap:EffectOfExchangeRateOnCashAndCashEquivalents,None,328000000,1/1/11,Unknown,unit
+JPM,0000019617-14-000289,Goodwill,us-gaap:Goodwill,None,48854000000,1/1/11,Unknown,unit
+JPM,0000019617-13-000221,Goodwill,us-gaap:Goodwill,None,48854000000,1/1/11,Unknown,unit
+JPM,0000019617-12-000163,Goodwill,us-gaap:Goodwill,None,48854000000,1/1/11,Unknown,unit
+JPM,0000950123-11-019773,Goodwill,us-gaap:Goodwill,None,48854000000,1/1/11,Unknown,unit
+JPM,0000019617-13-000221,Income Tax Paid Supplemental Data,us-gaap:IncomeTaxesPaid,None,9747000000,1/1/11,Unknown,unit
+JPM,0000019617-12-000163,Income Tax Paid Supplemental Data,us-gaap:IncomeTaxesPaid,None,9747000000,1/1/11,Unknown,unit
+JPM,0000950123-11-019773,Income Tax Paid Supplemental Data,us-gaap:IncomeTaxesPaid,None,9747000000,1/1/11,Unknown,unit
+JPM,0000019617-13-000221,Tax Provision,us-gaap:IncomeTaxExpenseBenefit,None,7489000000,1/1/11,Unknown,unit
+JPM,0000019617-12-000163,Tax Provision,us-gaap:IncomeTaxExpenseBenefit,None,7489000000,1/1/11,Unknown,unit
+JPM,0000950123-11-019773,Tax Provision,us-gaap:IncomeTaxExpenseBenefit,None,7489000000,1/1/11,Unknown,unit
+JPM,0000019617-13-000221,Interest Paid Supplemental Data,us-gaap:InterestPaid,None,12404000000,1/1/11,Unknown,unit
+JPM,0000019617-12-000163,Interest Paid Supplemental Data,us-gaap:InterestPaid,None,12404000000,1/1/11,Unknown,unit
+JPM,0000950123-11-019773,Interest Paid Supplemental Data,us-gaap:InterestPaid,None,12404000000,1/1/11,Unknown,unit
+JPM,0000019617-12-000163,Total Liabilities Net Minority Interest,us-gaap:Liabilities,None,1.9415E+12,1/1/11,Unknown,unit
+JPM,0000950123-11-019773,Total Liabilities Net Minority Interest,us-gaap:Liabilities,None,1.9415E+12,1/1/11,Unknown,unit
+JPM,0000019617-12-000163,Long Term Debt,us-gaap:LongTermDebt,None,2.70653E+11,1/1/11,Unknown,unit
+JPM,0000950123-11-019773,Long Term Debt,us-gaap:LongTermDebt,None,2.47669E+11,1/1/11,Unknown,unit
+JPM,0000019617-13-000221,Financing Cash Flow,us-gaap:NetCashProvidedByUsedInFinancingActivities,None,-49217000000,1/1/11,Unknown,unit
+JPM,0000019617-12-000163,Financing Cash Flow,us-gaap:NetCashProvidedByUsedInFinancingActivities,None,-49217000000,1/1/11,Unknown,unit
+JPM,0000950123-11-019773,Financing Cash Flow,us-gaap:NetCashProvidedByUsedInFinancingActivities,None,-49217000000,1/1/11,Unknown,unit
+JPM,0000019617-13-000221,Investing Cash Flow,us-gaap:NetCashProvidedByUsedInInvestingActivities,None,54002000000,1/1/11,Unknown,unit
+JPM,0000019617-12-000163,Investing Cash Flow,us-gaap:NetCashProvidedByUsedInInvestingActivities,None,54002000000,1/1/11,Unknown,unit
+JPM,0000950123-11-019773,Investing Cash Flow,us-gaap:NetCashProvidedByUsedInInvestingActivities,None,54002000000,1/1/11,Unknown,unit
+JPM,0000019617-13-000221,Operating Cash Flow,us-gaap:NetCashProvidedByUsedInOperatingActivities,None,-3752000000,1/1/11,Unknown,unit
+JPM,0000019617-13-000221,Free Cash Flow,us-gaap:NetCashProvidedByUsedInOperatingActivities,None,-3752000000,1/1/11,Unknown,unit
+JPM,0000019617-12-000163,Operating Cash Flow,us-gaap:NetCashProvidedByUsedInOperatingActivities,None,-3752000000,1/1/11,Unknown,unit
+JPM,0000019617-12-000163,Free Cash Flow,us-gaap:NetCashProvidedByUsedInOperatingActivities,None,-3752000000,1/1/11,Unknown,unit
+JPM,0000950123-11-019773,Operating Cash Flow,us-gaap:NetCashProvidedByUsedInOperatingActivities,None,-3752000000,1/1/11,Unknown,unit
+JPM,0000950123-11-019773,Free Cash Flow,us-gaap:NetCashProvidedByUsedInOperatingActivities,None,-3752000000,1/1/11,Unknown,unit
+JPM,0000019617-13-000221,Net Income,us-gaap:NetIncomeLoss,None,17370000000,1/1/11,Unknown,unit
+JPM,0000019617-13-000221,Net Income Including Noncontrolling Interests,us-gaap:NetIncomeLoss,None,17370000000,1/1/11,Unknown,unit
+JPM,0000019617-12-000163,Net Income,us-gaap:NetIncomeLoss,None,17370000000,1/1/11,Unknown,unit
+JPM,0000019617-12-000163,Net Income Including Noncontrolling Interests,us-gaap:NetIncomeLoss,None,17370000000,1/1/11,Unknown,unit
+JPM,0000950123-11-019773,Net Income,us-gaap:NetIncomeLoss,None,17370000000,1/1/11,Unknown,unit
+JPM,0000950123-11-019773,Net Income Including Noncontrolling Interests,us-gaap:NetIncomeLoss,None,17370000000,1/1/11,Unknown,unit
+JPM,0000950123-11-019773,Repurchase Of Capital Stock,us-gaap:PaymentsForRepurchaseOfCommonStock,None,2999000000,1/1/11,Unknown,unit
+JPM,0000019617-13-000221,Cash Dividends Paid,us-gaap:PaymentsOfDividends,None,1486000000,1/1/11,Unknown,unit
+JPM,0000019617-12-000163,Cash Dividends Paid,us-gaap:PaymentsOfDividends,None,1486000000,1/1/11,Unknown,unit
+JPM,0000950123-11-019773,Cash Dividends Paid,us-gaap:PaymentsOfDividends,None,1486000000,1/1/11,Unknown,unit
+JPM,0000019617-12-000163,Net PPE,us-gaap:PropertyPlantAndEquipmentNet,None,13355000000,1/1/11,Unknown,unit
+JPM,0000950123-11-019773,Net PPE,us-gaap:PropertyPlantAndEquipmentNet,None,13355000000,1/1/11,Unknown,unit
+JPM,0000019617-13-000221,Total Revenue,us-gaap:Revenues,None,1.02694E+11,1/1/11,Unknown,unit
+JPM,0000019617-12-000163,Total Revenue,us-gaap:Revenues,None,1.02694E+11,1/1/11,Unknown,unit
+JPM,0000950123-11-019773,Total Revenue,us-gaap:Revenues,None,1.02694E+11,1/1/11,Unknown,unit
+JPM,0000019617-13-000221,Share-based compensation,us-gaap:ShareBasedCompensation,None,3251000000,1/1/11,Unknown,unit
+JPM,0000019617-12-000163,Share-based compensation,us-gaap:ShareBasedCompensation,None,3251000000,1/1/11,Unknown,unit
+JPM,0000950123-11-019773,Share-based compensation,us-gaap:ShareBasedCompensation,None,3251000000,1/1/11,Unknown,unit
+JPM,0000019617-12-000163,Common Stock Equity,us-gaap:StockholdersEquity,None,1.76106E+11,1/1/11,Unknown,unit
+JPM,0000019617-12-000163,Stockholders Equity,us-gaap:StockholdersEquity,None,1.76106E+11,1/1/11,Unknown,unit
+JPM,0000950123-11-019773,Common Stock Equity,us-gaap:StockholdersEquity,None,1.76106E+11,1/1/11,Unknown,unit
+JPM,0000950123-11-019773,Stockholders Equity,us-gaap:StockholdersEquity,None,1.76106E+11,1/1/11,Unknown,unit
+JPM,0000019617-13-000221,Basic Average Shares,us-gaap:WeightedAverageNumberOfSharesOutstandingBasic,None,3956300000,1/1/11,Unknown,unit
+JPM,0000019617-12-000163,Basic Average Shares,us-gaap:WeightedAverageNumberOfSharesOutstandingBasic,None,3956300000,1/1/11,Unknown,unit
+JPM,0000950123-11-019773,Basic Average Shares,us-gaap:WeightedAverageNumberOfSharesOutstandingBasic,None,3956300000,1/1/11,Unknown,unit
+JPM,0000019617-14-000289,Total Assets,us-gaap:Assets,None,2.26579E+12,1/1/12,Unknown,unit
+JPM,0000019617-13-000221,Total Assets,us-gaap:Assets,None,2.26579E+12,1/1/12,Unknown,unit
+JPM,0000019617-12-000163,Total Assets,us-gaap:Assets,None,2.26579E+12,1/1/12,Unknown,unit
+JPM,0000019617-14-000289,Changes In Cash,us-gaap:CashAndCashEquivalentsPeriodIncreaseDecrease,None,32035000000,1/1/12,Unknown,unit
+JPM,0000019617-13-000221,Changes In Cash,us-gaap:CashAndCashEquivalentsPeriodIncreaseDecrease,None,32035000000,1/1/12,Unknown,unit
+JPM,0000019617-12-000163,Changes In Cash,us-gaap:CashAndCashEquivalentsPeriodIncreaseDecrease,None,32035000000,1/1/12,Unknown,unit
+JPM,0000019617-13-000221,CommercialPaper(ST debt),us-gaap:CommercialPaper,None,51631000000,1/1/12,Unknown,unit
+JPM,0000019617-12-000163,CommercialPaper(ST debt),us-gaap:CommercialPaper,None,51631000000,1/1/12,Unknown,unit
+JPM,0000019617-14-000289,Share Issued,us-gaap:CommonStockSharesIssued,None,4104933895,1/1/12,Unknown,unit
+JPM,0000019617-13-000221,Share Issued,us-gaap:CommonStockSharesIssued,None,4104933895,1/1/12,Unknown,unit
+JPM,0000019617-12-000163,Share Issued,us-gaap:CommonStockSharesIssued,None,4104933895,1/1/12,Unknown,unit
+JPM,0000019617-15-000272,Share Issued,us-gaap:CommonStockSharesIssued,None,4104933895,1/1/12,Unknown,unit
+JPM,0000019617-14-000289,Ordinary Shares Number,us-gaap:CommonStockSharesOutstanding,None,3772700000,1/1/12,Unknown,unit
+JPM,0000019617-13-000221,Ordinary Shares Number,us-gaap:CommonStockSharesOutstanding,None,3772700000,1/1/12,Unknown,unit
+JPM,0000019617-12-000163,Ordinary Shares Number,us-gaap:CommonStockSharesOutstanding,None,3772700000,1/1/12,Unknown,unit
+JPM,0000019617-13-000221,Common Stock,us-gaap:CommonStockValue,None,4105000000,1/1/12,Unknown,unit
+JPM,0000019617-12-000163,Common Stock,us-gaap:CommonStockValue,None,4105000000,1/1/12,Unknown,unit
+JPM,0000019617-14-000289,Deferred Tax,us-gaap:DeferredIncomeTaxExpenseBenefit,None,1693000000,1/1/12,Unknown,unit
+JPM,0000019617-13-000221,Deferred Tax,us-gaap:DeferredIncomeTaxExpenseBenefit,None,1693000000,1/1/12,Unknown,unit
+JPM,0000019617-12-000163,Deferred Tax,us-gaap:DeferredIncomeTaxExpenseBenefit,None,1693000000,1/1/12,Unknown,unit
+JPM,0000019617-14-000289,Basic EPS,us-gaap:EarningsPerShareBasic,None,4.5,1/1/12,Unknown,unit
+JPM,0000019617-13-000221,Basic EPS,us-gaap:EarningsPerShareBasic,None,4.5,1/1/12,Unknown,unit
+JPM,0000019617-12-000163,Basic EPS,us-gaap:EarningsPerShareBasic,None,4.5,1/1/12,Unknown,unit
+JPM,0000019617-14-000289,Diluted EPS,us-gaap:EarningsPerShareDiluted,None,4.48,1/1/12,Unknown,unit
+JPM,0000019617-13-000221,Diluted EPS,us-gaap:EarningsPerShareDiluted,None,4.48,1/1/12,Unknown,unit
+JPM,0000019617-12-000163,Diluted EPS,us-gaap:EarningsPerShareDiluted,None,4.48,1/1/12,Unknown,unit
+JPM,0000019617-14-000289,Effect Of Exchange Rate Changes,us-gaap:EffectOfExchangeRateOnCashAndCashEquivalents,None,-851000000,1/1/12,Unknown,unit
+JPM,0000019617-13-000221,Effect Of Exchange Rate Changes,us-gaap:EffectOfExchangeRateOnCashAndCashEquivalents,None,-851000000,1/1/12,Unknown,unit
+JPM,0000019617-12-000163,Effect Of Exchange Rate Changes,us-gaap:EffectOfExchangeRateOnCashAndCashEquivalents,None,-851000000,1/1/12,Unknown,unit
+JPM,0000019617-14-000289,Goodwill,us-gaap:Goodwill,None,48188000000,1/1/12,Unknown,unit
+JPM,0000019617-13-000221,Goodwill,us-gaap:Goodwill,None,48188000000,1/1/12,Unknown,unit
+JPM,0000019617-12-000163,Goodwill,us-gaap:Goodwill,None,48188000000,1/1/12,Unknown,unit
+JPM,0000019617-15-000272,Goodwill,us-gaap:Goodwill,None,48188000000,1/1/12,Unknown,unit
+JPM,0000019617-14-000289,Income Tax Paid Supplemental Data,us-gaap:IncomeTaxesPaid,None,8153000000,1/1/12,Unknown,unit
+JPM,0000019617-13-000221,Income Tax Paid Supplemental Data,us-gaap:IncomeTaxesPaid,None,8153000000,1/1/12,Unknown,unit
+JPM,0000019617-12-000163,Income Tax Paid Supplemental Data,us-gaap:IncomeTaxesPaid,None,8153000000,1/1/12,Unknown,unit
+JPM,0000019617-14-000289,Tax Provision,us-gaap:IncomeTaxExpenseBenefit,None,7773000000,1/1/12,Unknown,unit
+JPM,0000019617-13-000221,Tax Provision,us-gaap:IncomeTaxExpenseBenefit,None,7773000000,1/1/12,Unknown,unit
+JPM,0000019617-12-000163,Tax Provision,us-gaap:IncomeTaxExpenseBenefit,None,7773000000,1/1/12,Unknown,unit
+JPM,0000019617-14-000289,Interest Paid Supplemental Data,us-gaap:InterestPaid,None,13725000000,1/1/12,Unknown,unit
+JPM,0000019617-13-000221,Interest Paid Supplemental Data,us-gaap:InterestPaid,None,13725000000,1/1/12,Unknown,unit
+JPM,0000019617-12-000163,Interest Paid Supplemental Data,us-gaap:InterestPaid,None,13725000000,1/1/12,Unknown,unit
+JPM,0000019617-13-000221,Total Liabilities Net Minority Interest,us-gaap:Liabilities,None,2.08222E+12,1/1/12,Unknown,unit
+JPM,0000019617-12-000163,Total Liabilities Net Minority Interest,us-gaap:Liabilities,None,2.08222E+12,1/1/12,Unknown,unit
+JPM,0000019617-13-000221,Long Term Debt,us-gaap:LongTermDebt,None,2.56775E+11,1/1/12,Unknown,unit
+JPM,0000019617-12-000163,Long Term Debt,us-gaap:LongTermDebt,None,2.56775E+11,1/1/12,Unknown,unit
+JPM,0000019617-14-000289,Financing Cash Flow,us-gaap:NetCashProvidedByUsedInFinancingActivities,None,1.07706E+11,1/1/12,Unknown,unit
+JPM,0000019617-13-000221,Financing Cash Flow,us-gaap:NetCashProvidedByUsedInFinancingActivities,None,1.07706E+11,1/1/12,Unknown,unit
+JPM,0000019617-12-000163,Financing Cash Flow,us-gaap:NetCashProvidedByUsedInFinancingActivities,None,1.07706E+11,1/1/12,Unknown,unit
+JPM,0000019617-14-000289,Investing Cash Flow,us-gaap:NetCashProvidedByUsedInInvestingActivities,None,-1.70752E+11,1/1/12,Unknown,unit
+JPM,0000019617-13-000221,Investing Cash Flow,us-gaap:NetCashProvidedByUsedInInvestingActivities,None,-1.70752E+11,1/1/12,Unknown,unit
+JPM,0000019617-12-000163,Investing Cash Flow,us-gaap:NetCashProvidedByUsedInInvestingActivities,None,-1.70752E+11,1/1/12,Unknown,unit
+JPM,0000019617-14-000289,Operating Cash Flow,us-gaap:NetCashProvidedByUsedInOperatingActivities,None,95932000000,1/1/12,Unknown,unit
+JPM,0000019617-14-000289,Free Cash Flow,us-gaap:NetCashProvidedByUsedInOperatingActivities,None,95932000000,1/1/12,Unknown,unit
+JPM,0000019617-13-000221,Operating Cash Flow,us-gaap:NetCashProvidedByUsedInOperatingActivities,None,95932000000,1/1/12,Unknown,unit
+JPM,0000019617-13-000221,Free Cash Flow,us-gaap:NetCashProvidedByUsedInOperatingActivities,None,95932000000,1/1/12,Unknown,unit
+JPM,0000019617-12-000163,Operating Cash Flow,us-gaap:NetCashProvidedByUsedInOperatingActivities,None,95932000000,1/1/12,Unknown,unit
+JPM,0000019617-12-000163,Free Cash Flow,us-gaap:NetCashProvidedByUsedInOperatingActivities,None,95932000000,1/1/12,Unknown,unit
+JPM,0000019617-14-000289,Net Income,us-gaap:NetIncomeLoss,None,18976000000,1/1/12,Unknown,unit
+JPM,0000019617-14-000289,Net Income Including Noncontrolling Interests,us-gaap:NetIncomeLoss,None,18976000000,1/1/12,Unknown,unit
+JPM,0000019617-13-000221,Net Income,us-gaap:NetIncomeLoss,None,18976000000,1/1/12,Unknown,unit
+JPM,0000019617-13-000221,Net Income Including Noncontrolling Interests,us-gaap:NetIncomeLoss,None,18976000000,1/1/12,Unknown,unit
+JPM,0000019617-12-000163,Net Income,us-gaap:NetIncomeLoss,None,18976000000,1/1/12,Unknown,unit
+JPM,0000019617-12-000163,Net Income Including Noncontrolling Interests,us-gaap:NetIncomeLoss,None,18976000000,1/1/12,Unknown,unit
+JPM,0000019617-14-000289,Cash Dividends Paid,us-gaap:PaymentsOfDividends,None,3895000000,1/1/12,Unknown,unit
+JPM,0000019617-13-000221,Cash Dividends Paid,us-gaap:PaymentsOfDividends,None,3895000000,1/1/12,Unknown,unit
+JPM,0000019617-12-000163,Cash Dividends Paid,us-gaap:PaymentsOfDividends,None,3895000000,1/1/12,Unknown,unit
+JPM,0000019617-13-000221,Net PPE,us-gaap:PropertyPlantAndEquipmentNet,None,14041000000,1/1/12,Unknown,unit
+JPM,0000019617-12-000163,Net PPE,us-gaap:PropertyPlantAndEquipmentNet,None,14041000000,1/1/12,Unknown,unit
+JPM,0000019617-14-000289,Total Revenue,us-gaap:Revenues,None,97234000000,1/1/12,Unknown,unit
+JPM,0000019617-13-000221,Total Revenue,us-gaap:Revenues,None,97234000000,1/1/12,Unknown,unit
+JPM,0000019617-12-000163,Total Revenue,us-gaap:Revenues,None,97234000000,1/1/12,Unknown,unit
+JPM,0000019617-14-000289,Share-based compensation,us-gaap:ShareBasedCompensation,None,2675000000,1/1/12,Unknown,unit
+JPM,0000019617-13-000221,Share-based compensation,us-gaap:ShareBasedCompensation,None,2675000000,1/1/12,Unknown,unit
+JPM,0000019617-12-000163,Share-based compensation,us-gaap:ShareBasedCompensation,None,2675000000,1/1/12,Unknown,unit
+JPM,0000019617-13-000221,Common Stock Equity,us-gaap:StockholdersEquity,None,1.83573E+11,1/1/12,Unknown,unit
+JPM,0000019617-13-000221,Stockholders Equity,us-gaap:StockholdersEquity,None,1.83573E+11,1/1/12,Unknown,unit
+JPM,0000019617-12-000163,Common Stock Equity,us-gaap:StockholdersEquity,None,1.83573E+11,1/1/12,Unknown,unit
+JPM,0000019617-12-000163,Stockholders Equity,us-gaap:StockholdersEquity,None,1.83573E+11,1/1/12,Unknown,unit
+JPM,0000019617-14-000289,Basic Average Shares,us-gaap:WeightedAverageNumberOfSharesOutstandingBasic,None,3900400000,1/1/12,Unknown,unit
+JPM,0000019617-13-000221,Basic Average Shares,us-gaap:WeightedAverageNumberOfSharesOutstandingBasic,None,3900400000,1/1/12,Unknown,unit
+JPM,0000019617-12-000163,Basic Average Shares,us-gaap:WeightedAverageNumberOfSharesOutstandingBasic,None,3900400000,1/1/12,Unknown,unit
+JPM,0000019617-14-000289,Total Assets,us-gaap:Assets,None,2.35914E+12,1/1/13,Unknown,unit
+JPM,0000019617-13-000221,Total Assets,us-gaap:Assets,None,2.35914E+12,1/1/13,Unknown,unit
+JPM,0000019617-15-000272,Total Assets,us-gaap:Assets,None,2.35914E+12,1/1/13,Unknown,unit
+JPM,0000019617-14-000289,Changes In Cash,us-gaap:CashAndCashEquivalentsPeriodIncreaseDecrease,None,-5879000000,1/1/13,Unknown,unit
+JPM,0000019617-13-000221,Changes In Cash,us-gaap:CashAndCashEquivalentsPeriodIncreaseDecrease,None,-5879000000,1/1/13,Unknown,unit
+JPM,0000019617-15-000272,Changes In Cash,us-gaap:CashAndCashEquivalentsPeriodIncreaseDecrease,None,-5879000000,1/1/13,Unknown,unit
+JPM,0000019617-14-000289,CommercialPaper(ST debt),us-gaap:CommercialPaper,None,55367000000,1/1/13,Unknown,unit
+JPM,0000019617-13-000221,CommercialPaper(ST debt),us-gaap:CommercialPaper,None,55367000000,1/1/13,Unknown,unit
+JPM,0000019617-14-000289,Share Issued,us-gaap:CommonStockSharesIssued,None,4104933895,1/1/13,Unknown,unit
+JPM,0000019617-13-000221,Share Issued,us-gaap:CommonStockSharesIssued,None,4104933895,1/1/13,Unknown,unit
+JPM,0000019617-15-000272,Share Issued,us-gaap:CommonStockSharesIssued,None,4104933895,1/1/13,Unknown,unit
+JPM,0000019617-16-000902,Share Issued,us-gaap:CommonStockSharesIssued,None,4104900000,1/1/13,Unknown,unit
+JPM,0000019617-14-000289,Ordinary Shares Number,us-gaap:CommonStockSharesOutstanding,None,3804000000,1/1/13,Unknown,unit
+JPM,0000019617-13-000221,Ordinary Shares Number,us-gaap:CommonStockSharesOutstanding,None,3804000000,1/1/13,Unknown,unit
+JPM,0000019617-15-000272,Ordinary Shares Number,us-gaap:CommonStockSharesOutstanding,None,3804000000,1/1/13,Unknown,unit
+JPM,0000019617-14-000289,Common Stock,us-gaap:CommonStockValue,None,4105000000,1/1/13,Unknown,unit
+JPM,0000019617-13-000221,Common Stock,us-gaap:CommonStockValue,None,4105000000,1/1/13,Unknown,unit
+JPM,0000019617-14-000289,Deferred Tax,us-gaap:DeferredIncomeTaxExpenseBenefit,None,1130000000,1/1/13,Unknown,unit
+JPM,0000019617-13-000221,Deferred Tax,us-gaap:DeferredIncomeTaxExpenseBenefit,None,1130000000,1/1/13,Unknown,unit
+JPM,0000019617-15-000272,Deferred Tax,us-gaap:DeferredIncomeTaxExpenseBenefit,None,1130000000,1/1/13,Unknown,unit
+JPM,0000019617-14-000289,Basic EPS,us-gaap:EarningsPerShareBasic,None,5.22,1/1/13,Unknown,unit
+JPM,0000019617-13-000221,Basic EPS,us-gaap:EarningsPerShareBasic,None,5.22,1/1/13,Unknown,unit
+JPM,0000019617-15-000272,Basic EPS,us-gaap:EarningsPerShareBasic,None,5.22,1/1/13,Unknown,unit
+JPM,0000019617-14-000289,Diluted EPS,us-gaap:EarningsPerShareDiluted,None,5.2,1/1/13,Unknown,unit
+JPM,0000019617-13-000221,Diluted EPS,us-gaap:EarningsPerShareDiluted,None,5.2,1/1/13,Unknown,unit
+JPM,0000019617-15-000272,Diluted EPS,us-gaap:EarningsPerShareDiluted,None,5.2,1/1/13,Unknown,unit
+JPM,0000019617-14-000289,Effect Of Exchange Rate Changes,us-gaap:EffectOfExchangeRateOnCashAndCashEquivalents,None,1160000000,1/1/13,Unknown,unit
+JPM,0000019617-13-000221,Effect Of Exchange Rate Changes,us-gaap:EffectOfExchangeRateOnCashAndCashEquivalents,None,1160000000,1/1/13,Unknown,unit
+JPM,0000019617-15-000272,Effect Of Exchange Rate Changes,us-gaap:EffectOfExchangeRateOnCashAndCashEquivalents,None,1160000000,1/1/13,Unknown,unit
+JPM,0000019617-14-000289,Goodwill,us-gaap:Goodwill,None,48175000000,1/1/13,Unknown,unit
+JPM,0000019617-13-000221,Goodwill,us-gaap:Goodwill,None,48175000000,1/1/13,Unknown,unit
+JPM,0000019617-15-000272,Goodwill,us-gaap:Goodwill,None,48175000000,1/1/13,Unknown,unit
+JPM,0000019617-16-000902,Goodwill,us-gaap:Goodwill,None,48175000000,1/1/13,Unknown,unit
+JPM,0000019617-14-000289,Income Tax Paid Supplemental Data,us-gaap:IncomeTaxesPaid,None,2050000000,1/1/13,Unknown,unit
+JPM,0000019617-13-000221,Income Tax Paid Supplemental Data,us-gaap:IncomeTaxesPaid,None,2050000000,1/1/13,Unknown,unit
+JPM,0000019617-14-000289,Tax Provision,us-gaap:IncomeTaxExpenseBenefit,None,7633000000,1/1/13,Unknown,unit
+JPM,0000019617-13-000221,Tax Provision,us-gaap:IncomeTaxExpenseBenefit,None,7633000000,1/1/13,Unknown,unit
+JPM,0000019617-15-000272,Tax Provision,us-gaap:IncomeTaxExpenseBenefit,None,7633000000,1/1/13,Unknown,unit
+JPM,0000019617-14-000289,Interest Paid Supplemental Data,us-gaap:InterestPaid,None,11161000000,1/1/13,Unknown,unit
+JPM,0000019617-13-000221,Interest Paid Supplemental Data,us-gaap:InterestPaid,None,11161000000,1/1/13,Unknown,unit
+JPM,0000019617-15-000272,Interest Paid Supplemental Data,us-gaap:InterestPaid,None,11161000000,1/1/13,Unknown,unit
+JPM,0000019617-14-000289,Total Liabilities Net Minority Interest,us-gaap:Liabilities,None,2.15507E+12,1/1/13,Unknown,unit
+JPM,0000019617-13-000221,Total Liabilities Net Minority Interest,us-gaap:Liabilities,None,2.15507E+12,1/1/13,Unknown,unit
+JPM,0000019617-14-000289,Long Term Debt,us-gaap:LongTermDebt,None,2.49024E+11,1/1/13,Unknown,unit
+JPM,0000019617-13-000221,Long Term Debt,us-gaap:LongTermDebt,None,2.49024E+11,1/1/13,Unknown,unit
+JPM,0000019617-14-000289,Financing Cash Flow,us-gaap:NetCashProvidedByUsedInFinancingActivities,None,87707000000,1/1/13,Unknown,unit
+JPM,0000019617-13-000221,Financing Cash Flow,us-gaap:NetCashProvidedByUsedInFinancingActivities,None,87707000000,1/1/13,Unknown,unit
+JPM,0000019617-15-000272,Financing Cash Flow,us-gaap:NetCashProvidedByUsedInFinancingActivities,None,87707000000,1/1/13,Unknown,unit
+JPM,0000019617-14-000289,Investing Cash Flow,us-gaap:NetCashProvidedByUsedInInvestingActivities,None,-1.19825E+11,1/1/13,Unknown,unit
+JPM,0000019617-13-000221,Investing Cash Flow,us-gaap:NetCashProvidedByUsedInInvestingActivities,None,-1.19825E+11,1/1/13,Unknown,unit
+JPM,0000019617-15-000272,Investing Cash Flow,us-gaap:NetCashProvidedByUsedInInvestingActivities,None,-1.19825E+11,1/1/13,Unknown,unit
+JPM,0000019617-14-000289,Operating Cash Flow,us-gaap:NetCashProvidedByUsedInOperatingActivities,None,25079000000,1/1/13,Unknown,unit
+JPM,0000019617-14-000289,Free Cash Flow,us-gaap:NetCashProvidedByUsedInOperatingActivities,None,25079000000,1/1/13,Unknown,unit
+JPM,0000019617-13-000221,Operating Cash Flow,us-gaap:NetCashProvidedByUsedInOperatingActivities,None,25079000000,1/1/13,Unknown,unit
+JPM,0000019617-13-000221,Free Cash Flow,us-gaap:NetCashProvidedByUsedInOperatingActivities,None,25079000000,1/1/13,Unknown,unit
+JPM,0000019617-15-000272,Operating Cash Flow,us-gaap:NetCashProvidedByUsedInOperatingActivities,None,25079000000,1/1/13,Unknown,unit
+JPM,0000019617-15-000272,Free Cash Flow,us-gaap:NetCashProvidedByUsedInOperatingActivities,None,25079000000,1/1/13,Unknown,unit
+JPM,0000019617-14-000289,Net Income,us-gaap:NetIncomeLoss,None,21284000000,1/1/13,Unknown,unit
+JPM,0000019617-14-000289,Net Income Including Noncontrolling Interests,us-gaap:NetIncomeLoss,None,21284000000,1/1/13,Unknown,unit
+JPM,0000019617-13-000221,Net Income,us-gaap:NetIncomeLoss,None,21284000000,1/1/13,Unknown,unit
+JPM,0000019617-13-000221,Net Income Including Noncontrolling Interests,us-gaap:NetIncomeLoss,None,21284000000,1/1/13,Unknown,unit
+JPM,0000019617-15-000272,Net Income,us-gaap:NetIncomeLoss,None,21284000000,1/1/13,Unknown,unit
+JPM,0000019617-15-000272,Net Income Including Noncontrolling Interests,us-gaap:NetIncomeLoss,None,21284000000,1/1/13,Unknown,unit
+JPM,0000019617-14-000289,Cash Dividends Paid,us-gaap:PaymentsOfDividends,None,5194000000,1/1/13,Unknown,unit
+JPM,0000019617-13-000221,Cash Dividends Paid,us-gaap:PaymentsOfDividends,None,5194000000,1/1/13,Unknown,unit
+JPM,0000019617-15-000272,Cash Dividends Paid,us-gaap:PaymentsOfDividends,None,5194000000,1/1/13,Unknown,unit
+JPM,0000019617-14-000289,Net PPE,us-gaap:PropertyPlantAndEquipmentNet,None,14519000000,1/1/13,Unknown,unit
+JPM,0000019617-13-000221,Net PPE,us-gaap:PropertyPlantAndEquipmentNet,None,14519000000,1/1/13,Unknown,unit
+JPM,0000019617-14-000289,Total Revenue,us-gaap:Revenues,None,97031000000,1/1/13,Unknown,unit
+JPM,0000019617-13-000221,Total Revenue,us-gaap:Revenues,None,97031000000,1/1/13,Unknown,unit
+JPM,0000019617-15-000272,Total Revenue,us-gaap:Revenues,None,97031000000,1/1/13,Unknown,unit
+JPM,0000019617-14-000289,Share-based compensation,us-gaap:ShareBasedCompensation,None,2545000000,1/1/13,Unknown,unit
+JPM,0000019617-13-000221,Share-based compensation,us-gaap:ShareBasedCompensation,None,2545000000,1/1/13,Unknown,unit
+JPM,0000019617-15-000272,Share-based compensation,us-gaap:ShareBasedCompensation,None,2545000000,1/1/13,Unknown,unit
+JPM,0000019617-14-000289,Common Stock Equity,us-gaap:StockholdersEquity,None,2.04069E+11,1/1/13,Unknown,unit
+JPM,0000019617-14-000289,Stockholders Equity,us-gaap:StockholdersEquity,None,2.04069E+11,1/1/13,Unknown,unit
+JPM,0000019617-13-000221,Common Stock Equity,us-gaap:StockholdersEquity,None,2.04069E+11,1/1/13,Unknown,unit
+JPM,0000019617-13-000221,Stockholders Equity,us-gaap:StockholdersEquity,None,2.04069E+11,1/1/13,Unknown,unit
+JPM,0000019617-14-000289,Basic Average Shares,us-gaap:WeightedAverageNumberOfSharesOutstandingBasic,None,3809400000,1/1/13,Unknown,unit
+JPM,0000019617-13-000221,Basic Average Shares,us-gaap:WeightedAverageNumberOfSharesOutstandingBasic,None,3809400000,1/1/13,Unknown,unit
+JPM,0000019617-15-000272,Basic Average Shares,us-gaap:WeightedAverageNumberOfSharesOutstandingBasic,None,3809400000,1/1/13,Unknown,unit
+JPM,0000019617-14-000289,Total Assets,us-gaap:Assets,None,2.41569E+12,1/1/14,Unknown,unit
+JPM,0000019617-15-000272,Total Assets,us-gaap:Assets,None,2.41569E+12,1/1/14,Unknown,unit
+JPM,0000019617-16-000902,Total Assets,us-gaap:Assets,None,2.41488E+12,1/1/14,Unknown,unit
+JPM,0000019617-14-000289,Changes In Cash,us-gaap:CashAndCashEquivalentsPeriodIncreaseDecrease,None,-13952000000,1/1/14,Unknown,unit
+JPM,0000019617-15-000272,Changes In Cash,us-gaap:CashAndCashEquivalentsPeriodIncreaseDecrease,None,-13952000000,1/1/14,Unknown,unit
+JPM,0000019617-16-000902,Changes In Cash,us-gaap:CashAndCashEquivalentsPeriodIncreaseDecrease,None,-13952000000,1/1/14,Unknown,unit
+JPM,0000019617-14-000289,CommercialPaper(ST debt),us-gaap:CommercialPaper,None,57848000000,1/1/14,Unknown,unit
+JPM,0000019617-15-000272,CommercialPaper(ST debt),us-gaap:CommercialPaper,None,57848000000,1/1/14,Unknown,unit
+JPM,0000019617-14-000289,Share Issued,us-gaap:CommonStockSharesIssued,None,4104933895,1/1/14,Unknown,unit
+JPM,0000019617-17-000314,Share Issued,us-gaap:CommonStockSharesIssued,None,4104900000,1/1/14,Unknown,unit
+JPM,0000019617-15-000272,Share Issued,us-gaap:CommonStockSharesIssued,None,4104933895,1/1/14,Unknown,unit
+JPM,0000019617-16-000902,Share Issued,us-gaap:CommonStockSharesIssued,None,4104933895,1/1/14,Unknown,unit
+JPM,0000019617-16-000902,Share Issued,us-gaap:CommonStockSharesIssued,None,4104900000,1/1/14,Unknown,unit
+JPM,0000019617-14-000289,Ordinary Shares Number,us-gaap:CommonStockSharesOutstanding,None,3756100000,1/1/14,Unknown,unit
+JPM,0000019617-15-000272,Ordinary Shares Number,us-gaap:CommonStockSharesOutstanding,None,3756100000,1/1/14,Unknown,unit
+JPM,0000019617-16-000902,Ordinary Shares Number,us-gaap:CommonStockSharesOutstanding,None,3756100000,1/1/14,Unknown,unit
+JPM,0000019617-14-000289,Common Stock,us-gaap:CommonStockValue,None,4105000000,1/1/14,Unknown,unit
+JPM,0000019617-15-000272,Common Stock,us-gaap:CommonStockValue,None,4105000000,1/1/14,Unknown,unit
+JPM,0000019617-14-000289,Deferred Tax,us-gaap:DeferredIncomeTaxExpenseBenefit,None,8003000000,1/1/14,Unknown,unit
+JPM,0000019617-15-000272,Deferred Tax,us-gaap:DeferredIncomeTaxExpenseBenefit,None,8003000000,1/1/14,Unknown,unit
+JPM,0000019617-16-000902,Deferred Tax,us-gaap:DeferredIncomeTaxExpenseBenefit,None,8139000000,1/1/14,Unknown,unit
+JPM,0000019617-14-000289,Basic EPS,us-gaap:EarningsPerShareBasic,None,4.39,1/1/14,Unknown,unit
+JPM,0000019617-15-000272,Basic EPS,us-gaap:EarningsPerShareBasic,None,4.39,1/1/14,Unknown,unit
+JPM,0000019617-16-000902,Basic EPS,us-gaap:EarningsPerShareBasic,None,4.38,1/1/14,Unknown,unit
+JPM,0000019617-14-000289,Diluted EPS,us-gaap:EarningsPerShareDiluted,None,4.35,1/1/14,Unknown,unit
+JPM,0000019617-15-000272,Diluted EPS,us-gaap:EarningsPerShareDiluted,None,4.35,1/1/14,Unknown,unit
+JPM,0000019617-16-000902,Diluted EPS,us-gaap:EarningsPerShareDiluted,None,4.34,1/1/14,Unknown,unit
+JPM,0000019617-14-000289,Effect Of Exchange Rate Changes,us-gaap:EffectOfExchangeRateOnCashAndCashEquivalents,None,272000000,1/1/14,Unknown,unit
+JPM,0000019617-15-000272,Effect Of Exchange Rate Changes,us-gaap:EffectOfExchangeRateOnCashAndCashEquivalents,None,272000000,1/1/14,Unknown,unit
+JPM,0000019617-16-000902,Effect Of Exchange Rate Changes,us-gaap:EffectOfExchangeRateOnCashAndCashEquivalents,None,272000000,1/1/14,Unknown,unit
+JPM,0000019617-14-000289,Goodwill,us-gaap:Goodwill,None,48081000000,1/1/14,Unknown,unit
+JPM,0000019617-17-000314,Goodwill,us-gaap:Goodwill,None,48081000000,1/1/14,Unknown,unit
+JPM,0000019617-15-000272,Goodwill,us-gaap:Goodwill,None,48081000000,1/1/14,Unknown,unit
+JPM,0000019617-16-000902,Goodwill,us-gaap:Goodwill,None,48081000000,1/1/14,Unknown,unit
+JPM,0000019617-14-000289,Income Tax Paid Supplemental Data,us-gaap:IncomeTaxesPaid,None,3502000000,1/1/14,Unknown,unit
+JPM,0000019617-14-000289,Tax Provision,us-gaap:IncomeTaxExpenseBenefit,None,7991000000,1/1/14,Unknown,unit
+JPM,0000019617-15-000272,Tax Provision,us-gaap:IncomeTaxExpenseBenefit,None,7991000000,1/1/14,Unknown,unit
+JPM,0000019617-16-000902,Tax Provision,us-gaap:IncomeTaxExpenseBenefit,None,8789000000,1/1/14,Unknown,unit
+JPM,0000019617-14-000289,Interest Paid Supplemental Data,us-gaap:InterestPaid,None,9573000000,1/1/14,Unknown,unit
+JPM,0000019617-15-000272,Interest Paid Supplemental Data,us-gaap:InterestPaid,None,9573000000,1/1/14,Unknown,unit
+JPM,0000019617-16-000902,Interest Paid Supplemental Data,us-gaap:InterestPaid,None,9573000000,1/1/14,Unknown,unit
+JPM,0000019617-14-000289,Total Liabilities Net Minority Interest,us-gaap:Liabilities,None,2.20451E+12,1/1/14,Unknown,unit
+JPM,0000019617-15-000272,Total Liabilities Net Minority Interest,us-gaap:Liabilities,None,2.20451E+12,1/1/14,Unknown,unit
+JPM,0000019617-14-000289,Long Term Debt,us-gaap:LongTermDebt,None,2.67889E+11,1/1/14,Unknown,unit
+JPM,0000019617-14-000289,Financing Cash Flow,us-gaap:NetCashProvidedByUsedInFinancingActivities,None,28324000000,1/1/14,Unknown,unit
+JPM,0000019617-15-000272,Financing Cash Flow,us-gaap:NetCashProvidedByUsedInFinancingActivities,None,28324000000,1/1/14,Unknown,unit
+JPM,0000019617-16-000902,Financing Cash Flow,us-gaap:NetCashProvidedByUsedInFinancingActivities,None,28324000000,1/1/14,Unknown,unit
+JPM,0000019617-14-000289,Investing Cash Flow,us-gaap:NetCashProvidedByUsedInInvestingActivities,None,-1.50501E+11,1/1/14,Unknown,unit
+JPM,0000019617-15-000272,Investing Cash Flow,us-gaap:NetCashProvidedByUsedInInvestingActivities,None,-1.50501E+11,1/1/14,Unknown,unit
+JPM,0000019617-16-000902,Investing Cash Flow,us-gaap:NetCashProvidedByUsedInInvestingActivities,None,-1.50501E+11,1/1/14,Unknown,unit
+JPM,0000019617-14-000289,Operating Cash Flow,us-gaap:NetCashProvidedByUsedInOperatingActivities,None,1.07953E+11,1/1/14,Unknown,unit
+JPM,0000019617-14-000289,Free Cash Flow,us-gaap:NetCashProvidedByUsedInOperatingActivities,None,1.07953E+11,1/1/14,Unknown,unit
+JPM,0000019617-15-000272,Operating Cash Flow,us-gaap:NetCashProvidedByUsedInOperatingActivities,None,1.07953E+11,1/1/14,Unknown,unit
+JPM,0000019617-15-000272,Free Cash Flow,us-gaap:NetCashProvidedByUsedInOperatingActivities,None,1.07953E+11,1/1/14,Unknown,unit
+JPM,0000019617-16-000902,Operating Cash Flow,us-gaap:NetCashProvidedByUsedInOperatingActivities,None,1.07953E+11,1/1/14,Unknown,unit
+JPM,0000019617-16-000902,Free Cash Flow,us-gaap:NetCashProvidedByUsedInOperatingActivities,None,1.07953E+11,1/1/14,Unknown,unit
+JPM,0000019617-14-000289,Net Income,us-gaap:NetIncomeLoss,None,17923000000,1/1/14,Unknown,unit
+JPM,0000019617-14-000289,Net Income Including Noncontrolling Interests,us-gaap:NetIncomeLoss,None,17923000000,1/1/14,Unknown,unit
+JPM,0000019617-15-000272,Net Income,us-gaap:NetIncomeLoss,None,17923000000,1/1/14,Unknown,unit
+JPM,0000019617-15-000272,Net Income Including Noncontrolling Interests,us-gaap:NetIncomeLoss,None,17923000000,1/1/14,Unknown,unit
+JPM,0000019617-16-000902,Net Income,us-gaap:NetIncomeLoss,None,17886000000,1/1/14,Unknown,unit
+JPM,0000019617-16-000902,Net Income Including Noncontrolling Interests,us-gaap:NetIncomeLoss,None,17886000000,1/1/14,Unknown,unit
+JPM,0000019617-14-000289,Cash Dividends Paid,us-gaap:PaymentsOfDividends,None,6056000000,1/1/14,Unknown,unit
+JPM,0000019617-15-000272,Cash Dividends Paid,us-gaap:PaymentsOfDividends,None,6056000000,1/1/14,Unknown,unit
+JPM,0000019617-16-000902,Cash Dividends Paid,us-gaap:PaymentsOfDividends,None,6056000000,1/1/14,Unknown,unit
+JPM,0000019617-14-000289,Net PPE,us-gaap:PropertyPlantAndEquipmentNet,None,14891000000,1/1/14,Unknown,unit
+JPM,0000019617-15-000272,Net PPE,us-gaap:PropertyPlantAndEquipmentNet,None,14891000000,1/1/14,Unknown,unit
+JPM,0000019617-14-000289,Total Revenue,us-gaap:Revenues,None,96606000000,1/1/14,Unknown,unit
+JPM,0000019617-15-000272,Total Revenue,us-gaap:Revenues,None,96606000000,1/1/14,Unknown,unit
+JPM,0000019617-16-000902,Total Revenue,us-gaap:Revenues,None,97367000000,1/1/14,Unknown,unit
+JPM,0000019617-14-000289,Share-based compensation,us-gaap:ShareBasedCompensation,None,2219000000,1/1/14,Unknown,unit
+JPM,0000019617-15-000272,Share-based compensation,us-gaap:ShareBasedCompensation,None,2219000000,1/1/14,Unknown,unit
+JPM,0000019617-16-000902,Share-based compensation,us-gaap:ShareBasedCompensation,None,2219000000,1/1/14,Unknown,unit
+JPM,0000019617-14-000289,Common Stock Equity,us-gaap:StockholdersEquity,None,2.11178E+11,1/1/14,Unknown,unit
+JPM,0000019617-14-000289,Stockholders Equity,us-gaap:StockholdersEquity,None,2.11178E+11,1/1/14,Unknown,unit
+JPM,0000019617-15-000272,Common Stock Equity,us-gaap:StockholdersEquity,None,2.11178E+11,1/1/14,Unknown,unit
+JPM,0000019617-15-000272,Stockholders Equity,us-gaap:StockholdersEquity,None,2.11178E+11,1/1/14,Unknown,unit
+JPM,0000019617-14-000289,Basic Average Shares,us-gaap:WeightedAverageNumberOfSharesOutstandingBasic,None,3782400000,1/1/14,Unknown,unit
+JPM,0000019617-15-000272,Basic Average Shares,us-gaap:WeightedAverageNumberOfSharesOutstandingBasic,None,3782400000,1/1/14,Unknown,unit
+JPM,0000019617-16-000902,Basic Average Shares,us-gaap:WeightedAverageNumberOfSharesOutstandingBasic,None,3782400000,1/1/14,Unknown,unit
+JPM,0000019617-17-000314,Total Assets,us-gaap:Assets,None,2.57227E+12,1/1/15,Unknown,unit
+JPM,0000019617-15-000272,Total Assets,us-gaap:Assets,None,2.57313E+12,1/1/15,Unknown,unit
+JPM,0000019617-16-000902,Total Assets,us-gaap:Assets,None,2.57227E+12,1/1/15,Unknown,unit
+JPM,0000019617-17-000314,Changes In Cash,us-gaap:CashAndCashEquivalentsPeriodIncreaseDecrease,None,-11940000000,1/1/15,Unknown,unit
+JPM,0000019617-15-000272,Changes In Cash,us-gaap:CashAndCashEquivalentsPeriodIncreaseDecrease,None,-11940000000,1/1/15,Unknown,unit
+JPM,0000019617-16-000902,Changes In Cash,us-gaap:CashAndCashEquivalentsPeriodIncreaseDecrease,None,-11940000000,1/1/15,Unknown,unit
+JPM,0000019617-15-000272,CommercialPaper(ST debt),us-gaap:CommercialPaper,None,66344000000,1/1/15,Unknown,unit
+JPM,0000019617-16-000902,CommercialPaper(ST debt),us-gaap:CommercialPaper,None,66344000000,1/1/15,Unknown,unit
+JPM,0000019617-17-000314,Share Issued,us-gaap:CommonStockSharesIssued,None,4104900000,1/1/15,Unknown,unit
+JPM,0000019617-18-000057,Share Issued,us-gaap:CommonStockSharesIssued,None,4104900000,1/1/15,Unknown,unit
+JPM,0000019617-15-000272,Share Issued,us-gaap:CommonStockSharesIssued,None,4104933895,1/1/15,Unknown,unit
+JPM,0000019617-16-000902,Share Issued,us-gaap:CommonStockSharesIssued,None,4104900000,1/1/15,Unknown,unit
+JPM,0000019617-16-000902,Share Issued,us-gaap:CommonStockSharesIssued,None,4104933895,1/1/15,Unknown,unit
+JPM,0000019617-17-000314,Ordinary Shares Number,us-gaap:CommonStockSharesOutstanding,None,3714800000,1/1/15,Unknown,unit
+JPM,0000019617-15-000272,Ordinary Shares Number,us-gaap:CommonStockSharesOutstanding,None,3714800000,1/1/15,Unknown,unit
+JPM,0000019617-16-000902,Ordinary Shares Number,us-gaap:CommonStockSharesOutstanding,None,3714800000,1/1/15,Unknown,unit
+JPM,0000019617-15-000272,Common Stock,us-gaap:CommonStockValue,None,4105000000,1/1/15,Unknown,unit
+JPM,0000019617-16-000902,Common Stock,us-gaap:CommonStockValue,None,4105000000,1/1/15,Unknown,unit
+JPM,0000019617-17-000314,Deferred Tax,us-gaap:DeferredIncomeTaxExpenseBenefit,None,4362000000,1/1/15,Unknown,unit
+JPM,0000019617-15-000272,Deferred Tax,us-gaap:DeferredIncomeTaxExpenseBenefit,None,4210000000,1/1/15,Unknown,unit
+JPM,0000019617-16-000902,Deferred Tax,us-gaap:DeferredIncomeTaxExpenseBenefit,None,4362000000,1/1/15,Unknown,unit
+JPM,0000019617-17-000314,Basic EPS,us-gaap:EarningsPerShareBasic,None,5.33,1/1/15,Unknown,unit
+JPM,0000019617-15-000272,Basic EPS,us-gaap:EarningsPerShareBasic,None,5.34,1/1/15,Unknown,unit
+JPM,0000019617-16-000902,Basic EPS,us-gaap:EarningsPerShareBasic,None,5.33,1/1/15,Unknown,unit
+JPM,0000019617-17-000314,Diluted EPS,us-gaap:EarningsPerShareDiluted,None,5.29,1/1/15,Unknown,unit
+JPM,0000019617-15-000272,Diluted EPS,us-gaap:EarningsPerShareDiluted,None,5.29,1/1/15,Unknown,unit
+JPM,0000019617-16-000902,Diluted EPS,us-gaap:EarningsPerShareDiluted,None,5.29,1/1/15,Unknown,unit
+JPM,0000019617-17-000314,Effect Of Exchange Rate Changes,us-gaap:EffectOfExchangeRateOnCashAndCashEquivalents,None,-1125000000,1/1/15,Unknown,unit
+JPM,0000019617-15-000272,Effect Of Exchange Rate Changes,us-gaap:EffectOfExchangeRateOnCashAndCashEquivalents,None,-1125000000,1/1/15,Unknown,unit
+JPM,0000019617-16-000902,Effect Of Exchange Rate Changes,us-gaap:EffectOfExchangeRateOnCashAndCashEquivalents,None,-1125000000,1/1/15,Unknown,unit
+JPM,0000019617-17-000314,Goodwill,us-gaap:Goodwill,None,47647000000,1/1/15,Unknown,unit
+JPM,0000019617-18-000057,Goodwill,us-gaap:Goodwill,None,47647000000,1/1/15,Unknown,unit
+JPM,0000019617-15-000272,Goodwill,us-gaap:Goodwill,None,47647000000,1/1/15,Unknown,unit
+JPM,0000019617-16-000902,Goodwill,us-gaap:Goodwill,None,47647000000,1/1/15,Unknown,unit
+JPM,0000019617-17-000314,Tax Provision,us-gaap:IncomeTaxExpenseBenefit,None,8954000000,1/1/15,Unknown,unit
+JPM,0000019617-15-000272,Tax Provision,us-gaap:IncomeTaxExpenseBenefit,None,8030000000,1/1/15,Unknown,unit
+JPM,0000019617-16-000902,Tax Provision,us-gaap:IncomeTaxExpenseBenefit,None,8954000000,1/1/15,Unknown,unit
+JPM,0000019617-17-000314,Interest Paid Supplemental Data,us-gaap:InterestPaid,None,8194000000,1/1/15,Unknown,unit
+JPM,0000019617-15-000272,Interest Paid Supplemental Data,us-gaap:InterestPaid,None,8194000000,1/1/15,Unknown,unit
+JPM,0000019617-16-000902,Interest Paid Supplemental Data,us-gaap:InterestPaid,None,8194000000,1/1/15,Unknown,unit
+JPM,0000019617-15-000272,Total Liabilities Net Minority Interest,us-gaap:Liabilities,None,2.34106E+12,1/1/15,Unknown,unit
+JPM,0000019617-16-000902,Total Liabilities Net Minority Interest,us-gaap:Liabilities,None,2.34055E+12,1/1/15,Unknown,unit
+JPM,0000019617-17-000314,Financing Cash Flow,us-gaap:NetCashProvidedByUsedInFinancingActivities,None,1.18228E+11,1/1/15,Unknown,unit
+JPM,0000019617-15-000272,Financing Cash Flow,us-gaap:NetCashProvidedByUsedInFinancingActivities,None,1.18228E+11,1/1/15,Unknown,unit
+JPM,0000019617-16-000902,Financing Cash Flow,us-gaap:NetCashProvidedByUsedInFinancingActivities,None,1.18228E+11,1/1/15,Unknown,unit
+JPM,0000019617-17-000314,Investing Cash Flow,us-gaap:NetCashProvidedByUsedInInvestingActivities,None,-1.65636E+11,1/1/15,Unknown,unit
+JPM,0000019617-15-000272,Investing Cash Flow,us-gaap:NetCashProvidedByUsedInInvestingActivities,None,-1.65636E+11,1/1/15,Unknown,unit
+JPM,0000019617-16-000902,Investing Cash Flow,us-gaap:NetCashProvidedByUsedInInvestingActivities,None,-1.65636E+11,1/1/15,Unknown,unit
+JPM,0000019617-17-000314,Operating Cash Flow,us-gaap:NetCashProvidedByUsedInOperatingActivities,None,36593000000,1/1/15,Unknown,unit
+JPM,0000019617-17-000314,Free Cash Flow,us-gaap:NetCashProvidedByUsedInOperatingActivities,None,36593000000,1/1/15,Unknown,unit
+JPM,0000019617-15-000272,Operating Cash Flow,us-gaap:NetCashProvidedByUsedInOperatingActivities,None,36593000000,1/1/15,Unknown,unit
+JPM,0000019617-15-000272,Free Cash Flow,us-gaap:NetCashProvidedByUsedInOperatingActivities,None,36593000000,1/1/15,Unknown,unit
+JPM,0000019617-16-000902,Operating Cash Flow,us-gaap:NetCashProvidedByUsedInOperatingActivities,None,36593000000,1/1/15,Unknown,unit
+JPM,0000019617-16-000902,Free Cash Flow,us-gaap:NetCashProvidedByUsedInOperatingActivities,None,36593000000,1/1/15,Unknown,unit
+JPM,0000019617-17-000314,Net Income,us-gaap:NetIncomeLoss,None,21745000000,1/1/15,Unknown,unit
+JPM,0000019617-17-000314,Net Income Including Noncontrolling Interests,us-gaap:NetIncomeLoss,None,21745000000,1/1/15,Unknown,unit
+JPM,0000019617-15-000272,Net Income,us-gaap:NetIncomeLoss,None,21762000000,1/1/15,Unknown,unit
+JPM,0000019617-15-000272,Net Income Including Noncontrolling Interests,us-gaap:NetIncomeLoss,None,21762000000,1/1/15,Unknown,unit
+JPM,0000019617-16-000902,Net Income,us-gaap:NetIncomeLoss,None,21745000000,1/1/15,Unknown,unit
+JPM,0000019617-16-000902,Net Income Including Noncontrolling Interests,us-gaap:NetIncomeLoss,None,21745000000,1/1/15,Unknown,unit
+JPM,0000019617-17-000314,Cash Dividends Paid,us-gaap:PaymentsOfDividends,None,6990000000,1/1/15,Unknown,unit
+JPM,0000019617-15-000272,Cash Dividends Paid,us-gaap:PaymentsOfDividends,None,6990000000,1/1/15,Unknown,unit
+JPM,0000019617-16-000902,Cash Dividends Paid,us-gaap:PaymentsOfDividends,None,6990000000,1/1/15,Unknown,unit
+JPM,0000019617-15-000272,Net PPE,us-gaap:PropertyPlantAndEquipmentNet,None,15133000000,1/1/15,Unknown,unit
+JPM,0000019617-16-000902,Net PPE,us-gaap:PropertyPlantAndEquipmentNet,None,15133000000,1/1/15,Unknown,unit
+JPM,0000019617-17-000314,Total Revenue,us-gaap:Revenues,None,95112000000,1/1/15,Unknown,unit
+JPM,0000019617-15-000272,Total Revenue,us-gaap:Revenues,None,94205000000,1/1/15,Unknown,unit
+JPM,0000019617-16-000902,Total Revenue,us-gaap:Revenues,None,95112000000,1/1/15,Unknown,unit
+JPM,0000019617-17-000314,Share-based compensation,us-gaap:ShareBasedCompensation,None,2190000000,1/1/15,Unknown,unit
+JPM,0000019617-15-000272,Share-based compensation,us-gaap:ShareBasedCompensation,None,2190000000,1/1/15,Unknown,unit
+JPM,0000019617-16-000902,Share-based compensation,us-gaap:ShareBasedCompensation,None,2190000000,1/1/15,Unknown,unit
+JPM,0000019617-17-000314,Common Stock Equity,us-gaap:StockholdersEquity,None,2.31727E+11,1/1/15,Unknown,unit
+JPM,0000019617-17-000314,Stockholders Equity,us-gaap:StockholdersEquity,None,2.31727E+11,1/1/15,Unknown,unit
+JPM,0000019617-15-000272,Common Stock Equity,us-gaap:StockholdersEquity,None,2.32065E+11,1/1/15,Unknown,unit
+JPM,0000019617-15-000272,Stockholders Equity,us-gaap:StockholdersEquity,None,2.32065E+11,1/1/15,Unknown,unit
+JPM,0000019617-16-000902,Common Stock Equity,us-gaap:StockholdersEquity,None,2.31727E+11,1/1/15,Unknown,unit
+JPM,0000019617-16-000902,Stockholders Equity,us-gaap:StockholdersEquity,None,2.31727E+11,1/1/15,Unknown,unit
+JPM,0000019617-17-000314,Basic Average Shares,us-gaap:WeightedAverageNumberOfSharesOutstandingBasic,None,3763500000,1/1/15,Unknown,unit
+JPM,0000019617-15-000272,Basic Average Shares,us-gaap:WeightedAverageNumberOfSharesOutstandingBasic,None,3763500000,1/1/15,Unknown,unit
+JPM,0000019617-16-000902,Basic Average Shares,us-gaap:WeightedAverageNumberOfSharesOutstandingBasic,None,3763500000,1/1/15,Unknown,unit
+JPM,0000019617-17-000314,Total Assets,us-gaap:Assets,None,2.3517E+12,1/1/16,Unknown,unit
+JPM,0000019617-18-000057,Total Assets,us-gaap:Assets,None,2.3517E+12,1/1/16,Unknown,unit
+JPM,0000019617-16-000902,Total Assets,us-gaap:Assets,None,2.3517E+12,1/1/16,Unknown,unit
+JPM,0000019617-19-000054,Cash And Cash Equivalents,us-gaap:CashAndCashEquivalentsAtCarryingValue,None,3.61683E+11,1/1/16,Unknown,unit
+JPM,0000019617-19-000054,End Cash Position,us-gaap:CashAndCashEquivalentsAtCarryingValue,None,3.61683E+11,1/1/16,Unknown,unit
+JPM,0000019617-19-000054,Beginning Cash Position,us-gaap:CashAndCashEquivalentsAtCarryingValue,None,3.61683E+11,1/1/16,Unknown,unit
+JPM,0000019617-17-000314,Changes In Cash,us-gaap:CashAndCashEquivalentsPeriodIncreaseDecrease,None,-7341000000,1/1/16,Unknown,unit
+JPM,0000019617-18-000057,Changes In Cash,us-gaap:CashAndCashEquivalentsPeriodIncreaseDecrease,None,-7341000000,1/1/16,Unknown,unit
+JPM,0000019617-16-000902,Changes In Cash,us-gaap:CashAndCashEquivalentsPeriodIncreaseDecrease,None,-7341000000,1/1/16,Unknown,unit
+JPM,0000019617-17-000314,CommercialPaper(ST debt),us-gaap:CommercialPaper,None,15562000000,1/1/16,Unknown,unit
+JPM,0000019617-16-000902,CommercialPaper(ST debt),us-gaap:CommercialPaper,None,15562000000,1/1/16,Unknown,unit
+JPM,0000019617-17-000314,Share Issued,us-gaap:CommonStockSharesIssued,None,4104900000,1/1/16,Unknown,unit
+JPM,0000019617-17-000314,Share Issued,us-gaap:CommonStockSharesIssued,None,4104933895,1/1/16,Unknown,unit
+JPM,0000019617-19-000054,Share Issued,us-gaap:CommonStockSharesIssued,None,4104900000,1/1/16,Unknown,unit
+JPM,0000019617-18-000057,Share Issued,us-gaap:CommonStockSharesIssued,None,4104900000,1/1/16,Unknown,unit
+JPM,0000019617-16-000902,Share Issued,us-gaap:CommonStockSharesIssued,None,4104933895,1/1/16,Unknown,unit
+JPM,0000019617-17-000314,Ordinary Shares Number,us-gaap:CommonStockSharesOutstanding,None,3663500000,1/1/16,Unknown,unit
+JPM,0000019617-18-000057,Ordinary Shares Number,us-gaap:CommonStockSharesOutstanding,None,3663500000,1/1/16,Unknown,unit
+JPM,0000019617-16-000902,Ordinary Shares Number,us-gaap:CommonStockSharesOutstanding,None,3663500000,1/1/16,Unknown,unit
+JPM,0000019617-17-000314,Common Stock,us-gaap:CommonStockValue,None,4105000000,1/1/16,Unknown,unit
+JPM,0000019617-16-000902,Common Stock,us-gaap:CommonStockValue,None,4105000000,1/1/16,Unknown,unit
+JPM,0000019617-17-000314,Deferred Tax,us-gaap:DeferredIncomeTaxExpenseBenefit,None,1333000000,1/1/16,Unknown,unit
+JPM,0000019617-18-000057,Deferred Tax,us-gaap:DeferredIncomeTaxExpenseBenefit,None,1333000000,1/1/16,Unknown,unit
+JPM,0000019617-16-000902,Deferred Tax,us-gaap:DeferredIncomeTaxExpenseBenefit,None,1333000000,1/1/16,Unknown,unit
+JPM,0000019617-17-000314,Basic EPS,us-gaap:EarningsPerShareBasic,None,6.05,1/1/16,Unknown,unit
+JPM,0000019617-18-000057,Basic EPS,us-gaap:EarningsPerShareBasic,None,6.05,1/1/16,Unknown,unit
+JPM,0000019617-16-000902,Basic EPS,us-gaap:EarningsPerShareBasic,None,6.05,1/1/16,Unknown,unit
+JPM,0000019617-17-000314,Diluted EPS,us-gaap:EarningsPerShareDiluted,None,6,1/1/16,Unknown,unit
+JPM,0000019617-18-000057,Diluted EPS,us-gaap:EarningsPerShareDiluted,None,6,1/1/16,Unknown,unit
+JPM,0000019617-16-000902,Diluted EPS,us-gaap:EarningsPerShareDiluted,None,6,1/1/16,Unknown,unit
+JPM,0000019617-17-000314,Effect Of Exchange Rate Changes,us-gaap:EffectOfExchangeRateOnCashAndCashEquivalents,None,-276000000,1/1/16,Unknown,unit
+JPM,0000019617-18-000057,Effect Of Exchange Rate Changes,us-gaap:EffectOfExchangeRateOnCashAndCashEquivalents,None,-276000000,1/1/16,Unknown,unit
+JPM,0000019617-16-000902,Effect Of Exchange Rate Changes,us-gaap:EffectOfExchangeRateOnCashAndCashEquivalents,None,-276000000,1/1/16,Unknown,unit
+JPM,0000019617-17-000314,Goodwill,us-gaap:Goodwill,None,47325000000,1/1/16,Unknown,unit
+JPM,0000019617-19-000054,Goodwill,us-gaap:Goodwill,None,47325000000,1/1/16,Unknown,unit
+JPM,0000019617-18-000057,Goodwill,us-gaap:Goodwill,None,47325000000,1/1/16,Unknown,unit
+JPM,0000019617-16-000902,Goodwill,us-gaap:Goodwill,None,47325000000,1/1/16,Unknown,unit
+JPM,0000019617-17-000314,Tax Provision,us-gaap:IncomeTaxExpenseBenefit,None,6260000000,1/1/16,Unknown,unit
+JPM,0000019617-18-000057,Tax Provision,us-gaap:IncomeTaxExpenseBenefit,None,6260000000,1/1/16,Unknown,unit
+JPM,0000019617-16-000902,Tax Provision,us-gaap:IncomeTaxExpenseBenefit,None,6260000000,1/1/16,Unknown,unit
+JPM,0000019617-17-000314,Interest Paid Supplemental Data,us-gaap:InterestPaid,None,7220000000,1/1/16,Unknown,unit
+JPM,0000019617-18-000057,Interest Paid Supplemental Data,us-gaap:InterestPaid,None,7220000000,1/1/16,Unknown,unit
+JPM,0000019617-16-000902,Interest Paid Supplemental Data,us-gaap:InterestPaid,None,7220000000,1/1/16,Unknown,unit
+JPM,0000019617-17-000314,Total Liabilities Net Minority Interest,us-gaap:Liabilities,None,2.10413E+12,1/1/16,Unknown,unit
+JPM,0000019617-16-000902,Total Liabilities Net Minority Interest,us-gaap:Liabilities,None,2.10413E+12,1/1/16,Unknown,unit
+JPM,0000019617-17-000314,Financing Cash Flow,us-gaap:NetCashProvidedByUsedInFinancingActivities,None,-1.87511E+11,1/1/16,Unknown,unit
+JPM,0000019617-18-000057,Financing Cash Flow,us-gaap:NetCashProvidedByUsedInFinancingActivities,None,-1.87511E+11,1/1/16,Unknown,unit
+JPM,0000019617-16-000902,Financing Cash Flow,us-gaap:NetCashProvidedByUsedInFinancingActivities,None,-1.87511E+11,1/1/16,Unknown,unit
+JPM,0000019617-17-000314,Investing Cash Flow,us-gaap:NetCashProvidedByUsedInInvestingActivities,None,1.0698E+11,1/1/16,Unknown,unit
+JPM,0000019617-18-000057,Investing Cash Flow,us-gaap:NetCashProvidedByUsedInInvestingActivities,None,1.0698E+11,1/1/16,Unknown,unit
+JPM,0000019617-16-000902,Investing Cash Flow,us-gaap:NetCashProvidedByUsedInInvestingActivities,None,1.0698E+11,1/1/16,Unknown,unit
+JPM,0000019617-17-000314,Operating Cash Flow,us-gaap:NetCashProvidedByUsedInOperatingActivities,None,73466000000,1/1/16,Unknown,unit
+JPM,0000019617-17-000314,Free Cash Flow,us-gaap:NetCashProvidedByUsedInOperatingActivities,None,73466000000,1/1/16,Unknown,unit
+JPM,0000019617-18-000057,Operating Cash Flow,us-gaap:NetCashProvidedByUsedInOperatingActivities,None,73466000000,1/1/16,Unknown,unit
+JPM,0000019617-18-000057,Free Cash Flow,us-gaap:NetCashProvidedByUsedInOperatingActivities,None,73466000000,1/1/16,Unknown,unit
+JPM,0000019617-16-000902,Operating Cash Flow,us-gaap:NetCashProvidedByUsedInOperatingActivities,None,73466000000,1/1/16,Unknown,unit
+JPM,0000019617-16-000902,Free Cash Flow,us-gaap:NetCashProvidedByUsedInOperatingActivities,None,73466000000,1/1/16,Unknown,unit
+JPM,0000019617-17-000314,Net Income,us-gaap:NetIncomeLoss,None,24442000000,1/1/16,Unknown,unit
+JPM,0000019617-17-000314,Net Income Including Noncontrolling Interests,us-gaap:NetIncomeLoss,None,24442000000,1/1/16,Unknown,unit
+JPM,0000019617-18-000057,Net Income,us-gaap:NetIncomeLoss,None,24442000000,1/1/16,Unknown,unit
+JPM,0000019617-18-000057,Net Income Including Noncontrolling Interests,us-gaap:NetIncomeLoss,None,24442000000,1/1/16,Unknown,unit
+JPM,0000019617-16-000902,Net Income,us-gaap:NetIncomeLoss,None,24442000000,1/1/16,Unknown,unit
+JPM,0000019617-16-000902,Net Income Including Noncontrolling Interests,us-gaap:NetIncomeLoss,None,24442000000,1/1/16,Unknown,unit
+JPM,0000019617-18-000057,Repurchase Of Capital Stock,us-gaap:PaymentsForRepurchaseOfCommonStock,None,5616000000,1/1/16,Unknown,unit
+JPM,0000019617-17-000314,Cash Dividends Paid,us-gaap:PaymentsOfDividends,None,7873000000,1/1/16,Unknown,unit
+JPM,0000019617-18-000057,Cash Dividends Paid,us-gaap:PaymentsOfDividends,None,7873000000,1/1/16,Unknown,unit
+JPM,0000019617-16-000902,Cash Dividends Paid,us-gaap:PaymentsOfDividends,None,7873000000,1/1/16,Unknown,unit
+JPM,0000019617-17-000314,Net PPE,us-gaap:PropertyPlantAndEquipmentNet,None,14362000000,1/1/16,Unknown,unit
+JPM,0000019617-16-000902,Net PPE,us-gaap:PropertyPlantAndEquipmentNet,None,14362000000,1/1/16,Unknown,unit
+JPM,0000019617-17-000314,Total Revenue,us-gaap:Revenues,None,93543000000,1/1/16,Unknown,unit
+JPM,0000019617-18-000057,Total Revenue,us-gaap:Revenues,None,93543000000,1/1/16,Unknown,unit
+JPM,0000019617-16-000902,Total Revenue,us-gaap:Revenues,None,93543000000,1/1/16,Unknown,unit
+JPM,0000019617-17-000314,Share-based compensation,us-gaap:ShareBasedCompensation,None,1987000000,1/1/16,Unknown,unit
+JPM,0000019617-18-000057,Share-based compensation,us-gaap:ShareBasedCompensation,None,1987000000,1/1/16,Unknown,unit
+JPM,0000019617-16-000902,Share-based compensation,us-gaap:ShareBasedCompensation,None,1987000000,1/1/16,Unknown,unit
+JPM,0000019617-17-000314,Common Stock Equity,us-gaap:StockholdersEquity,None,2.47573E+11,1/1/16,Unknown,unit
+JPM,0000019617-17-000314,Stockholders Equity,us-gaap:StockholdersEquity,None,2.47573E+11,1/1/16,Unknown,unit
+JPM,0000019617-18-000057,Common Stock Equity,us-gaap:StockholdersEquity,None,2.47573E+11,1/1/16,Unknown,unit
+JPM,0000019617-18-000057,Stockholders Equity,us-gaap:StockholdersEquity,None,2.47573E+11,1/1/16,Unknown,unit
+JPM,0000019617-16-000902,Common Stock Equity,us-gaap:StockholdersEquity,None,2.47573E+11,1/1/16,Unknown,unit
+JPM,0000019617-16-000902,Stockholders Equity,us-gaap:StockholdersEquity,None,2.47573E+11,1/1/16,Unknown,unit
+JPM,0000019617-17-000314,Basic Average Shares,us-gaap:WeightedAverageNumberOfSharesOutstandingBasic,None,3700400000,1/1/16,Unknown,unit
+JPM,0000019617-18-000057,Basic Average Shares,us-gaap:WeightedAverageNumberOfSharesOutstandingBasic,None,3741200000,1/1/16,Unknown,unit
+JPM,0000019617-16-000902,Basic Average Shares,us-gaap:WeightedAverageNumberOfSharesOutstandingBasic,None,3700400000,1/1/16,Unknown,unit
+JPM,0000019617-17-000314,Total Assets,us-gaap:Assets,None,2.49097E+12,1/1/17,Unknown,unit
+JPM,0000019617-19-000054,Total Assets,us-gaap:Assets,None,2.49097E+12,1/1/17,Unknown,unit
+JPM,0000019617-19-000054,Total Assets,us-gaap:Assets,None,2.49097E+12,1/1/17,Unknown,unit
+JPM,0000019617-18-000057,Total Assets,us-gaap:Assets,None,2.49097E+12,1/1/17,Unknown,unit
+JPM,0000019617-19-000054,Cash And Cash Equivalents,us-gaap:CashAndCashEquivalentsAtCarryingValue,None,3.91154E+11,1/1/17,Unknown,unit
+JPM,0000019617-19-000054,End Cash Position,us-gaap:CashAndCashEquivalentsAtCarryingValue,None,3.91154E+11,1/1/17,Unknown,unit
+JPM,0000019617-19-000054,Beginning Cash Position,us-gaap:CashAndCashEquivalentsAtCarryingValue,None,3.91154E+11,1/1/17,Unknown,unit
+JPM,0000019617-19-000054,Cash And Cash Equivalents,us-gaap:CashAndCashEquivalentsAtCarryingValue,None,3.91154E+11,1/1/17,Unknown,unit
+JPM,0000019617-19-000054,End Cash Position,us-gaap:CashAndCashEquivalentsAtCarryingValue,None,3.91154E+11,1/1/17,Unknown,unit
+JPM,0000019617-19-000054,Beginning Cash Position,us-gaap:CashAndCashEquivalentsAtCarryingValue,None,3.91154E+11,1/1/17,Unknown,unit
+JPM,0000019617-17-000314,Changes In Cash,us-gaap:CashAndCashEquivalentsPeriodIncreaseDecrease,None,3383000000,1/1/17,Unknown,unit
+JPM,0000019617-19-000054,Changes In Cash,us-gaap:CashAndCashEquivalentsPeriodIncreaseDecrease,None,29471000000,1/1/17,Unknown,unit
+JPM,0000019617-18-000057,Changes In Cash,us-gaap:CashAndCashEquivalentsPeriodIncreaseDecrease,None,3383000000,1/1/17,Unknown,unit
+JPM,0000019617-17-000314,CommercialPaper(ST debt),us-gaap:CommercialPaper,None,11738000000,1/1/17,Unknown,unit
+JPM,0000019617-20-000257,Share Issued,us-gaap:CommonStockSharesIssued,None,4104900000,1/1/17,Unknown,unit
+JPM,0000019617-17-000314,Share Issued,us-gaap:CommonStockSharesIssued,None,4104933895,1/1/17,Unknown,unit
+JPM,0000019617-19-000054,Share Issued,us-gaap:CommonStockSharesIssued,None,4104900000,1/1/17,Unknown,unit
+JPM,0000019617-18-000057,Share Issued,us-gaap:CommonStockSharesIssued,None,4104933895,1/1/17,Unknown,unit
+JPM,0000019617-18-000057,Share Issued,us-gaap:CommonStockSharesIssued,None,4104900000,1/1/17,Unknown,unit
+JPM,0000019617-17-000314,Ordinary Shares Number,us-gaap:CommonStockSharesOutstanding,None,3561200000,1/1/17,Unknown,unit
+JPM,0000019617-19-000054,Ordinary Shares Number,us-gaap:CommonStockSharesOutstanding,None,3561200000,1/1/17,Unknown,unit
+JPM,0000019617-18-000057,Ordinary Shares Number,us-gaap:CommonStockSharesOutstanding,None,3561200000,1/1/17,Unknown,unit
+JPM,0000019617-17-000314,Common Stock,us-gaap:CommonStockValue,None,4105000000,1/1/17,Unknown,unit
+JPM,0000019617-18-000057,Common Stock,us-gaap:CommonStockValue,None,4105000000,1/1/17,Unknown,unit
+JPM,0000019617-17-000314,Deferred Tax,us-gaap:DeferredIncomeTaxExpenseBenefit,None,4651000000,1/1/17,Unknown,unit
+JPM,0000019617-19-000054,Deferred Tax,us-gaap:DeferredIncomeTaxExpenseBenefit,None,4651000000,1/1/17,Unknown,unit
+JPM,0000019617-19-000054,Deferred Tax,us-gaap:DeferredIncomeTaxExpenseBenefit,None,4651000000,1/1/17,Unknown,unit
+JPM,0000019617-18-000057,Deferred Tax,us-gaap:DeferredIncomeTaxExpenseBenefit,None,4651000000,1/1/17,Unknown,unit
+JPM,0000019617-17-000314,Basic EPS,us-gaap:EarningsPerShareBasic,None,6.24,1/1/17,Unknown,unit
+JPM,0000019617-19-000054,Basic EPS,us-gaap:EarningsPerShareBasic,None,6.24,1/1/17,Unknown,unit
+JPM,0000019617-19-000054,Basic EPS,us-gaap:EarningsPerShareBasic,None,6.24,1/1/17,Unknown,unit
+JPM,0000019617-18-000057,Basic EPS,us-gaap:EarningsPerShareBasic,None,6.24,1/1/17,Unknown,unit
+JPM,0000019617-17-000314,Diluted EPS,us-gaap:EarningsPerShareDiluted,None,6.19,1/1/17,Unknown,unit
+JPM,0000019617-19-000054,Diluted EPS,us-gaap:EarningsPerShareDiluted,None,6.19,1/1/17,Unknown,unit
+JPM,0000019617-19-000054,Diluted EPS,us-gaap:EarningsPerShareDiluted,None,6.19,1/1/17,Unknown,unit
+JPM,0000019617-18-000057,Diluted EPS,us-gaap:EarningsPerShareDiluted,None,6.19,1/1/17,Unknown,unit
+JPM,0000019617-17-000314,Effect Of Exchange Rate Changes,us-gaap:EffectOfExchangeRateOnCashAndCashEquivalents,None,-135000000,1/1/17,Unknown,unit
+JPM,0000019617-19-000054,Effect Of Exchange Rate Changes,us-gaap:EffectOfExchangeRateOnCashAndCashEquivalents,None,-1482000000,1/1/17,Unknown,unit
+JPM,0000019617-18-000057,Effect Of Exchange Rate Changes,us-gaap:EffectOfExchangeRateOnCashAndCashEquivalents,None,-135000000,1/1/17,Unknown,unit
+JPM,0000019617-20-000257,Goodwill,us-gaap:Goodwill,None,47288000000,1/1/17,Unknown,unit
+JPM,0000019617-17-000314,Goodwill,us-gaap:Goodwill,None,47288000000,1/1/17,Unknown,unit
+JPM,0000019617-19-000054,Goodwill,us-gaap:Goodwill,None,47288000000,1/1/17,Unknown,unit
+JPM,0000019617-19-000054,Goodwill,us-gaap:Goodwill,None,47288000000,1/1/17,Unknown,unit
+JPM,0000019617-19-000054,Goodwill,us-gaap:Goodwill,None,47288000000,1/1/17,Unknown,unit
+JPM,0000019617-18-000057,Goodwill,us-gaap:Goodwill,None,47288000000,1/1/17,Unknown,unit
+JPM,0000019617-17-000314,Tax Provision,us-gaap:IncomeTaxExpenseBenefit,None,9803000000,1/1/17,Unknown,unit
+JPM,0000019617-19-000054,Tax Provision,us-gaap:IncomeTaxExpenseBenefit,None,9803000000,1/1/17,Unknown,unit
+JPM,0000019617-19-000054,Tax Provision,us-gaap:IncomeTaxExpenseBenefit,None,9803000000,1/1/17,Unknown,unit
+JPM,0000019617-19-000054,Tax Provision,us-gaap:IncomeTaxExpenseBenefit,None,9803000000,1/1/17,Unknown,unit
+JPM,0000019617-18-000057,Tax Provision,us-gaap:IncomeTaxExpenseBenefit,None,9803000000,1/1/17,Unknown,unit
+JPM,0000019617-17-000314,Interest Paid Supplemental Data,us-gaap:InterestPaid,None,9508000000,1/1/17,Unknown,unit
+JPM,0000019617-18-000057,Interest Paid Supplemental Data,us-gaap:InterestPaid,None,9508000000,1/1/17,Unknown,unit
+JPM,0000019617-17-000314,Total Liabilities Net Minority Interest,us-gaap:Liabilities,None,2.23678E+12,1/1/17,Unknown,unit
+JPM,0000019617-18-000057,Total Liabilities Net Minority Interest,us-gaap:Liabilities,None,2.23678E+12,1/1/17,Unknown,unit
+JPM,0000019617-17-000314,Financing Cash Flow,us-gaap:NetCashProvidedByUsedInFinancingActivities,None,98271000000,1/1/17,Unknown,unit
+JPM,0000019617-19-000054,Financing Cash Flow,us-gaap:NetCashProvidedByUsedInFinancingActivities,None,98271000000,1/1/17,Unknown,unit
+JPM,0000019617-18-000057,Financing Cash Flow,us-gaap:NetCashProvidedByUsedInFinancingActivities,None,98271000000,1/1/17,Unknown,unit
+JPM,0000019617-17-000314,Investing Cash Flow,us-gaap:NetCashProvidedByUsedInInvestingActivities,None,-1.14949E+11,1/1/17,Unknown,unit
+JPM,0000019617-19-000054,Investing Cash Flow,us-gaap:NetCashProvidedByUsedInInvestingActivities,None,-89202000000,1/1/17,Unknown,unit
+JPM,0000019617-18-000057,Investing Cash Flow,us-gaap:NetCashProvidedByUsedInInvestingActivities,None,-1.14949E+11,1/1/17,Unknown,unit
+JPM,0000019617-17-000314,Operating Cash Flow,us-gaap:NetCashProvidedByUsedInOperatingActivities,None,20196000000,1/1/17,Unknown,unit
+JPM,0000019617-17-000314,Free Cash Flow,us-gaap:NetCashProvidedByUsedInOperatingActivities,None,20196000000,1/1/17,Unknown,unit
+JPM,0000019617-19-000054,Operating Cash Flow,us-gaap:NetCashProvidedByUsedInOperatingActivities,None,21884000000,1/1/17,Unknown,unit
+JPM,0000019617-19-000054,Free Cash Flow,us-gaap:NetCashProvidedByUsedInOperatingActivities,None,21884000000,1/1/17,Unknown,unit
+JPM,0000019617-18-000057,Operating Cash Flow,us-gaap:NetCashProvidedByUsedInOperatingActivities,None,20196000000,1/1/17,Unknown,unit
+JPM,0000019617-18-000057,Free Cash Flow,us-gaap:NetCashProvidedByUsedInOperatingActivities,None,20196000000,1/1/17,Unknown,unit
+JPM,0000019617-17-000314,Net Income,us-gaap:NetIncomeLoss,None,24733000000,1/1/17,Unknown,unit
+JPM,0000019617-17-000314,Net Income Including Noncontrolling Interests,us-gaap:NetIncomeLoss,None,24733000000,1/1/17,Unknown,unit
+JPM,0000019617-19-000054,Net Income,us-gaap:NetIncomeLoss,None,24733000000,1/1/17,Unknown,unit
+JPM,0000019617-19-000054,Net Income Including Noncontrolling Interests,us-gaap:NetIncomeLoss,None,24733000000,1/1/17,Unknown,unit
+JPM,0000019617-19-000054,Net Income,us-gaap:NetIncomeLoss,None,24733000000,1/1/17,Unknown,unit
+JPM,0000019617-19-000054,Net Income Including Noncontrolling Interests,us-gaap:NetIncomeLoss,None,24733000000,1/1/17,Unknown,unit
+JPM,0000019617-19-000054,Net Income,us-gaap:NetIncomeLoss,None,24733000000,1/1/17,Unknown,unit
+JPM,0000019617-19-000054,Net Income Including Noncontrolling Interests,us-gaap:NetIncomeLoss,None,24733000000,1/1/17,Unknown,unit
+JPM,0000019617-19-000054,Net Income,us-gaap:NetIncomeLoss,None,24733000000,1/1/17,Unknown,unit
+JPM,0000019617-19-000054,Net Income Including Noncontrolling Interests,us-gaap:NetIncomeLoss,None,24733000000,1/1/17,Unknown,unit
+JPM,0000019617-19-000054,Net Income,us-gaap:NetIncomeLoss,None,24733000000,1/1/17,Unknown,unit
+JPM,0000019617-19-000054,Net Income Including Noncontrolling Interests,us-gaap:NetIncomeLoss,None,24733000000,1/1/17,Unknown,unit
+JPM,0000019617-19-000054,Net Income,us-gaap:NetIncomeLoss,None,24733000000,1/1/17,Unknown,unit
+JPM,0000019617-19-000054,Net Income Including Noncontrolling Interests,us-gaap:NetIncomeLoss,None,24733000000,1/1/17,Unknown,unit
+JPM,0000019617-18-000057,Net Income,us-gaap:NetIncomeLoss,None,24733000000,1/1/17,Unknown,unit
+JPM,0000019617-18-000057,Net Income Including Noncontrolling Interests,us-gaap:NetIncomeLoss,None,24733000000,1/1/17,Unknown,unit
+JPM,0000019617-19-000054,Repurchase Of Capital Stock,us-gaap:PaymentsForRepurchaseOfCommonStock,None,9082000000,1/1/17,Unknown,unit
+JPM,0000019617-18-000057,Repurchase Of Capital Stock,us-gaap:PaymentsForRepurchaseOfCommonStock,None,9082000000,1/1/17,Unknown,unit
+JPM,0000019617-17-000314,Cash Dividends Paid,us-gaap:PaymentsOfDividends,None,8476000000,1/1/17,Unknown,unit
+JPM,0000019617-19-000054,Cash Dividends Paid,us-gaap:PaymentsOfDividends,None,8476000000,1/1/17,Unknown,unit
+JPM,0000019617-18-000057,Cash Dividends Paid,us-gaap:PaymentsOfDividends,None,8476000000,1/1/17,Unknown,unit
+JPM,0000019617-17-000314,Net PPE,us-gaap:PropertyPlantAndEquipmentNet,None,14131000000,1/1/17,Unknown,unit
+JPM,0000019617-18-000057,Net PPE,us-gaap:PropertyPlantAndEquipmentNet,None,14131000000,1/1/17,Unknown,unit
+JPM,0000019617-17-000314,Total Revenue,us-gaap:Revenues,None,95668000000,1/1/17,Unknown,unit
+JPM,0000019617-19-000054,Total Revenue,us-gaap:Revenues,None,96569000000,1/1/17,Unknown,unit
+JPM,0000019617-18-000057,Total Revenue,us-gaap:Revenues,None,95668000000,1/1/17,Unknown,unit
+JPM,0000019617-17-000314,Share-based compensation,us-gaap:ShareBasedCompensation,None,1940000000,1/1/17,Unknown,unit
+JPM,0000019617-19-000054,Share-based compensation,us-gaap:ShareBasedCompensation,None,1940000000,1/1/17,Unknown,unit
+JPM,0000019617-18-000057,Share-based compensation,us-gaap:ShareBasedCompensation,None,1940000000,1/1/17,Unknown,unit
+JPM,0000019617-17-000314,Common Stock Equity,us-gaap:StockholdersEquity,None,2.5419E+11,1/1/17,Unknown,unit
+JPM,0000019617-17-000314,Stockholders Equity,us-gaap:StockholdersEquity,None,2.5419E+11,1/1/17,Unknown,unit
+JPM,0000019617-19-000054,Common Stock Equity,us-gaap:StockholdersEquity,None,2.5419E+11,1/1/17,Unknown,unit
+JPM,0000019617-19-000054,Stockholders Equity,us-gaap:StockholdersEquity,None,2.5419E+11,1/1/17,Unknown,unit
+JPM,0000019617-18-000057,Common Stock Equity,us-gaap:StockholdersEquity,None,2.5419E+11,1/1/17,Unknown,unit
+JPM,0000019617-18-000057,Stockholders Equity,us-gaap:StockholdersEquity,None,2.5419E+11,1/1/17,Unknown,unit
+JPM,0000019617-17-000314,Basic Average Shares,us-gaap:WeightedAverageNumberOfSharesOutstandingBasic,None,3618500000,1/1/17,Unknown,unit
+JPM,0000019617-19-000054,Basic Average Shares,us-gaap:WeightedAverageNumberOfSharesOutstandingBasic,None,3658800000,1/1/17,Unknown,unit
+JPM,0000019617-19-000054,Basic Average Shares,us-gaap:WeightedAverageNumberOfSharesOutstandingBasic,None,3658800000,1/1/17,Unknown,unit
+JPM,0000019617-19-000054,Basic Average Shares,us-gaap:WeightedAverageNumberOfSharesOutstandingBasic,None,3658800000,1/1/17,Unknown,unit
+JPM,0000019617-18-000057,Basic Average Shares,us-gaap:WeightedAverageNumberOfSharesOutstandingBasic,None,3658800000,1/1/17,Unknown,unit
+JPM,0000019617-20-000257,Total Assets,us-gaap:Assets,None,2.5336E+12,1/1/18,Unknown,unit
+JPM,0000019617-20-000257,Total Assets,us-gaap:Assets,None,2.5336E+12,1/1/18,Unknown,unit
+JPM,0000019617-19-000054,Total Assets,us-gaap:Assets,None,2.5336E+12,1/1/18,Unknown,unit
+JPM,0000019617-19-000054,Total Assets,us-gaap:Assets,None,2.5336E+12,1/1/18,Unknown,unit
+JPM,0000019617-19-000054,Total Assets,us-gaap:Assets,None,2.5336E+12,1/1/18,Unknown,unit
+JPM,0000019617-18-000057,Total Assets,us-gaap:Assets,None,2.5336E+12,1/1/18,Unknown,unit
+JPM,0000019617-19-000054,Cash And Cash Equivalents,us-gaap:CashAndCashEquivalentsAtCarryingValue,None,4.31304E+11,1/1/18,Unknown,unit
+JPM,0000019617-19-000054,End Cash Position,us-gaap:CashAndCashEquivalentsAtCarryingValue,None,4.31304E+11,1/1/18,Unknown,unit
+JPM,0000019617-19-000054,Beginning Cash Position,us-gaap:CashAndCashEquivalentsAtCarryingValue,None,4.31304E+11,1/1/18,Unknown,unit
+JPM,0000019617-19-000054,Cash And Cash Equivalents,us-gaap:CashAndCashEquivalentsAtCarryingValue,None,4.31304E+11,1/1/18,Unknown,unit
+JPM,0000019617-19-000054,End Cash Position,us-gaap:CashAndCashEquivalentsAtCarryingValue,None,4.31304E+11,1/1/18,Unknown,unit
+JPM,0000019617-19-000054,Beginning Cash Position,us-gaap:CashAndCashEquivalentsAtCarryingValue,None,4.31304E+11,1/1/18,Unknown,unit
+JPM,0000019617-19-000054,Changes In Cash,us-gaap:CashAndCashEquivalentsPeriodIncreaseDecrease,None,40150000000,1/1/18,Unknown,unit
+JPM,0000019617-18-000057,Changes In Cash,us-gaap:CashAndCashEquivalentsPeriodIncreaseDecrease,None,1954000000,1/1/18,Unknown,unit
+JPM,0000019617-20-000257,Share Issued,us-gaap:CommonStockSharesIssued,None,4104900000,1/1/18,Unknown,unit
+JPM,0000019617-21-000236,Share Issued,us-gaap:CommonStockSharesIssued,None,4104900000,1/1/18,Unknown,unit
+JPM,0000019617-19-000054,Share Issued,us-gaap:CommonStockSharesIssued,None,4104933895,1/1/18,Unknown,unit
+JPM,0000019617-19-000054,Share Issued,us-gaap:CommonStockSharesIssued,None,4104900000,1/1/18,Unknown,unit
+JPM,0000019617-18-000057,Share Issued,us-gaap:CommonStockSharesIssued,None,4104933895,1/1/18,Unknown,unit
+JPM,0000019617-20-000257,Ordinary Shares Number,us-gaap:CommonStockSharesOutstanding,None,3425300000,1/1/18,Unknown,unit
+JPM,0000019617-19-000054,Ordinary Shares Number,us-gaap:CommonStockSharesOutstanding,None,3425300000,1/1/18,Unknown,unit
+JPM,0000019617-18-000057,Ordinary Shares Number,us-gaap:CommonStockSharesOutstanding,None,3425300000,1/1/18,Unknown,unit
+JPM,0000019617-19-000054,Common Stock,us-gaap:CommonStockValue,None,4105000000,1/1/18,Unknown,unit
+JPM,0000019617-18-000057,Common Stock,us-gaap:CommonStockValue,None,4105000000,1/1/18,Unknown,unit
+JPM,0000019617-20-000257,Deferred Tax,us-gaap:DeferredIncomeTaxExpenseBenefit,None,2312000000,1/1/18,Unknown,unit
+JPM,0000019617-20-000257,Deferred Tax,us-gaap:DeferredIncomeTaxExpenseBenefit,None,2312000000,1/1/18,Unknown,unit
+JPM,0000019617-19-000054,Deferred Tax,us-gaap:DeferredIncomeTaxExpenseBenefit,None,2312000000,1/1/18,Unknown,unit
+JPM,0000019617-19-000054,Deferred Tax,us-gaap:DeferredIncomeTaxExpenseBenefit,None,2312000000,1/1/18,Unknown,unit
+JPM,0000019617-18-000057,Deferred Tax,us-gaap:DeferredIncomeTaxExpenseBenefit,None,2312000000,1/1/18,Unknown,unit
+JPM,0000019617-20-000257,Basic EPS,us-gaap:EarningsPerShareBasic,None,6.35,1/1/18,Unknown,unit
+JPM,0000019617-20-000257,Basic EPS,us-gaap:EarningsPerShareBasic,None,6.35,1/1/18,Unknown,unit
+JPM,0000019617-19-000054,Basic EPS,us-gaap:EarningsPerShareBasic,None,6.35,1/1/18,Unknown,unit
+JPM,0000019617-19-000054,Basic EPS,us-gaap:EarningsPerShareBasic,None,6.35,1/1/18,Unknown,unit
+JPM,0000019617-18-000057,Basic EPS,us-gaap:EarningsPerShareBasic,None,6.35,1/1/18,Unknown,unit
+JPM,0000019617-20-000257,Diluted EPS,us-gaap:EarningsPerShareDiluted,None,6.31,1/1/18,Unknown,unit
+JPM,0000019617-20-000257,Diluted EPS,us-gaap:EarningsPerShareDiluted,None,6.31,1/1/18,Unknown,unit
+JPM,0000019617-19-000054,Diluted EPS,us-gaap:EarningsPerShareDiluted,None,6.31,1/1/18,Unknown,unit
+JPM,0000019617-19-000054,Diluted EPS,us-gaap:EarningsPerShareDiluted,None,6.31,1/1/18,Unknown,unit
+JPM,0000019617-18-000057,Diluted EPS,us-gaap:EarningsPerShareDiluted,None,6.31,1/1/18,Unknown,unit
+JPM,0000019617-19-000054,Effect Of Exchange Rate Changes,us-gaap:EffectOfExchangeRateOnCashAndCashEquivalents,None,8086000000,1/1/18,Unknown,unit
+JPM,0000019617-18-000057,Effect Of Exchange Rate Changes,us-gaap:EffectOfExchangeRateOnCashAndCashEquivalents,None,96000000,1/1/18,Unknown,unit
+JPM,0000019617-20-000257,Goodwill,us-gaap:Goodwill,None,47507000000,1/1/18,Unknown,unit
+JPM,0000019617-20-000257,Goodwill,us-gaap:Goodwill,None,47507000000,1/1/18,Unknown,unit
+JPM,0000019617-20-000257,Goodwill,us-gaap:Goodwill,None,47507000000,1/1/18,Unknown,unit
+JPM,0000019617-21-000236,Goodwill,us-gaap:Goodwill,None,47507000000,1/1/18,Unknown,unit
+JPM,0000019617-19-000054,Goodwill,us-gaap:Goodwill,None,47507000000,1/1/18,Unknown,unit
+JPM,0000019617-19-000054,Goodwill,us-gaap:Goodwill,None,47507000000,1/1/18,Unknown,unit
+JPM,0000019617-19-000054,Goodwill,us-gaap:Goodwill,None,47507000000,1/1/18,Unknown,unit
+JPM,0000019617-18-000057,Goodwill,us-gaap:Goodwill,None,47507000000,1/1/18,Unknown,unit
+JPM,0000019617-20-000257,Tax Provision,us-gaap:IncomeTaxExpenseBenefit,None,11459000000,1/1/18,Unknown,unit
+JPM,0000019617-20-000257,Tax Provision,us-gaap:IncomeTaxExpenseBenefit,None,11459000000,1/1/18,Unknown,unit
+JPM,0000019617-20-000257,Tax Provision,us-gaap:IncomeTaxExpenseBenefit,None,11459000000,1/1/18,Unknown,unit
+JPM,0000019617-19-000054,Tax Provision,us-gaap:IncomeTaxExpenseBenefit,None,11459000000,1/1/18,Unknown,unit
+JPM,0000019617-19-000054,Tax Provision,us-gaap:IncomeTaxExpenseBenefit,None,11459000000,1/1/18,Unknown,unit
+JPM,0000019617-19-000054,Tax Provision,us-gaap:IncomeTaxExpenseBenefit,None,11459000000,1/1/18,Unknown,unit
+JPM,0000019617-18-000057,Tax Provision,us-gaap:IncomeTaxExpenseBenefit,None,11459000000,1/1/18,Unknown,unit
+JPM,0000019617-18-000057,Interest Paid Supplemental Data,us-gaap:InterestPaid,None,14153000000,1/1/18,Unknown,unit
+JPM,0000019617-19-000054,Total Liabilities Net Minority Interest,us-gaap:Liabilities,None,2.27791E+12,1/1/18,Unknown,unit
+JPM,0000019617-18-000057,Total Liabilities Net Minority Interest,us-gaap:Liabilities,None,2.27791E+12,1/1/18,Unknown,unit
+JPM,0000019617-20-000257,Financing Cash Flow,us-gaap:NetCashProvidedByUsedInFinancingActivities,None,14642000000,1/1/18,Unknown,unit
+JPM,0000019617-19-000054,Financing Cash Flow,us-gaap:NetCashProvidedByUsedInFinancingActivities,None,14642000000,1/1/18,Unknown,unit
+JPM,0000019617-18-000057,Financing Cash Flow,us-gaap:NetCashProvidedByUsedInFinancingActivities,None,14642000000,1/1/18,Unknown,unit
+JPM,0000019617-20-000257,Investing Cash Flow,us-gaap:NetCashProvidedByUsedInInvestingActivities,None,28249000000,1/1/18,Unknown,unit
+JPM,0000019617-19-000054,Investing Cash Flow,us-gaap:NetCashProvidedByUsedInInvestingActivities,None,28249000000,1/1/18,Unknown,unit
+JPM,0000019617-18-000057,Investing Cash Flow,us-gaap:NetCashProvidedByUsedInInvestingActivities,None,-10283000000,1/1/18,Unknown,unit
+JPM,0000019617-20-000257,Operating Cash Flow,us-gaap:NetCashProvidedByUsedInOperatingActivities,None,-10827000000,1/1/18,Unknown,unit
+JPM,0000019617-20-000257,Free Cash Flow,us-gaap:NetCashProvidedByUsedInOperatingActivities,None,-10827000000,1/1/18,Unknown,unit
+JPM,0000019617-19-000054,Operating Cash Flow,us-gaap:NetCashProvidedByUsedInOperatingActivities,None,-10827000000,1/1/18,Unknown,unit
+JPM,0000019617-19-000054,Free Cash Flow,us-gaap:NetCashProvidedByUsedInOperatingActivities,None,-10827000000,1/1/18,Unknown,unit
+JPM,0000019617-18-000057,Operating Cash Flow,us-gaap:NetCashProvidedByUsedInOperatingActivities,None,-2501000000,1/1/18,Unknown,unit
+JPM,0000019617-18-000057,Free Cash Flow,us-gaap:NetCashProvidedByUsedInOperatingActivities,None,-2501000000,1/1/18,Unknown,unit
+JPM,0000019617-20-000257,Net Income,us-gaap:NetIncomeLoss,None,24441000000,1/1/18,Unknown,unit
+JPM,0000019617-20-000257,Net Income Including Noncontrolling Interests,us-gaap:NetIncomeLoss,None,24441000000,1/1/18,Unknown,unit
+JPM,0000019617-20-000257,Net Income,us-gaap:NetIncomeLoss,None,24441000000,1/1/18,Unknown,unit
+JPM,0000019617-20-000257,Net Income Including Noncontrolling Interests,us-gaap:NetIncomeLoss,None,24441000000,1/1/18,Unknown,unit
+JPM,0000019617-20-000257,Net Income,us-gaap:NetIncomeLoss,None,24441000000,1/1/18,Unknown,unit
+JPM,0000019617-20-000257,Net Income Including Noncontrolling Interests,us-gaap:NetIncomeLoss,None,24441000000,1/1/18,Unknown,unit
+JPM,0000019617-20-000257,Net Income,us-gaap:NetIncomeLoss,None,24441000000,1/1/18,Unknown,unit
+JPM,0000019617-20-000257,Net Income Including Noncontrolling Interests,us-gaap:NetIncomeLoss,None,24441000000,1/1/18,Unknown,unit
+JPM,0000019617-20-000257,Net Income,us-gaap:NetIncomeLoss,None,24441000000,1/1/18,Unknown,unit
+JPM,0000019617-20-000257,Net Income Including Noncontrolling Interests,us-gaap:NetIncomeLoss,None,24441000000,1/1/18,Unknown,unit
+JPM,0000019617-20-000257,Net Income,us-gaap:NetIncomeLoss,None,24441000000,1/1/18,Unknown,unit
+JPM,0000019617-20-000257,Net Income Including Noncontrolling Interests,us-gaap:NetIncomeLoss,None,24441000000,1/1/18,Unknown,unit
+JPM,0000019617-19-000054,Net Income,us-gaap:NetIncomeLoss,None,24441000000,1/1/18,Unknown,unit
+JPM,0000019617-19-000054,Net Income Including Noncontrolling Interests,us-gaap:NetIncomeLoss,None,24441000000,1/1/18,Unknown,unit
+JPM,0000019617-19-000054,Net Income,us-gaap:NetIncomeLoss,None,24441000000,1/1/18,Unknown,unit
+JPM,0000019617-19-000054,Net Income Including Noncontrolling Interests,us-gaap:NetIncomeLoss,None,24441000000,1/1/18,Unknown,unit
+JPM,0000019617-19-000054,Net Income,us-gaap:NetIncomeLoss,None,24441000000,1/1/18,Unknown,unit
+JPM,0000019617-19-000054,Net Income Including Noncontrolling Interests,us-gaap:NetIncomeLoss,None,24441000000,1/1/18,Unknown,unit
+JPM,0000019617-19-000054,Net Income,us-gaap:NetIncomeLoss,None,24441000000,1/1/18,Unknown,unit
+JPM,0000019617-19-000054,Net Income Including Noncontrolling Interests,us-gaap:NetIncomeLoss,None,24441000000,1/1/18,Unknown,unit
+JPM,0000019617-19-000054,Net Income,us-gaap:NetIncomeLoss,None,24441000000,1/1/18,Unknown,unit
+JPM,0000019617-19-000054,Net Income Including Noncontrolling Interests,us-gaap:NetIncomeLoss,None,24441000000,1/1/18,Unknown,unit
+JPM,0000019617-19-000054,Net Income,us-gaap:NetIncomeLoss,None,24441000000,1/1/18,Unknown,unit
+JPM,0000019617-19-000054,Net Income Including Noncontrolling Interests,us-gaap:NetIncomeLoss,None,24441000000,1/1/18,Unknown,unit
+JPM,0000019617-18-000057,Net Income,us-gaap:NetIncomeLoss,None,24441000000,1/1/18,Unknown,unit
+JPM,0000019617-18-000057,Net Income Including Noncontrolling Interests,us-gaap:NetIncomeLoss,None,24441000000,1/1/18,Unknown,unit
+JPM,0000019617-20-000257,Repurchase Of Capital Stock,us-gaap:PaymentsForRepurchaseOfCommonStock,None,15410000000,1/1/18,Unknown,unit
+JPM,0000019617-19-000054,Repurchase Of Capital Stock,us-gaap:PaymentsForRepurchaseOfCommonStock,None,15410000000,1/1/18,Unknown,unit
+JPM,0000019617-18-000057,Repurchase Of Capital Stock,us-gaap:PaymentsForRepurchaseOfCommonStock,None,15410000000,1/1/18,Unknown,unit
+JPM,0000019617-20-000257,Cash Dividends Paid,us-gaap:PaymentsOfDividends,None,8993000000,1/1/18,Unknown,unit
+JPM,0000019617-19-000054,Cash Dividends Paid,us-gaap:PaymentsOfDividends,None,8993000000,1/1/18,Unknown,unit
+JPM,0000019617-18-000057,Cash Dividends Paid,us-gaap:PaymentsOfDividends,None,8993000000,1/1/18,Unknown,unit
+JPM,0000019617-19-000054,Net PPE,us-gaap:PropertyPlantAndEquipmentNet,None,14159000000,1/1/18,Unknown,unit
+JPM,0000019617-18-000057,Net PPE,us-gaap:PropertyPlantAndEquipmentNet,None,14159000000,1/1/18,Unknown,unit
+JPM,0000019617-20-000257,Total Revenue,us-gaap:Revenues,None,1.00705E+11,1/1/18,Unknown,unit
+JPM,0000019617-19-000054,Total Revenue,us-gaap:Revenues,None,1.00705E+11,1/1/18,Unknown,unit
+JPM,0000019617-18-000057,Total Revenue,us-gaap:Revenues,None,99624000000,1/1/18,Unknown,unit
+JPM,0000019617-20-000257,Share-based compensation,us-gaap:ShareBasedCompensation,None,2070000000,1/1/18,Unknown,unit
+JPM,0000019617-19-000054,Share-based compensation,us-gaap:ShareBasedCompensation,None,2070000000,1/1/18,Unknown,unit
+JPM,0000019617-18-000057,Share-based compensation,us-gaap:ShareBasedCompensation,None,2070000000,1/1/18,Unknown,unit
+JPM,0000019617-20-000257,Common Stock Equity,us-gaap:StockholdersEquity,None,2.55693E+11,1/1/18,Unknown,unit
+JPM,0000019617-20-000257,Stockholders Equity,us-gaap:StockholdersEquity,None,2.55693E+11,1/1/18,Unknown,unit
+JPM,0000019617-19-000054,Common Stock Equity,us-gaap:StockholdersEquity,None,2.55693E+11,1/1/18,Unknown,unit
+JPM,0000019617-19-000054,Stockholders Equity,us-gaap:StockholdersEquity,None,2.55693E+11,1/1/18,Unknown,unit
+JPM,0000019617-19-000054,Common Stock Equity,us-gaap:StockholdersEquity,None,2.55693E+11,1/1/18,Unknown,unit
+JPM,0000019617-19-000054,Stockholders Equity,us-gaap:StockholdersEquity,None,2.55693E+11,1/1/18,Unknown,unit
+JPM,0000019617-18-000057,Common Stock Equity,us-gaap:StockholdersEquity,None,2.55693E+11,1/1/18,Unknown,unit
+JPM,0000019617-18-000057,Stockholders Equity,us-gaap:StockholdersEquity,None,2.55693E+11,1/1/18,Unknown,unit
+JPM,0000019617-20-000257,Basic Average Shares,us-gaap:WeightedAverageNumberOfSharesOutstandingBasic,None,3551600000,1/1/18,Unknown,unit
+JPM,0000019617-20-000257,Basic Average Shares,us-gaap:WeightedAverageNumberOfSharesOutstandingBasic,None,3551600000,1/1/18,Unknown,unit
+JPM,0000019617-20-000257,Basic Average Shares,us-gaap:WeightedAverageNumberOfSharesOutstandingBasic,None,3551600000,1/1/18,Unknown,unit
+JPM,0000019617-19-000054,Basic Average Shares,us-gaap:WeightedAverageNumberOfSharesOutstandingBasic,None,3551600000,1/1/18,Unknown,unit
+JPM,0000019617-19-000054,Basic Average Shares,us-gaap:WeightedAverageNumberOfSharesOutstandingBasic,None,3551600000,1/1/18,Unknown,unit
+JPM,0000019617-19-000054,Basic Average Shares,us-gaap:WeightedAverageNumberOfSharesOutstandingBasic,None,3551600000,1/1/18,Unknown,unit
+JPM,0000019617-18-000057,Basic Average Shares,us-gaap:WeightedAverageNumberOfSharesOutstandingBasic,None,3551600000,1/1/18,Unknown,unit
+JPM,0000019617-20-000257,Total Assets,us-gaap:Assets,None,2.62253E+12,1/1/19,Unknown,unit
+JPM,0000019617-20-000257,Total Assets,us-gaap:Assets,None,2.62253E+12,1/1/19,Unknown,unit
+JPM,0000019617-20-000257,Total Assets,us-gaap:Assets,None,2.62253E+12,1/1/19,Unknown,unit
+JPM,0000019617-21-000236,Total Assets,us-gaap:Assets,None,2.62253E+12,1/1/19,Unknown,unit
+JPM,0000019617-21-000236,Total Assets,us-gaap:Assets,None,2.62253E+12,1/1/19,Unknown,unit
+JPM,0000019617-19-000054,Total Assets,us-gaap:Assets,None,2.62253E+12,1/1/19,Unknown,unit
+JPM,0000019617-19-000054,Total Assets,us-gaap:Assets,None,2.62253E+12,1/1/19,Unknown,unit
+JPM,0000019617-19-000054,Total Assets,us-gaap:Assets,None,2.62253E+12,1/1/19,Unknown,unit
+JPM,0000019617-19-000054,Cash And Cash Equivalents,us-gaap:CashAndCashEquivalentsAtCarryingValue,None,2.78793E+11,1/1/19,Unknown,unit
+JPM,0000019617-19-000054,End Cash Position,us-gaap:CashAndCashEquivalentsAtCarryingValue,None,2.78793E+11,1/1/19,Unknown,unit
+JPM,0000019617-19-000054,Beginning Cash Position,us-gaap:CashAndCashEquivalentsAtCarryingValue,None,2.78793E+11,1/1/19,Unknown,unit
+JPM,0000019617-19-000054,Changes In Cash,us-gaap:CashAndCashEquivalentsPeriodIncreaseDecrease,None,-1.52511E+11,1/1/19,Unknown,unit
+JPM,0000019617-20-000257,Share Issued,us-gaap:CommonStockSharesIssued,None,4104933895,1/1/19,Unknown,unit
+JPM,0000019617-20-000257,Share Issued,us-gaap:CommonStockSharesIssued,None,4104900000,1/1/19,Unknown,unit
+JPM,0000019617-21-000236,Share Issued,us-gaap:CommonStockSharesIssued,None,4104900000,1/1/19,Unknown,unit
+JPM,0000019617-22-000272,Share Issued,us-gaap:CommonStockSharesIssued,None,4104900000,1/1/19,Unknown,unit
+JPM,0000019617-19-000054,Share Issued,us-gaap:CommonStockSharesIssued,None,4104933895,1/1/19,Unknown,unit
+JPM,0000019617-20-000257,Ordinary Shares Number,us-gaap:CommonStockSharesOutstanding,None,3275800000,1/1/19,Unknown,unit
+JPM,0000019617-21-000236,Ordinary Shares Number,us-gaap:CommonStockSharesOutstanding,None,3275800000,1/1/19,Unknown,unit
+JPM,0000019617-19-000054,Ordinary Shares Number,us-gaap:CommonStockSharesOutstanding,None,3275800000,1/1/19,Unknown,unit
+JPM,0000019617-20-000257,Common Stock,us-gaap:CommonStockValue,None,4105000000,1/1/19,Unknown,unit
+JPM,0000019617-19-000054,Common Stock,us-gaap:CommonStockValue,None,4105000000,1/1/19,Unknown,unit
+JPM,0000019617-20-000257,Deferred Tax,us-gaap:DeferredIncomeTaxExpenseBenefit,None,1721000000,1/1/19,Unknown,unit
+JPM,0000019617-20-000257,Deferred Tax,us-gaap:DeferredIncomeTaxExpenseBenefit,None,1721000000,1/1/19,Unknown,unit
+JPM,0000019617-21-000236,Deferred Tax,us-gaap:DeferredIncomeTaxExpenseBenefit,None,1721000000,1/1/19,Unknown,unit
+JPM,0000019617-21-000236,Deferred Tax,us-gaap:DeferredIncomeTaxExpenseBenefit,None,1721000000,1/1/19,Unknown,unit
+JPM,0000019617-19-000054,Deferred Tax,us-gaap:DeferredIncomeTaxExpenseBenefit,None,1721000000,1/1/19,Unknown,unit
+JPM,0000019617-19-000054,Deferred Tax,us-gaap:DeferredIncomeTaxExpenseBenefit,None,1721000000,1/1/19,Unknown,unit
+JPM,0000019617-20-000257,Basic EPS,us-gaap:EarningsPerShareBasic,None,9.04,1/1/19,Unknown,unit
+JPM,0000019617-20-000257,Basic EPS,us-gaap:EarningsPerShareBasic,None,9.04,1/1/19,Unknown,unit
+JPM,0000019617-21-000236,Basic EPS,us-gaap:EarningsPerShareBasic,None,9.04,1/1/19,Unknown,unit
+JPM,0000019617-21-000236,Basic EPS,us-gaap:EarningsPerShareBasic,None,9.04,1/1/19,Unknown,unit
+JPM,0000019617-19-000054,Basic EPS,us-gaap:EarningsPerShareBasic,None,9.04,1/1/19,Unknown,unit
+JPM,0000019617-19-000054,Basic EPS,us-gaap:EarningsPerShareBasic,None,9.04,1/1/19,Unknown,unit
+JPM,0000019617-20-000257,Diluted EPS,us-gaap:EarningsPerShareDiluted,None,9,1/1/19,Unknown,unit
+JPM,0000019617-20-000257,Diluted EPS,us-gaap:EarningsPerShareDiluted,None,9,1/1/19,Unknown,unit
+JPM,0000019617-21-000236,Diluted EPS,us-gaap:EarningsPerShareDiluted,None,9,1/1/19,Unknown,unit
+JPM,0000019617-21-000236,Diluted EPS,us-gaap:EarningsPerShareDiluted,None,9,1/1/19,Unknown,unit
+JPM,0000019617-19-000054,Diluted EPS,us-gaap:EarningsPerShareDiluted,None,9,1/1/19,Unknown,unit
+JPM,0000019617-19-000054,Diluted EPS,us-gaap:EarningsPerShareDiluted,None,9,1/1/19,Unknown,unit
+JPM,0000019617-19-000054,Effect Of Exchange Rate Changes,us-gaap:EffectOfExchangeRateOnCashAndCashEquivalents,None,-2863000000,1/1/19,Unknown,unit
+JPM,0000019617-20-000257,Goodwill,us-gaap:Goodwill,None,47471000000,1/1/19,Unknown,unit
+JPM,0000019617-20-000257,Goodwill,us-gaap:Goodwill,None,47471000000,1/1/19,Unknown,unit
+JPM,0000019617-20-000257,Goodwill,us-gaap:Goodwill,None,47471000000,1/1/19,Unknown,unit
+JPM,0000019617-21-000236,Goodwill,us-gaap:Goodwill,None,47471000000,1/1/19,Unknown,unit
+JPM,0000019617-21-000236,Goodwill,us-gaap:Goodwill,None,47471000000,1/1/19,Unknown,unit
+JPM,0000019617-21-000236,Goodwill,us-gaap:Goodwill,None,47471000000,1/1/19,Unknown,unit
+JPM,0000019617-22-000272,Goodwill,us-gaap:Goodwill,None,47471000000,1/1/19,Unknown,unit
+JPM,0000019617-19-000054,Goodwill,us-gaap:Goodwill,None,47471000000,1/1/19,Unknown,unit
+JPM,0000019617-19-000054,Goodwill,us-gaap:Goodwill,None,47471000000,1/1/19,Unknown,unit
+JPM,0000019617-20-000257,Tax Provision,us-gaap:IncomeTaxExpenseBenefit,None,8290000000,1/1/19,Unknown,unit
+JPM,0000019617-20-000257,Tax Provision,us-gaap:IncomeTaxExpenseBenefit,None,8290000000,1/1/19,Unknown,unit
+JPM,0000019617-20-000257,Tax Provision,us-gaap:IncomeTaxExpenseBenefit,None,8290000000,1/1/19,Unknown,unit
+JPM,0000019617-21-000236,Tax Provision,us-gaap:IncomeTaxExpenseBenefit,None,8290000000,1/1/19,Unknown,unit
+JPM,0000019617-21-000236,Tax Provision,us-gaap:IncomeTaxExpenseBenefit,None,8290000000,1/1/19,Unknown,unit
+JPM,0000019617-21-000236,Tax Provision,us-gaap:IncomeTaxExpenseBenefit,None,8290000000,1/1/19,Unknown,unit
+JPM,0000019617-19-000054,Tax Provision,us-gaap:IncomeTaxExpenseBenefit,None,8290000000,1/1/19,Unknown,unit
+JPM,0000019617-19-000054,Tax Provision,us-gaap:IncomeTaxExpenseBenefit,None,8290000000,1/1/19,Unknown,unit
+JPM,0000019617-19-000054,Tax Provision,us-gaap:IncomeTaxExpenseBenefit,None,8290000000,1/1/19,Unknown,unit
+JPM,0000019617-20-000257,Total Liabilities Net Minority Interest,us-gaap:Liabilities,None,2.36602E+12,1/1/19,Unknown,unit
+JPM,0000019617-19-000054,Total Liabilities Net Minority Interest,us-gaap:Liabilities,None,2.36602E+12,1/1/19,Unknown,unit
+JPM,0000019617-20-000257,Financing Cash Flow,us-gaap:NetCashProvidedByUsedInFinancingActivities,None,34158000000,1/1/19,Unknown,unit
+JPM,0000019617-21-000236,Financing Cash Flow,us-gaap:NetCashProvidedByUsedInFinancingActivities,None,34158000000,1/1/19,Unknown,unit
+JPM,0000019617-19-000054,Financing Cash Flow,us-gaap:NetCashProvidedByUsedInFinancingActivities,None,34158000000,1/1/19,Unknown,unit
+JPM,0000019617-20-000257,Investing Cash Flow,us-gaap:NetCashProvidedByUsedInInvestingActivities,None,-1.97993E+11,1/1/19,Unknown,unit
+JPM,0000019617-21-000236,Investing Cash Flow,us-gaap:NetCashProvidedByUsedInInvestingActivities,None,-1.9942E+11,1/1/19,Unknown,unit
+JPM,0000019617-19-000054,Investing Cash Flow,us-gaap:NetCashProvidedByUsedInInvestingActivities,None,-1.97993E+11,1/1/19,Unknown,unit
+JPM,0000019617-20-000257,Operating Cash Flow,us-gaap:NetCashProvidedByUsedInOperatingActivities,None,14187000000,1/1/19,Unknown,unit
+JPM,0000019617-20-000257,Free Cash Flow,us-gaap:NetCashProvidedByUsedInOperatingActivities,None,14187000000,1/1/19,Unknown,unit
+JPM,0000019617-21-000236,Operating Cash Flow,us-gaap:NetCashProvidedByUsedInOperatingActivities,None,15614000000,1/1/19,Unknown,unit
+JPM,0000019617-21-000236,Free Cash Flow,us-gaap:NetCashProvidedByUsedInOperatingActivities,None,15614000000,1/1/19,Unknown,unit
+JPM,0000019617-19-000054,Operating Cash Flow,us-gaap:NetCashProvidedByUsedInOperatingActivities,None,14187000000,1/1/19,Unknown,unit
+JPM,0000019617-19-000054,Free Cash Flow,us-gaap:NetCashProvidedByUsedInOperatingActivities,None,14187000000,1/1/19,Unknown,unit
+JPM,0000019617-20-000257,Net Income,us-gaap:NetIncomeLoss,None,32474000000,1/1/19,Unknown,unit
+JPM,0000019617-20-000257,Net Income Including Noncontrolling Interests,us-gaap:NetIncomeLoss,None,32474000000,1/1/19,Unknown,unit
+JPM,0000019617-20-000257,Net Income,us-gaap:NetIncomeLoss,None,32474000000,1/1/19,Unknown,unit
+JPM,0000019617-20-000257,Net Income Including Noncontrolling Interests,us-gaap:NetIncomeLoss,None,32474000000,1/1/19,Unknown,unit
+JPM,0000019617-20-000257,Net Income,us-gaap:NetIncomeLoss,None,32474000000,1/1/19,Unknown,unit
+JPM,0000019617-20-000257,Net Income Including Noncontrolling Interests,us-gaap:NetIncomeLoss,None,32474000000,1/1/19,Unknown,unit
+JPM,0000019617-20-000257,Net Income,us-gaap:NetIncomeLoss,None,32474000000,1/1/19,Unknown,unit
+JPM,0000019617-20-000257,Net Income Including Noncontrolling Interests,us-gaap:NetIncomeLoss,None,32474000000,1/1/19,Unknown,unit
+JPM,0000019617-20-000257,Net Income,us-gaap:NetIncomeLoss,None,32474000000,1/1/19,Unknown,unit
+JPM,0000019617-20-000257,Net Income Including Noncontrolling Interests,us-gaap:NetIncomeLoss,None,32474000000,1/1/19,Unknown,unit
+JPM,0000019617-20-000257,Net Income,us-gaap:NetIncomeLoss,None,32474000000,1/1/19,Unknown,unit
+JPM,0000019617-20-000257,Net Income Including Noncontrolling Interests,us-gaap:NetIncomeLoss,None,32474000000,1/1/19,Unknown,unit
+JPM,0000019617-21-000236,Net Income,us-gaap:NetIncomeLoss,None,32474000000,1/1/19,Unknown,unit
+JPM,0000019617-21-000236,Net Income Including Noncontrolling Interests,us-gaap:NetIncomeLoss,None,32474000000,1/1/19,Unknown,unit
+JPM,0000019617-21-000236,Net Income,us-gaap:NetIncomeLoss,None,32474000000,1/1/19,Unknown,unit
+JPM,0000019617-21-000236,Net Income Including Noncontrolling Interests,us-gaap:NetIncomeLoss,None,32474000000,1/1/19,Unknown,unit
+JPM,0000019617-21-000236,Net Income,us-gaap:NetIncomeLoss,None,32474000000,1/1/19,Unknown,unit
+JPM,0000019617-21-000236,Net Income Including Noncontrolling Interests,us-gaap:NetIncomeLoss,None,32474000000,1/1/19,Unknown,unit
+JPM,0000019617-21-000236,Net Income,us-gaap:NetIncomeLoss,None,32474000000,1/1/19,Unknown,unit
+JPM,0000019617-21-000236,Net Income Including Noncontrolling Interests,us-gaap:NetIncomeLoss,None,32474000000,1/1/19,Unknown,unit
+JPM,0000019617-21-000236,Net Income,us-gaap:NetIncomeLoss,None,32474000000,1/1/19,Unknown,unit
+JPM,0000019617-21-000236,Net Income Including Noncontrolling Interests,us-gaap:NetIncomeLoss,None,32474000000,1/1/19,Unknown,unit
+JPM,0000019617-21-000236,Net Income,us-gaap:NetIncomeLoss,None,32474000000,1/1/19,Unknown,unit
+JPM,0000019617-21-000236,Net Income Including Noncontrolling Interests,us-gaap:NetIncomeLoss,None,32474000000,1/1/19,Unknown,unit
+JPM,0000019617-19-000054,Net Income,us-gaap:NetIncomeLoss,None,32474000000,1/1/19,Unknown,unit
+JPM,0000019617-19-000054,Net Income Including Noncontrolling Interests,us-gaap:NetIncomeLoss,None,32474000000,1/1/19,Unknown,unit
+JPM,0000019617-19-000054,Net Income,us-gaap:NetIncomeLoss,None,32474000000,1/1/19,Unknown,unit
+JPM,0000019617-19-000054,Net Income Including Noncontrolling Interests,us-gaap:NetIncomeLoss,None,32474000000,1/1/19,Unknown,unit
+JPM,0000019617-19-000054,Net Income,us-gaap:NetIncomeLoss,None,32474000000,1/1/19,Unknown,unit
+JPM,0000019617-19-000054,Net Income Including Noncontrolling Interests,us-gaap:NetIncomeLoss,None,32474000000,1/1/19,Unknown,unit
+JPM,0000019617-19-000054,Net Income,us-gaap:NetIncomeLoss,None,32474000000,1/1/19,Unknown,unit
+JPM,0000019617-19-000054,Net Income Including Noncontrolling Interests,us-gaap:NetIncomeLoss,None,32474000000,1/1/19,Unknown,unit
+JPM,0000019617-19-000054,Net Income,us-gaap:NetIncomeLoss,None,32474000000,1/1/19,Unknown,unit
+JPM,0000019617-19-000054,Net Income Including Noncontrolling Interests,us-gaap:NetIncomeLoss,None,32474000000,1/1/19,Unknown,unit
+JPM,0000019617-19-000054,Net Income,us-gaap:NetIncomeLoss,None,32474000000,1/1/19,Unknown,unit
+JPM,0000019617-19-000054,Net Income Including Noncontrolling Interests,us-gaap:NetIncomeLoss,None,32474000000,1/1/19,Unknown,unit
+JPM,0000019617-20-000257,Repurchase Of Capital Stock,us-gaap:PaymentsForRepurchaseOfCommonStock,None,19983000000,1/1/19,Unknown,unit
+JPM,0000019617-21-000236,Repurchase Of Capital Stock,us-gaap:PaymentsForRepurchaseOfCommonStock,None,19983000000,1/1/19,Unknown,unit
+JPM,0000019617-19-000054,Repurchase Of Capital Stock,us-gaap:PaymentsForRepurchaseOfCommonStock,None,19983000000,1/1/19,Unknown,unit
+JPM,0000019617-20-000257,Cash Dividends Paid,us-gaap:PaymentsOfDividends,None,10109000000,1/1/19,Unknown,unit
+JPM,0000019617-21-000236,Cash Dividends Paid,us-gaap:PaymentsOfDividends,None,10109000000,1/1/19,Unknown,unit
+JPM,0000019617-19-000054,Cash Dividends Paid,us-gaap:PaymentsOfDividends,None,10109000000,1/1/19,Unknown,unit
+JPM,0000019617-20-000257,Net PPE,us-gaap:PropertyPlantAndEquipmentNet,None,14934000000,1/1/19,Unknown,unit
+JPM,0000019617-19-000054,Net PPE,us-gaap:PropertyPlantAndEquipmentNet,None,14934000000,1/1/19,Unknown,unit
+JPM,0000019617-20-000257,Total Revenue,us-gaap:Revenues,None,1.09029E+11,1/1/19,Unknown,unit
+JPM,0000019617-21-000236,Total Revenue,us-gaap:Revenues,None,1.08783E+11,1/1/19,Unknown,unit
+JPM,0000019617-19-000054,Total Revenue,us-gaap:Revenues,None,1.09029E+11,1/1/19,Unknown,unit
+JPM,0000019617-20-000257,Share-based compensation,us-gaap:ShareBasedCompensation,None,2322000000,1/1/19,Unknown,unit
+JPM,0000019617-21-000236,Share-based compensation,us-gaap:ShareBasedCompensation,None,2322000000,1/1/19,Unknown,unit
+JPM,0000019617-19-000054,Share-based compensation,us-gaap:ShareBasedCompensation,None,2322000000,1/1/19,Unknown,unit
+JPM,0000019617-20-000257,Common Stock Equity,us-gaap:StockholdersEquity,None,2.56515E+11,1/1/19,Unknown,unit
+JPM,0000019617-20-000257,Stockholders Equity,us-gaap:StockholdersEquity,None,2.56515E+11,1/1/19,Unknown,unit
+JPM,0000019617-20-000257,Common Stock Equity,us-gaap:StockholdersEquity,None,2.56515E+11,1/1/19,Unknown,unit
+JPM,0000019617-20-000257,Stockholders Equity,us-gaap:StockholdersEquity,None,2.56515E+11,1/1/19,Unknown,unit
+JPM,0000019617-21-000236,Common Stock Equity,us-gaap:StockholdersEquity,None,2.56515E+11,1/1/19,Unknown,unit
+JPM,0000019617-21-000236,Stockholders Equity,us-gaap:StockholdersEquity,None,2.56515E+11,1/1/19,Unknown,unit
+JPM,0000019617-19-000054,Common Stock Equity,us-gaap:StockholdersEquity,None,2.56515E+11,1/1/19,Unknown,unit
+JPM,0000019617-19-000054,Stockholders Equity,us-gaap:StockholdersEquity,None,2.56515E+11,1/1/19,Unknown,unit
+JPM,0000019617-19-000054,Common Stock Equity,us-gaap:StockholdersEquity,None,2.56515E+11,1/1/19,Unknown,unit
+JPM,0000019617-19-000054,Stockholders Equity,us-gaap:StockholdersEquity,None,2.56515E+11,1/1/19,Unknown,unit
+JPM,0000019617-20-000257,Basic Average Shares,us-gaap:WeightedAverageNumberOfSharesOutstandingBasic,None,3396400000,1/1/19,Unknown,unit
+JPM,0000019617-20-000257,Basic Average Shares,us-gaap:WeightedAverageNumberOfSharesOutstandingBasic,None,3396400000,1/1/19,Unknown,unit
+JPM,0000019617-20-000257,Basic Average Shares,us-gaap:WeightedAverageNumberOfSharesOutstandingBasic,None,3396400000,1/1/19,Unknown,unit
+JPM,0000019617-21-000236,Basic Average Shares,us-gaap:WeightedAverageNumberOfSharesOutstandingBasic,None,3396400000,1/1/19,Unknown,unit
+JPM,0000019617-21-000236,Basic Average Shares,us-gaap:WeightedAverageNumberOfSharesOutstandingBasic,None,3396400000,1/1/19,Unknown,unit
+JPM,0000019617-21-000236,Basic Average Shares,us-gaap:WeightedAverageNumberOfSharesOutstandingBasic,None,3396400000,1/1/19,Unknown,unit
+JPM,0000019617-19-000054,Basic Average Shares,us-gaap:WeightedAverageNumberOfSharesOutstandingBasic,None,3396400000,1/1/19,Unknown,unit
+JPM,0000019617-19-000054,Basic Average Shares,us-gaap:WeightedAverageNumberOfSharesOutstandingBasic,None,3396400000,1/1/19,Unknown,unit
+JPM,0000019617-19-000054,Basic Average Shares,us-gaap:WeightedAverageNumberOfSharesOutstandingBasic,None,3396400000,1/1/19,Unknown,unit
+JPM,0000019617-20-000257,Total Assets,us-gaap:Assets,None,2.68738E+12,1/1/20,Unknown,unit
+JPM,0000019617-20-000257,Total Assets,us-gaap:Assets,None,2.68738E+12,1/1/20,Unknown,unit
+JPM,0000019617-20-000257,Total Assets,us-gaap:Assets,None,2.68738E+12,1/1/20,Unknown,unit
+JPM,0000019617-21-000236,Total Assets,us-gaap:Assets,None,2.68738E+12,1/1/20,Unknown,unit
+JPM,0000019617-21-000236,Total Assets,us-gaap:Assets,None,2.68738E+12,1/1/20,Unknown,unit
+JPM,0000019617-21-000236,Total Assets,us-gaap:Assets,None,2.68738E+12,1/1/20,Unknown,unit
+JPM,0000019617-22-000272,Total Assets,us-gaap:Assets,None,2.68648E+12,1/1/20,Unknown,unit
+JPM,0000019617-22-000272,Total Assets,us-gaap:Assets,None,2.68648E+12,1/1/20,Unknown,unit
+JPM,0000019617-20-000257,Share Issued,us-gaap:CommonStockSharesIssued,None,4104933895,1/1/20,Unknown,unit
+JPM,0000019617-21-000236,Share Issued,us-gaap:CommonStockSharesIssued,None,4104933895,1/1/20,Unknown,unit
+JPM,0000019617-21-000236,Share Issued,us-gaap:CommonStockSharesIssued,None,4104900000,1/1/20,Unknown,unit
+JPM,0000019617-23-000231,Share Issued,us-gaap:CommonStockSharesIssued,None,4104900000,1/1/20,Unknown,unit
+JPM,0000019617-22-000272,Share Issued,us-gaap:CommonStockSharesIssued,None,4104900000,1/1/20,Unknown,unit
+JPM,0000019617-20-000257,Ordinary Shares Number,us-gaap:CommonStockSharesOutstanding,None,3084000000,1/1/20,Unknown,unit
+JPM,0000019617-21-000236,Ordinary Shares Number,us-gaap:CommonStockSharesOutstanding,None,3084000000,1/1/20,Unknown,unit
+JPM,0000019617-22-000272,Ordinary Shares Number,us-gaap:CommonStockSharesOutstanding,None,3084000000,1/1/20,Unknown,unit
+JPM,0000019617-20-000257,Common Stock,us-gaap:CommonStockValue,None,4105000000,1/1/20,Unknown,unit
+JPM,0000019617-21-000236,Common Stock,us-gaap:CommonStockValue,None,4105000000,1/1/20,Unknown,unit
+JPM,0000019617-20-000257,Deferred Tax,us-gaap:DeferredIncomeTaxExpenseBenefit,None,949000000,1/1/20,Unknown,unit
+JPM,0000019617-20-000257,Deferred Tax,us-gaap:DeferredIncomeTaxExpenseBenefit,None,949000000,1/1/20,Unknown,unit
+JPM,0000019617-21-000236,Deferred Tax,us-gaap:DeferredIncomeTaxExpenseBenefit,None,949000000,1/1/20,Unknown,unit
+JPM,0000019617-21-000236,Deferred Tax,us-gaap:DeferredIncomeTaxExpenseBenefit,None,949000000,1/1/20,Unknown,unit
+JPM,0000019617-22-000272,Deferred Tax,us-gaap:DeferredIncomeTaxExpenseBenefit,None,1270000000,1/1/20,Unknown,unit
+JPM,0000019617-22-000272,Deferred Tax,us-gaap:DeferredIncomeTaxExpenseBenefit,None,1270000000,1/1/20,Unknown,unit
+JPM,0000019617-20-000257,Basic EPS,us-gaap:EarningsPerShareBasic,None,10.75,1/1/20,Unknown,unit
+JPM,0000019617-20-000257,Basic EPS,us-gaap:EarningsPerShareBasic,None,10.75,1/1/20,Unknown,unit
+JPM,0000019617-21-000236,Basic EPS,us-gaap:EarningsPerShareBasic,None,10.75,1/1/20,Unknown,unit
+JPM,0000019617-21-000236,Basic EPS,us-gaap:EarningsPerShareBasic,None,10.75,1/1/20,Unknown,unit
+JPM,0000019617-22-000272,Basic EPS,us-gaap:EarningsPerShareBasic,None,10.75,1/1/20,Unknown,unit
+JPM,0000019617-22-000272,Basic EPS,us-gaap:EarningsPerShareBasic,None,10.75,1/1/20,Unknown,unit
+JPM,0000019617-20-000257,Diluted EPS,us-gaap:EarningsPerShareDiluted,None,10.72,1/1/20,Unknown,unit
+JPM,0000019617-20-000257,Diluted EPS,us-gaap:EarningsPerShareDiluted,None,10.72,1/1/20,Unknown,unit
+JPM,0000019617-21-000236,Diluted EPS,us-gaap:EarningsPerShareDiluted,None,10.72,1/1/20,Unknown,unit
+JPM,0000019617-21-000236,Diluted EPS,us-gaap:EarningsPerShareDiluted,None,10.72,1/1/20,Unknown,unit
+JPM,0000019617-22-000272,Diluted EPS,us-gaap:EarningsPerShareDiluted,None,10.72,1/1/20,Unknown,unit
+JPM,0000019617-22-000272,Diluted EPS,us-gaap:EarningsPerShareDiluted,None,10.72,1/1/20,Unknown,unit
+JPM,0000019617-20-000257,Goodwill,us-gaap:Goodwill,None,47823000000,1/1/20,Unknown,unit
+JPM,0000019617-20-000257,Goodwill,us-gaap:Goodwill,None,47823000000,1/1/20,Unknown,unit
+JPM,0000019617-21-000236,Goodwill,us-gaap:Goodwill,None,47823000000,1/1/20,Unknown,unit
+JPM,0000019617-21-000236,Goodwill,us-gaap:Goodwill,None,47823000000,1/1/20,Unknown,unit
+JPM,0000019617-21-000236,Goodwill,us-gaap:Goodwill,None,47823000000,1/1/20,Unknown,unit
+JPM,0000019617-23-000231,Goodwill,us-gaap:Goodwill,None,47823000000,1/1/20,Unknown,unit
+JPM,0000019617-22-000272,Goodwill,us-gaap:Goodwill,None,47823000000,1/1/20,Unknown,unit
+JPM,0000019617-22-000272,Goodwill,us-gaap:Goodwill,None,47823000000,1/1/20,Unknown,unit
+JPM,0000019617-22-000272,Goodwill,us-gaap:Goodwill,None,47823000000,1/1/20,Unknown,unit
+JPM,0000019617-20-000257,Tax Provision,us-gaap:IncomeTaxExpenseBenefit,None,8114000000,1/1/20,Unknown,unit
+JPM,0000019617-20-000257,Tax Provision,us-gaap:IncomeTaxExpenseBenefit,None,8114000000,1/1/20,Unknown,unit
+JPM,0000019617-20-000257,Tax Provision,us-gaap:IncomeTaxExpenseBenefit,None,8114000000,1/1/20,Unknown,unit
+JPM,0000019617-21-000236,Tax Provision,us-gaap:IncomeTaxExpenseBenefit,None,8114000000,1/1/20,Unknown,unit
+JPM,0000019617-21-000236,Tax Provision,us-gaap:IncomeTaxExpenseBenefit,None,8114000000,1/1/20,Unknown,unit
+JPM,0000019617-21-000236,Tax Provision,us-gaap:IncomeTaxExpenseBenefit,None,8114000000,1/1/20,Unknown,unit
+JPM,0000019617-22-000272,Tax Provision,us-gaap:IncomeTaxExpenseBenefit,None,8435000000,1/1/20,Unknown,unit
+JPM,0000019617-22-000272,Tax Provision,us-gaap:IncomeTaxExpenseBenefit,None,8435000000,1/1/20,Unknown,unit
+JPM,0000019617-22-000272,Tax Provision,us-gaap:IncomeTaxExpenseBenefit,None,8435000000,1/1/20,Unknown,unit
+JPM,0000019617-20-000257,Total Liabilities Net Minority Interest,us-gaap:Liabilities,None,2.42605E+12,1/1/20,Unknown,unit
+JPM,0000019617-21-000236,Total Liabilities Net Minority Interest,us-gaap:Liabilities,None,2.42605E+12,1/1/20,Unknown,unit
+JPM,0000019617-20-000257,Financing Cash Flow,us-gaap:NetCashProvidedByUsedInFinancingActivities,None,32987000000,1/1/20,Unknown,unit
+JPM,0000019617-21-000236,Financing Cash Flow,us-gaap:NetCashProvidedByUsedInFinancingActivities,None,32987000000,1/1/20,Unknown,unit
+JPM,0000019617-22-000272,Financing Cash Flow,us-gaap:NetCashProvidedByUsedInFinancingActivities,None,32987000000,1/1/20,Unknown,unit
+JPM,0000019617-20-000257,Investing Cash Flow,us-gaap:NetCashProvidedByUsedInInvestingActivities,None,-54013000000,1/1/20,Unknown,unit
+JPM,0000019617-21-000236,Investing Cash Flow,us-gaap:NetCashProvidedByUsedInInvestingActivities,None,-52059000000,1/1/20,Unknown,unit
+JPM,0000019617-22-000272,Investing Cash Flow,us-gaap:NetCashProvidedByUsedInInvestingActivities,None,-52059000000,1/1/20,Unknown,unit
+JPM,0000019617-20-000257,Operating Cash Flow,us-gaap:NetCashProvidedByUsedInOperatingActivities,None,6046000000,1/1/20,Unknown,unit
+JPM,0000019617-20-000257,Free Cash Flow,us-gaap:NetCashProvidedByUsedInOperatingActivities,None,6046000000,1/1/20,Unknown,unit
+JPM,0000019617-21-000236,Operating Cash Flow,us-gaap:NetCashProvidedByUsedInOperatingActivities,None,4092000000,1/1/20,Unknown,unit
+JPM,0000019617-21-000236,Free Cash Flow,us-gaap:NetCashProvidedByUsedInOperatingActivities,None,4092000000,1/1/20,Unknown,unit
+JPM,0000019617-22-000272,Operating Cash Flow,us-gaap:NetCashProvidedByUsedInOperatingActivities,None,4092000000,1/1/20,Unknown,unit
+JPM,0000019617-22-000272,Free Cash Flow,us-gaap:NetCashProvidedByUsedInOperatingActivities,None,4092000000,1/1/20,Unknown,unit
+JPM,0000019617-20-000257,Net Income,us-gaap:NetIncomeLoss,None,36431000000,1/1/20,Unknown,unit
+JPM,0000019617-20-000257,Net Income Including Noncontrolling Interests,us-gaap:NetIncomeLoss,None,36431000000,1/1/20,Unknown,unit
+JPM,0000019617-20-000257,Net Income,us-gaap:NetIncomeLoss,None,36431000000,1/1/20,Unknown,unit
+JPM,0000019617-20-000257,Net Income Including Noncontrolling Interests,us-gaap:NetIncomeLoss,None,36431000000,1/1/20,Unknown,unit
+JPM,0000019617-20-000257,Net Income,us-gaap:NetIncomeLoss,None,36431000000,1/1/20,Unknown,unit
+JPM,0000019617-20-000257,Net Income Including Noncontrolling Interests,us-gaap:NetIncomeLoss,None,36431000000,1/1/20,Unknown,unit
+JPM,0000019617-20-000257,Net Income,us-gaap:NetIncomeLoss,None,36431000000,1/1/20,Unknown,unit
+JPM,0000019617-20-000257,Net Income Including Noncontrolling Interests,us-gaap:NetIncomeLoss,None,36431000000,1/1/20,Unknown,unit
+JPM,0000019617-20-000257,Net Income,us-gaap:NetIncomeLoss,None,36431000000,1/1/20,Unknown,unit
+JPM,0000019617-20-000257,Net Income Including Noncontrolling Interests,us-gaap:NetIncomeLoss,None,36431000000,1/1/20,Unknown,unit
+JPM,0000019617-20-000257,Net Income,us-gaap:NetIncomeLoss,None,36431000000,1/1/20,Unknown,unit
+JPM,0000019617-20-000257,Net Income Including Noncontrolling Interests,us-gaap:NetIncomeLoss,None,36431000000,1/1/20,Unknown,unit
+JPM,0000019617-21-000236,Net Income,us-gaap:NetIncomeLoss,None,36431000000,1/1/20,Unknown,unit
+JPM,0000019617-21-000236,Net Income Including Noncontrolling Interests,us-gaap:NetIncomeLoss,None,36431000000,1/1/20,Unknown,unit
+JPM,0000019617-21-000236,Net Income,us-gaap:NetIncomeLoss,None,36431000000,1/1/20,Unknown,unit
+JPM,0000019617-21-000236,Net Income Including Noncontrolling Interests,us-gaap:NetIncomeLoss,None,36431000000,1/1/20,Unknown,unit
+JPM,0000019617-21-000236,Net Income,us-gaap:NetIncomeLoss,None,36431000000,1/1/20,Unknown,unit
+JPM,0000019617-21-000236,Net Income Including Noncontrolling Interests,us-gaap:NetIncomeLoss,None,36431000000,1/1/20,Unknown,unit
+JPM,0000019617-21-000236,Net Income,us-gaap:NetIncomeLoss,None,36431000000,1/1/20,Unknown,unit
+JPM,0000019617-21-000236,Net Income Including Noncontrolling Interests,us-gaap:NetIncomeLoss,None,36431000000,1/1/20,Unknown,unit
+JPM,0000019617-21-000236,Net Income,us-gaap:NetIncomeLoss,None,36431000000,1/1/20,Unknown,unit
+JPM,0000019617-21-000236,Net Income Including Noncontrolling Interests,us-gaap:NetIncomeLoss,None,36431000000,1/1/20,Unknown,unit
+JPM,0000019617-21-000236,Net Income,us-gaap:NetIncomeLoss,None,36431000000,1/1/20,Unknown,unit
+JPM,0000019617-21-000236,Net Income Including Noncontrolling Interests,us-gaap:NetIncomeLoss,None,36431000000,1/1/20,Unknown,unit
+JPM,0000019617-22-000272,Net Income,us-gaap:NetIncomeLoss,None,36431000000,1/1/20,Unknown,unit
+JPM,0000019617-22-000272,Net Income Including Noncontrolling Interests,us-gaap:NetIncomeLoss,None,36431000000,1/1/20,Unknown,unit
+JPM,0000019617-22-000272,Net Income,us-gaap:NetIncomeLoss,None,36431000000,1/1/20,Unknown,unit
+JPM,0000019617-22-000272,Net Income Including Noncontrolling Interests,us-gaap:NetIncomeLoss,None,36431000000,1/1/20,Unknown,unit
+JPM,0000019617-22-000272,Net Income,us-gaap:NetIncomeLoss,None,36431000000,1/1/20,Unknown,unit
+JPM,0000019617-22-000272,Net Income Including Noncontrolling Interests,us-gaap:NetIncomeLoss,None,36431000000,1/1/20,Unknown,unit
+JPM,0000019617-22-000272,Net Income,us-gaap:NetIncomeLoss,None,36431000000,1/1/20,Unknown,unit
+JPM,0000019617-22-000272,Net Income Including Noncontrolling Interests,us-gaap:NetIncomeLoss,None,36431000000,1/1/20,Unknown,unit
+JPM,0000019617-22-000272,Net Income,us-gaap:NetIncomeLoss,None,36431000000,1/1/20,Unknown,unit
+JPM,0000019617-22-000272,Net Income Including Noncontrolling Interests,us-gaap:NetIncomeLoss,None,36431000000,1/1/20,Unknown,unit
+JPM,0000019617-22-000272,Net Income,us-gaap:NetIncomeLoss,None,36431000000,1/1/20,Unknown,unit
+JPM,0000019617-22-000272,Net Income Including Noncontrolling Interests,us-gaap:NetIncomeLoss,None,36431000000,1/1/20,Unknown,unit
+JPM,0000019617-20-000257,Repurchase Of Capital Stock,us-gaap:PaymentsForRepurchaseOfCommonStock,None,24001000000,1/1/20,Unknown,unit
+JPM,0000019617-21-000236,Repurchase Of Capital Stock,us-gaap:PaymentsForRepurchaseOfCommonStock,None,24001000000,1/1/20,Unknown,unit
+JPM,0000019617-22-000272,Repurchase Of Capital Stock,us-gaap:PaymentsForRepurchaseOfCommonStock,None,24001000000,1/1/20,Unknown,unit
+JPM,0000019617-20-000257,Cash Dividends Paid,us-gaap:PaymentsOfDividends,None,12343000000,1/1/20,Unknown,unit
+JPM,0000019617-21-000236,Cash Dividends Paid,us-gaap:PaymentsOfDividends,None,12343000000,1/1/20,Unknown,unit
+JPM,0000019617-22-000272,Cash Dividends Paid,us-gaap:PaymentsOfDividends,None,12343000000,1/1/20,Unknown,unit
+JPM,0000019617-20-000257,Net PPE,us-gaap:PropertyPlantAndEquipmentNet,None,25813000000,1/1/20,Unknown,unit
+JPM,0000019617-21-000236,Net PPE,us-gaap:PropertyPlantAndEquipmentNet,None,25813000000,1/1/20,Unknown,unit
+JPM,0000019617-20-000257,Total Revenue,us-gaap:Revenues,None,1.15627E+11,1/1/20,Unknown,unit
+JPM,0000019617-21-000236,Total Revenue,us-gaap:Revenues,None,1.15399E+11,1/1/20,Unknown,unit
+JPM,0000019617-22-000272,Total Revenue,us-gaap:Revenues,None,1.1572E+11,1/1/20,Unknown,unit
+JPM,0000019617-20-000257,Share-based compensation,us-gaap:ShareBasedCompensation,None,2256000000,1/1/20,Unknown,unit
+JPM,0000019617-21-000236,Share-based compensation,us-gaap:ShareBasedCompensation,None,2256000000,1/1/20,Unknown,unit
+JPM,0000019617-22-000272,Share-based compensation,us-gaap:ShareBasedCompensation,None,2256000000,1/1/20,Unknown,unit
+JPM,0000019617-20-000257,Common Stock Equity,us-gaap:StockholdersEquity,None,2.6133E+11,1/1/20,Unknown,unit
+JPM,0000019617-20-000257,Stockholders Equity,us-gaap:StockholdersEquity,None,2.6133E+11,1/1/20,Unknown,unit
+JPM,0000019617-20-000257,Common Stock Equity,us-gaap:StockholdersEquity,None,2.6133E+11,1/1/20,Unknown,unit
+JPM,0000019617-20-000257,Stockholders Equity,us-gaap:StockholdersEquity,None,2.6133E+11,1/1/20,Unknown,unit
+JPM,0000019617-21-000236,Common Stock Equity,us-gaap:StockholdersEquity,None,2.6133E+11,1/1/20,Unknown,unit
+JPM,0000019617-21-000236,Stockholders Equity,us-gaap:StockholdersEquity,None,2.6133E+11,1/1/20,Unknown,unit
+JPM,0000019617-21-000236,Common Stock Equity,us-gaap:StockholdersEquity,None,2.6133E+11,1/1/20,Unknown,unit
+JPM,0000019617-21-000236,Stockholders Equity,us-gaap:StockholdersEquity,None,2.6133E+11,1/1/20,Unknown,unit
+JPM,0000019617-22-000272,Common Stock Equity,us-gaap:StockholdersEquity,None,2.6133E+11,1/1/20,Unknown,unit
+JPM,0000019617-22-000272,Stockholders Equity,us-gaap:StockholdersEquity,None,2.6133E+11,1/1/20,Unknown,unit
+JPM,0000019617-20-000257,Basic Average Shares,us-gaap:WeightedAverageNumberOfSharesOutstandingBasic,None,3221500000,1/1/20,Unknown,unit
+JPM,0000019617-20-000257,Basic Average Shares,us-gaap:WeightedAverageNumberOfSharesOutstandingBasic,None,3221500000,1/1/20,Unknown,unit
+JPM,0000019617-20-000257,Basic Average Shares,us-gaap:WeightedAverageNumberOfSharesOutstandingBasic,None,3221500000,1/1/20,Unknown,unit
+JPM,0000019617-21-000236,Basic Average Shares,us-gaap:WeightedAverageNumberOfSharesOutstandingBasic,None,3221500000,1/1/20,Unknown,unit
+JPM,0000019617-21-000236,Basic Average Shares,us-gaap:WeightedAverageNumberOfSharesOutstandingBasic,None,3221500000,1/1/20,Unknown,unit
+JPM,0000019617-21-000236,Basic Average Shares,us-gaap:WeightedAverageNumberOfSharesOutstandingBasic,None,3221500000,1/1/20,Unknown,unit
+JPM,0000019617-22-000272,Basic Average Shares,us-gaap:WeightedAverageNumberOfSharesOutstandingBasic,None,3221500000,1/1/20,Unknown,unit
+JPM,0000019617-22-000272,Basic Average Shares,us-gaap:WeightedAverageNumberOfSharesOutstandingBasic,None,3221500000,1/1/20,Unknown,unit
+JPM,0000019617-22-000272,Basic Average Shares,us-gaap:WeightedAverageNumberOfSharesOutstandingBasic,None,3221500000,1/1/20,Unknown,unit
+JPM,0000019617-21-000236,Total Assets,us-gaap:Assets,None,3.38607E+12,1/1/21,Unknown,unit
+JPM,0000019617-21-000236,Total Assets,us-gaap:Assets,None,3.38607E+12,1/1/21,Unknown,unit
+JPM,0000019617-21-000236,Total Assets,us-gaap:Assets,None,3.38607E+12,1/1/21,Unknown,unit
+JPM,0000019617-23-000231,Total Assets,us-gaap:Assets,None,3.38476E+12,1/1/21,Unknown,unit
+JPM,0000019617-23-000231,Total Assets,us-gaap:Assets,None,3.38476E+12,1/1/21,Unknown,unit
+JPM,0000019617-22-000272,Total Assets,us-gaap:Assets,None,3.38476E+12,1/1/21,Unknown,unit
+JPM,0000019617-22-000272,Total Assets,us-gaap:Assets,None,3.38476E+12,1/1/21,Unknown,unit
+JPM,0000019617-22-000272,Total Assets,us-gaap:Assets,None,3.38476E+12,1/1/21,Unknown,unit
+JPM,0000019617-21-000236,Share Issued,us-gaap:CommonStockSharesIssued,None,4104933895,1/1/21,Unknown,unit
+JPM,0000019617-23-000231,Share Issued,us-gaap:CommonStockSharesIssued,None,4104900000,1/1/21,Unknown,unit
+JPM,0000019617-22-000272,Share Issued,us-gaap:CommonStockSharesIssued,None,4104933895,1/1/21,Unknown,unit
+JPM,0000019617-22-000272,Share Issued,us-gaap:CommonStockSharesIssued,None,4104900000,1/1/21,Unknown,unit
+JPM,0000019617-24-000225,Share Issued,us-gaap:CommonStockSharesIssued,None,4104900000,1/1/21,Unknown,unit
+JPM,0000019617-21-000236,Ordinary Shares Number,us-gaap:CommonStockSharesOutstanding,None,3049400000,1/1/21,Unknown,unit
+JPM,0000019617-23-000231,Ordinary Shares Number,us-gaap:CommonStockSharesOutstanding,None,3049400000,1/1/21,Unknown,unit
+JPM,0000019617-22-000272,Ordinary Shares Number,us-gaap:CommonStockSharesOutstanding,None,3049400000,1/1/21,Unknown,unit
+JPM,0000019617-21-000236,Common Stock,us-gaap:CommonStockValue,None,4105000000,1/1/21,Unknown,unit
+JPM,0000019617-22-000272,Common Stock,us-gaap:CommonStockValue,None,4105000000,1/1/21,Unknown,unit
+JPM,0000019617-21-000236,Deferred Tax,us-gaap:DeferredIncomeTaxExpenseBenefit,None,-3981000000,1/1/21,Unknown,unit
+JPM,0000019617-21-000236,Deferred Tax,us-gaap:DeferredIncomeTaxExpenseBenefit,None,-3981000000,1/1/21,Unknown,unit
+JPM,0000019617-23-000231,Deferred Tax,us-gaap:DeferredIncomeTaxExpenseBenefit,None,-3573000000,1/1/21,Unknown,unit
+JPM,0000019617-23-000231,Deferred Tax,us-gaap:DeferredIncomeTaxExpenseBenefit,None,-3573000000,1/1/21,Unknown,unit
+JPM,0000019617-22-000272,Deferred Tax,us-gaap:DeferredIncomeTaxExpenseBenefit,None,-3573000000,1/1/21,Unknown,unit
+JPM,0000019617-22-000272,Deferred Tax,us-gaap:DeferredIncomeTaxExpenseBenefit,None,-3573000000,1/1/21,Unknown,unit
+JPM,0000019617-21-000236,Basic EPS,us-gaap:EarningsPerShareBasic,None,8.89,1/1/21,Unknown,unit
+JPM,0000019617-21-000236,Basic EPS,us-gaap:EarningsPerShareBasic,None,8.89,1/1/21,Unknown,unit
+JPM,0000019617-23-000231,Basic EPS,us-gaap:EarningsPerShareBasic,None,8.89,1/1/21,Unknown,unit
+JPM,0000019617-23-000231,Basic EPS,us-gaap:EarningsPerShareBasic,None,8.89,1/1/21,Unknown,unit
+JPM,0000019617-22-000272,Basic EPS,us-gaap:EarningsPerShareBasic,None,8.89,1/1/21,Unknown,unit
+JPM,0000019617-22-000272,Basic EPS,us-gaap:EarningsPerShareBasic,None,8.89,1/1/21,Unknown,unit
+JPM,0000019617-21-000236,Diluted EPS,us-gaap:EarningsPerShareDiluted,None,8.88,1/1/21,Unknown,unit
+JPM,0000019617-21-000236,Diluted EPS,us-gaap:EarningsPerShareDiluted,None,8.88,1/1/21,Unknown,unit
+JPM,0000019617-23-000231,Diluted EPS,us-gaap:EarningsPerShareDiluted,None,8.88,1/1/21,Unknown,unit
+JPM,0000019617-23-000231,Diluted EPS,us-gaap:EarningsPerShareDiluted,None,8.88,1/1/21,Unknown,unit
+JPM,0000019617-22-000272,Diluted EPS,us-gaap:EarningsPerShareDiluted,None,8.88,1/1/21,Unknown,unit
+JPM,0000019617-22-000272,Diluted EPS,us-gaap:EarningsPerShareDiluted,None,8.88,1/1/21,Unknown,unit
+JPM,0000019617-21-000236,Goodwill,us-gaap:Goodwill,None,49248000000,1/1/21,Unknown,unit
+JPM,0000019617-21-000236,Goodwill,us-gaap:Goodwill,None,49248000000,1/1/21,Unknown,unit
+JPM,0000019617-23-000231,Goodwill,us-gaap:Goodwill,None,49248000000,1/1/21,Unknown,unit
+JPM,0000019617-23-000231,Goodwill,us-gaap:Goodwill,None,49248000000,1/1/21,Unknown,unit
+JPM,0000019617-23-000231,Goodwill,us-gaap:Goodwill,None,49248000000,1/1/21,Unknown,unit
+JPM,0000019617-22-000272,Goodwill,us-gaap:Goodwill,None,49248000000,1/1/21,Unknown,unit
+JPM,0000019617-22-000272,Goodwill,us-gaap:Goodwill,None,49248000000,1/1/21,Unknown,unit
+JPM,0000019617-22-000272,Goodwill,us-gaap:Goodwill,None,49248000000,1/1/21,Unknown,unit
+JPM,0000019617-24-000225,Goodwill,us-gaap:Goodwill,None,49248000000,1/1/21,Unknown,unit
+JPM,0000019617-21-000236,Tax Provision,us-gaap:IncomeTaxExpenseBenefit,None,6276000000,1/1/21,Unknown,unit
+JPM,0000019617-21-000236,Tax Provision,us-gaap:IncomeTaxExpenseBenefit,None,6276000000,1/1/21,Unknown,unit
+JPM,0000019617-21-000236,Tax Provision,us-gaap:IncomeTaxExpenseBenefit,None,6276000000,1/1/21,Unknown,unit
+JPM,0000019617-23-000231,Tax Provision,us-gaap:IncomeTaxExpenseBenefit,None,6684000000,1/1/21,Unknown,unit
+JPM,0000019617-23-000231,Tax Provision,us-gaap:IncomeTaxExpenseBenefit,None,6684000000,1/1/21,Unknown,unit
+JPM,0000019617-23-000231,Tax Provision,us-gaap:IncomeTaxExpenseBenefit,None,6684000000,1/1/21,Unknown,unit
+JPM,0000019617-22-000272,Tax Provision,us-gaap:IncomeTaxExpenseBenefit,None,6684000000,1/1/21,Unknown,unit
+JPM,0000019617-22-000272,Tax Provision,us-gaap:IncomeTaxExpenseBenefit,None,6684000000,1/1/21,Unknown,unit
+JPM,0000019617-22-000272,Tax Provision,us-gaap:IncomeTaxExpenseBenefit,None,6684000000,1/1/21,Unknown,unit
+JPM,0000019617-21-000236,Total Liabilities Net Minority Interest,us-gaap:Liabilities,None,3.10672E+12,1/1/21,Unknown,unit
+JPM,0000019617-22-000272,Total Liabilities Net Minority Interest,us-gaap:Liabilities,None,3.1054E+12,1/1/21,Unknown,unit
+JPM,0000019617-21-000236,Financing Cash Flow,us-gaap:NetCashProvidedByUsedInFinancingActivities,None,5.96645E+11,1/1/21,Unknown,unit
+JPM,0000019617-23-000231,Financing Cash Flow,us-gaap:NetCashProvidedByUsedInFinancingActivities,None,5.96645E+11,1/1/21,Unknown,unit
+JPM,0000019617-22-000272,Financing Cash Flow,us-gaap:NetCashProvidedByUsedInFinancingActivities,None,5.96645E+11,1/1/21,Unknown,unit
+JPM,0000019617-21-000236,Investing Cash Flow,us-gaap:NetCashProvidedByUsedInInvestingActivities,None,-2.61912E+11,1/1/21,Unknown,unit
+JPM,0000019617-23-000231,Investing Cash Flow,us-gaap:NetCashProvidedByUsedInInvestingActivities,None,-2.61912E+11,1/1/21,Unknown,unit
+JPM,0000019617-22-000272,Investing Cash Flow,us-gaap:NetCashProvidedByUsedInInvestingActivities,None,-2.61912E+11,1/1/21,Unknown,unit
+JPM,0000019617-21-000236,Operating Cash Flow,us-gaap:NetCashProvidedByUsedInOperatingActivities,None,-79910000000,1/1/21,Unknown,unit
+JPM,0000019617-21-000236,Free Cash Flow,us-gaap:NetCashProvidedByUsedInOperatingActivities,None,-79910000000,1/1/21,Unknown,unit
+JPM,0000019617-23-000231,Operating Cash Flow,us-gaap:NetCashProvidedByUsedInOperatingActivities,None,-79910000000,1/1/21,Unknown,unit
+JPM,0000019617-23-000231,Free Cash Flow,us-gaap:NetCashProvidedByUsedInOperatingActivities,None,-79910000000,1/1/21,Unknown,unit
+JPM,0000019617-22-000272,Operating Cash Flow,us-gaap:NetCashProvidedByUsedInOperatingActivities,None,-79910000000,1/1/21,Unknown,unit
+JPM,0000019617-22-000272,Free Cash Flow,us-gaap:NetCashProvidedByUsedInOperatingActivities,None,-79910000000,1/1/21,Unknown,unit
+JPM,0000019617-21-000236,Net Income,us-gaap:NetIncomeLoss,None,29131000000,1/1/21,Unknown,unit
+JPM,0000019617-21-000236,Net Income Including Noncontrolling Interests,us-gaap:NetIncomeLoss,None,29131000000,1/1/21,Unknown,unit
+JPM,0000019617-21-000236,Net Income,us-gaap:NetIncomeLoss,None,29131000000,1/1/21,Unknown,unit
+JPM,0000019617-21-000236,Net Income Including Noncontrolling Interests,us-gaap:NetIncomeLoss,None,29131000000,1/1/21,Unknown,unit
+JPM,0000019617-21-000236,Net Income,us-gaap:NetIncomeLoss,None,29131000000,1/1/21,Unknown,unit
+JPM,0000019617-21-000236,Net Income Including Noncontrolling Interests,us-gaap:NetIncomeLoss,None,29131000000,1/1/21,Unknown,unit
+JPM,0000019617-21-000236,Net Income,us-gaap:NetIncomeLoss,None,29131000000,1/1/21,Unknown,unit
+JPM,0000019617-21-000236,Net Income Including Noncontrolling Interests,us-gaap:NetIncomeLoss,None,29131000000,1/1/21,Unknown,unit
+JPM,0000019617-21-000236,Net Income,us-gaap:NetIncomeLoss,None,29131000000,1/1/21,Unknown,unit
+JPM,0000019617-21-000236,Net Income Including Noncontrolling Interests,us-gaap:NetIncomeLoss,None,29131000000,1/1/21,Unknown,unit
+JPM,0000019617-21-000236,Net Income,us-gaap:NetIncomeLoss,None,29131000000,1/1/21,Unknown,unit
+JPM,0000019617-21-000236,Net Income Including Noncontrolling Interests,us-gaap:NetIncomeLoss,None,29131000000,1/1/21,Unknown,unit
+JPM,0000019617-21-000236,Net Income,us-gaap:NetIncomeLoss,None,29131000000,1/1/21,Unknown,unit
+JPM,0000019617-21-000236,Net Income Including Noncontrolling Interests,us-gaap:NetIncomeLoss,None,29131000000,1/1/21,Unknown,unit
+JPM,0000019617-21-000236,Net Income,us-gaap:NetIncomeLoss,None,29131000000,1/1/21,Unknown,unit
+JPM,0000019617-21-000236,Net Income Including Noncontrolling Interests,us-gaap:NetIncomeLoss,None,29131000000,1/1/21,Unknown,unit
+JPM,0000019617-23-000231,Net Income,us-gaap:NetIncomeLoss,None,29131000000,1/1/21,Unknown,unit
+JPM,0000019617-23-000231,Net Income Including Noncontrolling Interests,us-gaap:NetIncomeLoss,None,29131000000,1/1/21,Unknown,unit
+JPM,0000019617-23-000231,Net Income,us-gaap:NetIncomeLoss,None,29131000000,1/1/21,Unknown,unit
+JPM,0000019617-23-000231,Net Income Including Noncontrolling Interests,us-gaap:NetIncomeLoss,None,29131000000,1/1/21,Unknown,unit
+JPM,0000019617-23-000231,Net Income,us-gaap:NetIncomeLoss,None,29131000000,1/1/21,Unknown,unit
+JPM,0000019617-23-000231,Net Income Including Noncontrolling Interests,us-gaap:NetIncomeLoss,None,29131000000,1/1/21,Unknown,unit
+JPM,0000019617-23-000231,Net Income,us-gaap:NetIncomeLoss,None,29131000000,1/1/21,Unknown,unit
+JPM,0000019617-23-000231,Net Income Including Noncontrolling Interests,us-gaap:NetIncomeLoss,None,29131000000,1/1/21,Unknown,unit
+JPM,0000019617-23-000231,Net Income,us-gaap:NetIncomeLoss,None,29131000000,1/1/21,Unknown,unit
+JPM,0000019617-23-000231,Net Income Including Noncontrolling Interests,us-gaap:NetIncomeLoss,None,29131000000,1/1/21,Unknown,unit
+JPM,0000019617-23-000231,Net Income,us-gaap:NetIncomeLoss,None,29131000000,1/1/21,Unknown,unit
+JPM,0000019617-23-000231,Net Income Including Noncontrolling Interests,us-gaap:NetIncomeLoss,None,29131000000,1/1/21,Unknown,unit
+JPM,0000019617-22-000272,Net Income,us-gaap:NetIncomeLoss,None,29131000000,1/1/21,Unknown,unit
+JPM,0000019617-22-000272,Net Income Including Noncontrolling Interests,us-gaap:NetIncomeLoss,None,29131000000,1/1/21,Unknown,unit
+JPM,0000019617-22-000272,Net Income,us-gaap:NetIncomeLoss,None,29131000000,1/1/21,Unknown,unit
+JPM,0000019617-22-000272,Net Income Including Noncontrolling Interests,us-gaap:NetIncomeLoss,None,29131000000,1/1/21,Unknown,unit
+JPM,0000019617-22-000272,Net Income,us-gaap:NetIncomeLoss,None,29131000000,1/1/21,Unknown,unit
+JPM,0000019617-22-000272,Net Income Including Noncontrolling Interests,us-gaap:NetIncomeLoss,None,29131000000,1/1/21,Unknown,unit
+JPM,0000019617-22-000272,Net Income,us-gaap:NetIncomeLoss,None,29131000000,1/1/21,Unknown,unit
+JPM,0000019617-22-000272,Net Income Including Noncontrolling Interests,us-gaap:NetIncomeLoss,None,29131000000,1/1/21,Unknown,unit
+JPM,0000019617-22-000272,Net Income,us-gaap:NetIncomeLoss,None,29131000000,1/1/21,Unknown,unit
+JPM,0000019617-22-000272,Net Income Including Noncontrolling Interests,us-gaap:NetIncomeLoss,None,29131000000,1/1/21,Unknown,unit
+JPM,0000019617-22-000272,Net Income,us-gaap:NetIncomeLoss,None,29131000000,1/1/21,Unknown,unit
+JPM,0000019617-22-000272,Net Income Including Noncontrolling Interests,us-gaap:NetIncomeLoss,None,29131000000,1/1/21,Unknown,unit
+JPM,0000019617-21-000236,Repurchase Of Capital Stock,us-gaap:PaymentsForRepurchaseOfCommonStock,None,6517000000,1/1/21,Unknown,unit
+JPM,0000019617-23-000231,Repurchase Of Capital Stock,us-gaap:PaymentsForRepurchaseOfCommonStock,None,6517000000,1/1/21,Unknown,unit
+JPM,0000019617-22-000272,Repurchase Of Capital Stock,us-gaap:PaymentsForRepurchaseOfCommonStock,None,6517000000,1/1/21,Unknown,unit
+JPM,0000019617-21-000236,Cash Dividends Paid,us-gaap:PaymentsOfDividends,None,12690000000,1/1/21,Unknown,unit
+JPM,0000019617-23-000231,Cash Dividends Paid,us-gaap:PaymentsOfDividends,None,12690000000,1/1/21,Unknown,unit
+JPM,0000019617-22-000272,Cash Dividends Paid,us-gaap:PaymentsOfDividends,None,12690000000,1/1/21,Unknown,unit
+JPM,0000019617-21-000236,Net PPE,us-gaap:PropertyPlantAndEquipmentNet,None,27109000000,1/1/21,Unknown,unit
+JPM,0000019617-22-000272,Net PPE,us-gaap:PropertyPlantAndEquipmentNet,None,27109000000,1/1/21,Unknown,unit
+JPM,0000019617-21-000236,Total Revenue,us-gaap:Revenues,None,1.19543E+11,1/1/21,Unknown,unit
+JPM,0000019617-23-000231,Total Revenue,us-gaap:Revenues,None,1.19951E+11,1/1/21,Unknown,unit
+JPM,0000019617-22-000272,Total Revenue,us-gaap:Revenues,None,1.19951E+11,1/1/21,Unknown,unit
+JPM,0000019617-21-000236,Share-based compensation,us-gaap:ShareBasedCompensation,None,2451000000,1/1/21,Unknown,unit
+JPM,0000019617-23-000231,Share-based compensation,us-gaap:ShareBasedCompensation,None,2451000000,1/1/21,Unknown,unit
+JPM,0000019617-22-000272,Share-based compensation,us-gaap:ShareBasedCompensation,None,2451000000,1/1/21,Unknown,unit
+JPM,0000019617-21-000236,Common Stock Equity,us-gaap:StockholdersEquity,None,2.79354E+11,1/1/21,Unknown,unit
+JPM,0000019617-21-000236,Stockholders Equity,us-gaap:StockholdersEquity,None,2.79354E+11,1/1/21,Unknown,unit
+JPM,0000019617-21-000236,Common Stock Equity,us-gaap:StockholdersEquity,None,2.79354E+11,1/1/21,Unknown,unit
+JPM,0000019617-21-000236,Stockholders Equity,us-gaap:StockholdersEquity,None,2.79354E+11,1/1/21,Unknown,unit
+JPM,0000019617-23-000231,Common Stock Equity,us-gaap:StockholdersEquity,None,2.79354E+11,1/1/21,Unknown,unit
+JPM,0000019617-23-000231,Stockholders Equity,us-gaap:StockholdersEquity,None,2.79354E+11,1/1/21,Unknown,unit
+JPM,0000019617-22-000272,Common Stock Equity,us-gaap:StockholdersEquity,None,2.79354E+11,1/1/21,Unknown,unit
+JPM,0000019617-22-000272,Stockholders Equity,us-gaap:StockholdersEquity,None,2.79354E+11,1/1/21,Unknown,unit
+JPM,0000019617-22-000272,Common Stock Equity,us-gaap:StockholdersEquity,None,2.79354E+11,1/1/21,Unknown,unit
+JPM,0000019617-22-000272,Stockholders Equity,us-gaap:StockholdersEquity,None,2.79354E+11,1/1/21,Unknown,unit
+JPM,0000019617-21-000236,Basic Average Shares,us-gaap:WeightedAverageNumberOfSharesOutstandingBasic,None,3082400000,1/1/21,Unknown,unit
+JPM,0000019617-21-000236,Basic Average Shares,us-gaap:WeightedAverageNumberOfSharesOutstandingBasic,None,3082400000,1/1/21,Unknown,unit
+JPM,0000019617-21-000236,Basic Average Shares,us-gaap:WeightedAverageNumberOfSharesOutstandingBasic,None,3082400000,1/1/21,Unknown,unit
+JPM,0000019617-23-000231,Basic Average Shares,us-gaap:WeightedAverageNumberOfSharesOutstandingBasic,None,3082400000,1/1/21,Unknown,unit
+JPM,0000019617-23-000231,Basic Average Shares,us-gaap:WeightedAverageNumberOfSharesOutstandingBasic,None,3082400000,1/1/21,Unknown,unit
+JPM,0000019617-23-000231,Basic Average Shares,us-gaap:WeightedAverageNumberOfSharesOutstandingBasic,None,3082400000,1/1/21,Unknown,unit
+JPM,0000019617-22-000272,Basic Average Shares,us-gaap:WeightedAverageNumberOfSharesOutstandingBasic,None,3082400000,1/1/21,Unknown,unit
+JPM,0000019617-22-000272,Basic Average Shares,us-gaap:WeightedAverageNumberOfSharesOutstandingBasic,None,3082400000,1/1/21,Unknown,unit
+JPM,0000019617-22-000272,Basic Average Shares,us-gaap:WeightedAverageNumberOfSharesOutstandingBasic,None,3082400000,1/1/21,Unknown,unit
+JPM,0000019617-23-000231,Total Assets,us-gaap:Assets,None,3.74357E+12,1/1/22,Unknown,unit
+JPM,0000019617-23-000231,Total Assets,us-gaap:Assets,None,3.74357E+12,1/1/22,Unknown,unit
+JPM,0000019617-23-000231,Total Assets,us-gaap:Assets,None,3.74357E+12,1/1/22,Unknown,unit
+JPM,0000019617-22-000272,Total Assets,us-gaap:Assets,None,3.74357E+12,1/1/22,Unknown,unit
+JPM,0000019617-22-000272,Total Assets,us-gaap:Assets,None,3.74357E+12,1/1/22,Unknown,unit
+JPM,0000019617-22-000272,Total Assets,us-gaap:Assets,None,3.74357E+12,1/1/22,Unknown,unit
+JPM,0000019617-24-000225,Total Assets,us-gaap:Assets,None,3.74357E+12,1/1/22,Unknown,unit
+JPM,0000019617-24-000225,Total Assets,us-gaap:Assets,None,3.74357E+12,1/1/22,Unknown,unit
+JPM,0000019617-25-000270,Share Issued,us-gaap:CommonStockSharesIssued,None,4104900000,1/1/22,Unknown,unit
+JPM,0000019617-23-000231,Share Issued,us-gaap:CommonStockSharesIssued,None,4104933895,1/1/22,Unknown,unit
+JPM,0000019617-23-000231,Share Issued,us-gaap:CommonStockSharesIssued,None,4104900000,1/1/22,Unknown,unit
+JPM,0000019617-22-000272,Share Issued,us-gaap:CommonStockSharesIssued,None,4104933895,1/1/22,Unknown,unit
+JPM,0000019617-24-000225,Share Issued,us-gaap:CommonStockSharesIssued,None,4104900000,1/1/22,Unknown,unit
+JPM,0000019617-23-000231,Ordinary Shares Number,us-gaap:CommonStockSharesOutstanding,None,2944100000,1/1/22,Unknown,unit
+JPM,0000019617-22-000272,Ordinary Shares Number,us-gaap:CommonStockSharesOutstanding,None,2944100000,1/1/22,Unknown,unit
+JPM,0000019617-24-000225,Ordinary Shares Number,us-gaap:CommonStockSharesOutstanding,None,2944100000,1/1/22,Unknown,unit
+JPM,0000019617-23-000231,Common Stock,us-gaap:CommonStockValue,None,4105000000,1/1/22,Unknown,unit
+JPM,0000019617-22-000272,Common Stock,us-gaap:CommonStockValue,None,4105000000,1/1/22,Unknown,unit
+JPM,0000019617-23-000231,Deferred Tax,us-gaap:DeferredIncomeTaxExpenseBenefit,None,3748000000,1/1/22,Unknown,unit
+JPM,0000019617-23-000231,Deferred Tax,us-gaap:DeferredIncomeTaxExpenseBenefit,None,3748000000,1/1/22,Unknown,unit
+JPM,0000019617-22-000272,Deferred Tax,us-gaap:DeferredIncomeTaxExpenseBenefit,None,3748000000,1/1/22,Unknown,unit
+JPM,0000019617-22-000272,Deferred Tax,us-gaap:DeferredIncomeTaxExpenseBenefit,None,3748000000,1/1/22,Unknown,unit
+JPM,0000019617-24-000225,Deferred Tax,us-gaap:DeferredIncomeTaxExpenseBenefit,None,3748000000,1/1/22,Unknown,unit
+JPM,0000019617-24-000225,Deferred Tax,us-gaap:DeferredIncomeTaxExpenseBenefit,None,3748000000,1/1/22,Unknown,unit
+JPM,0000019617-23-000231,Basic EPS,us-gaap:EarningsPerShareBasic,None,15.39,1/1/22,Unknown,unit
+JPM,0000019617-23-000231,Basic EPS,us-gaap:EarningsPerShareBasic,None,15.39,1/1/22,Unknown,unit
+JPM,0000019617-22-000272,Basic EPS,us-gaap:EarningsPerShareBasic,None,15.39,1/1/22,Unknown,unit
+JPM,0000019617-22-000272,Basic EPS,us-gaap:EarningsPerShareBasic,None,15.39,1/1/22,Unknown,unit
+JPM,0000019617-24-000225,Basic EPS,us-gaap:EarningsPerShareBasic,None,15.39,1/1/22,Unknown,unit
+JPM,0000019617-24-000225,Basic EPS,us-gaap:EarningsPerShareBasic,None,15.39,1/1/22,Unknown,unit
+JPM,0000019617-23-000231,Diluted EPS,us-gaap:EarningsPerShareDiluted,None,15.36,1/1/22,Unknown,unit
+JPM,0000019617-23-000231,Diluted EPS,us-gaap:EarningsPerShareDiluted,None,15.36,1/1/22,Unknown,unit
+JPM,0000019617-22-000272,Diluted EPS,us-gaap:EarningsPerShareDiluted,None,15.36,1/1/22,Unknown,unit
+JPM,0000019617-22-000272,Diluted EPS,us-gaap:EarningsPerShareDiluted,None,15.36,1/1/22,Unknown,unit
+JPM,0000019617-24-000225,Diluted EPS,us-gaap:EarningsPerShareDiluted,None,15.36,1/1/22,Unknown,unit
+JPM,0000019617-24-000225,Diluted EPS,us-gaap:EarningsPerShareDiluted,None,15.36,1/1/22,Unknown,unit
+JPM,0000019617-25-000270,Goodwill,us-gaap:Goodwill,None,50315000000,1/1/22,Unknown,unit
+JPM,0000019617-23-000231,Goodwill,us-gaap:Goodwill,None,50315000000,1/1/22,Unknown,unit
+JPM,0000019617-23-000231,Goodwill,us-gaap:Goodwill,None,50315000000,1/1/22,Unknown,unit
+JPM,0000019617-23-000231,Goodwill,us-gaap:Goodwill,None,50315000000,1/1/22,Unknown,unit
+JPM,0000019617-22-000272,Goodwill,us-gaap:Goodwill,None,50315000000,1/1/22,Unknown,unit
+JPM,0000019617-22-000272,Goodwill,us-gaap:Goodwill,None,50315000000,1/1/22,Unknown,unit
+JPM,0000019617-24-000225,Goodwill,us-gaap:Goodwill,None,50315000000,1/1/22,Unknown,unit
+JPM,0000019617-24-000225,Goodwill,us-gaap:Goodwill,None,50315000000,1/1/22,Unknown,unit
+JPM,0000019617-24-000225,Goodwill,us-gaap:Goodwill,None,50315000000,1/1/22,Unknown,unit
+JPM,0000019617-23-000231,Tax Provision,us-gaap:IncomeTaxExpenseBenefit,None,11228000000,1/1/22,Unknown,unit
+JPM,0000019617-23-000231,Tax Provision,us-gaap:IncomeTaxExpenseBenefit,None,11228000000,1/1/22,Unknown,unit
+JPM,0000019617-23-000231,Tax Provision,us-gaap:IncomeTaxExpenseBenefit,None,11228000000,1/1/22,Unknown,unit
+JPM,0000019617-22-000272,Tax Provision,us-gaap:IncomeTaxExpenseBenefit,None,11228000000,1/1/22,Unknown,unit
+JPM,0000019617-22-000272,Tax Provision,us-gaap:IncomeTaxExpenseBenefit,None,11228000000,1/1/22,Unknown,unit
+JPM,0000019617-22-000272,Tax Provision,us-gaap:IncomeTaxExpenseBenefit,None,11228000000,1/1/22,Unknown,unit
+JPM,0000019617-24-000225,Tax Provision,us-gaap:IncomeTaxExpenseBenefit,None,11228000000,1/1/22,Unknown,unit
+JPM,0000019617-24-000225,Tax Provision,us-gaap:IncomeTaxExpenseBenefit,None,11228000000,1/1/22,Unknown,unit
+JPM,0000019617-24-000225,Tax Provision,us-gaap:IncomeTaxExpenseBenefit,None,11228000000,1/1/22,Unknown,unit
+JPM,0000019617-23-000231,Total Liabilities Net Minority Interest,us-gaap:Liabilities,None,3.44944E+12,1/1/22,Unknown,unit
+JPM,0000019617-22-000272,Total Liabilities Net Minority Interest,us-gaap:Liabilities,None,3.44944E+12,1/1/22,Unknown,unit
+JPM,0000019617-23-000231,Financing Cash Flow,us-gaap:NetCashProvidedByUsedInFinancingActivities,None,2.75993E+11,1/1/22,Unknown,unit
+JPM,0000019617-22-000272,Financing Cash Flow,us-gaap:NetCashProvidedByUsedInFinancingActivities,None,2.75993E+11,1/1/22,Unknown,unit
+JPM,0000019617-24-000225,Financing Cash Flow,us-gaap:NetCashProvidedByUsedInFinancingActivities,None,2.75993E+11,1/1/22,Unknown,unit
+JPM,0000019617-23-000231,Investing Cash Flow,us-gaap:NetCashProvidedByUsedInInvestingActivities,None,-1.29344E+11,1/1/22,Unknown,unit
+JPM,0000019617-22-000272,Investing Cash Flow,us-gaap:NetCashProvidedByUsedInInvestingActivities,None,-1.29344E+11,1/1/22,Unknown,unit
+JPM,0000019617-24-000225,Investing Cash Flow,us-gaap:NetCashProvidedByUsedInInvestingActivities,None,-1.29344E+11,1/1/22,Unknown,unit
+JPM,0000019617-23-000231,Operating Cash Flow,us-gaap:NetCashProvidedByUsedInOperatingActivities,None,78084000000,1/1/22,Unknown,unit
+JPM,0000019617-23-000231,Free Cash Flow,us-gaap:NetCashProvidedByUsedInOperatingActivities,None,78084000000,1/1/22,Unknown,unit
+JPM,0000019617-22-000272,Operating Cash Flow,us-gaap:NetCashProvidedByUsedInOperatingActivities,None,78084000000,1/1/22,Unknown,unit
+JPM,0000019617-22-000272,Free Cash Flow,us-gaap:NetCashProvidedByUsedInOperatingActivities,None,78084000000,1/1/22,Unknown,unit
+JPM,0000019617-24-000225,Operating Cash Flow,us-gaap:NetCashProvidedByUsedInOperatingActivities,None,78084000000,1/1/22,Unknown,unit
+JPM,0000019617-24-000225,Free Cash Flow,us-gaap:NetCashProvidedByUsedInOperatingActivities,None,78084000000,1/1/22,Unknown,unit
+JPM,0000019617-23-000231,Net Income,us-gaap:NetIncomeLoss,None,48334000000,1/1/22,Unknown,unit
+JPM,0000019617-23-000231,Net Income Including Noncontrolling Interests,us-gaap:NetIncomeLoss,None,48334000000,1/1/22,Unknown,unit
+JPM,0000019617-23-000231,Net Income,us-gaap:NetIncomeLoss,None,48334000000,1/1/22,Unknown,unit
+JPM,0000019617-23-000231,Net Income Including Noncontrolling Interests,us-gaap:NetIncomeLoss,None,48334000000,1/1/22,Unknown,unit
+JPM,0000019617-23-000231,Net Income,us-gaap:NetIncomeLoss,None,48334000000,1/1/22,Unknown,unit
+JPM,0000019617-23-000231,Net Income Including Noncontrolling Interests,us-gaap:NetIncomeLoss,None,48334000000,1/1/22,Unknown,unit
+JPM,0000019617-23-000231,Net Income,us-gaap:NetIncomeLoss,None,48334000000,1/1/22,Unknown,unit
+JPM,0000019617-23-000231,Net Income Including Noncontrolling Interests,us-gaap:NetIncomeLoss,None,48334000000,1/1/22,Unknown,unit
+JPM,0000019617-23-000231,Net Income,us-gaap:NetIncomeLoss,None,48334000000,1/1/22,Unknown,unit
+JPM,0000019617-23-000231,Net Income Including Noncontrolling Interests,us-gaap:NetIncomeLoss,None,48334000000,1/1/22,Unknown,unit
+JPM,0000019617-23-000231,Net Income,us-gaap:NetIncomeLoss,None,48334000000,1/1/22,Unknown,unit
+JPM,0000019617-23-000231,Net Income Including Noncontrolling Interests,us-gaap:NetIncomeLoss,None,48334000000,1/1/22,Unknown,unit
+JPM,0000019617-22-000272,Net Income,us-gaap:NetIncomeLoss,None,48334000000,1/1/22,Unknown,unit
+JPM,0000019617-22-000272,Net Income Including Noncontrolling Interests,us-gaap:NetIncomeLoss,None,48334000000,1/1/22,Unknown,unit
+JPM,0000019617-22-000272,Net Income,us-gaap:NetIncomeLoss,None,48334000000,1/1/22,Unknown,unit
+JPM,0000019617-22-000272,Net Income Including Noncontrolling Interests,us-gaap:NetIncomeLoss,None,48334000000,1/1/22,Unknown,unit
+JPM,0000019617-22-000272,Net Income,us-gaap:NetIncomeLoss,None,48334000000,1/1/22,Unknown,unit
+JPM,0000019617-22-000272,Net Income Including Noncontrolling Interests,us-gaap:NetIncomeLoss,None,48334000000,1/1/22,Unknown,unit
+JPM,0000019617-22-000272,Net Income,us-gaap:NetIncomeLoss,None,48334000000,1/1/22,Unknown,unit
+JPM,0000019617-22-000272,Net Income Including Noncontrolling Interests,us-gaap:NetIncomeLoss,None,48334000000,1/1/22,Unknown,unit
+JPM,0000019617-22-000272,Net Income,us-gaap:NetIncomeLoss,None,48334000000,1/1/22,Unknown,unit
+JPM,0000019617-22-000272,Net Income Including Noncontrolling Interests,us-gaap:NetIncomeLoss,None,48334000000,1/1/22,Unknown,unit
+JPM,0000019617-22-000272,Net Income,us-gaap:NetIncomeLoss,None,48334000000,1/1/22,Unknown,unit
+JPM,0000019617-22-000272,Net Income Including Noncontrolling Interests,us-gaap:NetIncomeLoss,None,48334000000,1/1/22,Unknown,unit
+JPM,0000019617-24-000225,Net Income,us-gaap:NetIncomeLoss,None,48334000000,1/1/22,Unknown,unit
+JPM,0000019617-24-000225,Net Income Including Noncontrolling Interests,us-gaap:NetIncomeLoss,None,48334000000,1/1/22,Unknown,unit
+JPM,0000019617-24-000225,Net Income,us-gaap:NetIncomeLoss,None,48334000000,1/1/22,Unknown,unit
+JPM,0000019617-24-000225,Net Income Including Noncontrolling Interests,us-gaap:NetIncomeLoss,None,48334000000,1/1/22,Unknown,unit
+JPM,0000019617-24-000225,Net Income,us-gaap:NetIncomeLoss,None,48334000000,1/1/22,Unknown,unit
+JPM,0000019617-24-000225,Net Income Including Noncontrolling Interests,us-gaap:NetIncomeLoss,None,48334000000,1/1/22,Unknown,unit
+JPM,0000019617-24-000225,Net Income,us-gaap:NetIncomeLoss,None,48334000000,1/1/22,Unknown,unit
+JPM,0000019617-24-000225,Net Income Including Noncontrolling Interests,us-gaap:NetIncomeLoss,None,48334000000,1/1/22,Unknown,unit
+JPM,0000019617-24-000225,Net Income,us-gaap:NetIncomeLoss,None,48334000000,1/1/22,Unknown,unit
+JPM,0000019617-24-000225,Net Income Including Noncontrolling Interests,us-gaap:NetIncomeLoss,None,48334000000,1/1/22,Unknown,unit
+JPM,0000019617-24-000225,Net Income,us-gaap:NetIncomeLoss,None,48334000000,1/1/22,Unknown,unit
+JPM,0000019617-24-000225,Net Income Including Noncontrolling Interests,us-gaap:NetIncomeLoss,None,48334000000,1/1/22,Unknown,unit
+JPM,0000019617-23-000231,Repurchase Of Capital Stock,us-gaap:PaymentsForRepurchaseOfCommonStock,None,18408000000,1/1/22,Unknown,unit
+JPM,0000019617-22-000272,Repurchase Of Capital Stock,us-gaap:PaymentsForRepurchaseOfCommonStock,None,18408000000,1/1/22,Unknown,unit
+JPM,0000019617-24-000225,Repurchase Of Capital Stock,us-gaap:PaymentsForRepurchaseOfCommonStock,None,18408000000,1/1/22,Unknown,unit
+JPM,0000019617-23-000231,Cash Dividends Paid,us-gaap:PaymentsOfDividends,None,12858000000,1/1/22,Unknown,unit
+JPM,0000019617-22-000272,Cash Dividends Paid,us-gaap:PaymentsOfDividends,None,12858000000,1/1/22,Unknown,unit
+JPM,0000019617-24-000225,Cash Dividends Paid,us-gaap:PaymentsOfDividends,None,12858000000,1/1/22,Unknown,unit
+JPM,0000019617-23-000231,Net PPE,us-gaap:PropertyPlantAndEquipmentNet,None,27070000000,1/1/22,Unknown,unit
+JPM,0000019617-22-000272,Net PPE,us-gaap:PropertyPlantAndEquipmentNet,None,27070000000,1/1/22,Unknown,unit
+JPM,0000019617-23-000231,Total Revenue,us-gaap:Revenues,None,1.21649E+11,1/1/22,Unknown,unit
+JPM,0000019617-22-000272,Total Revenue,us-gaap:Revenues,None,1.21649E+11,1/1/22,Unknown,unit
+JPM,0000019617-24-000225,Total Revenue,us-gaap:Revenues,None,1.21649E+11,1/1/22,Unknown,unit
+JPM,0000019617-23-000231,Share-based compensation,us-gaap:ShareBasedCompensation,None,2929000000,1/1/22,Unknown,unit
+JPM,0000019617-22-000272,Share-based compensation,us-gaap:ShareBasedCompensation,None,2929000000,1/1/22,Unknown,unit
+JPM,0000019617-24-000225,Share-based compensation,us-gaap:ShareBasedCompensation,None,2929000000,1/1/22,Unknown,unit
+JPM,0000019617-23-000231,Common Stock Equity,us-gaap:StockholdersEquity,None,2.94127E+11,1/1/22,Unknown,unit
+JPM,0000019617-23-000231,Stockholders Equity,us-gaap:StockholdersEquity,None,2.94127E+11,1/1/22,Unknown,unit
+JPM,0000019617-23-000231,Common Stock Equity,us-gaap:StockholdersEquity,None,2.94127E+11,1/1/22,Unknown,unit
+JPM,0000019617-23-000231,Stockholders Equity,us-gaap:StockholdersEquity,None,2.94127E+11,1/1/22,Unknown,unit
+JPM,0000019617-22-000272,Common Stock Equity,us-gaap:StockholdersEquity,None,2.94127E+11,1/1/22,Unknown,unit
+JPM,0000019617-22-000272,Stockholders Equity,us-gaap:StockholdersEquity,None,2.94127E+11,1/1/22,Unknown,unit
+JPM,0000019617-22-000272,Common Stock Equity,us-gaap:StockholdersEquity,None,2.94127E+11,1/1/22,Unknown,unit
+JPM,0000019617-22-000272,Stockholders Equity,us-gaap:StockholdersEquity,None,2.94127E+11,1/1/22,Unknown,unit
+JPM,0000019617-24-000225,Common Stock Equity,us-gaap:StockholdersEquity,None,2.94127E+11,1/1/22,Unknown,unit
+JPM,0000019617-24-000225,Stockholders Equity,us-gaap:StockholdersEquity,None,2.94127E+11,1/1/22,Unknown,unit
+JPM,0000019617-23-000231,Basic Average Shares,us-gaap:WeightedAverageNumberOfSharesOutstandingBasic,None,3021500000,1/1/22,Unknown,unit
+JPM,0000019617-23-000231,Basic Average Shares,us-gaap:WeightedAverageNumberOfSharesOutstandingBasic,None,3021500000,1/1/22,Unknown,unit
+JPM,0000019617-23-000231,Basic Average Shares,us-gaap:WeightedAverageNumberOfSharesOutstandingBasic,None,3021500000,1/1/22,Unknown,unit
+JPM,0000019617-22-000272,Basic Average Shares,us-gaap:WeightedAverageNumberOfSharesOutstandingBasic,None,3021500000,1/1/22,Unknown,unit
+JPM,0000019617-22-000272,Basic Average Shares,us-gaap:WeightedAverageNumberOfSharesOutstandingBasic,None,3021500000,1/1/22,Unknown,unit
+JPM,0000019617-22-000272,Basic Average Shares,us-gaap:WeightedAverageNumberOfSharesOutstandingBasic,None,3021500000,1/1/22,Unknown,unit
+JPM,0000019617-24-000225,Basic Average Shares,us-gaap:WeightedAverageNumberOfSharesOutstandingBasic,None,3021500000,1/1/22,Unknown,unit
+JPM,0000019617-24-000225,Basic Average Shares,us-gaap:WeightedAverageNumberOfSharesOutstandingBasic,None,3021500000,1/1/22,Unknown,unit
+JPM,0000019617-24-000225,Basic Average Shares,us-gaap:WeightedAverageNumberOfSharesOutstandingBasic,None,3021500000,1/1/22,Unknown,unit
+JPM,0000019617-25-000270,Total Assets,us-gaap:Assets,None,3.66574E+12,1/1/23,Unknown,unit
+JPM,0000019617-25-000270,Total Assets,us-gaap:Assets,None,3.66574E+12,1/1/23,Unknown,unit
+JPM,0000019617-23-000231,Total Assets,us-gaap:Assets,None,3.66574E+12,1/1/23,Unknown,unit
+JPM,0000019617-23-000231,Total Assets,us-gaap:Assets,None,3.66574E+12,1/1/23,Unknown,unit
+JPM,0000019617-23-000231,Total Assets,us-gaap:Assets,None,3.66574E+12,1/1/23,Unknown,unit
+JPM,0000019617-24-000225,Total Assets,us-gaap:Assets,None,3.66574E+12,1/1/23,Unknown,unit
+JPM,0000019617-24-000225,Total Assets,us-gaap:Assets,None,3.66574E+12,1/1/23,Unknown,unit
+JPM,0000019617-24-000225,Total Assets,us-gaap:Assets,None,3.66574E+12,1/1/23,Unknown,unit
+JPM,0000019617-25-000270,Share Issued,us-gaap:CommonStockSharesIssued,None,4104900000,1/1/23,Unknown,unit
+JPM,0000019617-23-000231,Share Issued,us-gaap:CommonStockSharesIssued,None,4104933895,1/1/23,Unknown,unit
+JPM,0000019617-24-000225,Share Issued,us-gaap:CommonStockSharesIssued,None,4104933895,1/1/23,Unknown,unit
+JPM,0000019617-24-000225,Share Issued,us-gaap:CommonStockSharesIssued,None,4104900000,1/1/23,Unknown,unit
+JPM,0000019617-25-000270,Ordinary Shares Number,us-gaap:CommonStockSharesOutstanding,None,2934200000,1/1/23,Unknown,unit
+JPM,0000019617-23-000231,Ordinary Shares Number,us-gaap:CommonStockSharesOutstanding,None,2934200000,1/1/23,Unknown,unit
+JPM,0000019617-24-000225,Ordinary Shares Number,us-gaap:CommonStockSharesOutstanding,None,2934200000,1/1/23,Unknown,unit
+JPM,0000019617-23-000231,Common Stock,us-gaap:CommonStockValue,None,4105000000,1/1/23,Unknown,unit
+JPM,0000019617-24-000225,Common Stock,us-gaap:CommonStockValue,None,4105000000,1/1/23,Unknown,unit
+JPM,0000019617-25-000270,Deferred Tax,us-gaap:DeferredIncomeTaxExpenseBenefit,None,-2738000000,1/1/23,Unknown,unit
+JPM,0000019617-25-000270,Deferred Tax,us-gaap:DeferredIncomeTaxExpenseBenefit,None,-2738000000,1/1/23,Unknown,unit
+JPM,0000019617-23-000231,Deferred Tax,us-gaap:DeferredIncomeTaxExpenseBenefit,None,-2738000000,1/1/23,Unknown,unit
+JPM,0000019617-23-000231,Deferred Tax,us-gaap:DeferredIncomeTaxExpenseBenefit,None,-2738000000,1/1/23,Unknown,unit
+JPM,0000019617-24-000225,Deferred Tax,us-gaap:DeferredIncomeTaxExpenseBenefit,None,-2738000000,1/1/23,Unknown,unit
+JPM,0000019617-24-000225,Deferred Tax,us-gaap:DeferredIncomeTaxExpenseBenefit,None,-2738000000,1/1/23,Unknown,unit
+JPM,0000019617-25-000270,Basic EPS,us-gaap:EarningsPerShareBasic,None,12.1,1/1/23,Unknown,unit
+JPM,0000019617-25-000270,Basic EPS,us-gaap:EarningsPerShareBasic,None,12.1,1/1/23,Unknown,unit
+JPM,0000019617-23-000231,Basic EPS,us-gaap:EarningsPerShareBasic,None,12.1,1/1/23,Unknown,unit
+JPM,0000019617-23-000231,Basic EPS,us-gaap:EarningsPerShareBasic,None,12.1,1/1/23,Unknown,unit
+JPM,0000019617-24-000225,Basic EPS,us-gaap:EarningsPerShareBasic,None,12.1,1/1/23,Unknown,unit
+JPM,0000019617-24-000225,Basic EPS,us-gaap:EarningsPerShareBasic,None,12.1,1/1/23,Unknown,unit
+JPM,0000019617-25-000270,Diluted EPS,us-gaap:EarningsPerShareDiluted,None,12.09,1/1/23,Unknown,unit
+JPM,0000019617-25-000270,Diluted EPS,us-gaap:EarningsPerShareDiluted,None,12.09,1/1/23,Unknown,unit
+JPM,0000019617-23-000231,Diluted EPS,us-gaap:EarningsPerShareDiluted,None,12.09,1/1/23,Unknown,unit
+JPM,0000019617-23-000231,Diluted EPS,us-gaap:EarningsPerShareDiluted,None,12.09,1/1/23,Unknown,unit
+JPM,0000019617-24-000225,Diluted EPS,us-gaap:EarningsPerShareDiluted,None,12.09,1/1/23,Unknown,unit
+JPM,0000019617-24-000225,Diluted EPS,us-gaap:EarningsPerShareDiluted,None,12.09,1/1/23,Unknown,unit
+JPM,0000019617-25-000270,Goodwill,us-gaap:Goodwill,None,51662000000,1/1/23,Unknown,unit
+JPM,0000019617-25-000270,Goodwill,us-gaap:Goodwill,None,51662000000,1/1/23,Unknown,unit
+JPM,0000019617-25-000270,Goodwill,us-gaap:Goodwill,None,51662000000,1/1/23,Unknown,unit
+JPM,0000019617-23-000231,Goodwill,us-gaap:Goodwill,None,51662000000,1/1/23,Unknown,unit
+JPM,0000019617-23-000231,Goodwill,us-gaap:Goodwill,None,51662000000,1/1/23,Unknown,unit
+JPM,0000019617-24-000225,Goodwill,us-gaap:Goodwill,None,51662000000,1/1/23,Unknown,unit
+JPM,0000019617-24-000225,Goodwill,us-gaap:Goodwill,None,51662000000,1/1/23,Unknown,unit
+JPM,0000019617-24-000225,Goodwill,us-gaap:Goodwill,None,51662000000,1/1/23,Unknown,unit
+JPM,0000019617-25-000270,Tax Provision,us-gaap:IncomeTaxExpenseBenefit,None,8490000000,1/1/23,Unknown,unit
+JPM,0000019617-25-000270,Tax Provision,us-gaap:IncomeTaxExpenseBenefit,None,8490000000,1/1/23,Unknown,unit
+JPM,0000019617-25-000270,Tax Provision,us-gaap:IncomeTaxExpenseBenefit,None,8490000000,1/1/23,Unknown,unit
+JPM,0000019617-23-000231,Tax Provision,us-gaap:IncomeTaxExpenseBenefit,None,8490000000,1/1/23,Unknown,unit
+JPM,0000019617-23-000231,Tax Provision,us-gaap:IncomeTaxExpenseBenefit,None,8490000000,1/1/23,Unknown,unit
+JPM,0000019617-23-000231,Tax Provision,us-gaap:IncomeTaxExpenseBenefit,None,8490000000,1/1/23,Unknown,unit
+JPM,0000019617-24-000225,Tax Provision,us-gaap:IncomeTaxExpenseBenefit,None,8490000000,1/1/23,Unknown,unit
+JPM,0000019617-24-000225,Tax Provision,us-gaap:IncomeTaxExpenseBenefit,None,8490000000,1/1/23,Unknown,unit
+JPM,0000019617-24-000225,Tax Provision,us-gaap:IncomeTaxExpenseBenefit,None,8490000000,1/1/23,Unknown,unit
+JPM,0000019617-23-000231,Total Liabilities Net Minority Interest,us-gaap:Liabilities,None,3.37341E+12,1/1/23,Unknown,unit
+JPM,0000019617-24-000225,Total Liabilities Net Minority Interest,us-gaap:Liabilities,None,3.37341E+12,1/1/23,Unknown,unit
+JPM,0000019617-25-000270,Financing Cash Flow,us-gaap:NetCashProvidedByUsedInFinancingActivities,None,-1.26257E+11,1/1/23,Unknown,unit
+JPM,0000019617-23-000231,Financing Cash Flow,us-gaap:NetCashProvidedByUsedInFinancingActivities,None,-1.26257E+11,1/1/23,Unknown,unit
+JPM,0000019617-24-000225,Financing Cash Flow,us-gaap:NetCashProvidedByUsedInFinancingActivities,None,-1.26257E+11,1/1/23,Unknown,unit
+JPM,0000019617-25-000270,Investing Cash Flow,us-gaap:NetCashProvidedByUsedInInvestingActivities,None,-1.37819E+11,1/1/23,Unknown,unit
+JPM,0000019617-23-000231,Investing Cash Flow,us-gaap:NetCashProvidedByUsedInInvestingActivities,None,-1.37819E+11,1/1/23,Unknown,unit
+JPM,0000019617-24-000225,Investing Cash Flow,us-gaap:NetCashProvidedByUsedInInvestingActivities,None,-1.37819E+11,1/1/23,Unknown,unit
+JPM,0000019617-25-000270,Operating Cash Flow,us-gaap:NetCashProvidedByUsedInOperatingActivities,None,1.07119E+11,1/1/23,Unknown,unit
+JPM,0000019617-25-000270,Free Cash Flow,us-gaap:NetCashProvidedByUsedInOperatingActivities,None,1.07119E+11,1/1/23,Unknown,unit
+JPM,0000019617-23-000231,Operating Cash Flow,us-gaap:NetCashProvidedByUsedInOperatingActivities,None,1.07119E+11,1/1/23,Unknown,unit
+JPM,0000019617-23-000231,Free Cash Flow,us-gaap:NetCashProvidedByUsedInOperatingActivities,None,1.07119E+11,1/1/23,Unknown,unit
+JPM,0000019617-24-000225,Operating Cash Flow,us-gaap:NetCashProvidedByUsedInOperatingActivities,None,1.07119E+11,1/1/23,Unknown,unit
+JPM,0000019617-24-000225,Free Cash Flow,us-gaap:NetCashProvidedByUsedInOperatingActivities,None,1.07119E+11,1/1/23,Unknown,unit
+JPM,0000019617-25-000270,Net Income,us-gaap:NetIncomeLoss,None,37676000000,1/1/23,Unknown,unit
+JPM,0000019617-25-000270,Net Income Including Noncontrolling Interests,us-gaap:NetIncomeLoss,None,37676000000,1/1/23,Unknown,unit
+JPM,0000019617-25-000270,Net Income,us-gaap:NetIncomeLoss,None,37676000000,1/1/23,Unknown,unit
+JPM,0000019617-25-000270,Net Income Including Noncontrolling Interests,us-gaap:NetIncomeLoss,None,37676000000,1/1/23,Unknown,unit
+JPM,0000019617-25-000270,Net Income,us-gaap:NetIncomeLoss,None,37676000000,1/1/23,Unknown,unit
+JPM,0000019617-25-000270,Net Income Including Noncontrolling Interests,us-gaap:NetIncomeLoss,None,37676000000,1/1/23,Unknown,unit
+JPM,0000019617-25-000270,Net Income,us-gaap:NetIncomeLoss,None,37676000000,1/1/23,Unknown,unit
+JPM,0000019617-25-000270,Net Income Including Noncontrolling Interests,us-gaap:NetIncomeLoss,None,37676000000,1/1/23,Unknown,unit
+JPM,0000019617-25-000270,Net Income,us-gaap:NetIncomeLoss,None,37676000000,1/1/23,Unknown,unit
+JPM,0000019617-25-000270,Net Income Including Noncontrolling Interests,us-gaap:NetIncomeLoss,None,37676000000,1/1/23,Unknown,unit
+JPM,0000019617-25-000270,Net Income,us-gaap:NetIncomeLoss,None,37676000000,1/1/23,Unknown,unit
+JPM,0000019617-25-000270,Net Income Including Noncontrolling Interests,us-gaap:NetIncomeLoss,None,37676000000,1/1/23,Unknown,unit
+JPM,0000019617-23-000231,Net Income,us-gaap:NetIncomeLoss,None,37676000000,1/1/23,Unknown,unit
+JPM,0000019617-23-000231,Net Income Including Noncontrolling Interests,us-gaap:NetIncomeLoss,None,37676000000,1/1/23,Unknown,unit
+JPM,0000019617-23-000231,Net Income,us-gaap:NetIncomeLoss,None,37676000000,1/1/23,Unknown,unit
+JPM,0000019617-23-000231,Net Income Including Noncontrolling Interests,us-gaap:NetIncomeLoss,None,37676000000,1/1/23,Unknown,unit
+JPM,0000019617-23-000231,Net Income,us-gaap:NetIncomeLoss,None,37676000000,1/1/23,Unknown,unit
+JPM,0000019617-23-000231,Net Income Including Noncontrolling Interests,us-gaap:NetIncomeLoss,None,37676000000,1/1/23,Unknown,unit
+JPM,0000019617-23-000231,Net Income,us-gaap:NetIncomeLoss,None,37676000000,1/1/23,Unknown,unit
+JPM,0000019617-23-000231,Net Income Including Noncontrolling Interests,us-gaap:NetIncomeLoss,None,37676000000,1/1/23,Unknown,unit
+JPM,0000019617-23-000231,Net Income,us-gaap:NetIncomeLoss,None,37676000000,1/1/23,Unknown,unit
+JPM,0000019617-23-000231,Net Income Including Noncontrolling Interests,us-gaap:NetIncomeLoss,None,37676000000,1/1/23,Unknown,unit
+JPM,0000019617-23-000231,Net Income,us-gaap:NetIncomeLoss,None,37676000000,1/1/23,Unknown,unit
+JPM,0000019617-23-000231,Net Income Including Noncontrolling Interests,us-gaap:NetIncomeLoss,None,37676000000,1/1/23,Unknown,unit
+JPM,0000019617-24-000225,Net Income,us-gaap:NetIncomeLoss,None,37676000000,1/1/23,Unknown,unit
+JPM,0000019617-24-000225,Net Income Including Noncontrolling Interests,us-gaap:NetIncomeLoss,None,37676000000,1/1/23,Unknown,unit
+JPM,0000019617-24-000225,Net Income,us-gaap:NetIncomeLoss,None,37676000000,1/1/23,Unknown,unit
+JPM,0000019617-24-000225,Net Income Including Noncontrolling Interests,us-gaap:NetIncomeLoss,None,37676000000,1/1/23,Unknown,unit
+JPM,0000019617-24-000225,Net Income,us-gaap:NetIncomeLoss,None,37676000000,1/1/23,Unknown,unit
+JPM,0000019617-24-000225,Net Income Including Noncontrolling Interests,us-gaap:NetIncomeLoss,None,37676000000,1/1/23,Unknown,unit
+JPM,0000019617-24-000225,Net Income,us-gaap:NetIncomeLoss,None,37676000000,1/1/23,Unknown,unit
+JPM,0000019617-24-000225,Net Income Including Noncontrolling Interests,us-gaap:NetIncomeLoss,None,37676000000,1/1/23,Unknown,unit
+JPM,0000019617-24-000225,Net Income,us-gaap:NetIncomeLoss,None,37676000000,1/1/23,Unknown,unit
+JPM,0000019617-24-000225,Net Income Including Noncontrolling Interests,us-gaap:NetIncomeLoss,None,37676000000,1/1/23,Unknown,unit
+JPM,0000019617-24-000225,Net Income,us-gaap:NetIncomeLoss,None,37676000000,1/1/23,Unknown,unit
+JPM,0000019617-24-000225,Net Income Including Noncontrolling Interests,us-gaap:NetIncomeLoss,None,37676000000,1/1/23,Unknown,unit
+JPM,0000019617-25-000270,Repurchase Of Capital Stock,us-gaap:PaymentsForRepurchaseOfCommonStock,None,3162000000,1/1/23,Unknown,unit
+JPM,0000019617-23-000231,Repurchase Of Capital Stock,us-gaap:PaymentsForRepurchaseOfCommonStock,None,3162000000,1/1/23,Unknown,unit
+JPM,0000019617-24-000225,Repurchase Of Capital Stock,us-gaap:PaymentsForRepurchaseOfCommonStock,None,3162000000,1/1/23,Unknown,unit
+JPM,0000019617-25-000270,Cash Dividends Paid,us-gaap:PaymentsOfDividends,None,13562000000,1/1/23,Unknown,unit
+JPM,0000019617-23-000231,Cash Dividends Paid,us-gaap:PaymentsOfDividends,None,13562000000,1/1/23,Unknown,unit
+JPM,0000019617-24-000225,Cash Dividends Paid,us-gaap:PaymentsOfDividends,None,13562000000,1/1/23,Unknown,unit
+JPM,0000019617-23-000231,Net PPE,us-gaap:PropertyPlantAndEquipmentNet,None,27734000000,1/1/23,Unknown,unit
+JPM,0000019617-25-000270,Total Revenue,us-gaap:Revenues,None,1.28695E+11,1/1/23,Unknown,unit
+JPM,0000019617-23-000231,Total Revenue,us-gaap:Revenues,None,1.28695E+11,1/1/23,Unknown,unit
+JPM,0000019617-24-000225,Total Revenue,us-gaap:Revenues,None,1.28695E+11,1/1/23,Unknown,unit
+JPM,0000019617-25-000270,Share-based compensation,us-gaap:ShareBasedCompensation,None,2794000000,1/1/23,Unknown,unit
+JPM,0000019617-23-000231,Share-based compensation,us-gaap:ShareBasedCompensation,None,2794000000,1/1/23,Unknown,unit
+JPM,0000019617-24-000225,Share-based compensation,us-gaap:ShareBasedCompensation,None,2794000000,1/1/23,Unknown,unit
+JPM,0000019617-25-000270,Common Stock Equity,us-gaap:StockholdersEquity,None,2.92332E+11,1/1/23,Unknown,unit
+JPM,0000019617-25-000270,Stockholders Equity,us-gaap:StockholdersEquity,None,2.92332E+11,1/1/23,Unknown,unit
+JPM,0000019617-23-000231,Common Stock Equity,us-gaap:StockholdersEquity,None,2.92332E+11,1/1/23,Unknown,unit
+JPM,0000019617-23-000231,Stockholders Equity,us-gaap:StockholdersEquity,None,2.92332E+11,1/1/23,Unknown,unit
+JPM,0000019617-23-000231,Common Stock Equity,us-gaap:StockholdersEquity,None,2.92332E+11,1/1/23,Unknown,unit
+JPM,0000019617-23-000231,Stockholders Equity,us-gaap:StockholdersEquity,None,2.92332E+11,1/1/23,Unknown,unit
+JPM,0000019617-24-000225,Common Stock Equity,us-gaap:StockholdersEquity,None,2.92332E+11,1/1/23,Unknown,unit
+JPM,0000019617-24-000225,Stockholders Equity,us-gaap:StockholdersEquity,None,2.92332E+11,1/1/23,Unknown,unit
+JPM,0000019617-24-000225,Common Stock Equity,us-gaap:StockholdersEquity,None,2.92332E+11,1/1/23,Unknown,unit
+JPM,0000019617-24-000225,Stockholders Equity,us-gaap:StockholdersEquity,None,2.92332E+11,1/1/23,Unknown,unit
+JPM,0000019617-25-000270,Basic Average Shares,us-gaap:WeightedAverageNumberOfSharesOutstandingBasic,None,2965800000,1/1/23,Unknown,unit
+JPM,0000019617-25-000270,Basic Average Shares,us-gaap:WeightedAverageNumberOfSharesOutstandingBasic,None,2965800000,1/1/23,Unknown,unit
+JPM,0000019617-25-000270,Basic Average Shares,us-gaap:WeightedAverageNumberOfSharesOutstandingBasic,None,2965800000,1/1/23,Unknown,unit
+JPM,0000019617-23-000231,Basic Average Shares,us-gaap:WeightedAverageNumberOfSharesOutstandingBasic,None,2965800000,1/1/23,Unknown,unit
+JPM,0000019617-23-000231,Basic Average Shares,us-gaap:WeightedAverageNumberOfSharesOutstandingBasic,None,2965800000,1/1/23,Unknown,unit
+JPM,0000019617-23-000231,Basic Average Shares,us-gaap:WeightedAverageNumberOfSharesOutstandingBasic,None,2965800000,1/1/23,Unknown,unit
+JPM,0000019617-24-000225,Basic Average Shares,us-gaap:WeightedAverageNumberOfSharesOutstandingBasic,None,2965800000,1/1/23,Unknown,unit
+JPM,0000019617-24-000225,Basic Average Shares,us-gaap:WeightedAverageNumberOfSharesOutstandingBasic,None,2965800000,1/1/23,Unknown,unit
+JPM,0000019617-24-000225,Basic Average Shares,us-gaap:WeightedAverageNumberOfSharesOutstandingBasic,None,2965800000,1/1/23,Unknown,unit
+JPM,0000019617-25-000270,Total Assets,us-gaap:Assets,None,3.87539E+12,1/1/24,Unknown,unit
+JPM,0000019617-25-000270,Total Assets,us-gaap:Assets,None,3.87539E+12,1/1/24,Unknown,unit
+JPM,0000019617-25-000270,Total Assets,us-gaap:Assets,None,3.87539E+12,1/1/24,Unknown,unit
+JPM,0000019617-24-000225,Total Assets,us-gaap:Assets,None,3.87539E+12,1/1/24,Unknown,unit
+JPM,0000019617-24-000225,Total Assets,us-gaap:Assets,None,3.87539E+12,1/1/24,Unknown,unit
+JPM,0000019617-24-000225,Total Assets,us-gaap:Assets,None,3.87539E+12,1/1/24,Unknown,unit
+JPM,0000019617-25-000270,Share Issued,us-gaap:CommonStockSharesIssued,None,4104933895,1/1/24,Unknown,unit
+JPM,0000019617-25-000270,Share Issued,us-gaap:CommonStockSharesIssued,None,4104900000,1/1/24,Unknown,unit
+JPM,0000019617-24-000225,Share Issued,us-gaap:CommonStockSharesIssued,None,4104933895,1/1/24,Unknown,unit
+JPM,0000019617-25-000270,Ordinary Shares Number,us-gaap:CommonStockSharesOutstanding,None,2876600000,1/1/24,Unknown,unit
+JPM,0000019617-24-000225,Ordinary Shares Number,us-gaap:CommonStockSharesOutstanding,None,2876600000,1/1/24,Unknown,unit
+JPM,0000019617-25-000270,Common Stock,us-gaap:CommonStockValue,None,4105000000,1/1/24,Unknown,unit
+JPM,0000019617-24-000225,Common Stock,us-gaap:CommonStockValue,None,4105000000,1/1/24,Unknown,unit
+JPM,0000019617-25-000270,Deferred Tax,us-gaap:DeferredIncomeTaxExpenseBenefit,None,-4534000000,1/1/24,Unknown,unit
+JPM,0000019617-25-000270,Deferred Tax,us-gaap:DeferredIncomeTaxExpenseBenefit,None,-4534000000,1/1/24,Unknown,unit
+JPM,0000019617-24-000225,Deferred Tax,us-gaap:DeferredIncomeTaxExpenseBenefit,None,-4534000000,1/1/24,Unknown,unit
+JPM,0000019617-24-000225,Deferred Tax,us-gaap:DeferredIncomeTaxExpenseBenefit,None,-4534000000,1/1/24,Unknown,unit
+JPM,0000019617-25-000270,Basic EPS,us-gaap:EarningsPerShareBasic,None,16.25,1/1/24,Unknown,unit
+JPM,0000019617-25-000270,Basic EPS,us-gaap:EarningsPerShareBasic,None,16.25,1/1/24,Unknown,unit
+JPM,0000019617-24-000225,Basic EPS,us-gaap:EarningsPerShareBasic,None,16.25,1/1/24,Unknown,unit
+JPM,0000019617-24-000225,Basic EPS,us-gaap:EarningsPerShareBasic,None,16.25,1/1/24,Unknown,unit
+JPM,0000019617-25-000270,Diluted EPS,us-gaap:EarningsPerShareDiluted,None,16.23,1/1/24,Unknown,unit
+JPM,0000019617-25-000270,Diluted EPS,us-gaap:EarningsPerShareDiluted,None,16.23,1/1/24,Unknown,unit
+JPM,0000019617-24-000225,Diluted EPS,us-gaap:EarningsPerShareDiluted,None,16.23,1/1/24,Unknown,unit
+JPM,0000019617-24-000225,Diluted EPS,us-gaap:EarningsPerShareDiluted,None,16.23,1/1/24,Unknown,unit
+JPM,0000019617-25-000270,Goodwill,us-gaap:Goodwill,None,52634000000,1/1/24,Unknown,unit
+JPM,0000019617-25-000270,Goodwill,us-gaap:Goodwill,None,52634000000,1/1/24,Unknown,unit
+JPM,0000019617-25-000270,Goodwill,us-gaap:Goodwill,None,52634000000,1/1/24,Unknown,unit
+JPM,0000019617-24-000225,Goodwill,us-gaap:Goodwill,None,52634000000,1/1/24,Unknown,unit
+JPM,0000019617-24-000225,Goodwill,us-gaap:Goodwill,None,52634000000,1/1/24,Unknown,unit
+JPM,0000019617-25-000270,Tax Provision,us-gaap:IncomeTaxExpenseBenefit,None,12060000000,1/1/24,Unknown,unit
+JPM,0000019617-25-000270,Tax Provision,us-gaap:IncomeTaxExpenseBenefit,None,12060000000,1/1/24,Unknown,unit
+JPM,0000019617-25-000270,Tax Provision,us-gaap:IncomeTaxExpenseBenefit,None,12060000000,1/1/24,Unknown,unit
+JPM,0000019617-24-000225,Tax Provision,us-gaap:IncomeTaxExpenseBenefit,None,12060000000,1/1/24,Unknown,unit
+JPM,0000019617-24-000225,Tax Provision,us-gaap:IncomeTaxExpenseBenefit,None,12060000000,1/1/24,Unknown,unit
+JPM,0000019617-24-000225,Tax Provision,us-gaap:IncomeTaxExpenseBenefit,None,12060000000,1/1/24,Unknown,unit
+JPM,0000019617-25-000270,Total Liabilities Net Minority Interest,us-gaap:Liabilities,None,3.54752E+12,1/1/24,Unknown,unit
+JPM,0000019617-24-000225,Total Liabilities Net Minority Interest,us-gaap:Liabilities,None,3.54752E+12,1/1/24,Unknown,unit
+JPM,0000019617-25-000270,Financing Cash Flow,us-gaap:NetCashProvidedByUsedInFinancingActivities,None,-25571000000,1/1/24,Unknown,unit
+JPM,0000019617-24-000225,Financing Cash Flow,us-gaap:NetCashProvidedByUsedInFinancingActivities,None,-25571000000,1/1/24,Unknown,unit
+JPM,0000019617-25-000270,Investing Cash Flow,us-gaap:NetCashProvidedByUsedInInvestingActivities,None,67643000000,1/1/24,Unknown,unit
+JPM,0000019617-24-000225,Investing Cash Flow,us-gaap:NetCashProvidedByUsedInInvestingActivities,None,67643000000,1/1/24,Unknown,unit
+JPM,0000019617-25-000270,Operating Cash Flow,us-gaap:NetCashProvidedByUsedInOperatingActivities,None,12974000000,1/1/24,Unknown,unit
+JPM,0000019617-25-000270,Free Cash Flow,us-gaap:NetCashProvidedByUsedInOperatingActivities,None,12974000000,1/1/24,Unknown,unit
+JPM,0000019617-24-000225,Operating Cash Flow,us-gaap:NetCashProvidedByUsedInOperatingActivities,None,12974000000,1/1/24,Unknown,unit
+JPM,0000019617-24-000225,Free Cash Flow,us-gaap:NetCashProvidedByUsedInOperatingActivities,None,12974000000,1/1/24,Unknown,unit
+JPM,0000019617-25-000270,Net Income,us-gaap:NetIncomeLoss,None,49552000000,1/1/24,Unknown,unit
+JPM,0000019617-25-000270,Net Income Including Noncontrolling Interests,us-gaap:NetIncomeLoss,None,49552000000,1/1/24,Unknown,unit
+JPM,0000019617-25-000270,Net Income,us-gaap:NetIncomeLoss,None,49552000000,1/1/24,Unknown,unit
+JPM,0000019617-25-000270,Net Income Including Noncontrolling Interests,us-gaap:NetIncomeLoss,None,49552000000,1/1/24,Unknown,unit
+JPM,0000019617-25-000270,Net Income,us-gaap:NetIncomeLoss,None,49552000000,1/1/24,Unknown,unit
+JPM,0000019617-25-000270,Net Income Including Noncontrolling Interests,us-gaap:NetIncomeLoss,None,49552000000,1/1/24,Unknown,unit
+JPM,0000019617-25-000270,Net Income,us-gaap:NetIncomeLoss,None,49552000000,1/1/24,Unknown,unit
+JPM,0000019617-25-000270,Net Income Including Noncontrolling Interests,us-gaap:NetIncomeLoss,None,49552000000,1/1/24,Unknown,unit
+JPM,0000019617-25-000270,Net Income,us-gaap:NetIncomeLoss,None,49552000000,1/1/24,Unknown,unit
+JPM,0000019617-25-000270,Net Income Including Noncontrolling Interests,us-gaap:NetIncomeLoss,None,49552000000,1/1/24,Unknown,unit
+JPM,0000019617-25-000270,Net Income,us-gaap:NetIncomeLoss,None,49552000000,1/1/24,Unknown,unit
+JPM,0000019617-25-000270,Net Income Including Noncontrolling Interests,us-gaap:NetIncomeLoss,None,49552000000,1/1/24,Unknown,unit
+JPM,0000019617-24-000225,Net Income,us-gaap:NetIncomeLoss,None,49552000000,1/1/24,Unknown,unit
+JPM,0000019617-24-000225,Net Income Including Noncontrolling Interests,us-gaap:NetIncomeLoss,None,49552000000,1/1/24,Unknown,unit
+JPM,0000019617-24-000225,Net Income,us-gaap:NetIncomeLoss,None,49552000000,1/1/24,Unknown,unit
+JPM,0000019617-24-000225,Net Income Including Noncontrolling Interests,us-gaap:NetIncomeLoss,None,49552000000,1/1/24,Unknown,unit
+JPM,0000019617-24-000225,Net Income,us-gaap:NetIncomeLoss,None,49552000000,1/1/24,Unknown,unit
+JPM,0000019617-24-000225,Net Income Including Noncontrolling Interests,us-gaap:NetIncomeLoss,None,49552000000,1/1/24,Unknown,unit
+JPM,0000019617-24-000225,Net Income,us-gaap:NetIncomeLoss,None,49552000000,1/1/24,Unknown,unit
+JPM,0000019617-24-000225,Net Income Including Noncontrolling Interests,us-gaap:NetIncomeLoss,None,49552000000,1/1/24,Unknown,unit
+JPM,0000019617-24-000225,Net Income,us-gaap:NetIncomeLoss,None,49552000000,1/1/24,Unknown,unit
+JPM,0000019617-24-000225,Net Income Including Noncontrolling Interests,us-gaap:NetIncomeLoss,None,49552000000,1/1/24,Unknown,unit
+JPM,0000019617-24-000225,Net Income,us-gaap:NetIncomeLoss,None,49552000000,1/1/24,Unknown,unit
+JPM,0000019617-24-000225,Net Income Including Noncontrolling Interests,us-gaap:NetIncomeLoss,None,49552000000,1/1/24,Unknown,unit
+JPM,0000019617-25-000270,Repurchase Of Capital Stock,us-gaap:PaymentsForRepurchaseOfCommonStock,None,9824000000,1/1/24,Unknown,unit
+JPM,0000019617-24-000225,Repurchase Of Capital Stock,us-gaap:PaymentsForRepurchaseOfCommonStock,None,9824000000,1/1/24,Unknown,unit
+JPM,0000019617-25-000270,Cash Dividends Paid,us-gaap:PaymentsOfDividends,None,13463000000,1/1/24,Unknown,unit
+JPM,0000019617-24-000225,Cash Dividends Paid,us-gaap:PaymentsOfDividends,None,13463000000,1/1/24,Unknown,unit
+JPM,0000019617-25-000270,Total Revenue,us-gaap:Revenues,None,1.58104E+11,1/1/24,Unknown,unit
+JPM,0000019617-24-000225,Total Revenue,us-gaap:Revenues,None,1.58104E+11,1/1/24,Unknown,unit
+JPM,0000019617-25-000270,Share-based compensation,us-gaap:ShareBasedCompensation,None,3117000000,1/1/24,Unknown,unit
+JPM,0000019617-24-000225,Share-based compensation,us-gaap:ShareBasedCompensation,None,3117000000,1/1/24,Unknown,unit
+JPM,0000019617-25-000270,Common Stock Equity,us-gaap:StockholdersEquity,None,3.27878E+11,1/1/24,Unknown,unit
+JPM,0000019617-25-000270,Stockholders Equity,us-gaap:StockholdersEquity,None,3.27878E+11,1/1/24,Unknown,unit
+JPM,0000019617-25-000270,Common Stock Equity,us-gaap:StockholdersEquity,None,3.27878E+11,1/1/24,Unknown,unit
+JPM,0000019617-25-000270,Stockholders Equity,us-gaap:StockholdersEquity,None,3.27878E+11,1/1/24,Unknown,unit
+JPM,0000019617-24-000225,Common Stock Equity,us-gaap:StockholdersEquity,None,3.27878E+11,1/1/24,Unknown,unit
+JPM,0000019617-24-000225,Stockholders Equity,us-gaap:StockholdersEquity,None,3.27878E+11,1/1/24,Unknown,unit
+JPM,0000019617-24-000225,Common Stock Equity,us-gaap:StockholdersEquity,None,3.27878E+11,1/1/24,Unknown,unit
+JPM,0000019617-24-000225,Stockholders Equity,us-gaap:StockholdersEquity,None,3.27878E+11,1/1/24,Unknown,unit
+JPM,0000019617-25-000270,Basic Average Shares,us-gaap:WeightedAverageNumberOfSharesOutstandingBasic,None,2938600000,1/1/24,Unknown,unit
+JPM,0000019617-25-000270,Basic Average Shares,us-gaap:WeightedAverageNumberOfSharesOutstandingBasic,None,2938600000,1/1/24,Unknown,unit
+JPM,0000019617-25-000270,Basic Average Shares,us-gaap:WeightedAverageNumberOfSharesOutstandingBasic,None,2938600000,1/1/24,Unknown,unit
+JPM,0000019617-24-000225,Basic Average Shares,us-gaap:WeightedAverageNumberOfSharesOutstandingBasic,None,2938600000,1/1/24,Unknown,unit
+JPM,0000019617-24-000225,Basic Average Shares,us-gaap:WeightedAverageNumberOfSharesOutstandingBasic,None,2938600000,1/1/24,Unknown,unit
+JPM,0000019617-24-000225,Basic Average Shares,us-gaap:WeightedAverageNumberOfSharesOutstandingBasic,None,2938600000,1/1/24,Unknown,unit
+JPM,0000019617-25-000270,Total Assets,us-gaap:Assets,None,4.00281E+12,1/1/25,Unknown,unit
+JPM,0000019617-25-000270,Total Assets,us-gaap:Assets,None,4.00281E+12,1/1/25,Unknown,unit
+JPM,0000019617-25-000270,Total Assets,us-gaap:Assets,None,4.00281E+12,1/1/25,Unknown,unit
+JPM,0000019617-25-000270,Share Issued,us-gaap:CommonStockSharesIssued,None,4104933895,1/1/25,Unknown,unit
+JPM,0000019617-25-000270,Ordinary Shares Number,us-gaap:CommonStockSharesOutstanding,None,2797600000,1/1/25,Unknown,unit
+JPM,0000019617-25-000270,Common Stock,us-gaap:CommonStockValue,None,4105000000,1/1/25,Unknown,unit
+JPM,0000019617-25-000270,Deferred Tax,us-gaap:DeferredIncomeTaxExpenseBenefit,None,2004000000,1/1/25,Unknown,unit
+JPM,0000019617-25-000270,Deferred Tax,us-gaap:DeferredIncomeTaxExpenseBenefit,None,2004000000,1/1/25,Unknown,unit
+JPM,0000019617-25-000270,Basic EPS,us-gaap:EarningsPerShareBasic,None,19.79,1/1/25,Unknown,unit
+JPM,0000019617-25-000270,Basic EPS,us-gaap:EarningsPerShareBasic,None,19.79,1/1/25,Unknown,unit
+JPM,0000019617-25-000270,Diluted EPS,us-gaap:EarningsPerShareDiluted,None,19.75,1/1/25,Unknown,unit
+JPM,0000019617-25-000270,Diluted EPS,us-gaap:EarningsPerShareDiluted,None,19.75,1/1/25,Unknown,unit
+JPM,0000019617-25-000270,Goodwill,us-gaap:Goodwill,None,52565000000,1/1/25,Unknown,unit
+JPM,0000019617-25-000270,Goodwill,us-gaap:Goodwill,None,52565000000,1/1/25,Unknown,unit
+JPM,0000019617-25-000270,Tax Provision,us-gaap:IncomeTaxExpenseBenefit,None,16610000000,1/1/25,Unknown,unit
+JPM,0000019617-25-000270,Tax Provision,us-gaap:IncomeTaxExpenseBenefit,None,16610000000,1/1/25,Unknown,unit
+JPM,0000019617-25-000270,Tax Provision,us-gaap:IncomeTaxExpenseBenefit,None,16610000000,1/1/25,Unknown,unit
+JPM,0000019617-25-000270,Total Liabilities Net Minority Interest,us-gaap:Liabilities,None,3.65806E+12,1/1/25,Unknown,unit
+JPM,0000019617-25-000270,Financing Cash Flow,us-gaap:NetCashProvidedByUsedInFinancingActivities,None,63447000000,1/1/25,Unknown,unit
+JPM,0000019617-25-000270,Investing Cash Flow,us-gaap:NetCashProvidedByUsedInInvestingActivities,None,-1.63403E+11,1/1/25,Unknown,unit
+JPM,0000019617-25-000270,Operating Cash Flow,us-gaap:NetCashProvidedByUsedInOperatingActivities,None,-42012000000,1/1/25,Unknown,unit
+JPM,0000019617-25-000270,Free Cash Flow,us-gaap:NetCashProvidedByUsedInOperatingActivities,None,-42012000000,1/1/25,Unknown,unit
+JPM,0000019617-25-000270,Net Income,us-gaap:NetIncomeLoss,None,58471000000,1/1/25,Unknown,unit
+JPM,0000019617-25-000270,Net Income Including Noncontrolling Interests,us-gaap:NetIncomeLoss,None,58471000000,1/1/25,Unknown,unit
+JPM,0000019617-25-000270,Net Income,us-gaap:NetIncomeLoss,None,58471000000,1/1/25,Unknown,unit
+JPM,0000019617-25-000270,Net Income Including Noncontrolling Interests,us-gaap:NetIncomeLoss,None,58471000000,1/1/25,Unknown,unit
+JPM,0000019617-25-000270,Net Income,us-gaap:NetIncomeLoss,None,58471000000,1/1/25,Unknown,unit
+JPM,0000019617-25-000270,Net Income Including Noncontrolling Interests,us-gaap:NetIncomeLoss,None,58471000000,1/1/25,Unknown,unit
+JPM,0000019617-25-000270,Net Income,us-gaap:NetIncomeLoss,None,58471000000,1/1/25,Unknown,unit
+JPM,0000019617-25-000270,Net Income Including Noncontrolling Interests,us-gaap:NetIncomeLoss,None,58471000000,1/1/25,Unknown,unit
+JPM,0000019617-25-000270,Net Income,us-gaap:NetIncomeLoss,None,58471000000,1/1/25,Unknown,unit
+JPM,0000019617-25-000270,Net Income Including Noncontrolling Interests,us-gaap:NetIncomeLoss,None,58471000000,1/1/25,Unknown,unit
+JPM,0000019617-25-000270,Net Income,us-gaap:NetIncomeLoss,None,58471000000,1/1/25,Unknown,unit
+JPM,0000019617-25-000270,Net Income Including Noncontrolling Interests,us-gaap:NetIncomeLoss,None,58471000000,1/1/25,Unknown,unit
+JPM,0000019617-25-000270,Repurchase Of Capital Stock,us-gaap:PaymentsForRepurchaseOfCommonStock,None,18830000000,1/1/25,Unknown,unit
+JPM,0000019617-25-000270,Cash Dividends Paid,us-gaap:PaymentsOfDividends,None,14783000000,1/1/25,Unknown,unit
+JPM,0000019617-25-000270,Total Revenue,us-gaap:Revenues,None,1.77556E+11,1/1/25,Unknown,unit
+JPM,0000019617-25-000270,Share-based compensation,us-gaap:ShareBasedCompensation,None,3504000000,1/1/25,Unknown,unit
+JPM,0000019617-25-000270,Common Stock Equity,us-gaap:StockholdersEquity,None,3.44758E+11,1/1/25,Unknown,unit
+JPM,0000019617-25-000270,Stockholders Equity,us-gaap:StockholdersEquity,None,3.44758E+11,1/1/25,Unknown,unit
+JPM,0000019617-25-000270,Common Stock Equity,us-gaap:StockholdersEquity,None,3.44758E+11,1/1/25,Unknown,unit
+JPM,0000019617-25-000270,Stockholders Equity,us-gaap:StockholdersEquity,None,3.44758E+11,1/1/25,Unknown,unit
+JPM,0000019617-25-000270,Basic Average Shares,us-gaap:WeightedAverageNumberOfSharesOutstandingBasic,None,2873900000,1/1/25,Unknown,unit
+JPM,0000019617-25-000270,Basic Average Shares,us-gaap:WeightedAverageNumberOfSharesOutstandingBasic,None,2873900000,1/1/25,Unknown,unit
+JPM,0000019617-25-000270,Basic Average Shares,us-gaap:WeightedAverageNumberOfSharesOutstandingBasic,None,2873900000,1/1/25,Unknown,unit

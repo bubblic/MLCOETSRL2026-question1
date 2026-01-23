@@ -38,6 +38,8 @@ from arelle import WebCache as _ArelleWebCache
 COMPANY_TICKER = "0000320193"  # Apple
 # COMPANY_TICKER = "KO"  # Coca Cola
 # COMPANY_TICKER = "GM"  # General Motors
+COMPANY_TICKER = "JPM"  # JPMorganChase
+
 EMAIL_ADDRESS = (
     "your.email@example.com"  # <--- REQUIRED BY SEC: Change this to your actual email
 )

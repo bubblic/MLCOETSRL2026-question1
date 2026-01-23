@@ -11,7 +11,8 @@ Env vars:
 # python custom_pdf_extraction_llm_pages.py --input-file "./annual_reports/2023 General Motors Annual Report .pdf" --query "Consolidated Balance Sheet" --query "Consolidated Income Statement"
 # python custom_pdf_extraction_llm_pages.py --input-file "./annual_reports/lvmh_dec_2024.pdf" --query "Consolidated Balance Sheet" --query "Consolidated Income Statement"
 
-# python custom_pdf_extraction_llm_pages.py --input-dir ./annual_reports --query "Consolidated Balance Sheet" --query "Consolidated Income Statement"
+## To extract all three statements from all annual reports in the annual_reports directory, run the following in Terminal:
+# python custom_pdf_extraction_llm_pages.py --input-dir ./annual_reports --query "Consolidated Balance Sheet" --query "Consolidated Income Statement" --query "Consolidated Cash Flow Statement"
 
 
 import argparse
