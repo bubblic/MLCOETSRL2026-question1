@@ -155,20 +155,7 @@ class TrainableFinancialModel(tf.Module):
         """
         # Ensure state is a FinancialState object for easier access
         if isinstance(state, dict):
-            # Map legacy/abbreviated keys to dataclass field names
-            mapping = {
-                "adv_pp": "advance_payments_purchases",
-                "adv_ps": "advance_payments_sales",
-                "ar": "accounts_receivable",
-                "inv": "inventory",
-                "ap": "accounts_payable",
-                "cl": "current_liabilities",
-                "ncl": "non_current_liabilities",
-                "ni": "net_income",
-                "ims": "investment_in_market_securities",
-            }
-            mapped_state = {mapping.get(k, k): v for k, v in state.items()}
-            state = FinancialState.from_dict(mapped_state)
+            state = FinancialState.from_dict(state)
 
         # 1. Assets Evolution
         asset_updates = self._evolve_assets(state, inputs)

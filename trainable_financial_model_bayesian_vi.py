@@ -44,21 +44,8 @@ class FinancialState:
 
     @classmethod
     def from_dict(cls, data: Dict[str, Any]) -> "FinancialState":
-        """Map legacy/abbreviated keys to full descriptive field names."""
-        mapping = {
-            "adv_pp": "advance_payments_purchases",
-            "adv_ps": "advance_payments_sales",
-            "ar": "accounts_receivable",
-            "inv": "inventory",
-            "ap": "accounts_payable",
-            "cl": "current_liabilities",
-            "ncl": "non_current_liabilities",
-            "ni": "net_income",
-            "ims": "investment_in_market_securities",
-        }
-        mapped = {mapping.get(k, k): v for k, v in data.items()}
         valid_keys = cls.__dataclass_fields__.keys()
-        return cls(**{k: v for k, v in mapped.items() if k in valid_keys})
+        return cls(**{k: v for k, v in data.items() if k in valid_keys})
 
 
 @dataclass(frozen=True)
