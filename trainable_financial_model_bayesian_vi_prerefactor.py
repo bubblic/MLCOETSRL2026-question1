@@ -303,6 +303,7 @@ class TrainableFinancialModel(tf.Module):
 
                 # 7. Calculate Likelihood on the SCALED values
                 # This generates gradients ~1.0 instead of ~1e-10
+                # TODO: This is the key part that needs to be fixed to update the noise_sigma I think. Currently, it's not updating. Can fix it by sampling the log_prob of the noise_sigma and then taking the gradient of that.
                 likelihood_dist = tfd.Normal(loc=0.0, scale=sigma_scaled)
                 neg_log_likelihood = -tf.reduce_sum(
                     likelihood_dist.log_prob(residuals_scaled)
