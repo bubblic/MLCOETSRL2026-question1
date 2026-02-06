@@ -9,7 +9,7 @@ tfb = tfp.bijectors
 # --- 1. Define the Trainable Model ---
 class TrainableFinancialModel(tf.Module):
     def __init__(self):
-        self.billion_factor = 1e9
+        self.amount_scale = 1.0e9
 
         # --- Policy Parameters (Deterministic) ---
         ## These are trainable with simple linear regression
@@ -64,12 +64,12 @@ class TrainableFinancialModel(tf.Module):
 
         # 2. Baseline OpEx (Large negative number)
         self.q_base_opex_loc = tf.Variable(
-            -3.0e10 / self.billion_factor,
+            -3.0e10 / self.amount_scale,
             dtype=tf.float64,
             name="q_base_opex_loc",
         )
         self.q_base_opex_scale = tfp.util.TransformedVariable(
-            initial_value=1.0e9 / self.billion_factor,
+            initial_value=1.0e9 / self.amount_scale,
             bijector=tfb.Softplus(),
             dtype=tf.float64,
             name="q_base_opex_scale",
@@ -77,7 +77,7 @@ class TrainableFinancialModel(tf.Module):
 
         # 3. Aleatoric Uncertainty (The inherent noise in the OpEx data)
         self.noise_sigma = tfp.util.TransformedVariable(
-            initial_value=1.0e9 / self.billion_factor,
+            initial_value=1.0e9 / self.amount_scale,
             bijector=tfb.Softplus(),
             dtype=tf.float64,
             name="noise_sigma",
@@ -116,8 +116,8 @@ class TrainableFinancialModel(tf.Module):
         prior_var = tfd.Normal(loc=tf.constant(0.20, dtype=tf.float64), scale=0.1)
         # Prior: Baseline OpEx is around -30B with large wiggle room
         prior_base = tfd.Normal(
-            loc=tf.constant(-3.0e10 / self.billion_factor, dtype=tf.float64),
-            scale=1.0e10 / self.billion_factor,
+            loc=tf.constant(-3.0e10 / self.amount_scale, dtype=tf.float64),
+            scale=1.0e10 / self.amount_scale,
         )
 
         # Define Posteriors
@@ -288,11 +288,11 @@ class TrainableFinancialModel(tf.Module):
 
                 # 2. Calculate the Raw Prediction (in Billion Dollars)
                 pred_opex_raw = (base_opex_sample * cum_inf_tensor) + (
-                    var_opex_sample * sales_tensor / self.billion_factor
+                    var_opex_sample * sales_tensor
                 )
 
                 # 3. Calculate Residuals (The Error)
-                residuals = opex_tensor / self.billion_factor - pred_opex_raw
+                residuals = opex_tensor - pred_opex_raw
 
                 # 4. Calculate Likelihood
                 likelihood_dist = tfd.Normal(loc=0.0, scale=self.noise_sigma)
@@ -354,7 +354,9 @@ class TrainableFinancialModel(tf.Module):
 
             if i % 1000 == 0:
                 print(
-                    f"Epoch {i}: Loss={total_loss.numpy():.4e} | OpEx VI Loss={loss_opex_bayes.numpy():.4e} | OpEx Noise={self.noise_sigma.numpy():.2e}"
+                    f"Epoch {i}: Loss={total_loss.numpy():.4e} | "
+                    f"OpEx VI Loss={loss_opex_bayes.numpy():.4e} | "
+                    f"OpEx Noise={(self.noise_sigma.numpy() * model.amount_scale):.2e}"
                 )
 
         print("-" * 50)
@@ -375,9 +377,14 @@ class TrainableFinancialModel(tf.Module):
             f"Bayesian OpEx Variable %: Mean={self.q_var_opex_loc.numpy():.4f}, Std={self.q_var_opex_scale.numpy():.4f}"
         )
         print(
-            f"Bayesian OpEx Baseline:   Mean={self.q_base_opex_loc.numpy():.2e}, Std={self.q_base_opex_scale.numpy():.2e}"
+            "Bayesian OpEx Baseline (USD):   "
+            f"Mean={(self.q_base_opex_loc.numpy() * model.output_scale):.2e}, "
+            f"Std={(self.q_base_opex_scale.numpy() * model.output_scale):.2e}"
         )
-        print(f"OpEx aleatoric uncertainty: {self.noise_sigma.numpy():.2e}")
+        print(
+            "OpEx aleatoric uncertainty (USD): "
+            f"{(self.noise_sigma.numpy() * model.output_scale):.2e}"
+        )
 
         print("-" * 50)
 
@@ -477,7 +484,9 @@ class TrainableFinancialModel(tf.Module):
 
                     # IMPORTANT: Use mean (deterministic) OpEx for structural training
                     state_pred = self.forecast_step(
-                        state_prev, inputs_curr, use_mean_opex=True
+                        state_prev,
+                        inputs_curr,
+                        use_mean_opex=True,
                     )
 
                     # Targets are values at t+1
@@ -488,8 +497,8 @@ class TrainableFinancialModel(tf.Module):
                     )
                     loss_equity = tf.square(state_pred["equity"] - equity_t[t + 1])
 
-                    # Heuristic normalization
-                    total_loss += (loss_ni + loss_cl + loss_ncl + loss_equity) / 1e18
+                    # Total loss to minimize
+                    total_loss += loss_ni + loss_cl + loss_ncl + loss_equity
 
             grads = tape.gradient(total_loss, vars_to_train)
             optimizer.apply_gradients(zip(grads, vars_to_train))
@@ -522,10 +531,15 @@ class TrainableFinancialModel(tf.Module):
         print(f"Final %EF: {self.equity_financing_pct.numpy():.5f}")
         print("-" * 50)
 
-    def forecast_step(self, state, inputs, use_mean_opex=False):
+    def forecast_step(
+        self,
+        state,
+        inputs,
+        use_mean_opex=False,
+    ):
         """
         Calculate t based on t-1 state and t inputs.
-        Implements the logic of Pareja (09) Cash Budget construction
+        Implements the logic of Pareja (09) Cash Budget construction.
         """
         # Unpack previous state (t-1)
         ## Assets
@@ -605,10 +619,7 @@ class TrainableFinancialModel(tf.Module):
             var_opex, base_opex = self.sample_opex_params()
             noise = tfd.Normal(0.0, self.noise_sigma).sample()
 
-        opex = self.billion_factor * (
-            (base_opex * cum_inflation + sales_t / self.billion_factor * var_opex)
-            + noise
-        )
+        opex = (base_opex * cum_inflation) + (sales_t * var_opex) + noise
 
         ebitda = sales_t - cogs - opex
 
@@ -822,7 +833,9 @@ def run_monte_carlo_forecast(
             }
             # use_mean_opex=False triggers sampling
             current_state = model.forecast_step(
-                current_state, inputs, use_mean_opex=False
+                current_state,
+                inputs,
+                use_mean_opex=False,
             )
 
             sample_ni.append(current_state["net_income"].numpy())
@@ -841,8 +854,11 @@ def run_monte_carlo_forecast(
     print(f"{'Year':<5} | {'Mean NI':<15} | {'2.5% CI':<15} | {'97.5% CI':<15}")
     print("-" * 60)
     for t in range(len(mean_ni)):
+        mean_ni_usd = mean_ni[t] * model.amount_scale
+        lower_usd = lower_bound[t] * model.amount_scale
+        upper_usd = upper_bound[t] * model.amount_scale
         print(
-            f"{t+1:<5} | {mean_ni[t]:<15.2e} | {lower_bound[t]:<15.2e} | {upper_bound[t]:<15.2e}"
+            f"{t+1:<5} | {mean_ni_usd:<15.2e} | {lower_usd:<15.2e} | {upper_usd:<15.2e}"
         )
 
 
@@ -1128,100 +1144,126 @@ def run_training_and_forecast():
         [0.024, 0.018, 0.012, 0.047, 0.08, 0.041, 0.029, 0.027], dtype=np.float64
     )
 
+    # --- 2. SCALE INPUTS AND TARGETS TO BILLIONS FOR TRAINING STABILITY ---
+    amount_scale = model.amount_scale
+    sales_hist_bil = sales_hist / amount_scale
+    purchases_hist_bil = purchases_hist / amount_scale
+    nca_hist_bil = nca_hist / amount_scale
+    depr_hist_bil = depr_hist / amount_scale
+    advance_payments_sales_hist_bil = advance_payments_sales_hist / amount_scale
+    advance_payments_purchases_hist_bil = advance_payments_purchases_hist / amount_scale
+    accounts_receivable_hist_bil = accounts_receivable_hist / amount_scale
+    accounts_payable_hist_bil = accounts_payable_hist / amount_scale
+    inventory_hist_bil = inventory_hist / amount_scale
+    cash_hist_bil = cash_hist / amount_scale
+    investment_in_market_securities_hist_bil = (
+        investment_in_market_securities_hist / amount_scale
+    )
+    net_income_hist_bil = net_income_hist / amount_scale
+    dividends_hist_bil = dividends_hist / amount_scale
+    stock_buyback_hist_bil = stock_buyback_hist / amount_scale
+    opex_hist_bil = opex_hist / amount_scale
+    tax_hist_bil = tax_hist / amount_scale
+    current_liabilities_hist_bil = current_liabilities_hist / amount_scale
+    non_current_liabilities_hist_bil = non_current_liabilities_hist / amount_scale
+    equity_hist_bil = equity_hist / amount_scale
+
     # --- 2. TRAIN THE MODEL ---
     # We feed in the historical arrays from 2022-2024, and leave 2025 for forecast testing.
     model.train_simple_policies(
-        sales_hist[:-1],
-        purchases_hist[:-1],
-        nca_hist[:-1],
-        depr_hist[:-1],
-        advance_payments_sales_hist[:-1],
-        advance_payments_purchases_hist[:-1],
-        accounts_receivable_hist[:-1],
-        accounts_payable_hist[:-1],
-        inventory_hist[:-1],
-        cash_hist[:-1],
-        investment_in_market_securities_hist[:-1],
-        net_income_hist[:-1],
-        dividends_hist[:-1],
-        stock_buyback_hist[:-1],
-        opex_hist[:-1],
-        tax_hist[:-1],
+        sales_hist_bil[:-1],
+        purchases_hist_bil[:-1],
+        nca_hist_bil[:-1],
+        depr_hist_bil[:-1],
+        advance_payments_sales_hist_bil[:-1],
+        advance_payments_purchases_hist_bil[:-1],
+        accounts_receivable_hist_bil[:-1],
+        accounts_payable_hist_bil[:-1],
+        inventory_hist_bil[:-1],
+        cash_hist_bil[:-1],
+        investment_in_market_securities_hist_bil[:-1],
+        net_income_hist_bil[:-1],
+        dividends_hist_bil[:-1],
+        stock_buyback_hist_bil[:-1],
+        opex_hist_bil[:-1],
+        tax_hist_bil[:-1],
         inflation_hist[:-1],
     )
 
     # --- 3. TRAIN STRUCTURAL PARAMETERS ---
     # We still only feed in the historical arrays from 2022-2024, and leave 2025 for forecast testing.
     model.train_structural_parameters(
-        sales_hist[:-1],
-        purchases_hist[:-1],
-        nca_hist[:-1],
-        advance_payments_sales_hist[:-1],
-        advance_payments_purchases_hist[:-1],
-        accounts_receivable_hist[:-1],
-        accounts_payable_hist[:-1],
-        inventory_hist[:-1],
-        cash_hist[:-1],
-        investment_in_market_securities_hist[:-1],
-        net_income_hist[:-1],
-        dividends_hist[:-1],
-        stock_buyback_hist[:-1],
-        opex_hist[:-1],
-        tax_hist[:-1],
-        current_liabilities_hist[:-1],
-        non_current_liabilities_hist[:-1],
-        equity_hist[:-1],
+        sales_hist_bil[:-1],
+        purchases_hist_bil[:-1],
+        nca_hist_bil[:-1],
+        advance_payments_sales_hist_bil[:-1],
+        advance_payments_purchases_hist_bil[:-1],
+        accounts_receivable_hist_bil[:-1],
+        accounts_payable_hist_bil[:-1],
+        inventory_hist_bil[:-1],
+        cash_hist_bil[:-1],
+        investment_in_market_securities_hist_bil[:-1],
+        net_income_hist_bil[:-1],
+        dividends_hist_bil[:-1],
+        stock_buyback_hist_bil[:-1],
+        opex_hist_bil[:-1],
+        tax_hist_bil[:-1],
+        current_liabilities_hist_bil[:-1],
+        non_current_liabilities_hist_bil[:-1],
+        equity_hist_bil[:-1],
         inflation_hist[:-1],
     )
 
     # --- 4. RUN FORECAST (Using new parameters) ---
     # Initial State (t=0) 2024 Apple Balance Sheet
     state = {
-        "nca": tf.constant(nca_hist[-2], dtype=tf.float64),
+        "nca": tf.constant(nca_hist_bil[-2], dtype=tf.float64),
         "advance_payments_purchases": tf.constant(
-            advance_payments_purchases_hist[-2], dtype=tf.float64
+            advance_payments_purchases_hist_bil[-2], dtype=tf.float64
         ),
         "accounts_receivable": tf.constant(
-            accounts_receivable_hist[-2], dtype=tf.float64
+            accounts_receivable_hist_bil[-2], dtype=tf.float64
         ),
-        "inventory": tf.constant(inventory_hist[-2], dtype=tf.float64),
-        "cash": tf.constant(cash_hist[-2], dtype=tf.float64),
+        "inventory": tf.constant(inventory_hist_bil[-2], dtype=tf.float64),
+        "cash": tf.constant(cash_hist_bil[-2], dtype=tf.float64),
         "investment_in_market_securities": tf.constant(
-            investment_in_market_securities_hist[-2], dtype=tf.float64
+            investment_in_market_securities_hist_bil[-2], dtype=tf.float64
         ),
-        "accounts_payable": tf.constant(accounts_payable_hist[-2], dtype=tf.float64),
+        "accounts_payable": tf.constant(
+            accounts_payable_hist_bil[-2], dtype=tf.float64
+        ),
         "advance_payments_sales": tf.constant(
-            advance_payments_sales_hist[-2], dtype=tf.float64
+            advance_payments_sales_hist_bil[-2], dtype=tf.float64
         ),
         "current_liabilities": tf.constant(
-            current_liabilities_hist[-2], dtype=tf.float64
+            current_liabilities_hist_bil[-2], dtype=tf.float64
         ),
         "non_current_liabilities": tf.constant(
-            non_current_liabilities_hist[-2], dtype=tf.float64
+            non_current_liabilities_hist_bil[-2], dtype=tf.float64
         ),
-        "equity": tf.constant(equity_hist[-2], dtype=tf.float64),
-        "net_income": tf.constant(net_income_hist[-2], dtype=tf.float64),
+        "equity": tf.constant(equity_hist_bil[-2], dtype=tf.float64),
+        "net_income": tf.constant(net_income_hist_bil[-2], dtype=tf.float64),
     }
 
     # Forecast Drivers (Sales/Purchases) for 2025-2028
     # Year 1 to 4. We are only interested in Year 1 to 3. The padding is needed for forecasting. Use float64
-    sales_growth_rate = sales_hist[-1] / sales_hist[-2]
-    purchases_growth_rate = purchases_hist[-1] / purchases_hist[-2]
+    sales_growth_rate = sales_hist_bil[-1] / sales_hist_bil[-2]
+    purchases_growth_rate = purchases_hist_bil[-1] / purchases_hist_bil[-2]
     sales_forecast = np.array(
         [
-            sales_hist[-1],
-            sales_hist[-1] * sales_growth_rate,
-            sales_hist[-1] * sales_growth_rate**2,
-            sales_hist[-1] * sales_growth_rate**3,
+            sales_hist_bil[-1],
+            sales_hist_bil[-1] * sales_growth_rate,
+            sales_hist_bil[-1] * sales_growth_rate**2,
+            sales_hist_bil[-1] * sales_growth_rate**3,
         ],
         dtype=np.float64,
     )
     purchases_forecast = np.array(
         [
-            purchases_hist[-1],
-            purchases_hist[-1] * purchases_growth_rate,
-            purchases_hist[-1] * purchases_growth_rate**2,
-            purchases_hist[-1] * purchases_growth_rate**3,
+            purchases_hist_bil[-1],
+            purchases_hist_bil[-1] * purchases_growth_rate,
+            purchases_hist_bil[-1] * purchases_growth_rate**2,
+            purchases_hist_bil[-1] * purchases_growth_rate**3,
         ],
         dtype=np.float64,
     )
