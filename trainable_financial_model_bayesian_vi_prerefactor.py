@@ -148,7 +148,7 @@ class TrainableFinancialModel(tf.Module):
         historical_tax,
         historical_inflation=None,
         learning_rate=0.0001,
-        epochs=50000,
+        epochs=100000,
     ):
         """
         Trains simple policy parameters using historical data.
@@ -410,7 +410,7 @@ class TrainableFinancialModel(tf.Module):
         historical_equity,
         historical_inflation=None,
         learning_rate=0.0001,
-        epochs=50000,
+        epochs=100000,
     ):
         """
         Trains structural parameters (interest rates, maturity, financing)
