@@ -9,6 +9,8 @@ tfb = tfp.bijectors
 # --- 1. Define the Trainable Model ---
 class TrainableFinancialModel(tf.Module):
     def __init__(self):
+        self.billion_factor = 1e9
+
         # --- Policy Parameters (Deterministic) ---
         ## These are trainable with simple linear regression
         self.asset_growth = tf.Variable(
@@ -62,10 +64,12 @@ class TrainableFinancialModel(tf.Module):
 
         # 2. Baseline OpEx (Large negative number)
         self.q_base_opex_loc = tf.Variable(
-            -3.0e10, dtype=tf.float64, name="q_base_opex_loc"
+            -3.0e10 / self.billion_factor,
+            dtype=tf.float64,
+            name="q_base_opex_loc",
         )
         self.q_base_opex_scale = tfp.util.TransformedVariable(
-            initial_value=1.0e9,
+            initial_value=1.0e9 / self.billion_factor,
             bijector=tfb.Softplus(),
             dtype=tf.float64,
             name="q_base_opex_scale",
@@ -73,7 +77,7 @@ class TrainableFinancialModel(tf.Module):
 
         # 3. Aleatoric Uncertainty (The inherent noise in the OpEx data)
         self.noise_sigma = tfp.util.TransformedVariable(
-            initial_value=1.0e9,
+            initial_value=1.0e9 / self.billion_factor,
             bijector=tfb.Softplus(),
             dtype=tf.float64,
             name="noise_sigma",
@@ -112,7 +116,8 @@ class TrainableFinancialModel(tf.Module):
         prior_var = tfd.Normal(loc=tf.constant(0.20, dtype=tf.float64), scale=0.1)
         # Prior: Baseline OpEx is around -30B with large wiggle room
         prior_base = tfd.Normal(
-            loc=tf.constant(-3.0e10, dtype=tf.float64), scale=1.0e10
+            loc=tf.constant(-3.0e10 / self.billion_factor, dtype=tf.float64),
+            scale=1.0e10 / self.billion_factor,
         )
 
         # Define Posteriors
@@ -143,7 +148,7 @@ class TrainableFinancialModel(tf.Module):
         historical_tax,
         historical_inflation=None,
         learning_rate=0.0001,
-        epochs=5000,
+        epochs=100000,
     ):
         """
         Trains simple policy parameters using historical data.
@@ -193,6 +198,7 @@ class TrainableFinancialModel(tf.Module):
         # 4. Advance Payments Purchases: adv_pp_t = purchases_{t+1} * adv_pp_pct
         adv_pp_true = adv_pay_purch_tensor[:-1]
         purchases_next_aligned = purchases_tensor[1:]
+
         # 5. Dividends: div_t = ni_{t-1} * div_pct
         div_true = div_tensor[1:]
         ni_prev_aligned = ni_tensor[:-1]
@@ -277,76 +283,28 @@ class TrainableFinancialModel(tf.Module):
                 )
 
                 # --- Bayesian OpEx Loss ---
-                # --- NEW (Attempting to fix so the noise_sigma (aleatoric uncertainty) will update) ---
-                # 1. Define a scaling factor for numerical stability (e.g., 10 Billion)
-                scale_normalization = 1e10
-
-                # 2. Sample parameters
+                # 1. Sample parameters
                 var_opex_sample, base_opex_sample = self.sample_opex_params()
 
-                # 3. Calculate the Raw Prediction (in Dollars)
+                # 2. Calculate the Raw Prediction (in Billion Dollars)
                 pred_opex_raw = (base_opex_sample * cum_inf_tensor) + (
-                    var_opex_sample * sales_tensor
+                    var_opex_sample * sales_tensor / self.billion_factor
                 )
 
-                # 4. Calculate Residuals (The Error)
-                residuals = opex_tensor - pred_opex_raw
+                # 3. Calculate Residuals (The Error)
+                residuals = opex_tensor / self.billion_factor - pred_opex_raw
 
-                # 5. SCALE DOWN the residuals
-                # We convert the error from "Dollars" to "Units of 10B"
-                # Example: An error of $5B becomes 0.5
-                residuals_scaled = residuals / scale_normalization
+                # 4. Calculate Likelihood
+                likelihood_dist = tfd.Normal(loc=0.0, scale=self.noise_sigma)
+                neg_log_likelihood = -tf.reduce_sum(likelihood_dist.log_prob(residuals))
 
-                # 6. We define a "Scaled Sigma" variable just for this loss calculation
-                # We want self.noise_sigma to still represent DOLLARS, so we divide it here.
-                sigma_scaled = self.noise_sigma / scale_normalization
-
-                # 7. Calculate Likelihood on the SCALED values
-                # This generates gradients ~1.0 instead of ~1e-10
-                # TODO: This is the key part that needs to be fixed to update the noise_sigma I think. Currently, it's not updating. Can fix it by sampling the log_prob of the noise_sigma and then taking the gradient of that.
-                likelihood_dist = tfd.Normal(loc=0.0, scale=sigma_scaled)
-                neg_log_likelihood = -tf.reduce_sum(
-                    likelihood_dist.log_prob(residuals_scaled)
-                )
-
-                # 8. KL Divergence
-                # We also scale this up slightly so it doesn't get drowned out
+                # 5. KL Divergence
                 kl = self.get_opex_kl_divergence()
 
-                # 9. Final Sum
-                # We no longer need the extreme 1e-20 factor from before.
-                # We just add them up. Since NLL is now based on small numbers, it will be approx 10-20.
+                # 6. Final Sum
                 loss_opex_bayes = neg_log_likelihood + kl
 
-                # --- OLD (Broken due to large numbers)
-                #  # 1. Sample from Posterior
-                # var_opex_sample, base_opex_sample = self.sample_opex_params()
-
-                # # 2. Predict OpEx using samples
-                # # opex = baseline * product(1+inf) + var * sales
-                # pred_opex_mean = (base_opex_sample * cum_inf_tensor) + (
-                #     var_opex_sample * sales_tensor
-                # )
-
-                # # 3. Calculate Negative Log Likelihood
-                # # We assume the Observed OpEx comes from N(pred_mean, noise_sigma)
-                # likelihood_dist = tfd.Normal(loc=pred_opex_mean, scale=self.noise_sigma)
-                # neg_log_likelihood = -tf.reduce_sum(
-                #     likelihood_dist.log_prob(opex_tensor)
-                # )
-
-                # # 4. Calculate KL Divergence
-                # kl = self.get_opex_kl_divergence()
-
-                # # Weighting: Scale down likelihood or up KL?
-                # # Since we have few data points and large numbers, simple summation is risky.
-                # # Heuristic: Scale KL by 1.0 (standard) and treat NegLL as usual.
-                # # Note: Because financial numbers are ~1e10, NegLL will be huge.
-                # # We normalize the NegLL by a factor to make gradients stable relative to MSE losses.
-                # scale_factor = 1e-20  # Empirically helps with large numbers
-                # loss_opex_bayes = (neg_log_likelihood + kl) * scale_factor
-
-                # Combined Loss (Heuristic: Normalize by scale to help Adam)
+                # --- Combined Loss (Heuristic: Normalize by scale to help Adam) ---
                 # But for simplicity, we'll just sum them up for now.
                 total_loss = (
                     loss_growth
@@ -396,7 +354,7 @@ class TrainableFinancialModel(tf.Module):
 
             if i % 1000 == 0:
                 print(
-                    f"Epoch {i}: Loss={total_loss.numpy():.4e} | OpEx Noise={self.noise_sigma.numpy():.2e}"
+                    f"Epoch {i}: Loss={total_loss.numpy():.4e} | OpEx VI Loss={loss_opex_bayes.numpy():.4e} | OpEx Noise={self.noise_sigma.numpy():.2e}"
                 )
 
         print("-" * 50)
@@ -419,6 +377,7 @@ class TrainableFinancialModel(tf.Module):
         print(
             f"Bayesian OpEx Baseline:   Mean={self.q_base_opex_loc.numpy():.2e}, Std={self.q_base_opex_scale.numpy():.2e}"
         )
+        print(f"OpEx aleatoric uncertainty: {self.noise_sigma.numpy():.2e}")
 
         print("-" * 50)
 
@@ -444,7 +403,7 @@ class TrainableFinancialModel(tf.Module):
         historical_equity,
         historical_inflation=None,
         learning_rate=0.0001,
-        epochs=5000,
+        epochs=100000,
     ):
         """
         Trains structural parameters (interest rates, maturity, financing)
@@ -646,7 +605,10 @@ class TrainableFinancialModel(tf.Module):
             var_opex, base_opex = self.sample_opex_params()
             noise = tfd.Normal(0.0, self.noise_sigma).sample()
 
-        opex = (base_opex * cum_inflation + sales_t * var_opex) + noise
+        opex = self.billion_factor * (
+            (base_opex * cum_inflation + sales_t / self.billion_factor * var_opex)
+            + noise
+        )
 
         ebitda = sales_t - cogs - opex
 
