@@ -378,12 +378,12 @@ class TrainableFinancialModel(tf.Module):
         )
         print(
             "Bayesian OpEx Baseline (USD):   "
-            f"Mean={(self.q_base_opex_loc.numpy() * self.output_scale):.2e}, "
-            f"Std={(self.q_base_opex_scale.numpy() * self.output_scale):.2e}"
+            f"Mean={(self.q_base_opex_loc.numpy() * self.amount_scale):.2e}, "
+            f"Std={(self.q_base_opex_scale.numpy() * self.amount_scale):.2e}"
         )
         print(
             "OpEx aleatoric uncertainty (USD): "
-            f"{(self.noise_sigma.numpy() * self.output_scale):.2e}"
+            f"{(self.noise_sigma.numpy() * self.amount_scale):.2e}"
         )
 
         print("-" * 50)
