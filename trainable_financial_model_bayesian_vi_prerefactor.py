@@ -2,6 +2,7 @@ import tensorflow as tf
 import tensorflow_probability as tfp
 import numpy as np
 import matplotlib.pyplot as plt
+from datetime import datetime
 
 tfd = tfp.distributions
 tfb = tfp.bijectors
@@ -457,7 +458,8 @@ class TrainableFinancialModel(tf.Module):
 
             fig.suptitle("Variational Inference Parameters and Loss Over Epochs")
             plt.tight_layout()
-            plt.savefig("vi_training_diagnostics.png", dpi=150)
+            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+            plt.savefig(f"vi_training_diagnostics_{timestamp}.png", dpi=150)
             if show_plot:
                 plt.show()
             else:
@@ -1016,7 +1018,8 @@ def plot_opex_fit_with_aleatoric_noise(
     plt.grid(True, alpha=0.3)
     plt.legend()
     plt.tight_layout()
-    plt.savefig("opex_probabilistic_fit.png", dpi=150)
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    plt.savefig(f"opex_probabilistic_fit_{timestamp}.png", dpi=150)
     if show_plot:
         plt.show()
     else:
