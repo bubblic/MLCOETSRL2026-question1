@@ -1075,6 +1075,12 @@ def plot_opex_fit_with_aleatoric_noise(
         color="tab:blue",
         alpha=0.8,
     )
+    # Add x-axis padding to visualize extrapolation beyond training range
+    x_min = float(np.min(sales_hist_usd))
+    x_max = float(np.max(sales_hist_usd))
+    x_span = x_max - x_min if x_max > x_min else max(abs(x_max), 1.0)
+    x_pad = 0.25 * x_span
+    plt.xlim(x_min - x_pad, x_max + x_pad)
     plt.title("OpEx vs Sales with Learned Probabilistic Linear Regression")
     plt.xlabel("Sales (USD)")
     plt.ylabel("OpEx (USD)")
