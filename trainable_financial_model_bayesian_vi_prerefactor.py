@@ -1037,12 +1037,52 @@ def plot_opex_fit_with_aleatoric_noise(
         plt.close()
 
     # --- OpEx vs Sales (separate figure) ---
-    sort_idx = np.argsort(sales_hist_usd)
-    sales_sorted = sales_hist_usd[sort_idx]
-    opex_hist_sorted = opex_hist_usd[sort_idx]
-    mean_opex_sorted = mean_opex_usd[sort_idx]
-    lower_opex_sorted = lower_opex_usd[sort_idx]
-    upper_opex_sorted = upper_opex_usd[sort_idx]
+    # Add x-axis padding to visualize extrapolation beyond training range
+    x_min = float(np.min(sales_hist_usd))
+    x_max = float(np.max(sales_hist_usd))
+    x_span = x_max - x_min if x_max > x_min else max(abs(x_max), 1.0)
+    x_pad = 0.25 * x_span
+    x_left = x_min - x_pad
+    x_right = x_max + x_pad
+
+    # Extend the regression lines to the padded range
+    sales_grid_usd = np.linspace(x_left, x_right, 200)
+    sales_grid_bil = sales_grid_usd / amount_scale
+    mean_opex_grid_bil = (mean_base_opex * cum_inf) + (
+        mean_var_opex * sales_grid_bil
+    )
+    mean_opex_grid_usd = mean_opex_grid_bil * amount_scale
+
+    q_var = tfd.Normal(loc=model.q_var_opex_loc, scale=model.q_var_opex_scale)
+    q_base = tfd.Normal(loc=model.q_base_opex_loc, scale=model.q_base_opex_scale)
+    var_samples = q_var.sample(n_samples)
+    base_samples = q_base.sample(n_samples)
+    var_samples = tf.reshape(var_samples, (-1, 1))
+    base_samples = tf.reshape(base_samples, (-1, 1))
+    sales_grid_t = tf.reshape(
+        tf.convert_to_tensor(sales_grid_bil, dtype=tf.float64), (1, -1)
+    )
+    cum_inf_mean = float(np.mean(cum_inf))
+    cum_inf_grid_t = tf.reshape(
+        tf.convert_to_tensor(
+            np.full_like(sales_grid_bil, cum_inf_mean), dtype=tf.float64
+        ),
+        (1, -1),
+    )
+    noise_grid = tf.random.normal(
+        shape=(n_samples, len(sales_grid_bil)),
+        mean=0.0,
+        stddev=sigma_opex,
+        dtype=tf.float64,
+    )
+    opex_samples_grid_bil = (
+        base_samples * cum_inf_grid_t
+    ) + (var_samples * sales_grid_t) + noise_grid
+    opex_samples_grid_bil = opex_samples_grid_bil.numpy()
+    lower_opex_grid_bil = np.percentile(opex_samples_grid_bil, lower_q, axis=0)
+    upper_opex_grid_bil = np.percentile(opex_samples_grid_bil, upper_q, axis=0)
+    lower_opex_grid_usd = lower_opex_grid_bil * amount_scale
+    upper_opex_grid_usd = upper_opex_grid_bil * amount_scale
 
     plt.figure(figsize=(10, 5))
     plt.scatter(
@@ -1053,34 +1093,29 @@ def plot_opex_fit_with_aleatoric_noise(
         zorder=3,
     )
     plt.plot(
-        sales_sorted,
-        mean_opex_sorted,
+        sales_grid_usd,
+        mean_opex_grid_usd,
         "-",
         label="Mean OpEx (learned)",
         color="tab:blue",
     )
     plt.plot(
-        sales_sorted,
-        lower_opex_sorted,
+        sales_grid_usd,
+        lower_opex_grid_usd,
         "--",
         label=f"Posterior predictive {lower_q:.0f}%",
         color="tab:blue",
         alpha=0.8,
     )
     plt.plot(
-        sales_sorted,
-        upper_opex_sorted,
+        sales_grid_usd,
+        upper_opex_grid_usd,
         "--",
         label=f"Posterior predictive {upper_q:.0f}%",
         color="tab:blue",
         alpha=0.8,
     )
-    # Add x-axis padding to visualize extrapolation beyond training range
-    x_min = float(np.min(sales_hist_usd))
-    x_max = float(np.max(sales_hist_usd))
-    x_span = x_max - x_min if x_max > x_min else max(abs(x_max), 1.0)
-    x_pad = 0.25 * x_span
-    plt.xlim(x_min - x_pad, x_max + x_pad)
+    plt.xlim(x_left, x_right)
     plt.title("OpEx vs Sales with Learned Probabilistic Linear Regression")
     plt.xlabel("Sales (USD)")
     plt.ylabel("OpEx (USD)")
