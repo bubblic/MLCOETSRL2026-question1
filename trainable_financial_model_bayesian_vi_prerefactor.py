@@ -940,100 +940,6 @@ def run_monte_carlo_forecast(
         )
 
 
-def make_design_matrix(x):
-    return np.hstack((np.ones((len(x), 1)), x))
-
-
-def posterior(x, y, one_over_var0, var):
-    """
-    x vector with training x data
-    y vector with training y values
-    one_over_var0 1/σ0^2 the variances of the prior distribution
-    var is the assumed to be known variance of data
-    @returns mean vector mu and covariance Matrix Sig
-    """
-    X = make_design_matrix(x)
-    sig_inv = one_over_var0 * np.eye(X.shape[1]) + X.T.dot(X) / var
-    sig = np.linalg.inv(sig_inv)
-    mu = sig.dot(X.T).dot(y) / var
-    return mu, sig
-
-
-def posterior_predictive(x_test, mu, sig, var):
-    """
-    x_test the positions, where the posterior is to be evaluated
-    mu the mean values of the weight-posterior
-    sig the covariance matrix
-    var is the assumed to be known variance of data
-    Computes mean and variances of the posterior predictive distribution of y
-    """
-    X_test = make_design_matrix(x_test)
-    y = X_test.dot(mu)
-    # Only compute variances (diagonal elements of covariance matrix)
-    y_var = var + np.sum(X_test.dot(sig) * X_test, axis=1)
-    return y, y_var
-
-
-def plot_opex_bayes_regression(
-    historical_sales_usd,
-    historical_opex_usd,
-    x_pad_frac=0.25,
-    show_plot=False,
-):
-    x = historical_sales_usd.reshape(-1, 1)
-    y = historical_opex_usd.reshape(-1, 1)
-
-    # Estimate observation variance from least-squares residuals
-    X = make_design_matrix(x)
-    beta, *_ = np.linalg.lstsq(X, y, rcond=None)
-    residuals = y - X.dot(beta)
-    var = float(np.var(residuals, ddof=2))
-    if not np.isfinite(var) or var <= 0.0:
-        var = 1e-8
-
-    x_min = float(np.min(x))
-    x_max = float(np.max(x))
-    x_span = x_max - x_min if x_max > x_min else max(abs(x_max), 1.0)
-    x_pad = x_pad_frac * x_span
-    x_left = x_min - x_pad
-    x_right = x_max + x_pad
-
-    xs = np.linspace(x_left, x_right, 250).reshape((250, 1))
-    mu, sig = posterior(x, y, 0.0, var)
-    y_mu, y_var = posterior_predictive(xs, mu, sig, var)
-
-    plt.figure(figsize=(10, 5))
-    plt.plot(xs, y_mu, color="black", label="Posterior mean")
-    plt.plot(
-        xs,
-        y_mu + 2 * np.sqrt(y_var),
-        linestyle="dashed",
-        alpha=0.5,
-        color="black",
-        label="±2σ",
-    )
-    plt.plot(
-        xs,
-        y_mu - 2 * np.sqrt(y_var),
-        linestyle="dashed",
-        alpha=0.5,
-        color="black",
-    )
-    plt.scatter(x, y, color="red", label="Historical OpEx")
-    plt.xlabel("Sales (USD)")
-    plt.ylabel("OpEx (USD)")
-    plt.title("OpEx vs Sales (Bayesian Linear Regression)")
-    plt.grid(True, alpha=0.3)
-    plt.legend()
-    plt.tight_layout()
-    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    plt.savefig(f"opex_vs_sales_bayes_{timestamp}.png", dpi=150)
-    if show_plot:
-        plt.show()
-    else:
-        plt.close()
-
-
 def plot_opex_fit_with_aleatoric_noise(
     model,
     historical_years,
@@ -1044,6 +950,7 @@ def plot_opex_fit_with_aleatoric_noise(
     lower_q=5.0,
     upper_q=95.0,
     show_plot=False,
+    use_gaussian_ci=False,
 ):
     if historical_inflation is None:
         historical_inflation = np.zeros_like(historical_sales_bil)
@@ -1055,29 +962,44 @@ def plot_opex_fit_with_aleatoric_noise(
 
     mean_opex_bil = (mean_base_opex * cum_inf) + (mean_var_opex * historical_sales_bil)
 
-    # Posterior predictive samples with aleatoric noise (sigma)
-    q_var = tfd.Normal(loc=model.q_var_opex_loc, scale=model.q_var_opex_scale)
-    q_base = tfd.Normal(loc=model.q_base_opex_loc, scale=model.q_base_opex_scale)
-    var_samples = q_var.sample(n_samples)  # [S]
-    base_samples = q_base.sample(n_samples)  # [S]
+    if use_gaussian_ci:
+        # Analytical Gaussian predictive intervals (exact for linear-Gaussian model)
+        var_var = float(model.q_var_opex_scale.numpy()) ** 2
+        var_base = float(model.q_base_opex_scale.numpy()) ** 2
+        var_noise = float(sigma_opex) ** 2
+        cum_inf_np = np.asarray(cum_inf, dtype=np.float64)
+        sales_np = np.asarray(historical_sales_bil, dtype=np.float64)
+        std_opex_bil = np.sqrt(
+            (cum_inf_np**2) * var_base + (sales_np**2) * var_var + var_noise
+        )
+        z_low = float(tfd.Normal(0.0, 1.0).quantile(lower_q / 100.0))
+        z_up = float(tfd.Normal(0.0, 1.0).quantile(upper_q / 100.0))
+        lower_opex_bil = mean_opex_bil + z_low * std_opex_bil
+        upper_opex_bil = mean_opex_bil + z_up * std_opex_bil
+    else:
+        # Posterior predictive samples with aleatoric noise (sigma)
+        q_var = tfd.Normal(loc=model.q_var_opex_loc, scale=model.q_var_opex_scale)
+        q_base = tfd.Normal(loc=model.q_base_opex_loc, scale=model.q_base_opex_scale)
+        var_samples = q_var.sample(n_samples)  # [S]
+        base_samples = q_base.sample(n_samples)  # [S]
 
-    var_samples = tf.reshape(var_samples, (-1, 1))
-    base_samples = tf.reshape(base_samples, (-1, 1))
-    sales = tf.reshape(
-        tf.convert_to_tensor(historical_sales_bil, dtype=tf.float64), (1, -1)
-    )
-    cum_inf_t = tf.reshape(tf.convert_to_tensor(cum_inf, dtype=tf.float64), (1, -1))
-    noise = tf.random.normal(
-        shape=(n_samples, len(historical_sales_bil)),
-        mean=0.0,
-        stddev=sigma_opex,
-        dtype=tf.float64,
-    )
-    opex_samples_bil = (base_samples * cum_inf_t) + (var_samples * sales) + noise
-    opex_samples_bil = opex_samples_bil.numpy()
+        var_samples = tf.reshape(var_samples, (-1, 1))
+        base_samples = tf.reshape(base_samples, (-1, 1))
+        sales = tf.reshape(
+            tf.convert_to_tensor(historical_sales_bil, dtype=tf.float64), (1, -1)
+        )
+        cum_inf_t = tf.reshape(tf.convert_to_tensor(cum_inf, dtype=tf.float64), (1, -1))
+        noise = tf.random.normal(
+            shape=(n_samples, len(historical_sales_bil)),
+            mean=0.0,
+            stddev=sigma_opex,
+            dtype=tf.float64,
+        )
+        opex_samples_bil = (base_samples * cum_inf_t) + (var_samples * sales) + noise
+        opex_samples_bil = opex_samples_bil.numpy()
 
-    lower_opex_bil = np.percentile(opex_samples_bil, lower_q, axis=0)
-    upper_opex_bil = np.percentile(opex_samples_bil, upper_q, axis=0)
+        lower_opex_bil = np.percentile(opex_samples_bil, lower_q, axis=0)
+        upper_opex_bil = np.percentile(opex_samples_bil, upper_q, axis=0)
 
     amount_scale = model.amount_scale
     mean_opex_usd = mean_opex_bil * amount_scale
@@ -1124,7 +1046,8 @@ def plot_opex_fit_with_aleatoric_noise(
     plt.legend()
     plt.tight_layout()
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    plt.savefig(f"opex_probabilistic_fit_{timestamp}.png", dpi=150)
+    tag = "gaussian_ci" if use_gaussian_ci else "monte_carlo"
+    plt.savefig(f"opex_probabilistic_fit_{timestamp}_{tag}.png", dpi=150)
     if show_plot:
         plt.show()
     else:
@@ -1148,33 +1071,45 @@ def plot_opex_fit_with_aleatoric_noise(
     )
     mean_opex_grid_usd = mean_opex_grid_bil * amount_scale
 
-    q_var = tfd.Normal(loc=model.q_var_opex_loc, scale=model.q_var_opex_scale)
-    q_base = tfd.Normal(loc=model.q_base_opex_loc, scale=model.q_base_opex_scale)
-    var_samples = q_var.sample(n_samples)
-    base_samples = q_base.sample(n_samples)
-    var_samples = tf.reshape(var_samples, (-1, 1))
-    base_samples = tf.reshape(base_samples, (-1, 1))
-    sales_grid_t = tf.reshape(
-        tf.convert_to_tensor(sales_grid_bil, dtype=tf.float64), (1, -1)
-    )
-    cum_inf_grid_t = tf.reshape(
-        tf.convert_to_tensor(
-            np.full_like(sales_grid_bil, cum_inf_mean), dtype=tf.float64
-        ),
-        (1, -1),
-    )
-    noise_grid = tf.random.normal(
-        shape=(n_samples, len(sales_grid_bil)),
-        mean=0.0,
-        stddev=sigma_opex,
-        dtype=tf.float64,
-    )
-    opex_samples_grid_bil = (
-        base_samples * cum_inf_grid_t
-    ) + (var_samples * sales_grid_t) + noise_grid
-    opex_samples_grid_bil = opex_samples_grid_bil.numpy()
-    lower_opex_grid_bil = np.percentile(opex_samples_grid_bil, lower_q, axis=0)
-    upper_opex_grid_bil = np.percentile(opex_samples_grid_bil, upper_q, axis=0)
+    if use_gaussian_ci:
+        var_var = float(model.q_var_opex_scale.numpy()) ** 2
+        var_base = float(model.q_base_opex_scale.numpy()) ** 2
+        var_noise = float(sigma_opex) ** 2
+        std_opex_grid_bil = np.sqrt(
+            (cum_inf_mean**2) * var_base + (sales_grid_bil**2) * var_var + var_noise
+        )
+        z_low = float(tfd.Normal(0.0, 1.0).quantile(lower_q / 100.0))
+        z_up = float(tfd.Normal(0.0, 1.0).quantile(upper_q / 100.0))
+        lower_opex_grid_bil = mean_opex_grid_bil + z_low * std_opex_grid_bil
+        upper_opex_grid_bil = mean_opex_grid_bil + z_up * std_opex_grid_bil
+    else:
+        q_var = tfd.Normal(loc=model.q_var_opex_loc, scale=model.q_var_opex_scale)
+        q_base = tfd.Normal(loc=model.q_base_opex_loc, scale=model.q_base_opex_scale)
+        var_samples = q_var.sample(n_samples)
+        base_samples = q_base.sample(n_samples)
+        var_samples = tf.reshape(var_samples, (-1, 1))
+        base_samples = tf.reshape(base_samples, (-1, 1))
+        sales_grid_t = tf.reshape(
+            tf.convert_to_tensor(sales_grid_bil, dtype=tf.float64), (1, -1)
+        )
+        cum_inf_grid_t = tf.reshape(
+            tf.convert_to_tensor(
+                np.full_like(sales_grid_bil, cum_inf_mean), dtype=tf.float64
+            ),
+            (1, -1),
+        )
+        noise_grid = tf.random.normal(
+            shape=(n_samples, len(sales_grid_bil)),
+            mean=0.0,
+            stddev=sigma_opex,
+            dtype=tf.float64,
+        )
+        opex_samples_grid_bil = (
+            (base_samples * cum_inf_grid_t) + (var_samples * sales_grid_t) + noise_grid
+        )
+        opex_samples_grid_bil = opex_samples_grid_bil.numpy()
+        lower_opex_grid_bil = np.percentile(opex_samples_grid_bil, lower_q, axis=0)
+        upper_opex_grid_bil = np.percentile(opex_samples_grid_bil, upper_q, axis=0)
     lower_opex_grid_usd = lower_opex_grid_bil * amount_scale
     upper_opex_grid_usd = upper_opex_grid_bil * amount_scale
 
@@ -1217,7 +1152,8 @@ def plot_opex_fit_with_aleatoric_noise(
     plt.legend()
     plt.tight_layout()
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    plt.savefig(f"opex_vs_sales_fit_{timestamp}.png", dpi=150)
+    tag = "gaussian_ci" if use_gaussian_ci else "monte_carlo"
+    plt.savefig(f"opex_vs_sales_fit_{timestamp}_{tag}.png", dpi=150)
     if show_plot:
         plt.show()
     else:
@@ -1557,6 +1493,8 @@ def run_training_and_forecast():
 
     # --- 3. PLOT OPEX FIT (Mean + Aleatoric Sigma) ---
     historical_years = np.arange(1, len(opex_hist_bil) + 1)
+
+    # Posterior prediction by Gaussian Confidence Interval
     plot_opex_fit_with_aleatoric_noise(
         model,
         historical_years,
@@ -1564,8 +1502,19 @@ def run_training_and_forecast():
         opex_hist_bil,
         inflation_hist,
         show_plot=False,
+        use_gaussian_ci=True,
     )
-    plot_opex_bayes_regression(sales_hist, opex_hist, show_plot=False)
+
+    # Posterior prediction by sampling (Monte Carlo)
+    plot_opex_fit_with_aleatoric_noise(
+        model,
+        historical_years,
+        sales_hist_bil,
+        opex_hist_bil,
+        inflation_hist,
+        show_plot=False,
+        use_gaussian_ci=False,
+    )
 
     # --- 4. TRAIN STRUCTURAL PARAMETERS ---
     # We still only feed in the historical arrays from 2022-2024, and leave 2025 for forecast testing.
