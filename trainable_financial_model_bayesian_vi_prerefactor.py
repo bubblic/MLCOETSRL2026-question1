@@ -1,6 +1,7 @@
 import tensorflow as tf
 import tensorflow_probability as tfp
 import numpy as np
+import matplotlib.pyplot as plt
 
 tfd = tfp.distributions
 tfb = tfp.bijectors
@@ -149,6 +150,8 @@ class TrainableFinancialModel(tf.Module):
         historical_inflation=None,
         learning_rate=0.0001,
         epochs=10000000,
+        plot_vi=True,
+        plot_every=1000,
     ):
         """
         Trains simple policy parameters using historical data.
@@ -227,6 +230,16 @@ class TrainableFinancialModel(tf.Module):
             self.q_base_opex_scale.trainable_variables[0],
             self.noise_sigma.trainable_variables[0],
         ]
+
+        vi_history = {
+            "epochs": [],
+            "loss_vi": [],
+            "q_var_opex_loc": [],
+            "q_var_opex_scale": [],
+            "q_base_opex_loc": [],
+            "q_base_opex_scale": [],
+            "noise_sigma": [],
+        }
 
         for i in range(epochs):
             with tf.GradientTape() as tape:
@@ -352,7 +365,15 @@ class TrainableFinancialModel(tf.Module):
             )
             self.stock_buyback_pct.assign(tf.maximum(0.0, self.stock_buyback_pct))
 
-            if i % 1000 == 0:
+            if i % plot_every == 0:
+                vi_history["epochs"].append(i)
+                vi_history["loss_vi"].append(loss_opex_bayes.numpy())
+                vi_history["q_var_opex_loc"].append(self.q_var_opex_loc.numpy())
+                vi_history["q_var_opex_scale"].append(self.q_var_opex_scale.numpy())
+                vi_history["q_base_opex_loc"].append(self.q_base_opex_loc.numpy())
+                vi_history["q_base_opex_scale"].append(self.q_base_opex_scale.numpy())
+                vi_history["noise_sigma"].append(self.noise_sigma.numpy())
+
                 print(
                     f"Epoch {i}: Loss={total_loss.numpy():.4e} | "
                     f"OpEx VI Loss={loss_opex_bayes.numpy():.4e} | "
@@ -387,6 +408,54 @@ class TrainableFinancialModel(tf.Module):
         )
 
         print("-" * 50)
+
+        if plot_vi and vi_history["epochs"]:
+            epochs_hist = np.array(vi_history["epochs"])
+            fig, axs = plt.subplots(4, 1, figsize=(10, 14), sharex=True)
+
+            axs[0].plot(epochs_hist, vi_history["q_var_opex_loc"], label="q_var_opex_loc")
+            axs[0].plot(
+                epochs_hist,
+                vi_history["q_var_opex_scale"],
+                label="q_var_opex_scale",
+            )
+            axs[0].set_ylabel("Variable OpEx %")
+            axs[0].legend()
+            axs[0].grid(True, alpha=0.3)
+
+            axs[1].plot(
+                epochs_hist,
+                np.array(vi_history["q_base_opex_loc"]) * self.amount_scale,
+                label="q_base_opex_loc (USD)",
+            )
+            axs[1].plot(
+                epochs_hist,
+                np.array(vi_history["q_base_opex_scale"]) * self.amount_scale,
+                label="q_base_opex_scale (USD)",
+            )
+            axs[1].set_ylabel("Baseline OpEx (USD)")
+            axs[1].legend()
+            axs[1].grid(True, alpha=0.3)
+
+            axs[2].plot(
+                epochs_hist,
+                np.array(vi_history["noise_sigma"]) * self.amount_scale,
+                label="noise_sigma (USD)",
+            )
+            axs[2].set_ylabel("Noise Sigma (USD)")
+            axs[2].legend()
+            axs[2].grid(True, alpha=0.3)
+
+            axs[3].plot(epochs_hist, vi_history["loss_vi"], label="Loss_VI")
+            axs[3].set_xlabel("Epoch")
+            axs[3].set_ylabel("Loss_VI")
+            axs[3].legend()
+            axs[3].grid(True, alpha=0.3)
+
+            fig.suptitle("Variational Inference Parameters and Loss Over Epochs")
+            plt.tight_layout()
+            plt.savefig("vi_training_diagnostics.png", dpi=150)
+            plt.show()
 
     def train_structural_parameters(
         self,
