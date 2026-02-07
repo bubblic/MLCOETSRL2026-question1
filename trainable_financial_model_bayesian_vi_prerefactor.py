@@ -1048,7 +1048,8 @@ def plot_opex_fit_with_aleatoric_noise(
     # Extend the regression lines to the padded range
     sales_grid_usd = np.linspace(x_left, x_right, 200)
     sales_grid_bil = sales_grid_usd / amount_scale
-    mean_opex_grid_bil = (mean_base_opex * cum_inf) + (
+    cum_inf_mean = float(np.mean(cum_inf))
+    mean_opex_grid_bil = (mean_base_opex * cum_inf_mean) + (
         mean_var_opex * sales_grid_bil
     )
     mean_opex_grid_usd = mean_opex_grid_bil * amount_scale
@@ -1062,7 +1063,6 @@ def plot_opex_fit_with_aleatoric_noise(
     sales_grid_t = tf.reshape(
         tf.convert_to_tensor(sales_grid_bil, dtype=tf.float64), (1, -1)
     )
-    cum_inf_mean = float(np.mean(cum_inf))
     cum_inf_grid_t = tf.reshape(
         tf.convert_to_tensor(
             np.full_like(sales_grid_bil, cum_inf_mean), dtype=tf.float64
