@@ -9,7 +9,7 @@ tfb = tfp.bijectors
 # --- 1. Define the Trainable Model ---
 class TrainableFinancialModel(tf.Module):
     def __init__(self):
-        self.amount_scale = 1.0e9
+        self.amount_scale = 1.0e11
 
         # --- Policy Parameters (Deterministic) ---
         ## These are trainable with simple linear regression
@@ -148,7 +148,7 @@ class TrainableFinancialModel(tf.Module):
         historical_tax,
         historical_inflation=None,
         learning_rate=0.0001,
-        epochs=100000,
+        epochs=10000000,
     ):
         """
         Trains simple policy parameters using historical data.
@@ -410,7 +410,7 @@ class TrainableFinancialModel(tf.Module):
         historical_equity,
         historical_inflation=None,
         learning_rate=0.0001,
-        epochs=100000,
+        epochs=10000,
     ):
         """
         Trains structural parameters (interest rates, maturity, financing)
