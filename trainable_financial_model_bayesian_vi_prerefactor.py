@@ -4,6 +4,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from datetime import datetime
 
+
 tfd = tfp.distributions
 tfb = tfp.bijectors
 
@@ -945,6 +946,7 @@ def plot_opex_fit_with_aleatoric_noise(
     historical_sales_bil,
     historical_opex_bil,
     historical_inflation,
+    n_samples=2000,
     lower_q=5.0,
     upper_q=95.0,
     show_plot=False,
@@ -959,21 +961,29 @@ def plot_opex_fit_with_aleatoric_noise(
 
     mean_opex_bil = (mean_base_opex * cum_inf) + (mean_var_opex * historical_sales_bil)
 
-    # Analytic posterior predictive interval (Gaussian, linear model)
-    var_var_opex = model.q_var_opex_scale.numpy() ** 2
-    var_base_opex = model.q_base_opex_scale.numpy() ** 2
-    pred_var = (
-        (cum_inf**2) * var_base_opex
-        + (historical_sales_bil**2) * var_var_opex
-        + sigma_opex**2
-    )
-    pred_std = np.sqrt(pred_var)
+    # Posterior predictive samples with aleatoric noise (sigma)
+    q_var = tfd.Normal(loc=model.q_var_opex_loc, scale=model.q_var_opex_scale)
+    q_base = tfd.Normal(loc=model.q_base_opex_loc, scale=model.q_base_opex_scale)
+    var_samples = q_var.sample(n_samples)  # [S]
+    base_samples = q_base.sample(n_samples)  # [S]
 
-    z_lower, z_upper = tfd.Normal(loc=0.0, scale=1.0).quantile(
-        [lower_q / 100.0, upper_q / 100.0]
+    var_samples = tf.reshape(var_samples, (-1, 1))
+    base_samples = tf.reshape(base_samples, (-1, 1))
+    sales = tf.reshape(
+        tf.convert_to_tensor(historical_sales_bil, dtype=tf.float64), (1, -1)
     )
-    lower_opex_bil = mean_opex_bil + (z_lower.numpy() * pred_std)
-    upper_opex_bil = mean_opex_bil + (z_upper.numpy() * pred_std)
+    cum_inf_t = tf.reshape(tf.convert_to_tensor(cum_inf, dtype=tf.float64), (1, -1))
+    noise = tf.random.normal(
+        shape=(n_samples, len(historical_sales_bil)),
+        mean=0.0,
+        stddev=sigma_opex,
+        dtype=tf.float64,
+    )
+    opex_samples_bil = (base_samples * cum_inf_t) + (var_samples * sales) + noise
+    opex_samples_bil = opex_samples_bil.numpy()
+
+    lower_opex_bil = np.percentile(opex_samples_bil, lower_q, axis=0)
+    upper_opex_bil = np.percentile(opex_samples_bil, upper_q, axis=0)
 
     amount_scale = model.amount_scale
     mean_opex_usd = mean_opex_bil * amount_scale
