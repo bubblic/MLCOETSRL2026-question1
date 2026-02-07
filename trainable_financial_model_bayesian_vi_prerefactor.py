@@ -152,6 +152,7 @@ class TrainableFinancialModel(tf.Module):
         epochs=1000000,
         plot_vi=True,
         plot_every=1000,
+        show_plot=False,
     ):
         """
         Trains simple policy parameters using historical data.
@@ -457,7 +458,10 @@ class TrainableFinancialModel(tf.Module):
             fig.suptitle("Variational Inference Parameters and Loss Over Epochs")
             plt.tight_layout()
             plt.savefig("vi_training_diagnostics.png", dpi=150)
-            plt.show()
+            if show_plot:
+                plt.show()
+            else:
+                plt.close()
 
     def train_structural_parameters(
         self,
@@ -1345,6 +1349,7 @@ def run_training_and_forecast():
         opex_hist_bil[:-1],
         tax_hist_bil[:-1],
         inflation_hist[:-1],
+        show_plot=False,
     )
 
     # --- 3. PLOT OPEX FIT (Mean + Aleatoric Sigma) ---
