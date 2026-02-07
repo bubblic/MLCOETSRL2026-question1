@@ -151,7 +151,7 @@ class TrainableFinancialModel(tf.Module):
         historical_tax,
         historical_inflation=None,
         learning_rate=0.0001,
-        epochs=1000000,
+        epochs=5000,
         plot_vi=True,
         plot_every=1000,
         show_plot=False,
@@ -1315,7 +1315,9 @@ def run_training_and_forecast():
     )
     # Inflation History
     inflation_hist = np.array(
-        [0.024, 0.018, 0.012, 0.047, 0.08, 0.041, 0.029, 0.027], dtype=np.float64
+        #  [0.024, 0.018, 0.012, 0.047, 0.08, 0.041, 0.029, 0.027],
+        [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+        dtype=np.float64,
     )
 
     # --- 2. SCALE INPUTS AND TARGETS TO BILLIONS FOR TRAINING STABILITY ---
