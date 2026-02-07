@@ -941,6 +941,7 @@ def plot_opex_fit_with_aleatoric_noise(
     historical_inflation,
     lower_q=5.0,
     upper_q=95.0,
+    show_plot=False,
 ):
     if historical_inflation is None:
         historical_inflation = np.zeros_like(historical_sales_bil)
@@ -1012,7 +1013,10 @@ def plot_opex_fit_with_aleatoric_noise(
     plt.legend()
     plt.tight_layout()
     plt.savefig("opex_probabilistic_fit.png", dpi=150)
-    plt.show()
+    if show_plot:
+        plt.show()
+    else:
+        plt.close()
 
 
 def run_training_and_forecast():
@@ -1351,6 +1355,7 @@ def run_training_and_forecast():
         sales_hist_bil,
         opex_hist_bil,
         inflation_hist,
+        show_plot=False,
     )
 
     # --- 4. TRAIN STRUCTURAL PARAMETERS ---
