@@ -940,6 +940,100 @@ def run_monte_carlo_forecast(
         )
 
 
+def make_design_matrix(x):
+    return np.hstack((np.ones((len(x), 1)), x))
+
+
+def posterior(x, y, one_over_var0, var):
+    """
+    x vector with training x data
+    y vector with training y values
+    one_over_var0 1/σ0^2 the variances of the prior distribution
+    var is the assumed to be known variance of data
+    @returns mean vector mu and covariance Matrix Sig
+    """
+    X = make_design_matrix(x)
+    sig_inv = one_over_var0 * np.eye(X.shape[1]) + X.T.dot(X) / var
+    sig = np.linalg.inv(sig_inv)
+    mu = sig.dot(X.T).dot(y) / var
+    return mu, sig
+
+
+def posterior_predictive(x_test, mu, sig, var):
+    """
+    x_test the positions, where the posterior is to be evaluated
+    mu the mean values of the weight-posterior
+    sig the covariance matrix
+    var is the assumed to be known variance of data
+    Computes mean and variances of the posterior predictive distribution of y
+    """
+    X_test = make_design_matrix(x_test)
+    y = X_test.dot(mu)
+    # Only compute variances (diagonal elements of covariance matrix)
+    y_var = var + np.sum(X_test.dot(sig) * X_test, axis=1)
+    return y, y_var
+
+
+def plot_opex_bayes_regression(
+    historical_sales_usd,
+    historical_opex_usd,
+    x_pad_frac=0.25,
+    show_plot=False,
+):
+    x = historical_sales_usd.reshape(-1, 1)
+    y = historical_opex_usd.reshape(-1, 1)
+
+    # Estimate observation variance from least-squares residuals
+    X = make_design_matrix(x)
+    beta, *_ = np.linalg.lstsq(X, y, rcond=None)
+    residuals = y - X.dot(beta)
+    var = float(np.var(residuals, ddof=2))
+    if not np.isfinite(var) or var <= 0.0:
+        var = 1e-8
+
+    x_min = float(np.min(x))
+    x_max = float(np.max(x))
+    x_span = x_max - x_min if x_max > x_min else max(abs(x_max), 1.0)
+    x_pad = x_pad_frac * x_span
+    x_left = x_min - x_pad
+    x_right = x_max + x_pad
+
+    xs = np.linspace(x_left, x_right, 250).reshape((250, 1))
+    mu, sig = posterior(x, y, 0.0, var)
+    y_mu, y_var = posterior_predictive(xs, mu, sig, var)
+
+    plt.figure(figsize=(10, 5))
+    plt.plot(xs, y_mu, color="black", label="Posterior mean")
+    plt.plot(
+        xs,
+        y_mu + 2 * np.sqrt(y_var),
+        linestyle="dashed",
+        alpha=0.5,
+        color="black",
+        label="±2σ",
+    )
+    plt.plot(
+        xs,
+        y_mu - 2 * np.sqrt(y_var),
+        linestyle="dashed",
+        alpha=0.5,
+        color="black",
+    )
+    plt.scatter(x, y, color="red", label="Historical OpEx")
+    plt.xlabel("Sales (USD)")
+    plt.ylabel("OpEx (USD)")
+    plt.title("OpEx vs Sales (Bayesian Linear Regression)")
+    plt.grid(True, alpha=0.3)
+    plt.legend()
+    plt.tight_layout()
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    plt.savefig(f"opex_vs_sales_bayes_{timestamp}.png", dpi=150)
+    if show_plot:
+        plt.show()
+    else:
+        plt.close()
+
+
 def plot_opex_fit_with_aleatoric_noise(
     model,
     historical_years,
@@ -1471,6 +1565,7 @@ def run_training_and_forecast():
         inflation_hist,
         show_plot=False,
     )
+    plot_opex_bayes_regression(sales_hist, opex_hist, show_plot=False)
 
     # --- 4. TRAIN STRUCTURAL PARAMETERS ---
     # We still only feed in the historical arrays from 2022-2024, and leave 2025 for forecast testing.
