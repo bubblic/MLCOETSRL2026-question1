@@ -990,6 +990,7 @@ def plot_opex_fit_with_aleatoric_noise(
     upper_opex_usd = upper_opex_bil * amount_scale
     lower_opex_usd = lower_opex_bil * amount_scale
     opex_hist_usd = historical_opex_bil * amount_scale
+    sales_hist_usd = historical_sales_bil * amount_scale
 
     plt.figure(figsize=(10, 5))
     plt.plot(
@@ -1030,6 +1031,58 @@ def plot_opex_fit_with_aleatoric_noise(
     plt.tight_layout()
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     plt.savefig(f"opex_probabilistic_fit_{timestamp}.png", dpi=150)
+    if show_plot:
+        plt.show()
+    else:
+        plt.close()
+
+    # --- OpEx vs Sales (separate figure) ---
+    sort_idx = np.argsort(sales_hist_usd)
+    sales_sorted = sales_hist_usd[sort_idx]
+    opex_hist_sorted = opex_hist_usd[sort_idx]
+    mean_opex_sorted = mean_opex_usd[sort_idx]
+    lower_opex_sorted = lower_opex_usd[sort_idx]
+    upper_opex_sorted = upper_opex_usd[sort_idx]
+
+    plt.figure(figsize=(10, 5))
+    plt.scatter(
+        sales_hist_usd,
+        opex_hist_usd,
+        label="Historical OpEx",
+        color="black",
+        zorder=3,
+    )
+    plt.plot(
+        sales_sorted,
+        mean_opex_sorted,
+        "-",
+        label="Mean OpEx (learned)",
+        color="tab:blue",
+    )
+    plt.plot(
+        sales_sorted,
+        lower_opex_sorted,
+        "--",
+        label=f"Posterior predictive {lower_q:.0f}%",
+        color="tab:blue",
+        alpha=0.8,
+    )
+    plt.plot(
+        sales_sorted,
+        upper_opex_sorted,
+        "--",
+        label=f"Posterior predictive {upper_q:.0f}%",
+        color="tab:blue",
+        alpha=0.8,
+    )
+    plt.title("OpEx vs Sales with Learned Probabilistic Linear Regression")
+    plt.xlabel("Sales (USD)")
+    plt.ylabel("OpEx (USD)")
+    plt.grid(True, alpha=0.3)
+    plt.legend()
+    plt.tight_layout()
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    plt.savefig(f"opex_vs_sales_fit_{timestamp}.png", dpi=150)
     if show_plot:
         plt.show()
     else:
