@@ -933,6 +933,88 @@ def run_monte_carlo_forecast(
         )
 
 
+def plot_opex_fit_with_aleatoric_noise(
+    model,
+    historical_years,
+    historical_sales_bil,
+    historical_opex_bil,
+    historical_inflation,
+    lower_q=5.0,
+    upper_q=95.0,
+):
+    if historical_inflation is None:
+        historical_inflation = np.zeros_like(historical_sales_bil)
+    cum_inf = np.cumprod(1 + historical_inflation)
+
+    mean_var_opex = model.q_var_opex_loc.numpy()
+    mean_base_opex = model.q_base_opex_loc.numpy()
+    sigma_opex = model.noise_sigma.numpy()
+
+    mean_opex_bil = (mean_base_opex * cum_inf) + (mean_var_opex * historical_sales_bil)
+
+    # Analytic posterior predictive interval (Gaussian, linear model)
+    var_var_opex = model.q_var_opex_scale.numpy() ** 2
+    var_base_opex = model.q_base_opex_scale.numpy() ** 2
+    pred_var = (
+        (cum_inf ** 2) * var_base_opex
+        + (historical_sales_bil ** 2) * var_var_opex
+        + sigma_opex**2
+    )
+    pred_std = np.sqrt(pred_var)
+
+    z_lower, z_upper = tfd.Normal(loc=0.0, scale=1.0).quantile(
+        [lower_q / 100.0, upper_q / 100.0]
+    )
+    lower_opex_bil = mean_opex_bil + (z_lower.numpy() * pred_std)
+    upper_opex_bil = mean_opex_bil + (z_upper.numpy() * pred_std)
+
+    amount_scale = model.amount_scale
+    mean_opex_usd = mean_opex_bil * amount_scale
+    upper_opex_usd = upper_opex_bil * amount_scale
+    lower_opex_usd = lower_opex_bil * amount_scale
+    opex_hist_usd = historical_opex_bil * amount_scale
+
+    plt.figure(figsize=(10, 5))
+    plt.plot(
+        historical_years,
+        opex_hist_usd,
+        "o-",
+        label="Historical OpEx",
+        color="black",
+    )
+    plt.plot(
+        historical_years,
+        mean_opex_usd,
+        "o-",
+        label="Mean OpEx (learned)",
+        color="tab:blue",
+    )
+    plt.plot(
+        historical_years,
+        lower_opex_usd,
+        "--",
+        label=f"Posterior predictive {lower_q:.0f}%",
+        color="tab:blue",
+        alpha=0.8,
+    )
+    plt.plot(
+        historical_years,
+        upper_opex_usd,
+        "--",
+        label=f"Posterior predictive {upper_q:.0f}%",
+        color="tab:blue",
+        alpha=0.8,
+    )
+    plt.title("OpEx vs Year with Learned Probabilistic Linear Regression")
+    plt.xlabel("Year")
+    plt.ylabel("OpEx (USD)")
+    plt.grid(True, alpha=0.3)
+    plt.legend()
+    plt.tight_layout()
+    plt.savefig("opex_probabilistic_fit.png", dpi=150)
+    plt.show()
+
+
 def run_training_and_forecast():
     model = TrainableFinancialModel()
 
@@ -1285,7 +1367,17 @@ def run_training_and_forecast():
         inflation_hist[:-1],
     )
 
-    # --- 4. RUN FORECAST (Using new parameters) ---
+    # --- 4. PLOT OPEX FIT (Mean + Aleatoric Sigma) ---
+    historical_years = np.arange(1, len(opex_hist_bil) + 1)
+    plot_opex_fit_with_aleatoric_noise(
+        model,
+        historical_years,
+        sales_hist_bil,
+        opex_hist_bil,
+        inflation_hist,
+    )
+
+    # --- 5. RUN FORECAST (Using new parameters) ---
     # Initial State (t=0) 2024 Apple Balance Sheet
     state = {
         "nca": tf.constant(nca_hist_bil[-2], dtype=tf.float64),
