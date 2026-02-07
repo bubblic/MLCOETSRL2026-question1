@@ -149,7 +149,7 @@ class TrainableFinancialModel(tf.Module):
         historical_tax,
         historical_inflation=None,
         learning_rate=0.0001,
-        epochs=10000000,
+        epochs=1000000,
         plot_vi=True,
         plot_every=1000,
     ):
@@ -413,7 +413,9 @@ class TrainableFinancialModel(tf.Module):
             epochs_hist = np.array(vi_history["epochs"])
             fig, axs = plt.subplots(4, 1, figsize=(10, 14), sharex=True)
 
-            axs[0].plot(epochs_hist, vi_history["q_var_opex_loc"], label="q_var_opex_loc")
+            axs[0].plot(
+                epochs_hist, vi_history["q_var_opex_loc"], label="q_var_opex_loc"
+            )
             axs[0].plot(
                 epochs_hist,
                 vi_history["q_var_opex_scale"],
