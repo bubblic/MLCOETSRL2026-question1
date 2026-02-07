@@ -956,8 +956,8 @@ def plot_opex_fit_with_aleatoric_noise(
     var_var_opex = model.q_var_opex_scale.numpy() ** 2
     var_base_opex = model.q_base_opex_scale.numpy() ** 2
     pred_var = (
-        (cum_inf ** 2) * var_base_opex
-        + (historical_sales_bil ** 2) * var_var_opex
+        (cum_inf**2) * var_base_opex
+        + (historical_sales_bil**2) * var_var_opex
         + sigma_opex**2
     )
     pred_std = np.sqrt(pred_var)
@@ -1343,7 +1343,17 @@ def run_training_and_forecast():
         inflation_hist[:-1],
     )
 
-    # --- 3. TRAIN STRUCTURAL PARAMETERS ---
+    # --- 3. PLOT OPEX FIT (Mean + Aleatoric Sigma) ---
+    historical_years = np.arange(1, len(opex_hist_bil) + 1)
+    plot_opex_fit_with_aleatoric_noise(
+        model,
+        historical_years,
+        sales_hist_bil,
+        opex_hist_bil,
+        inflation_hist,
+    )
+
+    # --- 4. TRAIN STRUCTURAL PARAMETERS ---
     # We still only feed in the historical arrays from 2022-2024, and leave 2025 for forecast testing.
     model.train_structural_parameters(
         sales_hist_bil[:-1],
@@ -1365,16 +1375,6 @@ def run_training_and_forecast():
         non_current_liabilities_hist_bil[:-1],
         equity_hist_bil[:-1],
         inflation_hist[:-1],
-    )
-
-    # --- 4. PLOT OPEX FIT (Mean + Aleatoric Sigma) ---
-    historical_years = np.arange(1, len(opex_hist_bil) + 1)
-    plot_opex_fit_with_aleatoric_noise(
-        model,
-        historical_years,
-        sales_hist_bil,
-        opex_hist_bil,
-        inflation_hist,
     )
 
     # --- 5. RUN FORECAST (Using new parameters) ---
