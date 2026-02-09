@@ -80,7 +80,9 @@ class TrainableFinancialModel(tf.Module):
 
         # 3. Aleatoric Uncertainty (The inherent noise in the OpEx data)
         self.noise_sigma = tfp.util.TransformedVariable(
-            initial_value=1.0e9 / self.amount_scale,
+            # initial_value=1.0e9 / self.amount_scale,
+            initial_value=1.0,  # The initial can be a normal distribution of mean 0, sigma 1 because the training data are scaled to be around the order of 1.
+            # initial_value=1.0e9,  # assuming a big sigma, i.e., uniform distribution, does not lead to convergence since the likelihood will always stay constant.
             bijector=tfb.Softplus(),
             dtype=tf.float64,
             name="noise_sigma",
@@ -116,11 +118,20 @@ class TrainableFinancialModel(tf.Module):
         """Calculates KL Divergence between Posterior (q) and Prior (p)"""
         # Define Priors (Fixed beliefs)
         # Prior: Variable OpEx is around 20% with some wiggle room
-        prior_var = tfd.Normal(loc=tf.constant(0.20, dtype=tf.float64), scale=0.1)
+        # prior_var = tfd.Normal(loc=tf.constant(0.20, dtype=tf.float64), scale=0.1)
+        # prior_var = tfd.Normal(loc=tf.constant(0.20, dtype=tf.float64), scale=0.5)
+
         # Prior: Baseline OpEx is around -30B with large wiggle room
+        # prior_base = tfd.Normal(
+        #     loc=tf.constant(-3.0e10 / self.amount_scale, dtype=tf.float64),
+        #     scale=1.0e10 / self.amount_scale,
+        # )
+
+        ## Assuming uniform distribution by setting very wide Gaussian and mean 0 works well for VI inference's prior distributions
+        prior_var = tfd.Normal(loc=tf.constant(0.0, dtype=tf.float64), scale=1.0e10)
         prior_base = tfd.Normal(
-            loc=tf.constant(-3.0e10 / self.amount_scale, dtype=tf.float64),
-            scale=1.0e10 / self.amount_scale,
+            loc=tf.constant(0.0, dtype=tf.float64),
+            scale=1.0e10,
         )
 
         # Define Posteriors
@@ -150,8 +161,9 @@ class TrainableFinancialModel(tf.Module):
         historical_opex,
         historical_tax,
         historical_inflation=None,
-        learning_rate=0.0001,
-        epochs=5000,
+        learning_rate=0.001,
+        # epochs=30000,
+        epochs=100000,
         plot_vi=True,
         plot_every=1000,
         show_plot=False,
@@ -1058,7 +1070,7 @@ def plot_opex_fit_with_aleatoric_noise(
     x_min = float(np.min(sales_hist_usd))
     x_max = float(np.max(sales_hist_usd))
     x_span = x_max - x_min if x_max > x_min else max(abs(x_max), 1.0)
-    x_pad = 0.25 * x_span
+    x_pad = 10.0 * x_span
     x_left = x_min - x_pad
     x_right = x_max + x_pad
 
@@ -1439,8 +1451,8 @@ def run_training_and_forecast():
     )
     # Inflation History
     inflation_hist = np.array(
-        #  [0.024, 0.018, 0.012, 0.047, 0.08, 0.041, 0.029, 0.027],
-        [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+        [0.024, 0.018, 0.012, 0.047, 0.08, 0.041, 0.029, 0.027],
+        # [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
         dtype=np.float64,
     )
 
