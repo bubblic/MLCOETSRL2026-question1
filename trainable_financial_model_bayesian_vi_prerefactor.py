@@ -1,3 +1,4 @@
+import os
 import tensorflow as tf
 import tensorflow_probability as tfp
 import numpy as np
@@ -105,6 +106,76 @@ class TrainableFinancialModel(tf.Module):
         self.equity_financing_pct = tf.Variable(
             0.15, name="equity_financing_pct", dtype=tf.float64
         )  # %EF
+
+    def save_parameters(self, path):
+        params = {
+            "asset_growth": float(self.asset_growth.numpy()),
+            "depreciation_rate": float(self.depreciation_rate.numpy()),
+            "advance_payments_sales_pct": float(
+                self.advance_payments_sales_pct.numpy()
+            ),
+            "advance_payments_purchases_pct": float(
+                self.advance_payments_purchases_pct.numpy()
+            ),
+            "account_receivables_pct": float(self.account_receivables_pct.numpy()),
+            "account_payables_pct": float(self.account_payables_pct.numpy()),
+            "inventory_pct": float(self.inventory_pct.numpy()),
+            "total_liquidity_pct": float(self.total_liquidity_pct.numpy()),
+            "cash_pct_of_liquidity": float(self.cash_pct_of_liquidity.numpy()),
+            "income_tax_pct": float(self.income_tax_pct.numpy()),
+            "dividend_payout_ratio_pct": float(
+                self.dividend_payout_ratio_pct.numpy()
+            ),
+            "stock_buyback_pct": float(self.stock_buyback_pct.numpy()),
+            "q_var_opex_loc": float(self.q_var_opex_loc.numpy()),
+            "q_var_opex_scale": float(self.q_var_opex_scale.numpy()),
+            "q_base_opex_loc": float(self.q_base_opex_loc.numpy()),
+            "q_base_opex_scale": float(self.q_base_opex_scale.numpy()),
+            "noise_sigma": float(self.noise_sigma.numpy()),
+            "avg_short_term_interest_pct": float(
+                self.avg_short_term_interest_pct.numpy()
+            ),
+            "avg_long_term_interest_pct": float(
+                self.avg_long_term_interest_pct.numpy()
+            ),
+            "avg_maturity_years": float(self.avg_maturity_years.numpy()),
+            "market_securities_return_pct": float(
+                self.market_securities_return_pct.numpy()
+            ),
+            "equity_financing_pct": float(self.equity_financing_pct.numpy()),
+        }
+        np.savez(path, **params)
+
+    def load_parameters(self, path):
+        if not os.path.exists(path):
+            raise FileNotFoundError(f"Parameter file not found: {path}")
+        data = np.load(path)
+        self.asset_growth.assign(data["asset_growth"])
+        self.depreciation_rate.assign(data["depreciation_rate"])
+        self.advance_payments_sales_pct.assign(data["advance_payments_sales_pct"])
+        self.advance_payments_purchases_pct.assign(
+            data["advance_payments_purchases_pct"]
+        )
+        self.account_receivables_pct.assign(data["account_receivables_pct"])
+        self.account_payables_pct.assign(data["account_payables_pct"])
+        self.inventory_pct.assign(data["inventory_pct"])
+        self.total_liquidity_pct.assign(data["total_liquidity_pct"])
+        self.cash_pct_of_liquidity.assign(data["cash_pct_of_liquidity"])
+        self.income_tax_pct.assign(data["income_tax_pct"])
+        self.dividend_payout_ratio_pct.assign(data["dividend_payout_ratio_pct"])
+        self.stock_buyback_pct.assign(data["stock_buyback_pct"])
+        self.q_var_opex_loc.assign(data["q_var_opex_loc"])
+        self.q_var_opex_scale.assign(data["q_var_opex_scale"])
+        self.q_base_opex_loc.assign(data["q_base_opex_loc"])
+        self.q_base_opex_scale.assign(data["q_base_opex_scale"])
+        self.noise_sigma.assign(data["noise_sigma"])
+        self.avg_short_term_interest_pct.assign(data["avg_short_term_interest_pct"])
+        self.avg_long_term_interest_pct.assign(data["avg_long_term_interest_pct"])
+        self.avg_maturity_years.assign(data["avg_maturity_years"])
+        self.market_securities_return_pct.assign(
+            data["market_securities_return_pct"]
+        )
+        self.equity_financing_pct.assign(data["equity_financing_pct"])
 
     def sample_opex_params(self):
         """Samples from the variational posterior using Reparameterization Trick"""
@@ -1172,7 +1243,10 @@ def plot_opex_fit_with_aleatoric_noise(
         plt.close()
 
 
-def run_training_and_forecast():
+def run_training_and_forecast(
+    use_trained_parameters=False,
+    parameters_path="trained_parameters.npz",
+):
     model = TrainableFinancialModel()
 
     # --- 1. HISTORICAL DATA FROM APPLE (2022-2025)---
@@ -1480,77 +1554,81 @@ def run_training_and_forecast():
     non_current_liabilities_hist_bil = non_current_liabilities_hist / amount_scale
     equity_hist_bil = equity_hist / amount_scale
 
-    # --- 2. TRAIN THE MODEL ---
-    # We feed in the historical arrays from 2022-2024, and leave 2025 for forecast testing.
-    model.train_simple_policies(
-        sales_hist_bil[:-1],
-        purchases_hist_bil[:-1],
-        nca_hist_bil[:-1],
-        depr_hist_bil[:-1],
-        advance_payments_sales_hist_bil[:-1],
-        advance_payments_purchases_hist_bil[:-1],
-        accounts_receivable_hist_bil[:-1],
-        accounts_payable_hist_bil[:-1],
-        inventory_hist_bil[:-1],
-        cash_hist_bil[:-1],
-        investment_in_market_securities_hist_bil[:-1],
-        net_income_hist_bil[:-1],
-        dividends_hist_bil[:-1],
-        stock_buyback_hist_bil[:-1],
-        opex_hist_bil[:-1],
-        tax_hist_bil[:-1],
-        inflation_hist[:-1],
-        show_plot=False,
-    )
+    if use_trained_parameters:
+        model.load_parameters(parameters_path)
+    else:
+        # --- 2. TRAIN THE MODEL ---
+        # We feed in the historical arrays from 2022-2024, and leave 2025 for forecast testing.
+        model.train_simple_policies(
+            sales_hist_bil[:-1],
+            purchases_hist_bil[:-1],
+            nca_hist_bil[:-1],
+            depr_hist_bil[:-1],
+            advance_payments_sales_hist_bil[:-1],
+            advance_payments_purchases_hist_bil[:-1],
+            accounts_receivable_hist_bil[:-1],
+            accounts_payable_hist_bil[:-1],
+            inventory_hist_bil[:-1],
+            cash_hist_bil[:-1],
+            investment_in_market_securities_hist_bil[:-1],
+            net_income_hist_bil[:-1],
+            dividends_hist_bil[:-1],
+            stock_buyback_hist_bil[:-1],
+            opex_hist_bil[:-1],
+            tax_hist_bil[:-1],
+            inflation_hist[:-1],
+            show_plot=False,
+        )
 
-    # --- 3. PLOT OPEX FIT (Mean + Aleatoric Sigma) ---
-    historical_years = np.arange(1, len(opex_hist_bil) + 1)
+        # --- 3. PLOT OPEX FIT (Mean + Aleatoric Sigma) ---
+        historical_years = np.arange(1, len(opex_hist_bil) + 1)
 
-    # Posterior prediction by Gaussian Confidence Interval
-    plot_opex_fit_with_aleatoric_noise(
-        model,
-        historical_years,
-        sales_hist_bil,
-        opex_hist_bil,
-        inflation_hist,
-        show_plot=False,
-        use_gaussian_ci=True,
-    )
+        # Posterior prediction by Gaussian Confidence Interval
+        plot_opex_fit_with_aleatoric_noise(
+            model,
+            historical_years,
+            sales_hist_bil,
+            opex_hist_bil,
+            inflation_hist,
+            show_plot=False,
+            use_gaussian_ci=True,
+        )
 
-    # Posterior prediction by sampling (Monte Carlo)
-    plot_opex_fit_with_aleatoric_noise(
-        model,
-        historical_years,
-        sales_hist_bil,
-        opex_hist_bil,
-        inflation_hist,
-        show_plot=False,
-        use_gaussian_ci=False,
-    )
+        # Posterior prediction by sampling (Monte Carlo)
+        plot_opex_fit_with_aleatoric_noise(
+            model,
+            historical_years,
+            sales_hist_bil,
+            opex_hist_bil,
+            inflation_hist,
+            show_plot=False,
+            use_gaussian_ci=False,
+        )
 
-    # --- 4. TRAIN STRUCTURAL PARAMETERS ---
-    # We still only feed in the historical arrays from 2022-2024, and leave 2025 for forecast testing.
-    model.train_structural_parameters(
-        sales_hist_bil[:-1],
-        purchases_hist_bil[:-1],
-        nca_hist_bil[:-1],
-        advance_payments_sales_hist_bil[:-1],
-        advance_payments_purchases_hist_bil[:-1],
-        accounts_receivable_hist_bil[:-1],
-        accounts_payable_hist_bil[:-1],
-        inventory_hist_bil[:-1],
-        cash_hist_bil[:-1],
-        investment_in_market_securities_hist_bil[:-1],
-        net_income_hist_bil[:-1],
-        dividends_hist_bil[:-1],
-        stock_buyback_hist_bil[:-1],
-        opex_hist_bil[:-1],
-        tax_hist_bil[:-1],
-        current_liabilities_hist_bil[:-1],
-        non_current_liabilities_hist_bil[:-1],
-        equity_hist_bil[:-1],
-        inflation_hist[:-1],
-    )
+        # --- 4. TRAIN STRUCTURAL PARAMETERS ---
+        # We still only feed in the historical arrays from 2022-2024, and leave 2025 for forecast testing.
+        model.train_structural_parameters(
+            sales_hist_bil[:-1],
+            purchases_hist_bil[:-1],
+            nca_hist_bil[:-1],
+            advance_payments_sales_hist_bil[:-1],
+            advance_payments_purchases_hist_bil[:-1],
+            accounts_receivable_hist_bil[:-1],
+            accounts_payable_hist_bil[:-1],
+            inventory_hist_bil[:-1],
+            cash_hist_bil[:-1],
+            investment_in_market_securities_hist_bil[:-1],
+            net_income_hist_bil[:-1],
+            dividends_hist_bil[:-1],
+            stock_buyback_hist_bil[:-1],
+            opex_hist_bil[:-1],
+            tax_hist_bil[:-1],
+            current_liabilities_hist_bil[:-1],
+            non_current_liabilities_hist_bil[:-1],
+            equity_hist_bil[:-1],
+            inflation_hist[:-1],
+        )
+        model.save_parameters(parameters_path)
 
     # --- 5. RUN FORECAST (Using new parameters) ---
     # Initial State (t=0) 2024 Apple Balance Sheet
@@ -1622,4 +1700,7 @@ def run_training_and_forecast():
 
 
 if __name__ == "__main__":
-    run_training_and_forecast()
+    run_training_and_forecast(
+        use_trained_parameters=False,
+        parameters_path="trained_parameters.npz",
+    )
