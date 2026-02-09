@@ -978,11 +978,29 @@ def run_monte_carlo_forecast(
     # Shape: [Samples, Years]
     ni_trajectories = []
     equity_trajectories = []
+    assets_trajectories = []
+    nca_trajectories = []
+    adv_pay_purch_trajectories = []
+    ar_trajectories = []
+    inv_trajectories = []
+    cash_trajectories = []
+    ims_trajectories = []
+    current_liabilities_trajectories = []
+    non_current_liabilities_trajectories = []
 
     for i in range(n_samples):
         current_state = initial_state.copy()
         sample_ni = []
         sample_equity = []
+        sample_assets = []
+        sample_nca = []
+        sample_adv_pp = []
+        sample_ar = []
+        sample_inv = []
+        sample_cash = []
+        sample_ims = []
+        sample_cl = []
+        sample_ncl = []
 
         for t in range(len(sales_forecast) - 1):
             inputs = {
@@ -1001,26 +1019,84 @@ def run_monte_carlo_forecast(
 
             sample_ni.append(current_state["net_income"].numpy())
             sample_equity.append(current_state["equity"].numpy())
+            total_assets = (
+                current_state["nca"]
+                + current_state["advance_payments_purchases"]
+                + current_state["accounts_receivable"]
+                + current_state["inventory"]
+                + current_state["cash"]
+                + current_state["investment_in_market_securities"]
+            )
+            sample_assets.append(total_assets.numpy())
+            sample_nca.append(current_state["nca"].numpy())
+            sample_adv_pp.append(current_state["advance_payments_purchases"].numpy())
+            sample_ar.append(current_state["accounts_receivable"].numpy())
+            sample_inv.append(current_state["inventory"].numpy())
+            sample_cash.append(current_state["cash"].numpy())
+            sample_ims.append(current_state["investment_in_market_securities"].numpy())
+            sample_cl.append(current_state["current_liabilities"].numpy())
+            sample_ncl.append(current_state["non_current_liabilities"].numpy())
 
         ni_trajectories.append(sample_ni)
         equity_trajectories.append(sample_equity)
+        assets_trajectories.append(sample_assets)
+        nca_trajectories.append(sample_nca)
+        adv_pay_purch_trajectories.append(sample_adv_pp)
+        ar_trajectories.append(sample_ar)
+        inv_trajectories.append(sample_inv)
+        cash_trajectories.append(sample_cash)
+        ims_trajectories.append(sample_ims)
+        current_liabilities_trajectories.append(sample_cl)
+        non_current_liabilities_trajectories.append(sample_ncl)
 
     ni_trajectories = np.array(ni_trajectories)
+    equity_trajectories = np.array(equity_trajectories)
+    assets_trajectories = np.array(assets_trajectories)
+    nca_trajectories = np.array(nca_trajectories)
+    adv_pay_purch_trajectories = np.array(adv_pay_purch_trajectories)
+    ar_trajectories = np.array(ar_trajectories)
+    inv_trajectories = np.array(inv_trajectories)
+    cash_trajectories = np.array(cash_trajectories)
+    ims_trajectories = np.array(ims_trajectories)
+    current_liabilities_trajectories = np.array(current_liabilities_trajectories)
+    non_current_liabilities_trajectories = np.array(
+        non_current_liabilities_trajectories
+    )
 
     # Calculate Statistics
-    mean_ni = np.mean(ni_trajectories, axis=0)
-    lower_bound = np.percentile(ni_trajectories, 2.5, axis=0)
-    upper_bound = np.percentile(ni_trajectories, 97.5, axis=0)
+    def summarize_trajectories(name, trajectories):
+        mean_vals = np.mean(trajectories, axis=0)
+        lower_bound = np.percentile(trajectories, 2.5, axis=0)
+        upper_bound = np.percentile(trajectories, 97.5, axis=0)
 
-    print(f"{'Year':<5} | {'Mean NI':<15} | {'2.5% CI':<15} | {'97.5% CI':<15}")
-    print("-" * 60)
-    for t in range(len(mean_ni)):
-        mean_ni_usd = mean_ni[t] * model.amount_scale
-        lower_usd = lower_bound[t] * model.amount_scale
-        upper_usd = upper_bound[t] * model.amount_scale
-        print(
-            f"{t+1:<5} | {mean_ni_usd:<15.2e} | {lower_usd:<15.2e} | {upper_usd:<15.2e}"
-        )
+        print(f"\n{name}")
+        print(f"{'Year':<5} | {'Mean':<15} | {'2.5% CI':<15} | {'97.5% CI':<15}")
+        print("-" * 60)
+        for t in range(len(mean_vals)):
+            mean_usd = mean_vals[t] * model.amount_scale
+            lower_usd = lower_bound[t] * model.amount_scale
+            upper_usd = upper_bound[t] * model.amount_scale
+            print(
+                f"{t+1:<5} | {mean_usd:<15.2e} | {lower_usd:<15.2e} | {upper_usd:<15.2e}"
+            )
+
+    summarize_trajectories("Net Income", ni_trajectories)
+    summarize_trajectories("Total Assets", assets_trajectories)
+    summarize_trajectories("Assets: Non-current Assets", nca_trajectories)
+    summarize_trajectories(
+        "Assets: Advance Payments (Purchases)", adv_pay_purch_trajectories
+    )
+    summarize_trajectories("Assets: Accounts Receivable", ar_trajectories)
+    summarize_trajectories("Assets: Inventory", inv_trajectories)
+    summarize_trajectories("Assets: Cash", cash_trajectories)
+    summarize_trajectories(
+        "Assets: Investment in Market Securities", ims_trajectories
+    )
+    summarize_trajectories("Current Liabilities", current_liabilities_trajectories)
+    summarize_trajectories(
+        "Non-current Liabilities", non_current_liabilities_trajectories
+    )
+    summarize_trajectories("Equity", equity_trajectories)
 
 
 def plot_opex_fit_with_aleatoric_noise(
