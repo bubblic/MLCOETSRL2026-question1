@@ -89,6 +89,14 @@ class TrainableFinancialModel(tf.Module):
             name="noise_sigma",
         )
 
+        # 4. Sales Offset (for centering sales data during OpEx training)
+        self.sales_offset = tf.Variable(
+            0.0,
+            dtype=tf.float64,
+            name="sales_offset",
+            trainable=False,  # This is not trained, just stored for reference
+        )
+
         # --- Structural Parameters ---
         ## These are trained with gradient descent with the trained variables from above and other data (sales, purchases, equity, liabilities, etc.) as inputs
         self.avg_short_term_interest_pct = tf.Variable(
@@ -123,15 +131,14 @@ class TrainableFinancialModel(tf.Module):
             "total_liquidity_pct": float(self.total_liquidity_pct.numpy()),
             "cash_pct_of_liquidity": float(self.cash_pct_of_liquidity.numpy()),
             "income_tax_pct": float(self.income_tax_pct.numpy()),
-            "dividend_payout_ratio_pct": float(
-                self.dividend_payout_ratio_pct.numpy()
-            ),
+            "dividend_payout_ratio_pct": float(self.dividend_payout_ratio_pct.numpy()),
             "stock_buyback_pct": float(self.stock_buyback_pct.numpy()),
             "q_var_opex_loc": float(self.q_var_opex_loc.numpy()),
             "q_var_opex_scale": float(self.q_var_opex_scale.numpy()),
             "q_base_opex_loc": float(self.q_base_opex_loc.numpy()),
             "q_base_opex_scale": float(self.q_base_opex_scale.numpy()),
             "noise_sigma": float(self.noise_sigma.numpy()),
+            "sales_offset": float(self.sales_offset.numpy()),
             "avg_short_term_interest_pct": float(
                 self.avg_short_term_interest_pct.numpy()
             ),
@@ -169,12 +176,11 @@ class TrainableFinancialModel(tf.Module):
         self.q_base_opex_loc.assign(data["q_base_opex_loc"])
         self.q_base_opex_scale.assign(data["q_base_opex_scale"])
         self.noise_sigma.assign(data["noise_sigma"])
+        self.sales_offset.assign(data["sales_offset"])
         self.avg_short_term_interest_pct.assign(data["avg_short_term_interest_pct"])
         self.avg_long_term_interest_pct.assign(data["avg_long_term_interest_pct"])
         self.avg_maturity_years.assign(data["avg_maturity_years"])
-        self.market_securities_return_pct.assign(
-            data["market_securities_return_pct"]
-        )
+        self.market_securities_return_pct.assign(data["market_securities_return_pct"])
         self.equity_financing_pct.assign(data["equity_financing_pct"])
 
     def sample_opex_params(self):
@@ -269,6 +275,20 @@ class TrainableFinancialModel(tf.Module):
             historical_inflation = tf.zeros_like(sales_tensor)
         inf_tensor = tf.convert_to_tensor(historical_inflation, dtype=tf.float64)
         cum_inf_tensor = tf.math.cumprod(1 + inf_tensor)
+
+        # --- Calculate and store sales offset for OpEx training ---
+        # This centers the sales data around 0 for better numerical stability
+        sales_offset_value = tf.reduce_mean(sales_tensor)
+        self.sales_offset.assign(sales_offset_value)
+        sales_tensor_centered = sales_tensor - sales_offset_value
+
+        print(f"Sales offset for OpEx training: {sales_offset_value.numpy():.4e}")
+        print(
+            f"Sales range before centering: [{tf.reduce_min(sales_tensor).numpy():.4e}, {tf.reduce_max(sales_tensor).numpy():.4e}]"
+        )
+        print(
+            f"Sales range after centering: [{tf.reduce_min(sales_tensor_centered).numpy():.4e}, {tf.reduce_max(sales_tensor_centered).numpy():.4e}]"
+        )
 
         # --- Prepare Training Data & Alignment ---
 
@@ -386,8 +406,9 @@ class TrainableFinancialModel(tf.Module):
                 var_opex_sample, base_opex_sample = self.sample_opex_params()
 
                 # 2. Calculate the Raw Prediction (in Billion Dollars)
+                # Use centered sales for training to make spread symmetric around y-axis
                 pred_opex_raw = (base_opex_sample * cum_inf_tensor) + (
-                    var_opex_sample * sales_tensor
+                    var_opex_sample * sales_tensor_centered
                 )
 
                 # 3. Calculate Residuals (The Error)
@@ -780,7 +801,9 @@ class TrainableFinancialModel(tf.Module):
             var_opex, base_opex = self.sample_opex_params()
             noise = tfd.Normal(0.0, self.noise_sigma).sample()
 
-        opex = (base_opex * cum_inflation) + (sales_t * var_opex) + noise
+        # Center sales by subtracting the offset used during training
+        sales_t_centered = sales_t - self.sales_offset
+        opex = (base_opex * cum_inflation) + (sales_t_centered * var_opex) + noise
 
         ebitda = sales_t - cogs - opex
 
@@ -1089,9 +1112,7 @@ def run_monte_carlo_forecast(
     summarize_trajectories("Assets: Accounts Receivable", ar_trajectories)
     summarize_trajectories("Assets: Inventory", inv_trajectories)
     summarize_trajectories("Assets: Cash", cash_trajectories)
-    summarize_trajectories(
-        "Assets: Investment in Market Securities", ims_trajectories
-    )
+    summarize_trajectories("Assets: Investment in Market Securities", ims_trajectories)
     summarize_trajectories("Current Liabilities", current_liabilities_trajectories)
     summarize_trajectories(
         "Non-current Liabilities", non_current_liabilities_trajectories
@@ -1118,8 +1139,13 @@ def plot_opex_fit_with_aleatoric_noise(
     mean_var_opex = model.q_var_opex_loc.numpy()
     mean_base_opex = model.q_base_opex_loc.numpy()
     sigma_opex = model.noise_sigma.numpy()
+    sales_offset = model.sales_offset.numpy()
 
-    mean_opex_bil = (mean_base_opex * cum_inf) + (mean_var_opex * historical_sales_bil)
+    # Center sales using the offset from training
+    historical_sales_bil_centered = historical_sales_bil - sales_offset
+    mean_opex_bil = (mean_base_opex * cum_inf) + (
+        mean_var_opex * historical_sales_bil_centered
+    )
 
     if use_gaussian_ci:
         # Analytical Gaussian predictive intervals (exact for linear-Gaussian model)
@@ -1127,7 +1153,8 @@ def plot_opex_fit_with_aleatoric_noise(
         var_base = float(model.q_base_opex_scale.numpy()) ** 2
         var_noise = float(sigma_opex) ** 2
         cum_inf_np = np.asarray(cum_inf, dtype=np.float64)
-        sales_np = np.asarray(historical_sales_bil, dtype=np.float64)
+        # Use centered sales for variance calculation
+        sales_np = np.asarray(historical_sales_bil_centered, dtype=np.float64)
         std_opex_bil = np.sqrt(
             (cum_inf_np**2) * var_base + (sales_np**2) * var_var + var_noise
         )
@@ -1144,8 +1171,10 @@ def plot_opex_fit_with_aleatoric_noise(
 
         var_samples = tf.reshape(var_samples, (-1, 1))
         base_samples = tf.reshape(base_samples, (-1, 1))
+        # Use centered sales for sampling
         sales = tf.reshape(
-            tf.convert_to_tensor(historical_sales_bil, dtype=tf.float64), (1, -1)
+            tf.convert_to_tensor(historical_sales_bil_centered, dtype=tf.float64),
+            (1, -1),
         )
         cum_inf_t = tf.reshape(tf.convert_to_tensor(cum_inf, dtype=tf.float64), (1, -1))
         noise = tf.random.normal(
@@ -1224,9 +1253,11 @@ def plot_opex_fit_with_aleatoric_noise(
     # Extend the regression lines to the padded range
     sales_grid_usd = np.linspace(x_left, x_right, 200)
     sales_grid_bil = sales_grid_usd / amount_scale
+    # Center the sales grid using the offset
+    sales_grid_bil_centered = sales_grid_bil - sales_offset
     cum_inf_mean = float(np.mean(cum_inf))
     mean_opex_grid_bil = (mean_base_opex * cum_inf_mean) + (
-        mean_var_opex * sales_grid_bil
+        mean_var_opex * sales_grid_bil_centered
     )
     mean_opex_grid_usd = mean_opex_grid_bil * amount_scale
 
@@ -1234,8 +1265,11 @@ def plot_opex_fit_with_aleatoric_noise(
         var_var = float(model.q_var_opex_scale.numpy()) ** 2
         var_base = float(model.q_base_opex_scale.numpy()) ** 2
         var_noise = float(sigma_opex) ** 2
+        # Use centered sales for variance calculation
         std_opex_grid_bil = np.sqrt(
-            (cum_inf_mean**2) * var_base + (sales_grid_bil**2) * var_var + var_noise
+            (cum_inf_mean**2) * var_base
+            + (sales_grid_bil_centered**2) * var_var
+            + var_noise
         )
         z_low = float(tfd.Normal(0.0, 1.0).quantile(lower_q / 100.0))
         z_up = float(tfd.Normal(0.0, 1.0).quantile(upper_q / 100.0))
@@ -1248,8 +1282,9 @@ def plot_opex_fit_with_aleatoric_noise(
         base_samples = q_base.sample(n_samples)
         var_samples = tf.reshape(var_samples, (-1, 1))
         base_samples = tf.reshape(base_samples, (-1, 1))
+        # Use centered sales for grid sampling
         sales_grid_t = tf.reshape(
-            tf.convert_to_tensor(sales_grid_bil, dtype=tf.float64), (1, -1)
+            tf.convert_to_tensor(sales_grid_bil_centered, dtype=tf.float64), (1, -1)
         )
         cum_inf_grid_t = tf.reshape(
             tf.convert_to_tensor(
