@@ -1320,12 +1320,23 @@ def plot_opex_fit_with_aleatoric_noise(
         color="black",
         zorder=3,
     )
+    # Per-data-point predictions using actual per-year cum_inf (matches vs-Year plot)
+    plt.scatter(
+        sales_hist_usd,
+        mean_opex_usd,
+        label="Mean OpEx per data point (learned)",
+        color="tab:blue",
+        marker="x",
+        s=80,
+        zorder=4,
+    )
     plt.plot(
         sales_grid_usd,
         mean_opex_grid_usd,
         "-",
-        label="Mean OpEx (learned)",
+        label="Mean OpEx trend (avg. inflation)",
         color="tab:blue",
+        alpha=0.5,
     )
     plt.plot(
         sales_grid_usd,
@@ -1362,6 +1373,7 @@ def plot_opex_fit_with_aleatoric_noise(
 def run_training_and_forecast(
     use_trained_parameters=False,
     parameters_path="trained_parameters.npz",
+    use_inflation=True,
 ):
     model = TrainableFinancialModel()
 
@@ -1642,9 +1654,10 @@ def run_training_and_forecast(
     # Inflation History
     inflation_hist = np.array(
         [0.024, 0.018, 0.012, 0.047, 0.08, 0.041, 0.029, 0.027],
-        # [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
         dtype=np.float64,
     )
+    if not use_inflation:
+        inflation_hist = np.zeros_like(inflation_hist)
 
     # --- 2. SCALE INPUTS AND TARGETS TO BILLIONS FOR TRAINING STABILITY ---
     amount_scale = model.amount_scale
@@ -1842,6 +1855,8 @@ def run_training_and_forecast(
         [0.03, 0.03, 0.03, 0.03, 0.03, 0.03, 0.03, 0.03, 0.03, 0.03],
         dtype=np.float64,
     )
+    if not use_inflation:
+        inflation_forecast = np.zeros_like(inflation_forecast)
     cum_inf_forecast = np.cumprod(1 + inflation_forecast)
 
     # --- Execute Monte Carlo Forecast ---
@@ -1859,4 +1874,5 @@ if __name__ == "__main__":
     run_training_and_forecast(
         use_trained_parameters=False,
         parameters_path="trained_parameters.npz",
+        use_inflation=False,  # Set to False to disable inflation (all rates → 0%)
     )
