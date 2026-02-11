@@ -58,9 +58,11 @@ class TrainableFinancialModel(tf.Module):
         # We learn a distribution (Normal) defined by a Mean (loc) and StdDev (scale)
 
         # 1. Variable OpEx %
-        self.q_var_opex_loc = tf.Variable(0.22, dtype=tf.float64, name="q_var_opex_loc")
+        # self.q_var_opex_loc = tf.Variable(0.22, dtype=tf.float64, name="q_var_opex_loc")
+        self.q_var_opex_loc = tf.Variable(0.0, dtype=tf.float64, name="q_var_opex_loc")
         self.q_var_opex_scale = tfp.util.TransformedVariable(
-            initial_value=0.01,
+            # initial_value=0.01,
+            initial_value=1.0,
             bijector=tfb.Softplus(),  # Ensures scale is always positive
             dtype=tf.float64,
             name="q_var_opex_scale",
@@ -68,12 +70,14 @@ class TrainableFinancialModel(tf.Module):
 
         # 2. Baseline OpEx (Large negative number)
         self.q_base_opex_loc = tf.Variable(
-            -3.0e10 / self.amount_scale,
+            # -3.0e10 / self.amount_scale,
+            0.0,
             dtype=tf.float64,
             name="q_base_opex_loc",
         )
         self.q_base_opex_scale = tfp.util.TransformedVariable(
-            initial_value=1.0e9 / self.amount_scale,
+            # initial_value=1.0e9 / self.amount_scale,
+            initial_value=1.0,
             bijector=tfb.Softplus(),
             dtype=tf.float64,
             name="q_base_opex_scale",
@@ -239,8 +243,8 @@ class TrainableFinancialModel(tf.Module):
         historical_tax,
         historical_inflation=None,
         learning_rate=0.001,
-        # epochs=30000,
-        epochs=100000,
+        epochs=30000,
+        # epochs=100000,
         plot_vi=True,
         plot_every=1000,
         show_plot=False,
@@ -1246,7 +1250,8 @@ def plot_opex_fit_with_aleatoric_noise(
     x_min = float(np.min(sales_hist_usd))
     x_max = float(np.max(sales_hist_usd))
     x_span = x_max - x_min if x_max > x_min else max(abs(x_max), 1.0)
-    x_pad = 10.0 * x_span
+    # x_pad = 10.0 * x_span
+    x_pad = 0.15 * x_span
     x_left = x_min - x_pad
     x_right = x_max + x_pad
 
@@ -1691,30 +1696,30 @@ def run_training_and_forecast(
             show_plot=False,
         )
 
-        # --- 3. PLOT OPEX FIT (Mean + Aleatoric Sigma) ---
-        historical_years = np.arange(1, len(opex_hist_bil) + 1)
+        # # --- 3. PLOT OPEX FIT (Mean + Aleatoric Sigma) ---
+        # historical_years = np.arange(1, len(opex_hist_bil) + 1)
 
-        # Posterior prediction by Gaussian Confidence Interval
-        plot_opex_fit_with_aleatoric_noise(
-            model,
-            historical_years,
-            sales_hist_bil,
-            opex_hist_bil,
-            inflation_hist,
-            show_plot=False,
-            use_gaussian_ci=True,
-        )
+        # # Posterior prediction by Gaussian Confidence Interval
+        # plot_opex_fit_with_aleatoric_noise(
+        #     model,
+        #     historical_years,
+        #     sales_hist_bil,
+        #     opex_hist_bil,
+        #     inflation_hist,
+        #     show_plot=False,
+        #     use_gaussian_ci=True,
+        # )
 
-        # Posterior prediction by sampling (Monte Carlo)
-        plot_opex_fit_with_aleatoric_noise(
-            model,
-            historical_years,
-            sales_hist_bil,
-            opex_hist_bil,
-            inflation_hist,
-            show_plot=False,
-            use_gaussian_ci=False,
-        )
+        # # Posterior prediction by sampling (Monte Carlo)
+        # plot_opex_fit_with_aleatoric_noise(
+        #     model,
+        #     historical_years,
+        #     sales_hist_bil,
+        #     opex_hist_bil,
+        #     inflation_hist,
+        #     show_plot=False,
+        #     use_gaussian_ci=False,
+        # )
 
         # --- 4. TRAIN STRUCTURAL PARAMETERS ---
         # We still only feed in the historical arrays from 2022-2024, and leave 2025 for forecast testing.
@@ -1740,6 +1745,31 @@ def run_training_and_forecast(
             inflation_hist[:-1],
         )
         model.save_parameters(parameters_path)
+
+    # --- 3. PLOT OPEX FIT (Mean + Aleatoric Sigma) ---
+    historical_years = np.arange(1, len(opex_hist_bil) + 1)
+
+    # Posterior prediction by Gaussian Confidence Interval
+    plot_opex_fit_with_aleatoric_noise(
+        model,
+        historical_years,
+        sales_hist_bil,
+        opex_hist_bil,
+        inflation_hist,
+        show_plot=False,
+        use_gaussian_ci=True,
+    )
+
+    # Posterior prediction by sampling (Monte Carlo)
+    plot_opex_fit_with_aleatoric_noise(
+        model,
+        historical_years,
+        sales_hist_bil,
+        opex_hist_bil,
+        inflation_hist,
+        show_plot=False,
+        use_gaussian_ci=False,
+    )
 
     # --- 5. RUN FORECAST (Using new parameters) ---
     # Initial State (t=0) 2024 Apple Balance Sheet
@@ -1782,6 +1812,12 @@ def run_training_and_forecast(
             sales_hist_bil[-1] * sales_growth_rate,
             sales_hist_bil[-1] * sales_growth_rate**2,
             sales_hist_bil[-1] * sales_growth_rate**3,
+            sales_hist_bil[-1] * sales_growth_rate**4,
+            sales_hist_bil[-1] * sales_growth_rate**5,
+            sales_hist_bil[-1] * sales_growth_rate**6,
+            sales_hist_bil[-1] * sales_growth_rate**7,
+            sales_hist_bil[-1] * sales_growth_rate**8,
+            sales_hist_bil[-1] * sales_growth_rate**9,
         ],
         dtype=np.float64,
     )
@@ -1791,12 +1827,21 @@ def run_training_and_forecast(
             purchases_hist_bil[-1] * purchases_growth_rate,
             purchases_hist_bil[-1] * purchases_growth_rate**2,
             purchases_hist_bil[-1] * purchases_growth_rate**3,
+            purchases_hist_bil[-1] * purchases_growth_rate**4,
+            purchases_hist_bil[-1] * purchases_growth_rate**5,
+            purchases_hist_bil[-1] * purchases_growth_rate**6,
+            purchases_hist_bil[-1] * purchases_growth_rate**7,
+            purchases_hist_bil[-1] * purchases_growth_rate**8,
+            purchases_hist_bil[-1] * purchases_growth_rate**9,
         ],
         dtype=np.float64,
     )
 
     # Year 1 to 4 inflation rate (2025-2028)
-    inflation_forecast = np.array([0.03, 0.03, 0.03, 0.03], dtype=np.float64)
+    inflation_forecast = np.array(
+        [0.03, 0.03, 0.03, 0.03, 0.03, 0.03, 0.03, 0.03, 0.03, 0.03],
+        dtype=np.float64,
+    )
     cum_inf_forecast = np.cumprod(1 + inflation_forecast)
 
     # --- Execute Monte Carlo Forecast ---
