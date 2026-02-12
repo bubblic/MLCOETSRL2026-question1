@@ -244,7 +244,6 @@ class TrainableFinancialModel(tf.Module):
         historical_inflation=None,
         learning_rate=0.001,
         epochs=30000,
-        # epochs=100000,
         plot_vi=True,
         plot_every=1000,
         show_plot=False,
@@ -1251,7 +1250,8 @@ def plot_opex_fit_with_aleatoric_noise(
     x_max = float(np.max(sales_hist_usd))
     x_span = x_max - x_min if x_max > x_min else max(abs(x_max), 1.0)
     # x_pad = 10.0 * x_span
-    x_pad = 0.15 * x_span
+    # x_pad = 0.15 * x_span
+    x_pad = 0.5 * x_span
     x_left = x_min - x_pad
     x_right = x_max + x_pad
 
@@ -1874,5 +1874,5 @@ if __name__ == "__main__":
     run_training_and_forecast(
         use_trained_parameters=False,
         parameters_path="trained_parameters.npz",
-        use_inflation=False,  # Set to False to disable inflation (all rates → 0%)
+        use_inflation=True,  # Set to False to disable inflation (all rates → 0%)
     )
