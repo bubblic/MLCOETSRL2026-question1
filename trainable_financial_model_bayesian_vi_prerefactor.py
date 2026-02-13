@@ -25,6 +25,12 @@ class TrainableFinancialModel(tf.Module):
             dtype=tf.float64,
             name="asset_growth",
         )  # %AG
+        self.asset_maintain = tfp.util.TransformedVariable(
+            initial_value=1.0,
+            bijector=tfb.Softplus(),
+            dtype=tf.float64,
+            name="asset_maintain",
+        )  # %AM (maintenance capex multiplier on depreciation)
         self.depreciation_rate = tfp.util.TransformedVariable(
             initial_value=0.055,
             bijector=tfb.Softplus(),
@@ -190,6 +196,7 @@ class TrainableFinancialModel(tf.Module):
     def save_parameters(self, path):
         params = {
             "asset_growth": float(self.asset_growth.numpy()),
+            "asset_maintain": float(self.asset_maintain.numpy()),
             "depreciation_rate": float(self.depreciation_rate.numpy()),
             "advance_payments_sales_pct": float(
                 self.advance_payments_sales_pct.numpy()
@@ -232,6 +239,7 @@ class TrainableFinancialModel(tf.Module):
             raise FileNotFoundError(f"Parameter file not found: {path}")
         data = np.load(path)
         self.asset_growth.assign(data["asset_growth"])
+        self.asset_maintain.assign(data["asset_maintain"])
         self.depreciation_rate.assign(data["depreciation_rate"])
         self.advance_payments_sales_pct.assign(data["advance_payments_sales_pct"])
         self.advance_payments_purchases_pct.assign(
@@ -403,6 +411,7 @@ class TrainableFinancialModel(tf.Module):
         vars_to_train = [
             # Policy params (unconstrained underlying variables via bijectors)
             self.asset_growth.trainable_variables[0],
+            self.asset_maintain.trainable_variables[0],
             self.depreciation_rate.trainable_variables[0],
             self.advance_payments_sales_pct.trainable_variables[0],
             self.advance_payments_purchases_pct.trainable_variables[0],
@@ -439,7 +448,13 @@ class TrainableFinancialModel(tf.Module):
             with tf.GradientTape() as tape:
                 # --- Deterministic Losses (MSE) ---
                 loss_growth = tf.reduce_mean(
-                    tf.square(delta_nca_true - sales_aligned_growth * self.asset_growth)
+                    tf.square(
+                        delta_nca_true
+                        - (
+                            (self.asset_maintain - 1) * depr_true
+                            + sales_aligned_growth * self.asset_growth
+                        )
+                    )
                 )
                 loss_depr = tf.reduce_mean(
                     tf.square(depr_true - nca_prev_aligned * self.depreciation_rate)
@@ -564,6 +579,7 @@ class TrainableFinancialModel(tf.Module):
         print("-" * 50)
         print("Training Complete.")
         print(f"Final %AG: {self.asset_growth.numpy():.5f}")
+        print(f"Final %AM: {self.asset_maintain.numpy():.5f}")
         print(f"Final %Depr: {self.depreciation_rate.numpy():.5f}")
         print(f"Final %AdvPS: {self.advance_payments_sales_pct.numpy():.5f}")
         print(f"Final %AdvPP: {self.advance_payments_purchases_pct.numpy():.5f}")
@@ -834,8 +850,8 @@ class TrainableFinancialModel(tf.Module):
         # --- 1. Assets Evolution ---
         # 1.1. Non-current Assets (NCA)
         # Policy: Maintain NCA + Growth (Simplified for this model)
-        # Investment required to replace depreciation + grow
-        capex = depreciation + (sales_t * self.asset_growth)
+        # Investment required to maintain depreciated assets + grow
+        capex = self.asset_maintain * depreciation + sales_t * self.asset_growth
         nca_curr = nca_prev - depreciation + capex
 
         # 1.3. Accounts Receivable (AR)
