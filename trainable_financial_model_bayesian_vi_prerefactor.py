@@ -92,6 +92,17 @@ class TrainableFinancialModel(tf.Module):
             name="bb_pct",
         )  # %BB
 
+        # --- Cost Ratio Parameters (Logit-Linear Trend) ---
+        # logit(CR_t) = alpha + beta * t  =>  CR_t = sigmoid(alpha + beta * t)
+        # Purchases are derived: P_t = Sales_t * CR_t + (Inv_target_t - Inv_{t-1})
+        # COGS simplifies to: Sales_t * CR_t
+        self.cost_ratio_alpha = tf.Variable(
+            0.35, dtype=tf.float64, name="cost_ratio_alpha"
+        )
+        self.cost_ratio_beta = tf.Variable(
+            -0.05, dtype=tf.float64, name="cost_ratio_beta"
+        )
+
         # --- BAYESIAN OPEX PARAMETERS (Variational Inference) ---
         # We learn a distribution (Normal) defined by a Mean (loc) and StdDev (scale)
 
@@ -211,6 +222,8 @@ class TrainableFinancialModel(tf.Module):
                 self.market_securities_return_pct.numpy()
             ),
             "equity_financing_pct": float(self.equity_financing_pct.numpy()),
+            "cost_ratio_alpha": float(self.cost_ratio_alpha.numpy()),
+            "cost_ratio_beta": float(self.cost_ratio_beta.numpy()),
         }
         np.savez(path, **params)
 
@@ -243,6 +256,8 @@ class TrainableFinancialModel(tf.Module):
         self.avg_maturity_years.assign(data["avg_maturity_years"])
         self.market_securities_return_pct.assign(data["market_securities_return_pct"])
         self.equity_financing_pct.assign(data["equity_financing_pct"])
+        self.cost_ratio_alpha.assign(data["cost_ratio_alpha"])
+        self.cost_ratio_beta.assign(data["cost_ratio_beta"])
 
     def sample_opex_params(self):
         """Samples from the variational posterior using Reparameterization Trick"""
@@ -284,6 +299,7 @@ class TrainableFinancialModel(tf.Module):
         self,
         historical_sales,
         historical_purchases,
+        historical_cogs,
         historical_nca,
         historical_depreciation,
         historical_adv_pay_sales,
@@ -312,6 +328,7 @@ class TrainableFinancialModel(tf.Module):
         # Convert inputs to tensors and ensure float64
         sales_tensor = tf.convert_to_tensor(historical_sales, dtype=tf.float64)
         purchases_tensor = tf.convert_to_tensor(historical_purchases, dtype=tf.float64)
+        cogs_tensor = tf.convert_to_tensor(historical_cogs, dtype=tf.float64)
         nca_tensor = tf.convert_to_tensor(historical_nca, dtype=tf.float64)
         depr_tensor = tf.convert_to_tensor(historical_depreciation, dtype=tf.float64)
         adv_pay_sales_tensor = tf.convert_to_tensor(
@@ -350,6 +367,13 @@ class TrainableFinancialModel(tf.Module):
             f"Sales range after centering: [{tf.reduce_min(sales_tensor_centered).numpy():.4e}, {tf.reduce_max(sales_tensor_centered).numpy():.4e}]"
         )
 
+        # --- Cost Ratio Training Data ---
+        # Compute logit(CR) targets from historical COGS/Sales
+        cost_ratio_hist = cogs_tensor / sales_tensor
+        logit_cr_hist = tf.math.log(cost_ratio_hist / (1.0 - cost_ratio_hist))
+        # Time indices: 0, 1, 2, ..., N-1
+        time_indices = tf.cast(tf.range(len(historical_sales)), dtype=tf.float64)
+
         # --- Prepare Training Data & Alignment ---
 
         # 1. Asset Growth: (NCA_t - NCA_{t-1}) = sales_t * asset_growth
@@ -364,9 +388,9 @@ class TrainableFinancialModel(tf.Module):
         adv_ps_true = adv_pay_sales_tensor[:-1]
         sales_next_aligned = sales_tensor[1:]
 
-        # 4. Advance Payments Purchases: adv_pp_t = purchases_{t+1} * adv_pp_pct
-        adv_pp_true = adv_pay_purch_tensor[:-1]
-        purchases_next_aligned = purchases_tensor[1:]
+        # 4. Advance Payments Purchases: adv_pp_t = purchases_t * adv_pp_pct
+        adv_pp_true = adv_pay_purch_tensor
+        purchases_aligned_adv_pp = purchases_tensor
 
         # 5. Dividends: div_t = ni_{t-1} * div_pct
         div_true = div_tensor[1:]
@@ -390,6 +414,9 @@ class TrainableFinancialModel(tf.Module):
             self.income_tax_pct.trainable_variables[0],
             self.dividend_payout_ratio_pct.trainable_variables[0],
             self.stock_buyback_pct.trainable_variables[0],
+            # Cost Ratio Params (Logit-Linear)
+            self.cost_ratio_alpha,
+            self.cost_ratio_beta,
             # Bayesian Params
             self.q_var_opex_loc,
             self.q_var_opex_scale.trainable_variables[0],
@@ -426,7 +453,7 @@ class TrainableFinancialModel(tf.Module):
                 loss_adv_pp = tf.reduce_mean(
                     tf.square(
                         adv_pp_true
-                        - purchases_next_aligned * self.advance_payments_purchases_pct
+                        - purchases_aligned_adv_pp * self.advance_payments_purchases_pct
                     )
                 )
                 loss_ar = tf.reduce_mean(
@@ -460,6 +487,15 @@ class TrainableFinancialModel(tf.Module):
                 )
                 loss_bb = tf.reduce_mean(
                     tf.square(bb_tensor - depr_tensor * self.stock_buyback_pct)
+                )
+
+                # --- Cost Ratio Loss (Logit-Linear) ---
+                # logit(CR_t) = alpha + beta * t
+                logit_cr_pred = (
+                    self.cost_ratio_alpha + self.cost_ratio_beta * time_indices
+                )
+                loss_cost_ratio = tf.reduce_mean(
+                    tf.square(logit_cr_hist - logit_cr_pred)
                 )
 
                 # --- Bayesian OpEx Loss ---
@@ -500,6 +536,7 @@ class TrainableFinancialModel(tf.Module):
                     + loss_tax
                     + loss_div
                     + loss_bb
+                    + loss_cost_ratio
                     + loss_opex_bayes
                 )
 
@@ -538,6 +575,15 @@ class TrainableFinancialModel(tf.Module):
         print(f"Final %IT: {self.income_tax_pct.numpy():.5f}")
         print(f"Final %PR: {self.dividend_payout_ratio_pct.numpy():.5f}")
         print(f"Final %BB: {self.stock_buyback_pct.numpy():.5f}")
+        print(
+            f"Cost Ratio (logit-linear): alpha={self.cost_ratio_alpha.numpy():.4f}, "
+            f"beta={self.cost_ratio_beta.numpy():.4f}"
+        )
+        print(
+            f"  => CR at t=0: {tf.sigmoid(self.cost_ratio_alpha).numpy():.4f}, "
+            f"CR at t={len(historical_sales)-1}: "
+            f"{tf.sigmoid(self.cost_ratio_alpha + self.cost_ratio_beta * (len(historical_sales)-1)).numpy():.4f}"
+        )
         print(
             f"Bayesian OpEx Variable %: Mean={self.q_var_opex_loc.numpy():.4f}, Std={self.q_var_opex_scale.numpy():.4f}"
         )
@@ -610,7 +656,6 @@ class TrainableFinancialModel(tf.Module):
     def train_structural_parameters(
         self,
         historical_sales,
-        historical_purchases,
         historical_nca,
         historical_adv_pay_sales,
         historical_adv_pay_purch,
@@ -628,17 +673,18 @@ class TrainableFinancialModel(tf.Module):
         historical_non_current_liabilities,
         historical_equity,
         historical_inflation=None,
+        historical_time_indices=None,
         learning_rate=0.0001,
         epochs=10000,
     ):
         """
         Trains structural parameters (interest rates, maturity, financing)
         using historical state transitions.
+        Purchases are derived inside forecast_step from the learned cost ratio.
         """
         # NOTE: When calling forecast_step inside here, we need to pass use_mean_opex=True
         # because we want to learn structural parameters based on the "most likely" OpEx, not noisy samples.
         sales_t = tf.convert_to_tensor(historical_sales, dtype=tf.float64)
-        purch_t = tf.convert_to_tensor(historical_purchases, dtype=tf.float64)
         nca_t = tf.convert_to_tensor(historical_nca, dtype=tf.float64)
         adv_ps_t = tf.convert_to_tensor(historical_adv_pay_sales, dtype=tf.float64)
         adv_pp_t = tf.convert_to_tensor(historical_adv_pay_purch, dtype=tf.float64)
@@ -658,6 +704,12 @@ class TrainableFinancialModel(tf.Module):
             historical_inflation = tf.zeros_like(sales_t)
         inf_t = tf.convert_to_tensor(historical_inflation, dtype=tf.float64)
         cum_inf_t = tf.math.cumprod(1 + inf_t)
+
+        if historical_time_indices is None:
+            historical_time_indices = tf.cast(
+                tf.range(len(historical_sales)), dtype=tf.float64
+            )
+        time_idx_t = tf.convert_to_tensor(historical_time_indices, dtype=tf.float64)
 
         optimizer = tf.optimizers.Adam(learning_rate=learning_rate)
         vars_to_train = [
@@ -693,11 +745,11 @@ class TrainableFinancialModel(tf.Module):
                     }
 
                     # Inputs for predicting state at t+1
+                    # Purchases are derived inside forecast_step from cost ratio
                     inputs_curr = {
                         "sales_t": sales_t[t + 1],
-                        "purchases_t": purch_t[t + 1],
                         "sales_t_plus_1": sales_t[t + 2],
-                        "purchases_t_plus_1": purch_t[t + 2],
+                        "time_index": time_idx_t[t + 1],
                         "cum_inflation": cum_inf_t[t + 1],
                     }
 
@@ -769,10 +821,15 @@ class TrainableFinancialModel(tf.Module):
 
         # Unpack current inputs (t)
         sales_t = inputs["sales_t"]
-        purchases_t = inputs["purchases_t"]
         sales_t_plus_1 = inputs["sales_t_plus_1"]
-        purchases_t_plus_1 = inputs["purchases_t_plus_1"]
+        time_index = inputs["time_index"]
         cum_inflation = inputs["cum_inflation"]
+
+        # --- Derive purchases from cost ratio (Logit-Linear Model) ---
+        # CR_t = sigmoid(alpha + beta * t)
+        cost_ratio_t = tf.sigmoid(
+            self.cost_ratio_alpha + self.cost_ratio_beta * time_index
+        )
 
         # --- 1. Assets Evolution ---
         # 1.1. Non-current Assets (NCA)
@@ -781,16 +838,20 @@ class TrainableFinancialModel(tf.Module):
         capex = depreciation + (sales_t * self.asset_growth)
         nca_curr = nca_prev - depreciation + capex
 
-        # 1.2. Advance Payments (AdvPP)
-        advance_payments_purchases_curr = (
-            purchases_t_plus_1 * self.advance_payments_purchases_pct
-        )
-
         # 1.3. Accounts Receivable (AR)
         accounts_receivable_curr = sales_t * self.account_receivables_pct
 
         # 1.4. Inventory (Inv)
         inventory_curr = sales_t * self.inventory_pct
+
+        # 1.2. Derive Purchases from Cost Ratio and Inventory Identity
+        # P_t = Sales_t * CR_t + (Inv_target_t - Inv_{t-1})
+        purchases_t = sales_t * cost_ratio_t + (inventory_curr - inventory_prev)
+
+        # 1.2b. Advance Payments (AdvPP) — based on this year's purchases (no lookahead)
+        advance_payments_purchases_curr = (
+            purchases_t * self.advance_payments_purchases_pct
+        )
 
         # 1.5. Total Liquidity Target (TL)
         total_liquidity_curr = sales_t * self.total_liquidity_pct
@@ -808,6 +869,7 @@ class TrainableFinancialModel(tf.Module):
         # Net income (NI) is calculated by first calculating EBITDA = Sales - COGS - OpEx
         # Then, EBT is calculated by EBITDA - Depreciation - loan interest payments + return from market securities.
         # Finally, NI is calculated by EBT - Tax.
+        # COGS = Inv_{t-1} + P_t - Inv_t = Sales_t * CR_t (by construction)
         cogs = inventory_prev + purchases_t - inventory_curr
 
         # --- BAYESIAN OPEX CALCULATION ---
@@ -1011,8 +1073,8 @@ def run_monte_carlo_forecast(
     model,
     initial_state,
     sales_forecast,
-    purchases_forecast,
     cum_inf_forecast,
+    time_indices_forecast,
     n_samples=1000,
 ):
     print(f"\n--- Running Monte Carlo Forecast ({n_samples} samples) ---")
@@ -1048,9 +1110,8 @@ def run_monte_carlo_forecast(
         for t in range(len(sales_forecast) - 1):
             inputs = {
                 "sales_t": tf.constant(sales_forecast[t]),
-                "purchases_t": tf.constant(purchases_forecast[t]),
                 "sales_t_plus_1": tf.constant(sales_forecast[t + 1]),
-                "purchases_t_plus_1": tf.constant(purchases_forecast[t + 1]),
+                "time_index": tf.constant(time_indices_forecast[t], dtype=tf.float64),
                 "cum_inflation": tf.constant(cum_inf_forecast[t]),
             }
             # use_mean_opex=False triggers sampling
@@ -1680,6 +1741,7 @@ def run_training_and_forecast(
     amount_scale = model.amount_scale
     sales_hist_bil = sales_hist / amount_scale
     purchases_hist_bil = purchases_hist / amount_scale
+    cogs_hist_bil = cogs_hist / amount_scale
     nca_hist_bil = nca_hist / amount_scale
     depr_hist_bil = depr_hist / amount_scale
     advance_payments_sales_hist_bil = advance_payments_sales_hist / amount_scale
@@ -1708,6 +1770,7 @@ def run_training_and_forecast(
         model.train_simple_policies(
             sales_hist_bil[:-1],
             purchases_hist_bil[:-1],
+            cogs_hist_bil[:-1],
             nca_hist_bil[:-1],
             depr_hist_bil[:-1],
             advance_payments_sales_hist_bil[:-1],
@@ -1753,9 +1816,11 @@ def run_training_and_forecast(
 
         # --- 4. TRAIN STRUCTURAL PARAMETERS ---
         # We still only feed in the historical arrays from 2022-2024, and leave 2025 for forecast testing.
+        # Time indices for training data (t=0 is FY2018)
+        n_train = len(sales_hist_bil[:-1])
+        train_time_indices = np.arange(n_train, dtype=np.float64)
         model.train_structural_parameters(
             sales_hist_bil[:-1],
-            purchases_hist_bil[:-1],
             nca_hist_bil[:-1],
             advance_payments_sales_hist_bil[:-1],
             advance_payments_purchases_hist_bil[:-1],
@@ -1773,6 +1838,7 @@ def run_training_and_forecast(
             non_current_liabilities_hist_bil[:-1],
             equity_hist_bil[:-1],
             inflation_hist[:-1],
+            train_time_indices,
         )
         model.save_parameters(parameters_path)
 
@@ -1832,39 +1898,19 @@ def run_training_and_forecast(
         "net_income": tf.constant(net_income_hist_bil[-2], dtype=tf.float64),
     }
 
-    # Forecast Drivers (Sales/Purchases) for 2025-2028
-    # Year 1 to 4. We are only interested in Year 1 to 3. The padding is needed for forecasting. Use float64
+    # Forecast Drivers: Sales is the sole exogenous driver.
+    # Purchases are derived inside forecast_step from the learned cost ratio.
+    n_hist = len(sales_hist)  # 8 (FY2018-FY2025), t=0..7
+    n_forecast_years = 10
     sales_growth_rate = sales_hist_bil[-1] / sales_hist_bil[-2]
-    purchases_growth_rate = purchases_hist_bil[-1] / purchases_hist_bil[-2]
     sales_forecast = np.array(
-        [
-            sales_hist_bil[-1],
-            sales_hist_bil[-1] * sales_growth_rate,
-            sales_hist_bil[-1] * sales_growth_rate**2,
-            sales_hist_bil[-1] * sales_growth_rate**3,
-            sales_hist_bil[-1] * sales_growth_rate**4,
-            sales_hist_bil[-1] * sales_growth_rate**5,
-            sales_hist_bil[-1] * sales_growth_rate**6,
-            sales_hist_bil[-1] * sales_growth_rate**7,
-            sales_hist_bil[-1] * sales_growth_rate**8,
-            sales_hist_bil[-1] * sales_growth_rate**9,
-        ],
+        [sales_hist_bil[-1] * sales_growth_rate**i for i in range(n_forecast_years)],
         dtype=np.float64,
     )
-    purchases_forecast = np.array(
-        [
-            purchases_hist_bil[-1],
-            purchases_hist_bil[-1] * purchases_growth_rate,
-            purchases_hist_bil[-1] * purchases_growth_rate**2,
-            purchases_hist_bil[-1] * purchases_growth_rate**3,
-            purchases_hist_bil[-1] * purchases_growth_rate**4,
-            purchases_hist_bil[-1] * purchases_growth_rate**5,
-            purchases_hist_bil[-1] * purchases_growth_rate**6,
-            purchases_hist_bil[-1] * purchases_growth_rate**7,
-            purchases_hist_bil[-1] * purchases_growth_rate**8,
-            purchases_hist_bil[-1] * purchases_growth_rate**9,
-        ],
-        dtype=np.float64,
+    # Time indices continue from historical: t=7 is FY2025 (last hist year),
+    # so forecast starts at t=7 (the first forecast year uses the last hist year as t=7)
+    time_indices_forecast = np.arange(
+        n_hist - 1, n_hist - 1 + n_forecast_years, dtype=np.float64
     )
 
     # Year 1 to 4 inflation rate (2025-2028)
@@ -1881,8 +1927,8 @@ def run_training_and_forecast(
         model,
         state,
         sales_forecast,
-        purchases_forecast,
         cum_inf_forecast,
+        time_indices_forecast,
         n_samples=1000,
     )
 
