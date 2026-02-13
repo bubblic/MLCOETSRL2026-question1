@@ -17,41 +17,79 @@ class TrainableFinancialModel(tf.Module):
 
         # --- Policy Parameters (Deterministic) ---
         ## These are trainable with simple linear regression
-        self.asset_growth = tf.Variable(
-            0.0076, name="asset_growth", dtype=tf.float64
+        ## Non-negative params use Softplus bijector (constraint by construction)
+        ## [0,1]-bounded params use Sigmoid bijector
+        self.asset_growth = tfp.util.TransformedVariable(
+            initial_value=0.0076,
+            bijector=tfb.Softplus(),
+            dtype=tf.float64,
+            name="asset_growth",
         )  # %AG
-        self.depreciation_rate = tf.Variable(
-            0.055, name="depr_rate", dtype=tf.float64
+        self.depreciation_rate = tfp.util.TransformedVariable(
+            initial_value=0.055,
+            bijector=tfb.Softplus(),
+            dtype=tf.float64,
+            name="depr_rate",
         )  # %Depr
-        self.advance_payments_sales_pct = tf.Variable(
-            0.0206, name="adv_ps", dtype=tf.float64
+        self.advance_payments_sales_pct = tfp.util.TransformedVariable(
+            initial_value=0.0206,
+            bijector=tfb.Softplus(),
+            dtype=tf.float64,
+            name="adv_ps",
         )  # %AdvPS
-        self.advance_payments_purchases_pct = tf.Variable(
-            0.0735, name="adv_pp", dtype=tf.float64
+        self.advance_payments_purchases_pct = tfp.util.TransformedVariable(
+            initial_value=0.0735,
+            bijector=tfb.Softplus(),
+            dtype=tf.float64,
+            name="adv_pp",
         )  # %AdvPP
-        self.account_receivables_pct = tf.Variable(
-            0.1591, name="ar_pct", dtype=tf.float64
+        self.account_receivables_pct = tfp.util.TransformedVariable(
+            initial_value=0.1591,
+            bijector=tfb.Softplus(),
+            dtype=tf.float64,
+            name="ar_pct",
         )  # %AR
-        self.account_payables_pct = tf.Variable(
-            0.3501, name="ap_pct", dtype=tf.float64
+        self.account_payables_pct = tfp.util.TransformedVariable(
+            initial_value=0.3501,
+            bijector=tfb.Softplus(),
+            dtype=tf.float64,
+            name="ap_pct",
         )  # %AP
-        self.inventory_pct = tf.Variable(
-            0.0165, name="inv_pct", dtype=tf.float64
+        self.inventory_pct = tfp.util.TransformedVariable(
+            initial_value=0.0165,
+            bijector=tfb.Softplus(),
+            dtype=tf.float64,
+            name="inv_pct",
         )  # %Inv
-        self.total_liquidity_pct = tf.Variable(
-            0.16, name="tl_pct", dtype=tf.float64
+        self.total_liquidity_pct = tfp.util.TransformedVariable(
+            initial_value=0.16,
+            bijector=tfb.Softplus(),
+            dtype=tf.float64,
+            name="tl_pct",
         )  # %TL
-        self.cash_pct_of_liquidity = tf.Variable(
-            0.487, name="cash_pct", dtype=tf.float64
+        self.cash_pct_of_liquidity = tfp.util.TransformedVariable(
+            initial_value=0.487,
+            bijector=tfb.Sigmoid(),
+            dtype=tf.float64,
+            name="cash_pct",
         )  # %Cash
-        self.income_tax_pct = tf.Variable(
-            0.147, name="tax_pct", dtype=tf.float64
+        self.income_tax_pct = tfp.util.TransformedVariable(
+            initial_value=0.147,
+            bijector=tfb.Sigmoid(),
+            dtype=tf.float64,
+            name="tax_pct",
         )  # %IT
-        self.dividend_payout_ratio_pct = tf.Variable(
-            0.15, name="div_pct", dtype=tf.float64
+        self.dividend_payout_ratio_pct = tfp.util.TransformedVariable(
+            initial_value=0.15,
+            bijector=tfb.Sigmoid(),
+            dtype=tf.float64,
+            name="div_pct",
         )  # %PR
-        self.stock_buyback_pct = tf.Variable(
-            7.5, name="bb_pct", dtype=tf.float64
+        self.stock_buyback_pct = tfp.util.TransformedVariable(
+            initial_value=7.5,
+            bijector=tfb.Softplus(),
+            dtype=tf.float64,
+            name="bb_pct",
         )  # %BB
 
         # --- BAYESIAN OPEX PARAMETERS (Variational Inference) ---
@@ -103,20 +141,39 @@ class TrainableFinancialModel(tf.Module):
 
         # --- Structural Parameters ---
         ## These are trained with gradient descent with the trained variables from above and other data (sales, purchases, equity, liabilities, etc.) as inputs
-        self.avg_short_term_interest_pct = tf.Variable(
-            0.6, name="avg_short_term_interest_pct", dtype=tf.float64
+        ## Non-negative params use Softplus, [0,1]-bounded use Sigmoid,
+        ## avg_maturity_years uses Shift(1.001) + Softplus to enforce > 1.001
+        self.avg_short_term_interest_pct = tfp.util.TransformedVariable(
+            initial_value=0.6,
+            bijector=tfb.Softplus(),
+            dtype=tf.float64,
+            name="avg_short_term_interest_pct",
         )  # %AvgSTInt
-        self.avg_long_term_interest_pct = tf.Variable(
-            0.06, name="avg_long_term_interest_pct", dtype=tf.float64
+        self.avg_long_term_interest_pct = tfp.util.TransformedVariable(
+            initial_value=0.06,
+            bijector=tfb.Softplus(),
+            dtype=tf.float64,
+            name="avg_long_term_interest_pct",
         )  # %AvgLTInt
-        self.avg_maturity_years = tf.Variable(
-            3.0, name="avg_maturity_years", dtype=tf.float64
-        )  # AvgM
-        self.market_securities_return_pct = tf.Variable(
-            0.05, name="market_securities_return_pct", dtype=tf.float64
+        self.avg_maturity_years = tfp.util.TransformedVariable(
+            initial_value=3.0,
+            bijector=tfb.Chain(
+                [tfb.Shift(tf.constant(1.001, dtype=tf.float64)), tfb.Softplus()]
+            ),
+            dtype=tf.float64,
+            name="avg_maturity_years",
+        )  # AvgM (always > 1.001)
+        self.market_securities_return_pct = tfp.util.TransformedVariable(
+            initial_value=0.05,
+            bijector=tfb.Softplus(),
+            dtype=tf.float64,
+            name="market_securities_return_pct",
         )  # %MSReturn
-        self.equity_financing_pct = tf.Variable(
-            0.15, name="equity_financing_pct", dtype=tf.float64
+        self.equity_financing_pct = tfp.util.TransformedVariable(
+            initial_value=0.15,
+            bijector=tfb.Sigmoid(),
+            dtype=tf.float64,
+            name="equity_financing_pct",
         )  # %EF
 
     def save_parameters(self, path):
@@ -320,18 +377,19 @@ class TrainableFinancialModel(tf.Module):
 
         # --- Training Loop ---
         vars_to_train = [
-            self.asset_growth,
-            self.depreciation_rate,
-            self.advance_payments_sales_pct,
-            self.advance_payments_purchases_pct,
-            self.account_receivables_pct,
-            self.account_payables_pct,
-            self.inventory_pct,
-            self.total_liquidity_pct,
-            self.cash_pct_of_liquidity,
-            self.income_tax_pct,
-            self.dividend_payout_ratio_pct,
-            self.stock_buyback_pct,
+            # Policy params (unconstrained underlying variables via bijectors)
+            self.asset_growth.trainable_variables[0],
+            self.depreciation_rate.trainable_variables[0],
+            self.advance_payments_sales_pct.trainable_variables[0],
+            self.advance_payments_purchases_pct.trainable_variables[0],
+            self.account_receivables_pct.trainable_variables[0],
+            self.account_payables_pct.trainable_variables[0],
+            self.inventory_pct.trainable_variables[0],
+            self.total_liquidity_pct.trainable_variables[0],
+            self.cash_pct_of_liquidity.trainable_variables[0],
+            self.income_tax_pct.trainable_variables[0],
+            self.dividend_payout_ratio_pct.trainable_variables[0],
+            self.stock_buyback_pct.trainable_variables[0],
             # Bayesian Params
             self.q_var_opex_loc,
             self.q_var_opex_scale.trainable_variables[0],
@@ -450,30 +508,6 @@ class TrainableFinancialModel(tf.Module):
 
             # Apply Gradients
             optimizer.apply_gradients(zip(grads, vars_to_train))
-
-            # --- Constraints (Clipping)
-            self.asset_growth.assign(tf.maximum(0.0, self.asset_growth))
-            self.depreciation_rate.assign(tf.maximum(0.0, self.depreciation_rate))
-            self.advance_payments_sales_pct.assign(
-                tf.maximum(0.0, self.advance_payments_sales_pct)
-            )
-            self.advance_payments_purchases_pct.assign(
-                tf.maximum(0.0, self.advance_payments_purchases_pct)
-            )
-            self.account_receivables_pct.assign(
-                tf.maximum(0.0, self.account_receivables_pct)
-            )
-            self.account_payables_pct.assign(tf.maximum(0.0, self.account_payables_pct))
-            self.inventory_pct.assign(tf.maximum(0.0, self.inventory_pct))
-            self.total_liquidity_pct.assign(tf.maximum(0.0, self.total_liquidity_pct))
-            self.cash_pct_of_liquidity.assign(
-                tf.clip_by_value(self.cash_pct_of_liquidity, 0.0, 1.0)
-            )
-            self.income_tax_pct.assign(tf.clip_by_value(self.income_tax_pct, 0.0, 1.0))
-            self.dividend_payout_ratio_pct.assign(
-                tf.clip_by_value(self.dividend_payout_ratio_pct, 0.0, 1.0)
-            )
-            self.stock_buyback_pct.assign(tf.maximum(0.0, self.stock_buyback_pct))
 
             if i % plot_every == 0:
                 vi_history["epochs"].append(i)
@@ -627,11 +661,11 @@ class TrainableFinancialModel(tf.Module):
 
         optimizer = tf.optimizers.Adam(learning_rate=learning_rate)
         vars_to_train = [
-            self.avg_short_term_interest_pct,
-            self.avg_long_term_interest_pct,
-            self.avg_maturity_years,
-            self.market_securities_return_pct,
-            self.equity_financing_pct,
+            self.avg_short_term_interest_pct.trainable_variables[0],
+            self.avg_long_term_interest_pct.trainable_variables[0],
+            self.avg_maturity_years.trainable_variables[0],
+            self.market_securities_return_pct.trainable_variables[0],
+            self.equity_financing_pct.trainable_variables[0],
         ]
 
         print(f"Training structural parameters...")
@@ -687,23 +721,6 @@ class TrainableFinancialModel(tf.Module):
 
             grads = tape.gradient(total_loss, vars_to_train)
             optimizer.apply_gradients(zip(grads, vars_to_train))
-
-            # --- Constraints ---
-            self.avg_short_term_interest_pct.assign(
-                tf.maximum(0.0, self.avg_short_term_interest_pct)
-            )
-            self.avg_long_term_interest_pct.assign(
-                tf.maximum(0.0, self.avg_long_term_interest_pct)
-            )
-            # Maturity must be > 1 to avoid division by zero in (AvgM - 1)
-            self.avg_maturity_years.assign(tf.maximum(1.001, self.avg_maturity_years))
-            self.market_securities_return_pct.assign(
-                tf.maximum(0.0, self.market_securities_return_pct)
-            )
-            # Financing percentage should be between 0 and 1
-            self.equity_financing_pct.assign(
-                tf.clip_by_value(self.equity_financing_pct, 0.0, 1.0)
-            )
 
             if i % 1000 == 0:
                 print(f"Epoch {i}: Structural Loss={total_loss.numpy():.4e}")
