@@ -1123,6 +1123,8 @@ def run_monte_carlo_forecast(
     ims_trajectories = []
     current_liabilities_trajectories = []
     non_current_liabilities_trajectories = []
+    ap_trajectories = []
+    aps_trajectories = []
 
     for i in range(n_samples):
         current_state = initial_state.copy()
@@ -1137,6 +1139,8 @@ def run_monte_carlo_forecast(
         sample_ims = []
         sample_cl = []
         sample_ncl = []
+        sample_ap = []
+        sample_aps = []
 
         for t in range(len(sales_forecast) - 1):
             inputs = {
@@ -1171,6 +1175,8 @@ def run_monte_carlo_forecast(
             sample_ims.append(current_state["investment_in_market_securities"].numpy())
             sample_cl.append(current_state["current_liabilities"].numpy())
             sample_ncl.append(current_state["non_current_liabilities"].numpy())
+            sample_ap.append(current_state["accounts_payable"].numpy())
+            sample_aps.append(current_state["advance_payments_sales"].numpy())
 
         ni_trajectories.append(sample_ni)
         equity_trajectories.append(sample_equity)
@@ -1183,6 +1189,8 @@ def run_monte_carlo_forecast(
         ims_trajectories.append(sample_ims)
         current_liabilities_trajectories.append(sample_cl)
         non_current_liabilities_trajectories.append(sample_ncl)
+        ap_trajectories.append(sample_ap)
+        aps_trajectories.append(sample_aps)
 
     ni_trajectories = np.array(ni_trajectories)
     equity_trajectories = np.array(equity_trajectories)
@@ -1197,6 +1205,8 @@ def run_monte_carlo_forecast(
     non_current_liabilities_trajectories = np.array(
         non_current_liabilities_trajectories
     )
+    ap_trajectories = np.array(ap_trajectories)
+    aps_trajectories = np.array(aps_trajectories)
 
     # Calculate Statistics
     def summarize_trajectories(name, trajectories):
@@ -1230,6 +1240,24 @@ def run_monte_carlo_forecast(
         "Non-current Liabilities", non_current_liabilities_trajectories
     )
     summarize_trajectories("Equity", equity_trajectories)
+    summarize_trajectories("Accounts Payable", ap_trajectories)
+    summarize_trajectories("Advance Payments (Sales)", aps_trajectories)
+
+    return {
+        "net_income": ni_trajectories,
+        "total_assets": assets_trajectories,
+        "nca": nca_trajectories,
+        "advance_payments_purchases": adv_pay_purch_trajectories,
+        "accounts_receivable": ar_trajectories,
+        "inventory": inv_trajectories,
+        "cash": cash_trajectories,
+        "investment_in_market_securities": ims_trajectories,
+        "accounts_payable": ap_trajectories,
+        "advance_payments_sales": aps_trajectories,
+        "current_liabilities": current_liabilities_trajectories,
+        "non_current_liabilities": non_current_liabilities_trajectories,
+        "equity": equity_trajectories,
+    }
 
 
 def plot_opex_fit_with_aleatoric_noise(
@@ -1473,6 +1501,162 @@ def plot_opex_fit_with_aleatoric_noise(
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     tag = "gaussian_ci" if use_gaussian_ci else "monte_carlo"
     plt.savefig(f"opex_vs_sales_fit_{timestamp}_{tag}.png", dpi=150)
+    if show_plot:
+        plt.show()
+    else:
+        plt.close()
+
+
+def plot_historical_and_forecast(
+    historical_years,
+    forecast_years,
+    historical_data,
+    forecast_trajectories,
+    amount_scale,
+    sales_hist_usd=None,
+    sales_forecast_usd=None,
+    show_plot=False,
+):
+    """
+    Plots all financial elements from historical period through forecast period.
+
+    Args:
+        historical_years: array of year labels for historical data (e.g., [2018, ..., 2025])
+        forecast_years: array of year labels for forecast data (e.g., [2025, ..., 2033])
+        historical_data: dict of {name: array_in_usd} for historical data
+        forecast_trajectories: dict of {name: array[n_samples, n_years] in scaled units}
+        amount_scale: scaling factor to convert scaled units back to USD
+        sales_hist_usd: optional array of historical sales in USD
+        sales_forecast_usd: optional array of deterministic sales forecast in USD
+        show_plot: whether to call plt.show()
+    """
+    elements = list(forecast_trajectories.keys())
+    n_elements = len(elements)
+
+    # Compute mean, 2.5%, 97.5% for each element
+    forecast_stats = {}
+    for name in elements:
+        trajs = forecast_trajectories[name]
+        forecast_stats[name] = {
+            "mean": np.mean(trajs, axis=0) * amount_scale,
+            "lower": np.percentile(trajs, 2.5, axis=0) * amount_scale,
+            "upper": np.percentile(trajs, 97.5, axis=0) * amount_scale,
+        }
+
+    # Layout: add 1 for sales if provided
+    total_plots = n_elements + (1 if sales_forecast_usd is not None else 0)
+    ncols = 3
+    nrows = (total_plots + ncols - 1) // ncols
+
+    fig, axs = plt.subplots(nrows, ncols, figsize=(7 * ncols, 4.5 * nrows))
+    axs = axs.flatten()
+
+    # Readable display names
+    display_names = {
+        "net_income": "Net Income",
+        "total_assets": "Total Assets",
+        "nca": "Non-Current Assets",
+        "advance_payments_purchases": "Advance Payments (Purchases)",
+        "accounts_receivable": "Accounts Receivable",
+        "inventory": "Inventory",
+        "cash": "Cash",
+        "investment_in_market_securities": "Investment in Market Securities",
+        "accounts_payable": "Accounts Payable",
+        "advance_payments_sales": "Advance Payments (Sales)",
+        "current_liabilities": "Current Liabilities",
+        "non_current_liabilities": "Non-Current Liabilities",
+        "equity": "Stockholders' Equity",
+    }
+
+    ax_idx = 0
+
+    # Plot Sales (deterministic, no CI)
+    if sales_forecast_usd is not None:
+        ax = axs[ax_idx]
+        if sales_hist_usd is not None:
+            ax.plot(
+                historical_years,
+                sales_hist_usd,
+                "ko-",
+                label="Historical",
+                markersize=5,
+                linewidth=1.5,
+            )
+        ax.plot(
+            forecast_years,
+            sales_forecast_usd,
+            "s-",
+            color="tab:blue",
+            label="Forecast",
+            markersize=5,
+            linewidth=1.5,
+        )
+        ax.set_title("Sales (Revenue)", fontsize=11, fontweight="bold")
+        ax.set_ylabel("USD")
+        ax.legend(fontsize=8)
+        ax.grid(True, alpha=0.3)
+        ax.ticklabel_format(style="scientific", axis="y", scilimits=(0, 0))
+        ax.tick_params(axis="x", rotation=45)
+        ax_idx += 1
+
+    # Plot each forecasted element
+    for name in elements:
+        ax = axs[ax_idx]
+        stats = forecast_stats[name]
+        label = display_names.get(name, name)
+
+        # Historical
+        if name in historical_data:
+            ax.plot(
+                historical_years,
+                historical_data[name],
+                "ko-",
+                label="Historical",
+                markersize=5,
+                linewidth=1.5,
+            )
+
+        # Forecast mean + 95% CI
+        ax.plot(
+            forecast_years,
+            stats["mean"],
+            "s-",
+            color="tab:blue",
+            label="Forecast Mean",
+            markersize=5,
+            linewidth=1.5,
+        )
+        ax.fill_between(
+            forecast_years,
+            stats["lower"],
+            stats["upper"],
+            color="tab:blue",
+            alpha=0.2,
+            label="95% CI",
+        )
+
+        ax.set_title(label, fontsize=11, fontweight="bold")
+        ax.set_ylabel("USD")
+        ax.legend(fontsize=7)
+        ax.grid(True, alpha=0.3)
+        ax.ticklabel_format(style="scientific", axis="y", scilimits=(0, 0))
+        ax.tick_params(axis="x", rotation=45)
+        ax_idx += 1
+
+    # Hide unused axes
+    for i in range(ax_idx, len(axs)):
+        axs[i].set_visible(False)
+
+    fig.suptitle(
+        "Financial Model: Historical Data & Monte Carlo Forecast",
+        fontsize=16,
+        fontweight="bold",
+        y=1.01,
+    )
+    plt.tight_layout()
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    plt.savefig(f"all_elements_forecast_{timestamp}.png", dpi=150, bbox_inches="tight")
+    print(f"\nPlot saved: all_elements_forecast_{timestamp}.png")
     if show_plot:
         plt.show()
     else:
@@ -1954,13 +2138,68 @@ def run_training_and_forecast(
     cum_inf_forecast = np.cumprod(1 + inflation_forecast)
 
     # --- Execute Monte Carlo Forecast ---
-    run_monte_carlo_forecast(
+    forecast_trajectories = run_monte_carlo_forecast(
         model,
         state,
         sales_forecast,
         cum_inf_forecast,
         time_indices_forecast,
         n_samples=1000,
+    )
+
+    # --- 6. PLOT ALL ELEMENTS: HISTORICAL + FORECAST ---
+    # Historical years: FY2018 through FY2025 (8 data points)
+    hist_year_start = 2018
+    historical_years = np.arange(
+        hist_year_start, hist_year_start + len(sales_hist)
+    )
+
+    # Forecast years: the forecast starts from FY2024 state and produces
+    # FY2025, FY2026, ..., FY2033 (9 years = len(sales_forecast) - 1 steps)
+    n_forecast_steps = len(sales_forecast) - 1  # 9
+    forecast_year_start = hist_year_start + len(sales_hist) - 1  # 2025
+    forecast_years = np.arange(
+        forecast_year_start, forecast_year_start + n_forecast_steps
+    )
+
+    # Build historical data dict (in USD, not scaled)
+    # Compute historical total assets for plotting
+    total_assets_hist = (
+        nca_hist
+        + advance_payments_purchases_hist
+        + accounts_receivable_hist
+        + inventory_hist
+        + cash_hist
+        + investment_in_market_securities_hist
+    )
+    historical_data = {
+        "net_income": net_income_hist,
+        "total_assets": total_assets_hist,
+        "nca": nca_hist,
+        "advance_payments_purchases": advance_payments_purchases_hist,
+        "accounts_receivable": accounts_receivable_hist,
+        "inventory": inventory_hist,
+        "cash": cash_hist,
+        "investment_in_market_securities": investment_in_market_securities_hist,
+        "accounts_payable": accounts_payable_hist,
+        "advance_payments_sales": advance_payments_sales_hist,
+        "current_liabilities": current_liabilities_hist,
+        "non_current_liabilities": non_current_liabilities_hist,
+        "equity": equity_hist,
+    }
+
+    # Sales forecast in USD for the forecasted years (first n_forecast_steps entries)
+    sales_forecast_usd = sales_forecast[:n_forecast_steps] * amount_scale
+
+    plot_historical_and_forecast(
+        historical_years=historical_years,
+        forecast_years=forecast_years,
+        historical_data=historical_data,
+        forecast_trajectories=forecast_trajectories,
+        amount_scale=amount_scale,
+        sales_hist_usd=sales_hist,
+        sales_forecast_usd=sales_forecast_usd,
+        show_plot=False,
     )
 
 
