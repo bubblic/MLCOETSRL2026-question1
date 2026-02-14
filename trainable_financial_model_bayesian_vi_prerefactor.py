@@ -328,6 +328,7 @@ class TrainableFinancialModel(tf.Module):
         plot_vi=True,
         plot_every=1000,
         show_plot=False,
+        prior_strength_asset_maintain=1.0,
     ):
         """
         Trains simple policy parameters using historical data.
@@ -536,6 +537,17 @@ class TrainableFinancialModel(tf.Module):
                 # 6. Final Sum
                 loss_opex_bayes = neg_log_likelihood + kl
 
+                # --- Prior / Regularization Losses ---
+                # Quadratic prior on asset_maintain centered at 1.0:
+                # Economically, asset_maintain ≈ 1.0 means capex fully replaces
+                # depreciation (maintenance capex), with asset_growth capturing
+                # incremental growth capex on top. Without this prior, the
+                # optimizer can collapse asset_maintain → 0 and absorb everything
+                # into asset_growth, which is economically implausible.
+                prior_loss_am = prior_strength_asset_maintain * tf.square(
+                    self.asset_maintain - 1.0
+                )
+
                 # --- Combined Loss (Heuristic: Normalize by scale to help Adam) ---
                 # But for simplicity, we'll just sum them up for now.
                 total_loss = (
@@ -553,6 +565,7 @@ class TrainableFinancialModel(tf.Module):
                     + loss_bb
                     + loss_cost_ratio
                     + loss_opex_bayes
+                    + prior_loss_am
                 )
 
             # Compute Gradients
@@ -573,7 +586,9 @@ class TrainableFinancialModel(tf.Module):
                 print(
                     f"Epoch {i}: Loss={total_loss.numpy():.4e} | "
                     f"OpEx VI Loss={loss_opex_bayes.numpy():.4e} | "
-                    f"OpEx Noise={(self.noise_sigma.numpy() * self.amount_scale):.2e}"
+                    f"OpEx Noise={(self.noise_sigma.numpy() * self.amount_scale):.2e} | "
+                    f"AM={self.asset_maintain.numpy():.4f} AG={self.asset_growth.numpy():.6f} "
+                    f"Prior_AM={prior_loss_am.numpy():.4e}"
                 )
 
         print("-" * 50)
