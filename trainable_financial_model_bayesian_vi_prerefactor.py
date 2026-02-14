@@ -1515,10 +1515,13 @@ def plot_historical_and_forecast(
     amount_scale,
     sales_hist_usd=None,
     sales_forecast_usd=None,
+    historical_fit=None,
+    historical_fit_years=None,
     show_plot=False,
 ):
     """
-    Plots all financial elements from historical period through forecast period.
+    Plots all financial elements from historical period through forecast period,
+    optionally overlaying the model's one-step-ahead fitted values on historical data.
 
     Args:
         historical_years: array of year labels for historical data (e.g., [2018, ..., 2025])
@@ -1528,6 +1531,8 @@ def plot_historical_and_forecast(
         amount_scale: scaling factor to convert scaled units back to USD
         sales_hist_usd: optional array of historical sales in USD
         sales_forecast_usd: optional array of deterministic sales forecast in USD
+        historical_fit: optional dict of {name: array_in_usd} for model-fitted historical values
+        historical_fit_years: optional array of year labels for fitted values
         show_plot: whether to call plt.show()
     """
     elements = list(forecast_trajectories.keys())
@@ -1570,7 +1575,7 @@ def plot_historical_and_forecast(
 
     ax_idx = 0
 
-    # Plot Sales (deterministic, no CI)
+    # Plot Sales (deterministic — exogenous input, no model fit)
     if sales_forecast_usd is not None:
         ax = axs[ax_idx]
         if sales_hist_usd is not None:
@@ -1591,7 +1596,9 @@ def plot_historical_and_forecast(
             markersize=5,
             linewidth=1.5,
         )
-        ax.set_title("Sales (Revenue)", fontsize=11, fontweight="bold")
+        ax.set_title(
+            "Sales (Revenue) [Exogenous Input]", fontsize=11, fontweight="bold"
+        )
         ax.set_ylabel("USD")
         ax.legend(fontsize=8)
         ax.grid(True, alpha=0.3)
@@ -1605,7 +1612,7 @@ def plot_historical_and_forecast(
         stats = forecast_stats[name]
         label = display_names.get(name, name)
 
-        # Historical
+        # Historical actual data
         if name in historical_data:
             ax.plot(
                 historical_years,
@@ -1614,6 +1621,23 @@ def plot_historical_and_forecast(
                 label="Historical",
                 markersize=5,
                 linewidth=1.5,
+            )
+
+        # Model fit on historical data (one-step-ahead predictions)
+        if (
+            historical_fit is not None
+            and historical_fit_years is not None
+            and name in historical_fit
+        ):
+            ax.plot(
+                historical_fit_years,
+                historical_fit[name],
+                "^--",
+                color="tab:red",
+                label="Model Fit (1-step)",
+                markersize=5,
+                linewidth=1.2,
+                alpha=0.85,
             )
 
         # Forecast mean + 95% CI
@@ -1648,7 +1672,7 @@ def plot_historical_and_forecast(
         axs[i].set_visible(False)
 
     fig.suptitle(
-        "Financial Model: Historical Data & Monte Carlo Forecast",
+        "Financial Model: Historical Fit & Monte Carlo Forecast",
         fontsize=16,
         fontweight="bold",
         y=1.01,
@@ -2147,23 +2171,141 @@ def run_training_and_forecast(
         n_samples=1000,
     )
 
-    # --- 6. PLOT ALL ELEMENTS: HISTORICAL + FORECAST ---
-    # Historical years: FY2018 through FY2025 (8 data points)
+    # --- 6. COMPUTE ONE-STEP-AHEAD HISTORICAL FIT ---
+    # For each year t+1, use actual state at t and predict state at t+1
+    # This shows how well the model's learned parameters fit the historical data.
     hist_year_start = 2018
-    historical_years = np.arange(
-        hist_year_start, hist_year_start + len(sales_hist)
-    )
+    n_hist_points = len(sales_hist)
+    cum_inf_hist = np.cumprod(1 + inflation_hist)
 
-    # Forecast years: the forecast starts from FY2024 state and produces
-    # FY2025, FY2026, ..., FY2033 (9 years = len(sales_forecast) - 1 steps)
-    n_forecast_steps = len(sales_forecast) - 1  # 9
-    forecast_year_start = hist_year_start + len(sales_hist) - 1  # 2025
+    hist_fit_keys = [
+        "net_income",
+        "total_assets",
+        "nca",
+        "advance_payments_purchases",
+        "accounts_receivable",
+        "inventory",
+        "cash",
+        "investment_in_market_securities",
+        "accounts_payable",
+        "advance_payments_sales",
+        "current_liabilities",
+        "non_current_liabilities",
+        "equity",
+    ]
+    historical_fit = {k: [] for k in hist_fit_keys}
+    historical_fit_years = []
+
+    for t in range(n_hist_points - 1):  # t = 0..6, predicting index t+1
+        # Actual state at year t
+        state_t = {
+            "nca": tf.constant(nca_hist_bil[t], dtype=tf.float64),
+            "advance_payments_purchases": tf.constant(
+                advance_payments_purchases_hist_bil[t], dtype=tf.float64
+            ),
+            "accounts_receivable": tf.constant(
+                accounts_receivable_hist_bil[t], dtype=tf.float64
+            ),
+            "inventory": tf.constant(inventory_hist_bil[t], dtype=tf.float64),
+            "cash": tf.constant(cash_hist_bil[t], dtype=tf.float64),
+            "investment_in_market_securities": tf.constant(
+                investment_in_market_securities_hist_bil[t], dtype=tf.float64
+            ),
+            "accounts_payable": tf.constant(
+                accounts_payable_hist_bil[t], dtype=tf.float64
+            ),
+            "advance_payments_sales": tf.constant(
+                advance_payments_sales_hist_bil[t], dtype=tf.float64
+            ),
+            "current_liabilities": tf.constant(
+                current_liabilities_hist_bil[t], dtype=tf.float64
+            ),
+            "non_current_liabilities": tf.constant(
+                non_current_liabilities_hist_bil[t], dtype=tf.float64
+            ),
+            "equity": tf.constant(equity_hist_bil[t], dtype=tf.float64),
+            "net_income": tf.constant(net_income_hist_bil[t], dtype=tf.float64),
+        }
+
+        # Sales at t+1 (current) and t+2 (lookahead for advance payments)
+        sales_t1 = sales_hist_bil[t + 1]
+        if t + 2 < n_hist_points:
+            sales_t2 = sales_hist_bil[t + 2]
+        else:
+            # For the last historical transition, use projected FY2026 sales
+            sales_t2 = sales_forecast[1]
+
+        inputs_t = {
+            "sales_t": tf.constant(sales_t1, dtype=tf.float64),
+            "sales_t_plus_1": tf.constant(sales_t2, dtype=tf.float64),
+            "time_index": tf.constant(float(t + 1), dtype=tf.float64),
+            "cum_inflation": tf.constant(cum_inf_hist[t + 1], dtype=tf.float64),
+        }
+
+        pred = model.forecast_step(state_t, inputs_t, use_mean_opex=True)
+
+        # Collect predicted values (convert back to USD)
+        historical_fit["net_income"].append(
+            float(pred["net_income"].numpy()) * amount_scale
+        )
+        historical_fit["nca"].append(float(pred["nca"].numpy()) * amount_scale)
+        historical_fit["advance_payments_purchases"].append(
+            float(pred["advance_payments_purchases"].numpy()) * amount_scale
+        )
+        historical_fit["accounts_receivable"].append(
+            float(pred["accounts_receivable"].numpy()) * amount_scale
+        )
+        historical_fit["inventory"].append(
+            float(pred["inventory"].numpy()) * amount_scale
+        )
+        historical_fit["cash"].append(float(pred["cash"].numpy()) * amount_scale)
+        historical_fit["investment_in_market_securities"].append(
+            float(pred["investment_in_market_securities"].numpy()) * amount_scale
+        )
+        historical_fit["accounts_payable"].append(
+            float(pred["accounts_payable"].numpy()) * amount_scale
+        )
+        historical_fit["advance_payments_sales"].append(
+            float(pred["advance_payments_sales"].numpy()) * amount_scale
+        )
+        historical_fit["current_liabilities"].append(
+            float(pred["current_liabilities"].numpy()) * amount_scale
+        )
+        historical_fit["non_current_liabilities"].append(
+            float(pred["non_current_liabilities"].numpy()) * amount_scale
+        )
+        historical_fit["equity"].append(float(pred["equity"].numpy()) * amount_scale)
+
+        total_assets_pred = (
+            pred["nca"]
+            + pred["advance_payments_purchases"]
+            + pred["accounts_receivable"]
+            + pred["inventory"]
+            + pred["cash"]
+            + pred["investment_in_market_securities"]
+        )
+        historical_fit["total_assets"].append(
+            float(total_assets_pred.numpy()) * amount_scale
+        )
+
+        historical_fit_years.append(hist_year_start + t + 1)
+
+    # Convert to numpy arrays
+    for k in historical_fit:
+        historical_fit[k] = np.array(historical_fit[k])
+    historical_fit_years = np.array(historical_fit_years)
+
+    # --- 7. PLOT ALL ELEMENTS: HISTORICAL + FIT + FORECAST ---
+    historical_years = np.arange(hist_year_start, hist_year_start + n_hist_points)
+
+    # Forecast years: FY2025, FY2026, ..., FY2033 (9 years)
+    n_forecast_steps = len(sales_forecast) - 1
+    forecast_year_start = hist_year_start + n_hist_points - 1  # 2025
     forecast_years = np.arange(
         forecast_year_start, forecast_year_start + n_forecast_steps
     )
 
     # Build historical data dict (in USD, not scaled)
-    # Compute historical total assets for plotting
     total_assets_hist = (
         nca_hist
         + advance_payments_purchases_hist
@@ -2188,7 +2330,7 @@ def run_training_and_forecast(
         "equity": equity_hist,
     }
 
-    # Sales forecast in USD for the forecasted years (first n_forecast_steps entries)
+    # Sales forecast in USD for the forecasted years
     sales_forecast_usd = sales_forecast[:n_forecast_steps] * amount_scale
 
     plot_historical_and_forecast(
@@ -2199,6 +2341,8 @@ def run_training_and_forecast(
         amount_scale=amount_scale,
         sales_hist_usd=sales_hist,
         sales_forecast_usd=sales_forecast_usd,
+        historical_fit=historical_fit,
+        historical_fit_years=historical_fit_years,
         show_plot=False,
     )
 
