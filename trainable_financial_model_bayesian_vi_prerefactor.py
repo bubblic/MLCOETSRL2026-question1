@@ -445,6 +445,25 @@ class TrainableFinancialModel(tf.Module):
             "noise_sigma": [],
         }
 
+        simple_history = {
+            "epochs": [],
+            "loss_total": [],
+            "loss_growth": [],
+            "loss_depr": [],
+            "loss_adv_ps": [],
+            "loss_adv_pp": [],
+            "loss_ar": [],
+            "loss_ap": [],
+            "loss_inv": [],
+            "loss_tl": [],
+            "loss_cash": [],
+            "loss_tax": [],
+            "loss_div": [],
+            "loss_bb": [],
+            "loss_cost_ratio": [],
+            "loss_prior_am": [],
+        }
+
         for i in range(epochs):
             with tf.GradientTape() as tape:
                 # --- Deterministic Losses (MSE) ---
@@ -583,6 +602,23 @@ class TrainableFinancialModel(tf.Module):
                 vi_history["q_base_opex_scale"].append(self.q_base_opex_scale.numpy())
                 vi_history["noise_sigma"].append(self.noise_sigma.numpy())
 
+                simple_history["epochs"].append(i)
+                simple_history["loss_total"].append(total_loss.numpy())
+                simple_history["loss_growth"].append(loss_growth.numpy())
+                simple_history["loss_depr"].append(loss_depr.numpy())
+                simple_history["loss_adv_ps"].append(loss_adv_ps.numpy())
+                simple_history["loss_adv_pp"].append(loss_adv_pp.numpy())
+                simple_history["loss_ar"].append(loss_ar.numpy())
+                simple_history["loss_ap"].append(loss_ap.numpy())
+                simple_history["loss_inv"].append(loss_inv.numpy())
+                simple_history["loss_tl"].append(loss_tl.numpy())
+                simple_history["loss_cash"].append(loss_cash.numpy())
+                simple_history["loss_tax"].append(loss_tax.numpy())
+                simple_history["loss_div"].append(loss_div.numpy())
+                simple_history["loss_bb"].append(loss_bb.numpy())
+                simple_history["loss_cost_ratio"].append(loss_cost_ratio.numpy())
+                simple_history["loss_prior_am"].append(prior_loss_am.numpy())
+
                 print(
                     f"Epoch {i}: Loss={total_loss.numpy():.4e} | "
                     f"OpEx VI Loss={loss_opex_bayes.numpy():.4e} | "
@@ -684,6 +720,64 @@ class TrainableFinancialModel(tf.Module):
             else:
                 plt.close()
 
+        # --- Simple Parameters Training Diagnostics ---
+        if plot_vi and simple_history["epochs"]:
+            epochs_hist = np.array(simple_history["epochs"])
+            fig, axs = plt.subplots(3, 1, figsize=(10, 12), sharex=True)
+
+            # Panel 1: Total loss
+            axs[0].plot(
+                epochs_hist, simple_history["loss_total"], label="Total Loss", color="black", linewidth=2
+            )
+            axs[0].set_ylabel("Total Loss")
+            axs[0].set_yscale("log")
+            axs[0].legend()
+            axs[0].grid(True, alpha=0.3)
+
+            # Panel 2: Individual simple parameter losses (balance sheet ratios)
+            ratio_losses = [
+                ("loss_ar", "%AR"),
+                ("loss_ap", "%AP"),
+                ("loss_inv", "%Inv"),
+                ("loss_tl", "%TL"),
+                ("loss_cash", "%Cash"),
+                ("loss_adv_ps", "%AdvPS"),
+                ("loss_adv_pp", "%AdvPP"),
+                ("loss_tax", "%IT"),
+                ("loss_div", "%PR"),
+                ("loss_bb", "%BB"),
+            ]
+            for key, label in ratio_losses:
+                axs[1].plot(epochs_hist, simple_history[key], label=label)
+            axs[1].set_ylabel("Loss (MSE)")
+            axs[1].set_yscale("log")
+            axs[1].legend(ncol=3, fontsize=8)
+            axs[1].grid(True, alpha=0.3)
+
+            # Panel 3: Asset-related losses + cost ratio + prior
+            structural_losses = [
+                ("loss_growth", "%AG (Growth)"),
+                ("loss_depr", "%Depr"),
+                ("loss_cost_ratio", "Cost Ratio"),
+                ("loss_prior_am", "Prior AM"),
+            ]
+            for key, label in structural_losses:
+                axs[2].plot(epochs_hist, simple_history[key], label=label)
+            axs[2].set_xlabel("Epoch")
+            axs[2].set_ylabel("Loss (MSE)")
+            axs[2].set_yscale("log")
+            axs[2].legend(fontsize=8)
+            axs[2].grid(True, alpha=0.3)
+
+            fig.suptitle("Simple Parameters Training Diagnostics")
+            plt.tight_layout()
+            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+            plt.savefig(f"simple_training_diagnostics_{timestamp}.png", dpi=150)
+            if show_plot:
+                plt.show()
+            else:
+                plt.close()
+
     def train_structural_parameters(
         self,
         historical_sales,
@@ -707,6 +801,8 @@ class TrainableFinancialModel(tf.Module):
         historical_time_indices=None,
         learning_rate=0.001,
         epochs=20000,
+        plot_every=1000,
+        show_plot=False,
     ):
         """
         Trains structural parameters (interest rates, maturity, financing)
@@ -751,10 +847,23 @@ class TrainableFinancialModel(tf.Module):
             self.equity_financing_pct.trainable_variables[0],
         ]
 
+        structural_history = {
+            "epochs": [],
+            "loss_total": [],
+            "loss_ni": [],
+            "loss_cl": [],
+            "loss_ncl": [],
+            "loss_equity": [],
+        }
+
         print(f"Training structural parameters...")
         for i in range(epochs):
             with tf.GradientTape() as tape:
                 total_loss = 0.0
+                total_loss_ni = 0.0
+                total_loss_cl = 0.0
+                total_loss_ncl = 0.0
+                total_loss_equity = 0.0
                 # We need t+1 for the target and t+2 for the lookahead inputs in forecast_step
                 num_transitions = len(historical_sales) - 2
 
@@ -801,9 +910,21 @@ class TrainableFinancialModel(tf.Module):
 
                     # Total loss to minimize
                     total_loss += loss_ni + loss_cl + loss_ncl + loss_equity
+                    total_loss_ni += loss_ni
+                    total_loss_cl += loss_cl
+                    total_loss_ncl += loss_ncl
+                    total_loss_equity += loss_equity
 
             grads = tape.gradient(total_loss, vars_to_train)
             optimizer.apply_gradients(zip(grads, vars_to_train))
+
+            if i % plot_every == 0:
+                structural_history["epochs"].append(i)
+                structural_history["loss_total"].append(total_loss.numpy())
+                structural_history["loss_ni"].append(total_loss_ni.numpy())
+                structural_history["loss_cl"].append(total_loss_cl.numpy())
+                structural_history["loss_ncl"].append(total_loss_ncl.numpy())
+                structural_history["loss_equity"].append(total_loss_equity.numpy())
 
             if i % 1000 == 0:
                 print(f"Epoch {i}: Structural Loss={total_loss.numpy():.4e}")
@@ -815,6 +936,45 @@ class TrainableFinancialModel(tf.Module):
         print(f"Final %MSReturn: {self.market_securities_return_pct.numpy():.5f}")
         print(f"Final %EF: {self.equity_financing_pct.numpy():.5f}")
         print("-" * 50)
+
+        # --- Structural Parameters Training Diagnostics ---
+        if structural_history["epochs"]:
+            epochs_hist = np.array(structural_history["epochs"])
+            fig, axs = plt.subplots(2, 1, figsize=(10, 8), sharex=True)
+
+            # Panel 1: Total loss
+            axs[0].plot(
+                epochs_hist, structural_history["loss_total"],
+                label="Total Loss", color="black", linewidth=2,
+            )
+            axs[0].set_ylabel("Total Loss")
+            axs[0].set_yscale("log")
+            axs[0].legend()
+            axs[0].grid(True, alpha=0.3)
+
+            # Panel 2: Component losses
+            component_losses = [
+                ("loss_ni", "Net Income"),
+                ("loss_cl", "Current Liabilities"),
+                ("loss_ncl", "Non-Current Liabilities"),
+                ("loss_equity", "Equity"),
+            ]
+            for key, label in component_losses:
+                axs[1].plot(epochs_hist, structural_history[key], label=label)
+            axs[1].set_xlabel("Epoch")
+            axs[1].set_ylabel("Loss (SSE)")
+            axs[1].set_yscale("log")
+            axs[1].legend(fontsize=9)
+            axs[1].grid(True, alpha=0.3)
+
+            fig.suptitle("Structural Parameters Training Diagnostics")
+            plt.tight_layout()
+            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+            plt.savefig(f"structural_training_diagnostics_{timestamp}.png", dpi=150)
+            if show_plot:
+                plt.show()
+            else:
+                plt.close()
 
     def forecast_step(
         self,
