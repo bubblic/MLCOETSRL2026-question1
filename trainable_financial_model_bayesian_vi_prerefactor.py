@@ -12,8 +12,9 @@ tfb = tfp.bijectors
 
 # --- 1. Define the Trainable Model ---
 class TrainableFinancialModel(tf.Module):
-    def __init__(self):
+    def __init__(self, base_year=2018):
         self.amount_scale = 1.0e11
+        self.base_year = base_year  # t=0 corresponds to this fiscal year
 
         # --- Policy Parameters (Deterministic) ---
         ## These are trainable with simple linear regression
@@ -67,18 +68,21 @@ class TrainableFinancialModel(tf.Module):
             dtype=tf.float64,
             name="inv_pct",
         )  # %Inv
-        self.total_liquidity_pct = tfp.util.TransformedVariable(
-            initial_value=0.16,
-            bijector=tfb.Softplus(),
-            dtype=tf.float64,
-            name="tl_pct",
-        )  # %TL
-        self.cash_pct_of_liquidity = tfp.util.TransformedVariable(
-            initial_value=0.487,
-            bijector=tfb.Sigmoid(),
-            dtype=tf.float64,
-            name="cash_pct",
-        )  # %Cash
+        # --- Total Liquidity Linear Model ---
+        # %TL(t) = tl_alpha + tl_beta * t, where t = year - base_year
+        # TL_t = sales_t * %TL(t)
+        # A linear function in time captures the historically flat/decreasing
+        # total liquidity despite increasing sales.
+        self.tl_alpha = tf.Variable(0.16, dtype=tf.float64, name="tl_alpha")
+        self.tl_beta = tf.Variable(0.0, dtype=tf.float64, name="tl_beta")
+
+        # --- Cash % of Liquidity Linear Model ---
+        # %Cash(t) = cash_alpha + cash_beta * t, where t = year - base_year
+        # Cash_t = TL_t * %Cash(t)
+        # Cash stays relatively constant while market securities decrease,
+        # so the cash fraction of liquidity changes over time.
+        self.cash_alpha = tf.Variable(0.487, dtype=tf.float64, name="cash_alpha")
+        self.cash_beta = tf.Variable(0.0, dtype=tf.float64, name="cash_beta")
         self.income_tax_pct = tfp.util.TransformedVariable(
             initial_value=0.147,
             bijector=tfb.Sigmoid(),
@@ -99,7 +103,7 @@ class TrainableFinancialModel(tf.Module):
         )  # %BB
 
         # --- Cost Ratio Parameters (Logit-Linear Trend) ---
-        # logit(CR_t) = alpha + beta * t  =>  CR_t = sigmoid(alpha + beta * t)
+        # logit(CR_t) = alpha + beta * t  =>  CR_t = sigmoid(alpha + beta * t), where t = year - base_year
         # Purchases are derived: P_t = Sales_t * CR_t + (Inv_target_t - Inv_{t-1})
         # COGS simplifies to: Sales_t * CR_t
         self.cost_ratio_alpha = tf.Variable(
@@ -207,8 +211,10 @@ class TrainableFinancialModel(tf.Module):
             "account_receivables_pct": float(self.account_receivables_pct.numpy()),
             "account_payables_pct": float(self.account_payables_pct.numpy()),
             "inventory_pct": float(self.inventory_pct.numpy()),
-            "total_liquidity_pct": float(self.total_liquidity_pct.numpy()),
-            "cash_pct_of_liquidity": float(self.cash_pct_of_liquidity.numpy()),
+            "tl_alpha": float(self.tl_alpha.numpy()),
+            "tl_beta": float(self.tl_beta.numpy()),
+            "cash_alpha": float(self.cash_alpha.numpy()),
+            "cash_beta": float(self.cash_beta.numpy()),
             "income_tax_pct": float(self.income_tax_pct.numpy()),
             "dividend_payout_ratio_pct": float(self.dividend_payout_ratio_pct.numpy()),
             "stock_buyback_pct": float(self.stock_buyback_pct.numpy()),
@@ -231,6 +237,7 @@ class TrainableFinancialModel(tf.Module):
             "equity_financing_pct": float(self.equity_financing_pct.numpy()),
             "cost_ratio_alpha": float(self.cost_ratio_alpha.numpy()),
             "cost_ratio_beta": float(self.cost_ratio_beta.numpy()),
+            "base_year": self.base_year,
         }
         np.savez(path, **params)
 
@@ -248,8 +255,10 @@ class TrainableFinancialModel(tf.Module):
         self.account_receivables_pct.assign(data["account_receivables_pct"])
         self.account_payables_pct.assign(data["account_payables_pct"])
         self.inventory_pct.assign(data["inventory_pct"])
-        self.total_liquidity_pct.assign(data["total_liquidity_pct"])
-        self.cash_pct_of_liquidity.assign(data["cash_pct_of_liquidity"])
+        self.tl_alpha.assign(data["tl_alpha"])
+        self.tl_beta.assign(data["tl_beta"])
+        self.cash_alpha.assign(data["cash_alpha"])
+        self.cash_beta.assign(data["cash_beta"])
         self.income_tax_pct.assign(data["income_tax_pct"])
         self.dividend_payout_ratio_pct.assign(data["dividend_payout_ratio_pct"])
         self.stock_buyback_pct.assign(data["stock_buyback_pct"])
@@ -266,6 +275,8 @@ class TrainableFinancialModel(tf.Module):
         self.equity_financing_pct.assign(data["equity_financing_pct"])
         self.cost_ratio_alpha.assign(data["cost_ratio_alpha"])
         self.cost_ratio_beta.assign(data["cost_ratio_beta"])
+        if "base_year" in data:
+            self.base_year = int(data["base_year"])
 
     def sample_opex_params(self):
         """Samples from the variational posterior using Reparameterization Trick"""
@@ -323,6 +334,7 @@ class TrainableFinancialModel(tf.Module):
         historical_opex,
         historical_tax,
         historical_inflation=None,
+        historical_years=None,
         learning_rate=0.001,
         epochs=30000,
         plot_vi=True,
@@ -380,8 +392,13 @@ class TrainableFinancialModel(tf.Module):
         # Compute logit(CR) targets from historical COGS/Sales
         cost_ratio_hist = cogs_tensor / sales_tensor
         logit_cr_hist = tf.math.log(cost_ratio_hist / (1.0 - cost_ratio_hist))
-        # Time indices: 0, 1, 2, ..., N-1
-        time_indices = tf.cast(tf.range(len(historical_sales)), dtype=tf.float64)
+        # Time indices: t = year - base_year (e.g., FY2018 -> 0, FY2019 -> 1, ...)
+        if historical_years is not None:
+            time_indices = tf.cast(historical_years, dtype=tf.float64) - tf.constant(
+                float(self.base_year), dtype=tf.float64
+            )
+        else:
+            time_indices = tf.cast(tf.range(len(historical_sales)), dtype=tf.float64)
 
         # --- Prepare Training Data & Alignment ---
 
@@ -419,8 +436,10 @@ class TrainableFinancialModel(tf.Module):
             self.account_receivables_pct.trainable_variables[0],
             self.account_payables_pct.trainable_variables[0],
             self.inventory_pct.trainable_variables[0],
-            self.total_liquidity_pct.trainable_variables[0],
-            self.cash_pct_of_liquidity.trainable_variables[0],
+            self.tl_alpha,
+            self.tl_beta,
+            self.cash_alpha,
+            self.cash_beta,
             self.income_tax_pct.trainable_variables[0],
             self.dividend_payout_ratio_pct.trainable_variables[0],
             self.stock_buyback_pct.trainable_variables[0],
@@ -500,17 +519,15 @@ class TrainableFinancialModel(tf.Module):
                 loss_inv = tf.reduce_mean(
                     tf.square(inv_tensor - sales_tensor * self.inventory_pct)
                 )
+                # %TL(t) = tl_alpha + tl_beta * t (linear in time)
+                tl_pct_t = self.tl_alpha + self.tl_beta * time_indices
                 loss_tl = tf.reduce_mean(
-                    tf.square(
-                        (cash_tensor + ims_tensor)
-                        - sales_tensor * self.total_liquidity_pct
-                    )
+                    tf.square((cash_tensor + ims_tensor) - sales_tensor * tl_pct_t)
                 )
+                # %Cash(t) = cash_alpha + cash_beta * t (linear in time)
+                cash_pct_t = self.cash_alpha + self.cash_beta * time_indices
                 loss_cash = tf.reduce_mean(
-                    tf.square(
-                        cash_tensor
-                        - (cash_tensor + ims_tensor) * self.cash_pct_of_liquidity
-                    )
+                    tf.square(cash_tensor - (cash_tensor + ims_tensor) * cash_pct_t)
                 )
                 loss_tax = tf.reduce_mean(
                     tf.square(tax_tensor - ni_tensor * self.income_tax_pct)
@@ -637,8 +654,24 @@ class TrainableFinancialModel(tf.Module):
         print(f"Final %AR: {self.account_receivables_pct.numpy():.5f}")
         print(f"Final %AP: {self.account_payables_pct.numpy():.5f}")
         print(f"Final %Inv: {self.inventory_pct.numpy():.5f}")
-        print(f"Final %TL: {self.total_liquidity_pct.numpy():.5f}")
-        print(f"Final %Cash: {self.cash_pct_of_liquidity.numpy():.5f}")
+        print(
+            f"Total Liquidity (linear): alpha={self.tl_alpha.numpy():.4f}, "
+            f"beta={self.tl_beta.numpy():.6f}"
+        )
+        print(
+            f"  => %TL at t=0: {self.tl_alpha.numpy():.4f}, "
+            f"%TL at t={len(historical_sales)-1}: "
+            f"{(self.tl_alpha.numpy() + self.tl_beta.numpy() * (len(historical_sales)-1)):.4f}"
+        )
+        print(
+            f"Cash % of Liquidity (linear): alpha={self.cash_alpha.numpy():.4f}, "
+            f"beta={self.cash_beta.numpy():.6f}"
+        )
+        print(
+            f"  => %Cash at t=0: {self.cash_alpha.numpy():.4f}, "
+            f"%Cash at t={len(historical_sales)-1}: "
+            f"{(self.cash_alpha.numpy() + self.cash_beta.numpy() * (len(historical_sales)-1)):.4f}"
+        )
         print(f"Final %IT: {self.income_tax_pct.numpy():.5f}")
         print(f"Final %PR: {self.dividend_payout_ratio_pct.numpy():.5f}")
         print(f"Final %BB: {self.stock_buyback_pct.numpy():.5f}")
@@ -727,7 +760,11 @@ class TrainableFinancialModel(tf.Module):
 
             # Panel 1: Total loss
             axs[0].plot(
-                epochs_hist, simple_history["loss_total"], label="Total Loss", color="black", linewidth=2
+                epochs_hist,
+                simple_history["loss_total"],
+                label="Total Loss",
+                color="black",
+                linewidth=2,
             )
             axs[0].set_ylabel("Total Loss")
             axs[0].set_yscale("log")
@@ -798,7 +835,7 @@ class TrainableFinancialModel(tf.Module):
         historical_non_current_liabilities,
         historical_equity,
         historical_inflation=None,
-        historical_time_indices=None,
+        historical_years=None,
         learning_rate=0.001,
         epochs=20000,
         plot_every=1000,
@@ -832,11 +869,12 @@ class TrainableFinancialModel(tf.Module):
         inf_t = tf.convert_to_tensor(historical_inflation, dtype=tf.float64)
         cum_inf_t = tf.math.cumprod(1 + inf_t)
 
-        if historical_time_indices is None:
-            historical_time_indices = tf.cast(
-                tf.range(len(historical_sales)), dtype=tf.float64
+        if historical_years is None:
+            historical_years = np.arange(
+                self.base_year, self.base_year + len(historical_sales)
             )
-        time_idx_t = tf.convert_to_tensor(historical_time_indices, dtype=tf.float64)
+        years_t = tf.convert_to_tensor(historical_years, dtype=tf.float64)
+        time_idx_t = years_t - tf.constant(float(self.base_year), dtype=tf.float64)
 
         optimizer = tf.optimizers.Adam(learning_rate=learning_rate)
         vars_to_train = [
@@ -889,7 +927,7 @@ class TrainableFinancialModel(tf.Module):
                     inputs_curr = {
                         "sales_t": sales_t[t + 1],
                         "sales_t_plus_1": sales_t[t + 2],
-                        "time_index": time_idx_t[t + 1],
+                        "year": years_t[t + 1],
                         "cum_inflation": cum_inf_t[t + 1],
                     }
 
@@ -944,8 +982,11 @@ class TrainableFinancialModel(tf.Module):
 
             # Panel 1: Total loss
             axs[0].plot(
-                epochs_hist, structural_history["loss_total"],
-                label="Total Loss", color="black", linewidth=2,
+                epochs_hist,
+                structural_history["loss_total"],
+                label="Total Loss",
+                color="black",
+                linewidth=2,
             )
             axs[0].set_ylabel("Total Loss")
             axs[0].set_yscale("log")
@@ -1013,8 +1054,11 @@ class TrainableFinancialModel(tf.Module):
         # Unpack current inputs (t)
         sales_t = inputs["sales_t"]
         sales_t_plus_1 = inputs["sales_t_plus_1"]
-        time_index = inputs["time_index"]
+        year = inputs["year"]
         cum_inflation = inputs["cum_inflation"]
+
+        # Convert year to 0-based time index for trend models (e.g., FY2018 -> 0)
+        time_index = year - tf.constant(float(self.base_year), dtype=tf.float64)
 
         # --- Derive purchases from cost ratio (Logit-Linear Model) ---
         # CR_t = sigmoid(alpha + beta * t)
@@ -1044,16 +1088,18 @@ class TrainableFinancialModel(tf.Module):
             purchases_t * self.advance_payments_purchases_pct
         )
 
-        # 1.5. Total Liquidity Target (TL)
-        total_liquidity_curr = sales_t * self.total_liquidity_pct
+        # 1.5. Total Liquidity Target (TL) — linear in time
+        # %TL(t) = tl_alpha + tl_beta * t
+        tl_pct = self.tl_alpha + self.tl_beta * time_index
+        total_liquidity_curr = sales_t * tl_pct
 
-        # 1.6. Cash Target (Cash)
-        cash_curr = total_liquidity_curr * self.cash_pct_of_liquidity
+        # 1.6. Cash Target (Cash) — linear cash fraction in time
+        # %Cash(t) = cash_alpha + cash_beta * t
+        cash_pct = self.cash_alpha + self.cash_beta * time_index
+        cash_curr = total_liquidity_curr * cash_pct
 
         # 1.7. Investment in Market Securities Target (IMS)
-        investment_in_market_securities_curr = total_liquidity_curr * (
-            1 - self.cash_pct_of_liquidity
-        )
+        investment_in_market_securities_curr = total_liquidity_curr - cash_curr
 
         # --- 2. Income Statement (IS) ---
         # Before we move on to Liabilities, we need to calculate Income Statement quantities and Liquidity Budget quantities, as they connect the assets to liabilities and equity.
@@ -1265,7 +1311,7 @@ def run_monte_carlo_forecast(
     initial_state,
     sales_forecast,
     cum_inf_forecast,
-    time_indices_forecast,
+    forecast_years,
     n_samples=1000,
 ):
     print(f"\n--- Running Monte Carlo Forecast ({n_samples} samples) ---")
@@ -1306,7 +1352,7 @@ def run_monte_carlo_forecast(
             inputs = {
                 "sales_t": tf.constant(sales_forecast[t]),
                 "sales_t_plus_1": tf.constant(sales_forecast[t + 1]),
-                "time_index": tf.constant(time_indices_forecast[t], dtype=tf.float64),
+                "year": tf.constant(float(forecast_years[t]), dtype=tf.float64),
                 "cum_inflation": tf.constant(cum_inf_forecast[t]),
             }
             # use_mean_opex=False triggers sampling
@@ -1852,9 +1898,9 @@ def run_training_and_forecast(
     parameters_path="trained_parameters.npz",
     use_inflation=True,
 ):
-    model = TrainableFinancialModel()
+    model = TrainableFinancialModel(base_year=2018)
 
-    # --- 1. HISTORICAL DATA FROM APPLE (2022-2025)---
+    # --- 1. HISTORICAL DATA FROM APPLE (2018-2025)---
     # Revenues from Income Statement
     sales_hist = np.array(
         [
@@ -2165,7 +2211,12 @@ def run_training_and_forecast(
         model.load_parameters(parameters_path)
     else:
         # --- 2. TRAIN THE MODEL ---
-        # We feed in the historical arrays from 2022-2024, and leave 2025 for forecast testing.
+        # We feed in the historical arrays from 2018-2024, and leave 2025 for forecast testing.
+        # Historical years: FY2018..FY2024 (training), FY2025 held out for testing
+        n_train = len(sales_hist_bil[:-1])
+        train_years = np.arange(
+            model.base_year, model.base_year + n_train, dtype=np.float64
+        )
         model.train_simple_policies(
             sales_hist_bil[:-1],
             purchases_hist_bil[:-1],
@@ -2185,39 +2236,12 @@ def run_training_and_forecast(
             opex_hist_bil[:-1],
             tax_hist_bil[:-1],
             inflation_hist[:-1],
+            historical_years=train_years,
             show_plot=False,
         )
 
-        # # --- 3. PLOT OPEX FIT (Mean + Aleatoric Sigma) ---
-        # historical_years = np.arange(1, len(opex_hist_bil) + 1)
-
-        # # Posterior prediction by Gaussian Confidence Interval
-        # plot_opex_fit_with_aleatoric_noise(
-        #     model,
-        #     historical_years,
-        #     sales_hist_bil,
-        #     opex_hist_bil,
-        #     inflation_hist,
-        #     show_plot=False,
-        #     use_gaussian_ci=True,
-        # )
-
-        # # Posterior prediction by sampling (Monte Carlo)
-        # plot_opex_fit_with_aleatoric_noise(
-        #     model,
-        #     historical_years,
-        #     sales_hist_bil,
-        #     opex_hist_bil,
-        #     inflation_hist,
-        #     show_plot=False,
-        #     use_gaussian_ci=False,
-        # )
-
-        # --- 4. TRAIN STRUCTURAL PARAMETERS ---
-        # We still only feed in the historical arrays from 2022-2024, and leave 2025 for forecast testing.
-        # Time indices for training data (t=0 is FY2018)
-        n_train = len(sales_hist_bil[:-1])
-        train_time_indices = np.arange(n_train, dtype=np.float64)
+        # --- 3. TRAIN STRUCTURAL PARAMETERS ---
+        # We still only feed in the historical arrays from FY2018-FY2024, and leave FY2025 for forecast testing.
         model.train_structural_parameters(
             sales_hist_bil[:-1],
             nca_hist_bil[:-1],
@@ -2237,11 +2261,11 @@ def run_training_and_forecast(
             non_current_liabilities_hist_bil[:-1],
             equity_hist_bil[:-1],
             inflation_hist[:-1],
-            train_time_indices,
+            train_years,
         )
         model.save_parameters(parameters_path)
 
-    # --- 3. PLOT OPEX FIT (Mean + Aleatoric Sigma) ---
+    # --- 4. PLOT OPEX FIT (Mean + Aleatoric Sigma) ---
     historical_years = np.arange(1, len(opex_hist_bil) + 1)
 
     # Posterior prediction by Gaussian Confidence Interval
@@ -2299,17 +2323,17 @@ def run_training_and_forecast(
 
     # Forecast Drivers: Sales is the sole exogenous driver.
     # Purchases are derived inside forecast_step from the learned cost ratio.
-    n_hist = len(sales_hist)  # 8 (FY2018-FY2025), t=0..7
+    n_hist = len(sales_hist)  # 8 (FY2018-FY2025)
     n_forecast_years = 10
     sales_growth_rate = sales_hist_bil[-1] / sales_hist_bil[-2]
     sales_forecast = np.array(
         [sales_hist_bil[-1] * sales_growth_rate**i for i in range(n_forecast_years)],
         dtype=np.float64,
     )
-    # Time indices continue from historical: t=7 is FY2025 (last hist year),
-    # so forecast starts at t=7 (the first forecast year uses the last hist year as t=7)
-    time_indices_forecast = np.arange(
-        n_hist - 1, n_hist - 1 + n_forecast_years, dtype=np.float64
+    # Forecast starts at FY2025 (last historical year) and continues forward
+    last_hist_year = model.base_year + n_hist - 1  # FY2025
+    forecast_years = np.arange(
+        last_hist_year, last_hist_year + n_forecast_years, dtype=np.float64
     )
 
     # Year 1 to 4 inflation rate (2025-2028)
@@ -2327,14 +2351,13 @@ def run_training_and_forecast(
         state,
         sales_forecast,
         cum_inf_forecast,
-        time_indices_forecast,
+        forecast_years,
         n_samples=1000,
     )
 
     # --- 6. COMPUTE ONE-STEP-AHEAD HISTORICAL FIT ---
     # For each year t+1, use actual state at t and predict state at t+1
     # This shows how well the model's learned parameters fit the historical data.
-    hist_year_start = 2018
     n_hist_points = len(sales_hist)
     cum_inf_hist = np.cumprod(1 + inflation_hist)
 
@@ -2398,7 +2421,7 @@ def run_training_and_forecast(
         inputs_t = {
             "sales_t": tf.constant(sales_t1, dtype=tf.float64),
             "sales_t_plus_1": tf.constant(sales_t2, dtype=tf.float64),
-            "time_index": tf.constant(float(t + 1), dtype=tf.float64),
+            "year": tf.constant(float(model.base_year + t + 1), dtype=tf.float64),
             "cum_inflation": tf.constant(cum_inf_hist[t + 1], dtype=tf.float64),
         }
 
@@ -2448,7 +2471,7 @@ def run_training_and_forecast(
             float(total_assets_pred.numpy()) * amount_scale
         )
 
-        historical_fit_years.append(hist_year_start + t + 1)
+        historical_fit_years.append(model.base_year + t + 1)
 
     # Convert to numpy arrays
     for k in historical_fit:
@@ -2456,12 +2479,12 @@ def run_training_and_forecast(
     historical_fit_years = np.array(historical_fit_years)
 
     # --- 7. PLOT ALL ELEMENTS: HISTORICAL + FIT + FORECAST ---
-    historical_years = np.arange(hist_year_start, hist_year_start + n_hist_points)
+    historical_years = np.arange(model.base_year, model.base_year + n_hist_points)
 
-    # Forecast years: FY2025, FY2026, ..., FY2033 (9 years)
+    # Forecast years for plotting: FY2025, FY2026, ..., FY2033 (9 years)
     n_forecast_steps = len(sales_forecast) - 1
-    forecast_year_start = hist_year_start + n_hist_points - 1  # 2025
-    forecast_years = np.arange(
+    forecast_year_start = model.base_year + n_hist_points - 1  # FY2025
+    plot_forecast_years = np.arange(
         forecast_year_start, forecast_year_start + n_forecast_steps
     )
 
@@ -2495,7 +2518,7 @@ def run_training_and_forecast(
 
     plot_historical_and_forecast(
         historical_years=historical_years,
-        forecast_years=forecast_years,
+        forecast_years=plot_forecast_years,
         historical_data=historical_data,
         forecast_trajectories=forecast_trajectories,
         amount_scale=amount_scale,
