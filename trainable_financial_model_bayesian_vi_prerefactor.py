@@ -705,8 +705,8 @@ class TrainableFinancialModel(tf.Module):
         historical_equity,
         historical_inflation=None,
         historical_time_indices=None,
-        learning_rate=0.0001,
-        epochs=10000,
+        learning_rate=0.001,
+        epochs=20000,
     ):
         """
         Trains structural parameters (interest rates, maturity, financing)
