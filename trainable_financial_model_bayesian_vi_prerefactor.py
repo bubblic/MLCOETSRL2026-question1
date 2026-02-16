@@ -68,20 +68,21 @@ class TrainableFinancialModel(tf.Module):
             dtype=tf.float64,
             name="inv_pct",
         )  # %Inv
-        # --- Total Liquidity Linear Model ---
-        # %TL(t) = tl_alpha + tl_beta * t, where t = year - base_year
+        # --- Total Liquidity Logit-Linear Model ---
+        # %TL(t) = sigmoid(tl_alpha + tl_beta * t), where t = year - base_year
         # TL_t = sales_t * %TL(t)
-        # A linear function in time captures the historically flat/decreasing
-        # total liquidity despite increasing sales.
-        self.tl_alpha = tf.Variable(0.16, dtype=tf.float64, name="tl_alpha")
+        # Sigmoid ensures %TL stays in (0, 1), preventing negative liquidity
+        # even when the historical trend is decreasing.
+        # Initialize alpha to inverse_sigmoid(0.16) ≈ -1.66
+        self.tl_alpha = tf.Variable(-1.66, dtype=tf.float64, name="tl_alpha")
         self.tl_beta = tf.Variable(0.0, dtype=tf.float64, name="tl_beta")
 
-        # --- Cash % of Liquidity Linear Model ---
-        # %Cash(t) = cash_alpha + cash_beta * t, where t = year - base_year
+        # --- Cash % of Liquidity Logit-Linear Model ---
+        # %Cash(t) = sigmoid(cash_alpha + cash_beta * t), where t = year - base_year
         # Cash_t = TL_t * %Cash(t)
-        # Cash stays relatively constant while market securities decrease,
-        # so the cash fraction of liquidity changes over time.
-        self.cash_alpha = tf.Variable(0.487, dtype=tf.float64, name="cash_alpha")
+        # Sigmoid ensures %Cash stays in (0, 1), so IMS = TL - Cash >= 0.
+        # Initialize alpha to inverse_sigmoid(0.487) ≈ -0.05
+        self.cash_alpha = tf.Variable(-0.05, dtype=tf.float64, name="cash_alpha")
         self.cash_beta = tf.Variable(0.0, dtype=tf.float64, name="cash_beta")
         self.income_tax_pct = tfp.util.TransformedVariable(
             initial_value=0.147,
@@ -519,13 +520,15 @@ class TrainableFinancialModel(tf.Module):
                 loss_inv = tf.reduce_mean(
                     tf.square(inv_tensor - sales_tensor * self.inventory_pct)
                 )
-                # %TL(t) = tl_alpha + tl_beta * t (linear in time)
-                tl_pct_t = self.tl_alpha + self.tl_beta * time_indices
+                # %TL(t) = sigmoid(tl_alpha + tl_beta * t) (logit-linear)
+                tl_pct_t_logit = self.tl_alpha + self.tl_beta * time_indices
+                tl_pct_t = tf.sigmoid(tl_pct_t_logit)
                 loss_tl = tf.reduce_mean(
                     tf.square((cash_tensor + ims_tensor) - sales_tensor * tl_pct_t)
                 )
-                # %Cash(t) = cash_alpha + cash_beta * t (linear in time)
-                cash_pct_t = self.cash_alpha + self.cash_beta * time_indices
+                # %Cash(t) = sigmoid(cash_alpha + cash_beta * t) (logit-linear)
+                cash_pct_t_logit = self.cash_alpha + self.cash_beta * time_indices
+                cash_pct_t = tf.sigmoid(cash_pct_t_logit)
                 loss_cash = tf.reduce_mean(
                     tf.square(cash_tensor - (cash_tensor + ims_tensor) * cash_pct_t)
                 )
@@ -655,22 +658,22 @@ class TrainableFinancialModel(tf.Module):
         print(f"Final %AP: {self.account_payables_pct.numpy():.5f}")
         print(f"Final %Inv: {self.inventory_pct.numpy():.5f}")
         print(
-            f"Total Liquidity (linear): alpha={self.tl_alpha.numpy():.4f}, "
+            f"Total Liquidity (logit-linear): alpha={self.tl_alpha.numpy():.4f}, "
             f"beta={self.tl_beta.numpy():.6f}"
         )
         print(
-            f"  => %TL at t=0: {self.tl_alpha.numpy():.4f}, "
+            f"  => %TL at t=0: {tf.sigmoid(self.tl_alpha).numpy():.4f}, "
             f"%TL at t={len(historical_sales)-1}: "
-            f"{(self.tl_alpha.numpy() + self.tl_beta.numpy() * (len(historical_sales)-1)):.4f}"
+            f"{tf.sigmoid(self.tl_alpha + self.tl_beta * (len(historical_sales)-1)).numpy():.4f}"
         )
         print(
-            f"Cash % of Liquidity (linear): alpha={self.cash_alpha.numpy():.4f}, "
+            f"Cash % of Liquidity (logit-linear): alpha={self.cash_alpha.numpy():.4f}, "
             f"beta={self.cash_beta.numpy():.6f}"
         )
         print(
-            f"  => %Cash at t=0: {self.cash_alpha.numpy():.4f}, "
+            f"  => %Cash at t=0: {tf.sigmoid(self.cash_alpha).numpy():.4f}, "
             f"%Cash at t={len(historical_sales)-1}: "
-            f"{(self.cash_alpha.numpy() + self.cash_beta.numpy() * (len(historical_sales)-1)):.4f}"
+            f"{tf.sigmoid(self.cash_alpha + self.cash_beta * (len(historical_sales)-1)).numpy():.4f}"
         )
         print(f"Final %IT: {self.income_tax_pct.numpy():.5f}")
         print(f"Final %PR: {self.dividend_payout_ratio_pct.numpy():.5f}")
@@ -1088,14 +1091,14 @@ class TrainableFinancialModel(tf.Module):
             purchases_t * self.advance_payments_purchases_pct
         )
 
-        # 1.5. Total Liquidity Target (TL) — linear in time
-        # %TL(t) = tl_alpha + tl_beta * t
-        tl_pct = self.tl_alpha + self.tl_beta * time_index
+        # 1.5. Total Liquidity Target (TL) — logit-linear (sigmoid) in time
+        # %TL(t) = sigmoid(tl_alpha + tl_beta * t)
+        tl_pct = tf.sigmoid(self.tl_alpha + self.tl_beta * time_index)
         total_liquidity_curr = sales_t * tl_pct
 
-        # 1.6. Cash Target (Cash) — linear cash fraction in time
-        # %Cash(t) = cash_alpha + cash_beta * t
-        cash_pct = self.cash_alpha + self.cash_beta * time_index
+        # 1.6. Cash Target (Cash) — logit-linear (sigmoid) cash fraction in time
+        # %Cash(t) = sigmoid(cash_alpha + cash_beta * t)
+        cash_pct = tf.sigmoid(self.cash_alpha + self.cash_beta * time_index)
         cash_curr = total_liquidity_curr * cash_pct
 
         # 1.7. Investment in Market Securities Target (IMS)
