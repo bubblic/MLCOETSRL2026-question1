@@ -548,12 +548,8 @@ class TrainableFinancialModel(tf.Module):
                     )
                 )
                 # %BB(t) = softplus(sb_alpha + sb_beta * t) (softplus-linear)
-                bb_pct_t = tf.math.softplus(
-                    self.sb_alpha + self.sb_beta * time_indices
-                )
-                loss_bb = tf.reduce_mean(
-                    tf.square(bb_tensor - depr_tensor * bb_pct_t)
-                )
+                bb_pct_t = tf.math.softplus(self.sb_alpha + self.sb_beta * time_indices)
+                loss_bb = tf.reduce_mean(tf.square(bb_tensor - depr_tensor * bb_pct_t))
 
                 # --- Cost Ratio Loss (Logit-Linear) ---
                 # logit(CR_t) = alpha + beta * t
@@ -1282,15 +1278,17 @@ class TrainableFinancialModel(tf.Module):
 
         # 4.3. Non-current Liabilities (NLiab)
         ## This is equal to the total long-term liabilities minus the effective principal due next year
-        non_current_liabilities_curr = (
-            new_long_term_loan + non_current_liabilities_prev
-        ) * ((self.avg_maturity_years - 1) / self.avg_maturity_years)
+        total_long_term_liabilities = new_long_term_loan + non_current_liabilities_prev
+
+        non_current_liabilities_curr = total_long_term_liabilities * (
+            1 - 1 / self.avg_maturity_years
+        )
 
         # 4.4. Current Liabilities (CLiab)
         # This is equal to the new short-term plus the long-term liabilities' effective principal due next year
-        current_liabilities_curr = new_short_term_loan + (
-            non_current_liabilities_curr / (self.avg_maturity_years - 1)
-        )
+        current_liabilities_curr = 
+            new_short_term_loan + total_long_term_liabilities / self.avg_maturity_years
+        
 
         # 4.5. Stockholders Equity (SE)
         equity_curr = (
