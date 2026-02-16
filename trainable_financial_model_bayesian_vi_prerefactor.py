@@ -191,12 +191,13 @@ class TrainableFinancialModel(tf.Module):
             dtype=tf.float64,
             name="market_securities_return_pct",
         )  # %MSReturn
-        self.equity_financing_pct = tfp.util.TransformedVariable(
-            initial_value=0.15,
-            bijector=tfb.Sigmoid(),
-            dtype=tf.float64,
-            name="equity_financing_pct",
-        )  # %EF
+        # --- Equity Financing % Logit-Linear Model ---
+        # %EF(t) = sigmoid(ef_alpha + ef_beta * t), where t = year - base_year
+        # Sigmoid ensures %EF stays in (0, 1), and allows the financing mix
+        # to evolve over time (e.g., declining equity reliance as firm matures).
+        # Initialize alpha to inverse_sigmoid(0.15) ≈ -1.73
+        self.ef_alpha = tf.Variable(-1.73, dtype=tf.float64, name="ef_alpha")
+        self.ef_beta = tf.Variable(0.0, dtype=tf.float64, name="ef_beta")
 
     def save_parameters(self, path):
         params = {
@@ -235,7 +236,8 @@ class TrainableFinancialModel(tf.Module):
             "market_securities_return_pct": float(
                 self.market_securities_return_pct.numpy()
             ),
-            "equity_financing_pct": float(self.equity_financing_pct.numpy()),
+            "ef_alpha": float(self.ef_alpha.numpy()),
+            "ef_beta": float(self.ef_beta.numpy()),
             "cost_ratio_alpha": float(self.cost_ratio_alpha.numpy()),
             "cost_ratio_beta": float(self.cost_ratio_beta.numpy()),
             "base_year": self.base_year,
@@ -273,7 +275,8 @@ class TrainableFinancialModel(tf.Module):
         self.avg_long_term_interest_pct.assign(data["avg_long_term_interest_pct"])
         self.avg_maturity_years.assign(data["avg_maturity_years"])
         self.market_securities_return_pct.assign(data["market_securities_return_pct"])
-        self.equity_financing_pct.assign(data["equity_financing_pct"])
+        self.ef_alpha.assign(data["ef_alpha"])
+        self.ef_beta.assign(data["ef_beta"])
         self.cost_ratio_alpha.assign(data["cost_ratio_alpha"])
         self.cost_ratio_beta.assign(data["cost_ratio_beta"])
         if "base_year" in data:
@@ -885,7 +888,8 @@ class TrainableFinancialModel(tf.Module):
             self.avg_long_term_interest_pct.trainable_variables[0],
             self.avg_maturity_years.trainable_variables[0],
             self.market_securities_return_pct.trainable_variables[0],
-            self.equity_financing_pct.trainable_variables[0],
+            self.ef_alpha,
+            self.ef_beta,
         ]
 
         structural_history = {
@@ -975,7 +979,15 @@ class TrainableFinancialModel(tf.Module):
         print(f"Final %AvgLTInt: {self.avg_long_term_interest_pct.numpy():.5f}")
         print(f"Final AvgM: {self.avg_maturity_years.numpy():.5f}")
         print(f"Final %MSReturn: {self.market_securities_return_pct.numpy():.5f}")
-        print(f"Final %EF: {self.equity_financing_pct.numpy():.5f}")
+        print(
+            f"Equity Financing % (logit-linear): alpha={self.ef_alpha.numpy():.4f}, "
+            f"beta={self.ef_beta.numpy():.6f}"
+        )
+        print(
+            f"  => %EF at t=0: {tf.sigmoid(self.ef_alpha).numpy():.4f}, "
+            f"%EF at t={num_transitions}: "
+            f"{tf.sigmoid(self.ef_alpha + self.ef_beta * num_transitions).numpy():.4f}"
+        )
         print("-" * 50)
 
         # --- Structural Parameters Training Diagnostics ---
@@ -1209,8 +1221,10 @@ class TrainableFinancialModel(tf.Module):
             + stock_buyback
         )
         long_term_financing = tf.maximum(0.0, liquidity_deficit_lt)
-        new_long_term_loan = long_term_financing * (1 - self.equity_financing_pct)
-        equity_financing = long_term_financing * self.equity_financing_pct
+        # %EF(t) = sigmoid(ef_alpha + ef_beta * t) — logit-linear equity financing mix
+        ef_pct = tf.sigmoid(self.ef_alpha + self.ef_beta * time_index)
+        new_long_term_loan = long_term_financing * (1 - ef_pct)
+        equity_financing = long_term_financing * ef_pct
 
         financing_nlb = (
             new_short_term_loan
