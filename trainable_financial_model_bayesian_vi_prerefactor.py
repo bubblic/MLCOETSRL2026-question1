@@ -1217,7 +1217,7 @@ class TrainableFinancialModel(tf.Module):
         liquidity_deficit_st = (
             total_liquidity_curr
             - (cash_prev + investment_in_market_securities_prev)
-            - external_investment_nlb
+            # - external_investment_nlb  # FIXED: This is accounted for when calculating long-term loan, like done in Pareja (09)
             - operating_nlb
             + principal_st
             + interest_st
@@ -1228,6 +1228,7 @@ class TrainableFinancialModel(tf.Module):
         liquidity_deficit_lt = (
             liquidity_deficit_st
             - new_short_term_loan
+            - external_investment_nlb  # FIXED: Moved from short-term loan calculation to long-term loan calculation
             - capex_nlb
             + principal_lt
             + interest_lt
