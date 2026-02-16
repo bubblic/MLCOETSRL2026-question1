@@ -1286,9 +1286,9 @@ class TrainableFinancialModel(tf.Module):
 
         # 4.4. Current Liabilities (CLiab)
         # This is equal to the new short-term plus the long-term liabilities' effective principal due next year
-        current_liabilities_curr = 
+        current_liabilities_curr = (
             new_short_term_loan + total_long_term_liabilities / self.avg_maturity_years
-        
+        )
 
         # 4.5. Stockholders Equity (SE)
         equity_curr = (
