@@ -1483,6 +1483,112 @@ def run_monte_carlo_forecast(
     summarize_trajectories("Accounts Payable", ap_trajectories)
     summarize_trajectories("Advance Payments (Sales)", aps_trajectories)
 
+    # --- Comprehensive Balance Sheet Table (Mean Values) ---
+    n_years = assets_trajectories.shape[1]
+    scale = model.amount_scale
+
+    # Compute mean trajectories (in scaled units, i.e. billions)
+    mean_nca = np.mean(nca_trajectories, axis=0)
+    mean_adv_pp = np.mean(adv_pay_purch_trajectories, axis=0)
+    mean_ar = np.mean(ar_trajectories, axis=0)
+    mean_inv = np.mean(inv_trajectories, axis=0)
+    mean_cash = np.mean(cash_trajectories, axis=0)
+    mean_ims = np.mean(ims_trajectories, axis=0)
+    mean_total_assets = np.mean(assets_trajectories, axis=0)
+
+    mean_ap = np.mean(ap_trajectories, axis=0)
+    mean_aps = np.mean(aps_trajectories, axis=0)
+    mean_cl = np.mean(current_liabilities_trajectories, axis=0)
+    mean_ncl = np.mean(non_current_liabilities_trajectories, axis=0)
+    mean_equity = np.mean(equity_trajectories, axis=0)
+    mean_ni = np.mean(ni_trajectories, axis=0)
+
+    mean_total_liabilities = mean_ap + mean_aps + mean_cl + mean_ncl
+    mean_total_liab_equity = mean_total_liabilities + mean_equity
+    mean_check = mean_total_assets - mean_total_liab_equity
+
+    # Build year labels from forecast_years
+    year_labels = [f"FY{int(forecast_years[t])}" for t in range(n_years)]
+
+    # Row definitions: (label, data_array)
+    rows = [
+        ("ASSETS", None),
+        ("  Non-Current Assets", mean_nca),
+        ("  Adv Payments (Purch)", mean_adv_pp),
+        ("  Accounts Receivable", mean_ar),
+        ("  Inventory", mean_inv),
+        ("  Cash", mean_cash),
+        ("  Invest in Mkt Sec", mean_ims),
+        ("TOTAL ASSETS", mean_total_assets),
+        ("", None),
+        ("LIABILITIES", None),
+        ("  Accounts Payable", mean_ap),
+        ("  Adv Payments (Sales)", mean_aps),
+        ("  Current Liabilities", mean_cl),
+        ("  Non-Current Liabilities", mean_ncl),
+        ("TOTAL LIABILITIES", mean_total_liabilities),
+        ("", None),
+        ("EQUITY", mean_equity),
+        ("", None),
+        ("TOTAL LIAB + EQUITY", mean_total_liab_equity),
+        ("", None),
+        ("INCOME STATEMENT", None),
+        ("  Net Income", mean_ni),
+        ("", None),
+        ("CHECK: Assets-(L+E)", mean_check),
+    ]
+
+    col_width = 14
+    label_width = 26
+    header = f"{'':>{label_width}}" + "".join(
+        f"{yl:>{col_width}}" for yl in year_labels
+    )
+
+    print("\n" + "=" * len(header))
+    print("FORECAST BALANCE SHEET — Mean across Monte Carlo samples (USD)")
+    print("=" * len(header))
+    print(header)
+    print("-" * len(header))
+
+    for label, data in rows:
+        if data is None:
+            print(f"{label:>{label_width}}")
+        else:
+            vals_str = "".join(f"{v * scale:>{col_width},.0f}" for v in data)
+            print(f"{label:>{label_width}}{vals_str}")
+
+    print("-" * len(header))
+
+    # --- Balance Sheet Identity Check ---
+    max_abs_check = np.max(np.abs(mean_check * scale))
+    print(f"\nBalance Sheet Identity Check (Assets = Liabilities + Equity):")
+    print(f"  Max absolute mismatch across years (mean): ${max_abs_check:,.2f}")
+    if max_abs_check < 1.0:
+        print("  PASS: Balance sheet identity holds (mismatch < $1).")
+    elif max_abs_check < 1000.0:
+        print("  PASS: Balance sheet identity holds within rounding (mismatch < $1,000).")
+    else:
+        print(f"  WARNING: Balance sheet mismatch detected!")
+        for t in range(n_years):
+            check_val = mean_check[t] * scale
+            if abs(check_val) >= 1000.0:
+                print(f"    {year_labels[t]}: Assets - (Liab+Eq) = ${check_val:,.2f}")
+
+    # --- Per-sample balance sheet identity check ---
+    total_liab_equity_all = (
+        ap_trajectories
+        + aps_trajectories
+        + current_liabilities_trajectories
+        + non_current_liabilities_trajectories
+        + equity_trajectories
+    )
+    check_all = assets_trajectories - total_liab_equity_all
+    max_abs_check_all = np.max(np.abs(check_all)) * scale
+    mean_abs_check_all = np.mean(np.abs(check_all)) * scale
+    print(f"\n  Per-sample check (across all {n_samples} samples x {n_years} years):")
+    print(f"    Max absolute mismatch:  ${max_abs_check_all:,.2f}")
+    print(f"    Mean absolute mismatch: ${mean_abs_check_all:,.2f}")
+
     return {
         "net_income": ni_trajectories,
         "total_assets": assets_trajectories,
