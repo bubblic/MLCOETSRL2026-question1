@@ -68,14 +68,16 @@ class TrainableFinancialModel(tf.Module):
             dtype=tf.float64,
             name="inv_pct",
         )  # %Inv
-        # --- Total Liquidity Logit-Linear Model ---
+        # --- Total Liquidity Logit-Linear Model with Baseline ---
         # %TL(t) = sigmoid(tl_alpha + tl_beta * t), where t = year - base_year
-        # TL_t = sales_t * %TL(t)
+        # TL_t = tl_baseline + sales_t * %TL(t)
         # Sigmoid ensures %TL stays in (0, 1), preventing negative liquidity
         # even when the historical trend is decreasing.
+        # tl_baseline captures a fixed liquidity floor independent of sales.
         # Initialize alpha to inverse_sigmoid(0.16) ≈ -1.66
         self.tl_alpha = tf.Variable(-1.66, dtype=tf.float64, name="tl_alpha")
         self.tl_beta = tf.Variable(0.0, dtype=tf.float64, name="tl_beta")
+        self.tl_baseline = tf.Variable(0.0, dtype=tf.float64, name="tl_baseline")
 
         # --- Cash % of Liquidity Logit-Linear Model ---
         # %Cash(t) = sigmoid(cash_alpha + cash_beta * t), where t = year - base_year
@@ -216,6 +218,7 @@ class TrainableFinancialModel(tf.Module):
             "inventory_pct": float(self.inventory_pct.numpy()),
             "tl_alpha": float(self.tl_alpha.numpy()),
             "tl_beta": float(self.tl_beta.numpy()),
+            "tl_baseline": float(self.tl_baseline.numpy()),
             "cash_alpha": float(self.cash_alpha.numpy()),
             "cash_beta": float(self.cash_beta.numpy()),
             "income_tax_pct": float(self.income_tax_pct.numpy()),
@@ -262,6 +265,7 @@ class TrainableFinancialModel(tf.Module):
         self.inventory_pct.assign(data["inventory_pct"])
         self.tl_alpha.assign(data["tl_alpha"])
         self.tl_beta.assign(data["tl_beta"])
+        self.tl_baseline.assign(data.get("tl_baseline", 0.0))
         self.cash_alpha.assign(data["cash_alpha"])
         self.cash_beta.assign(data["cash_beta"])
         self.income_tax_pct.assign(data["income_tax_pct"])
@@ -445,6 +449,7 @@ class TrainableFinancialModel(tf.Module):
             self.inventory_pct.trainable_variables[0],
             self.tl_alpha,
             self.tl_beta,
+            self.tl_baseline,
             self.cash_alpha,
             self.cash_beta,
             self.income_tax_pct.trainable_variables[0],
@@ -527,11 +532,14 @@ class TrainableFinancialModel(tf.Module):
                 loss_inv = tf.reduce_mean(
                     tf.square(inv_tensor - sales_tensor * self.inventory_pct)
                 )
-                # %TL(t) = sigmoid(tl_alpha + tl_beta * t) (logit-linear)
+                # TL(t) = tl_baseline + sales_t * sigmoid(tl_alpha + tl_beta * t)
                 tl_pct_t_logit = self.tl_alpha + self.tl_beta * time_indices
                 tl_pct_t = tf.sigmoid(tl_pct_t_logit)
                 loss_tl = tf.reduce_mean(
-                    tf.square((cash_tensor + ims_tensor) - sales_tensor * tl_pct_t)
+                    tf.square(
+                        (cash_tensor + ims_tensor)
+                        - (self.tl_baseline + sales_tensor * tl_pct_t)
+                    )
                 )
                 # %Cash(t) = sigmoid(cash_alpha + cash_beta * t) (logit-linear)
                 cash_pct_t_logit = self.cash_alpha + self.cash_beta * time_indices
@@ -665,7 +673,8 @@ class TrainableFinancialModel(tf.Module):
         print(f"Final %AP: {self.account_payables_pct.numpy():.5f}")
         print(f"Final %Inv: {self.inventory_pct.numpy():.5f}")
         print(
-            f"Total Liquidity (logit-linear): alpha={self.tl_alpha.numpy():.4f}, "
+            f"Total Liquidity (baseline + logit-linear): baseline={self.tl_baseline.numpy():.4f}, "
+            f"alpha={self.tl_alpha.numpy():.4f}, "
             f"beta={self.tl_beta.numpy():.6f}"
         )
         print(
@@ -1117,10 +1126,10 @@ class TrainableFinancialModel(tf.Module):
             purchases_t * self.advance_payments_purchases_pct
         )
 
-        # 1.5. Total Liquidity Target (TL) — logit-linear (sigmoid) in time
-        # %TL(t) = sigmoid(tl_alpha + tl_beta * t)
+        # 1.5. Total Liquidity Target (TL) — baseline + logit-linear (sigmoid) in time
+        # TL(t) = tl_baseline + sales_t * sigmoid(tl_alpha + tl_beta * t)
         tl_pct = tf.sigmoid(self.tl_alpha + self.tl_beta * time_index)
-        total_liquidity_curr = sales_t * tl_pct
+        total_liquidity_curr = self.tl_baseline + sales_t * tl_pct
 
         # 1.6. Cash Target (Cash) — logit-linear (sigmoid) cash fraction in time
         # %Cash(t) = sigmoid(cash_alpha + cash_beta * t)
