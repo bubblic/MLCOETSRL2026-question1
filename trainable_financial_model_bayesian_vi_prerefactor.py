@@ -96,14 +96,6 @@ class TrainableFinancialModel(tf.Module):
             dtype=tf.float64,
             name="div_pct",
         )  # %PR
-        # --- Stock Buyback % Softplus-Linear Model ---
-        # %BB(t) = softplus(sb_alpha + sb_beta * t), where t = year - base_year
-        # Softplus ensures %BB stays positive (but can be > 1, since buybacks
-        # can exceed depreciation). Time trend allows buyback policy to evolve.
-        # Initialize alpha to inverse_softplus(7.5) ≈ 7.5 (for large x, softplus ≈ identity)
-        self.sb_alpha = tf.Variable(7.5, dtype=tf.float64, name="sb_alpha")
-        self.sb_beta = tf.Variable(0.0, dtype=tf.float64, name="sb_beta")
-
         # --- Cost Ratio Parameters (Logit-Linear Trend) ---
         # logit(CR_t) = alpha + beta * t  =>  CR_t = sigmoid(alpha + beta * t), where t = year - base_year
         # Purchases are derived: P_t = Sales_t * CR_t + (Inv_target_t - Inv_{t-1})
@@ -220,8 +212,6 @@ class TrainableFinancialModel(tf.Module):
             "cash_beta": float(self.cash_beta.numpy()),
             "income_tax_pct": float(self.income_tax_pct.numpy()),
             "dividend_payout_ratio_pct": float(self.dividend_payout_ratio_pct.numpy()),
-            "sb_alpha": float(self.sb_alpha.numpy()),
-            "sb_beta": float(self.sb_beta.numpy()),
             "q_var_opex_loc": float(self.q_var_opex_loc.numpy()),
             "q_var_opex_scale": float(self.q_var_opex_scale.numpy()),
             "q_base_opex_loc": float(self.q_base_opex_loc.numpy()),
@@ -266,8 +256,6 @@ class TrainableFinancialModel(tf.Module):
         self.cash_beta.assign(data["cash_beta"])
         self.income_tax_pct.assign(data["income_tax_pct"])
         self.dividend_payout_ratio_pct.assign(data["dividend_payout_ratio_pct"])
-        self.sb_alpha.assign(data["sb_alpha"])
-        self.sb_beta.assign(data["sb_beta"])
         self.q_var_opex_loc.assign(data["q_var_opex_loc"])
         self.q_var_opex_scale.assign(data["q_var_opex_scale"])
         self.q_base_opex_loc.assign(data["q_base_opex_loc"])
@@ -337,7 +325,6 @@ class TrainableFinancialModel(tf.Module):
         historical_ims,
         historical_net_income,
         historical_dividends,
-        historical_stock_buyback,
         historical_opex,
         historical_tax,
         historical_inflation=None,
@@ -372,7 +359,6 @@ class TrainableFinancialModel(tf.Module):
         ims_tensor = tf.convert_to_tensor(historical_ims, dtype=tf.float64)
         ni_tensor = tf.convert_to_tensor(historical_net_income, dtype=tf.float64)
         div_tensor = tf.convert_to_tensor(historical_dividends, dtype=tf.float64)
-        bb_tensor = tf.convert_to_tensor(historical_stock_buyback, dtype=tf.float64)
         opex_tensor = tf.convert_to_tensor(historical_opex, dtype=tf.float64)
         tax_tensor = tf.convert_to_tensor(historical_tax, dtype=tf.float64)
 
@@ -449,8 +435,6 @@ class TrainableFinancialModel(tf.Module):
             self.cash_beta,
             self.income_tax_pct.trainable_variables[0],
             self.dividend_payout_ratio_pct.trainable_variables[0],
-            self.sb_alpha,
-            self.sb_beta,
             # Cost Ratio Params (Logit-Linear)
             self.cost_ratio_alpha,
             self.cost_ratio_beta,
@@ -486,7 +470,6 @@ class TrainableFinancialModel(tf.Module):
             "loss_cash": [],
             "loss_tax": [],
             "loss_div": [],
-            "loss_bb": [],
             "loss_cost_ratio": [],
             "loss_prior_am": [],
         }
@@ -547,10 +530,6 @@ class TrainableFinancialModel(tf.Module):
                         div_true - ni_prev_aligned * self.dividend_payout_ratio_pct
                     )
                 )
-                # %BB(t) = softplus(sb_alpha + sb_beta * t) (softplus-linear)
-                bb_pct_t = tf.math.softplus(self.sb_alpha + self.sb_beta * time_indices)
-                loss_bb = tf.reduce_mean(tf.square(bb_tensor - depr_tensor * bb_pct_t))
-
                 # --- Cost Ratio Loss (Logit-Linear) ---
                 # logit(CR_t) = alpha + beta * t
                 logit_cr_pred = (
@@ -608,7 +587,6 @@ class TrainableFinancialModel(tf.Module):
                     + loss_cash
                     + loss_tax
                     + loss_div
-                    + loss_bb
                     + loss_cost_ratio
                     + loss_opex_bayes
                     + prior_loss_am
@@ -642,7 +620,6 @@ class TrainableFinancialModel(tf.Module):
                 simple_history["loss_cash"].append(loss_cash.numpy())
                 simple_history["loss_tax"].append(loss_tax.numpy())
                 simple_history["loss_div"].append(loss_div.numpy())
-                simple_history["loss_bb"].append(loss_bb.numpy())
                 simple_history["loss_cost_ratio"].append(loss_cost_ratio.numpy())
                 simple_history["loss_prior_am"].append(prior_loss_am.numpy())
 
@@ -684,15 +661,6 @@ class TrainableFinancialModel(tf.Module):
         )
         print(f"Final %IT: {self.income_tax_pct.numpy():.5f}")
         print(f"Final %PR: {self.dividend_payout_ratio_pct.numpy():.5f}")
-        print(
-            f"Stock Buyback % (softplus-linear): alpha={self.sb_alpha.numpy():.4f}, "
-            f"beta={self.sb_beta.numpy():.6f}"
-        )
-        print(
-            f"  => %BB at t=0: {tf.math.softplus(self.sb_alpha).numpy():.4f}, "
-            f"%BB at t={len(historical_sales)-1}: "
-            f"{tf.math.softplus(self.sb_alpha + self.sb_beta * (len(historical_sales)-1)).numpy():.4f}"
-        )
         print(
             f"Cost Ratio (logit-linear): alpha={self.cost_ratio_alpha.numpy():.4f}, "
             f"beta={self.cost_ratio_beta.numpy():.4f}"
@@ -800,7 +768,6 @@ class TrainableFinancialModel(tf.Module):
                 ("loss_adv_pp", "%AdvPP"),
                 ("loss_tax", "%IT"),
                 ("loss_div", "%PR"),
-                ("loss_bb", "%BB"),
             ]
             for key, label in ratio_losses:
                 axs[1].plot(epochs_hist, simple_history[key], label=label)
@@ -846,7 +813,6 @@ class TrainableFinancialModel(tf.Module):
         historical_ims,
         historical_net_income,
         historical_dividends,
-        historical_stock_buyback,
         historical_opex,
         historical_tax,
         historical_current_liabilities,
@@ -1084,9 +1050,6 @@ class TrainableFinancialModel(tf.Module):
         time_index = year - tf.constant(float(self.base_year), dtype=tf.float64)
 
         depreciation = nca_prev * self.depreciation_rate
-        # %BB(t) = softplus(sb_alpha + sb_beta * t) — softplus-linear buyback policy
-        bb_pct = tf.math.softplus(self.sb_alpha + self.sb_beta * time_index)
-        stock_buyback = depreciation * bb_pct
         dividends_prev = net_income_prev * self.dividend_payout_ratio_pct
 
         # --- Derive purchases from cost ratio (Logit-Linear Model) ---
@@ -1224,7 +1187,7 @@ class TrainableFinancialModel(tf.Module):
         )
         new_short_term_loan = tf.maximum(0.0, liquidity_deficit_st)
 
-        ## New long-term loan is found by:
+        ## New long-term loan is found by (buyback excluded — it is computed as the residual excess):
         liquidity_deficit_lt = (
             liquidity_deficit_st
             - new_short_term_loan
@@ -1233,7 +1196,6 @@ class TrainableFinancialModel(tf.Module):
             + principal_lt
             + interest_lt
             + dividends_prev
-            + stock_buyback
         )
         long_term_financing = tf.maximum(0.0, liquidity_deficit_lt)
         # %EF(t) = sigmoid(ef_alpha + ef_beta * t) — logit-linear equity financing mix
@@ -1250,24 +1212,31 @@ class TrainableFinancialModel(tf.Module):
             - interest_lt
         )
 
-        # 3.5. Transaction with Owners Net Liquidity Balance (Transaction with Owners NLB)
-        transaction_with_owners_nlb = equity_financing - dividends_prev - stock_buyback
+        # 3.5. Transaction with Owners Net Liquidity Balance (pre-buyback)
+        transaction_with_owners_nlb_pre_bb = equity_financing - dividends_prev
 
-        # 3.6. Total Net Liquidity Balance (Total NLB)
-        total_nlb = (
+        # 3.6. Total Net Liquidity Balance (pre-buyback)
+        total_nlb_pre_bb = (
             operating_nlb
             + capex_nlb
             + financing_nlb
             + external_investment_nlb
-            + transaction_with_owners_nlb
+            + transaction_with_owners_nlb_pre_bb
         )
 
+        # 3.7. Stock Buyback — absorb any excess liquidity above target
+        # Any cash flow surplus beyond the liquidity target is returned to shareholders
+        # via buybacks. This guarantees the liquidity budget closes exactly.
+        total_liquidity_prev = cash_prev + investment_in_market_securities_prev
+        actual_liquidity_pre_bb = total_liquidity_prev + total_nlb_pre_bb
+        stock_buyback = tf.maximum(0.0, actual_liquidity_pre_bb - total_liquidity_curr)
+
+        # Final NLB and owners NLB (after buyback)
+        total_nlb = total_nlb_pre_bb - stock_buyback
+        transaction_with_owners_nlb = transaction_with_owners_nlb_pre_bb - stock_buyback
+
         ## Check that the liquidity arrived in the Liquidity Budget matches the target liquidity
-        liquidity_check = (
-            (cash_prev + investment_in_market_securities_prev)
-            + total_nlb
-            - total_liquidity_curr
-        )
+        liquidity_check = total_liquidity_prev + total_nlb - total_liquidity_curr
 
         # --- 4. Liabilities Evolution ---
         # 4.1. Accounts Payable (AP)
@@ -2372,7 +2341,6 @@ def run_training_and_forecast(
             investment_in_market_securities_hist_bil[:-1],
             net_income_hist_bil[:-1],
             dividends_hist_bil[:-1],
-            stock_buyback_hist_bil[:-1],
             opex_hist_bil[:-1],
             tax_hist_bil[:-1],
             inflation_hist[:-1],
@@ -2394,7 +2362,6 @@ def run_training_and_forecast(
             investment_in_market_securities_hist_bil[:-1],
             net_income_hist_bil[:-1],
             dividends_hist_bil[:-1],
-            stock_buyback_hist_bil[:-1],
             opex_hist_bil[:-1],
             tax_hist_bil[:-1],
             current_liabilities_hist_bil[:-1],
