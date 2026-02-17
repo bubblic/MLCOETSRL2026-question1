@@ -1241,6 +1241,11 @@ class TrainableFinancialModel(tf.Module):
         new_long_term_loan = long_term_financing * (1 - ef_pct)
         equity_financing = long_term_financing * ef_pct
 
+        # Any surplus cash beyond the liquidity target (negative deficit) is used for
+        # additional stock buybacks, ensuring the liquidity budget closes exactly.
+        excess_cash_buyback = tf.maximum(0.0, -liquidity_deficit_lt)
+        stock_buyback = stock_buyback + excess_cash_buyback
+
         financing_nlb = (
             new_short_term_loan
             + new_long_term_loan
@@ -1262,19 +1267,12 @@ class TrainableFinancialModel(tf.Module):
             + transaction_with_owners_nlb
         )
 
-        ## If the firm generates more cash than the liquidity target (surplus from
-        ## strong operating cash flow when tf.maximum clamps loans to zero), keep
-        ## the excess as actual liquidity instead of losing it.  This ensures the
-        ## balance-sheet identity holds: Assets = Liabilities + Equity.
-        actual_liquidity = (
-            (cash_prev + investment_in_market_securities_prev) + total_nlb
-        )
-        total_liquidity_curr = tf.maximum(total_liquidity_curr, actual_liquidity)
-        cash_curr = total_liquidity_curr * cash_pct
-        investment_in_market_securities_curr = total_liquidity_curr - cash_curr
-
         ## Check that the liquidity arrived in the Liquidity Budget matches the target liquidity
-        liquidity_check = actual_liquidity - total_liquidity_curr
+        liquidity_check = (
+            (cash_prev + investment_in_market_securities_prev)
+            + total_nlb
+            - total_liquidity_curr
+        )
 
         # --- 4. Liabilities Evolution ---
         # 4.1. Accounts Payable (AP)
