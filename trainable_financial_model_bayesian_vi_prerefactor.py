@@ -1348,6 +1348,12 @@ class TrainableFinancialModel(tf.Module):
             "non_current_liabilities": non_current_liabilities_curr,
             "equity": equity_curr,
             "net_income": net_income_curr,
+            "depreciation": depreciation,
+            "dividends": dividends_prev,
+            "stock_buyback": stock_buyback,
+            "new_short_term_loan": new_short_term_loan,
+            "new_long_term_loan": new_long_term_loan,
+            "equity_financing": equity_financing,
             "liquidity_check": liquidity_check,
             "check": check,
         }
@@ -1379,6 +1385,12 @@ def run_monte_carlo_forecast(
     non_current_liabilities_trajectories = []
     ap_trajectories = []
     aps_trajectories = []
+    depreciation_trajectories = []
+    dividends_trajectories = []
+    stock_buyback_trajectories = []
+    new_st_loan_trajectories = []
+    new_lt_loan_trajectories = []
+    equity_financing_trajectories = []
 
     for i in range(n_samples):
         current_state = initial_state.copy()
@@ -1395,6 +1407,12 @@ def run_monte_carlo_forecast(
         sample_ncl = []
         sample_ap = []
         sample_aps = []
+        sample_depr = []
+        sample_div = []
+        sample_bb = []
+        sample_new_st = []
+        sample_new_lt = []
+        sample_ef = []
 
         for t in range(len(sales_forecast) - 1):
             inputs = {
@@ -1431,6 +1449,12 @@ def run_monte_carlo_forecast(
             sample_ncl.append(current_state["non_current_liabilities"].numpy())
             sample_ap.append(current_state["accounts_payable"].numpy())
             sample_aps.append(current_state["advance_payments_sales"].numpy())
+            sample_depr.append(current_state["depreciation"].numpy())
+            sample_div.append(current_state["dividends"].numpy())
+            sample_bb.append(current_state["stock_buyback"].numpy())
+            sample_new_st.append(current_state["new_short_term_loan"].numpy())
+            sample_new_lt.append(current_state["new_long_term_loan"].numpy())
+            sample_ef.append(current_state["equity_financing"].numpy())
 
         ni_trajectories.append(sample_ni)
         equity_trajectories.append(sample_equity)
@@ -1445,6 +1469,12 @@ def run_monte_carlo_forecast(
         non_current_liabilities_trajectories.append(sample_ncl)
         ap_trajectories.append(sample_ap)
         aps_trajectories.append(sample_aps)
+        depreciation_trajectories.append(sample_depr)
+        dividends_trajectories.append(sample_div)
+        stock_buyback_trajectories.append(sample_bb)
+        new_st_loan_trajectories.append(sample_new_st)
+        new_lt_loan_trajectories.append(sample_new_lt)
+        equity_financing_trajectories.append(sample_ef)
 
     ni_trajectories = np.array(ni_trajectories)
     equity_trajectories = np.array(equity_trajectories)
@@ -1461,6 +1491,12 @@ def run_monte_carlo_forecast(
     )
     ap_trajectories = np.array(ap_trajectories)
     aps_trajectories = np.array(aps_trajectories)
+    depreciation_trajectories = np.array(depreciation_trajectories)
+    dividends_trajectories = np.array(dividends_trajectories)
+    stock_buyback_trajectories = np.array(stock_buyback_trajectories)
+    new_st_loan_trajectories = np.array(new_st_loan_trajectories)
+    new_lt_loan_trajectories = np.array(new_lt_loan_trajectories)
+    equity_financing_trajectories = np.array(equity_financing_trajectories)
 
     # Calculate Statistics
     def summarize_trajectories(name, trajectories):
@@ -1496,6 +1532,12 @@ def run_monte_carlo_forecast(
     summarize_trajectories("Equity", equity_trajectories)
     summarize_trajectories("Accounts Payable", ap_trajectories)
     summarize_trajectories("Advance Payments (Sales)", aps_trajectories)
+    summarize_trajectories("Depreciation", depreciation_trajectories)
+    summarize_trajectories("Dividends", dividends_trajectories)
+    summarize_trajectories("Stock Buyback", stock_buyback_trajectories)
+    summarize_trajectories("New Short-Term Loan", new_st_loan_trajectories)
+    summarize_trajectories("New Long-Term Loan", new_lt_loan_trajectories)
+    summarize_trajectories("Equity Financing", equity_financing_trajectories)
 
     # --- Comprehensive Balance Sheet Table (Mean Values) ---
     n_years = assets_trajectories.shape[1]
@@ -1619,6 +1661,12 @@ def run_monte_carlo_forecast(
         "current_liabilities": current_liabilities_trajectories,
         "non_current_liabilities": non_current_liabilities_trajectories,
         "equity": equity_trajectories,
+        "depreciation": depreciation_trajectories,
+        "dividends": dividends_trajectories,
+        "stock_buyback": stock_buyback_trajectories,
+        "new_short_term_loan": new_st_loan_trajectories,
+        "new_long_term_loan": new_lt_loan_trajectories,
+        "equity_financing": equity_financing_trajectories,
     }
 
 
@@ -1933,6 +1981,12 @@ def plot_historical_and_forecast(
         "current_liabilities": "Current Liabilities",
         "non_current_liabilities": "Non-Current Liabilities",
         "equity": "Stockholders' Equity",
+        "depreciation": "Depreciation",
+        "dividends": "Dividends",
+        "stock_buyback": "Stock Buyback",
+        "new_short_term_loan": "New Short-Term Loan",
+        "new_long_term_loan": "New Long-Term Loan",
+        "equity_financing": "Equity Financing",
     }
 
     ax_idx = 0
@@ -2531,6 +2585,12 @@ def run_training_and_forecast(
         "current_liabilities",
         "non_current_liabilities",
         "equity",
+        "depreciation",
+        "dividends",
+        "stock_buyback",
+        "new_short_term_loan",
+        "new_long_term_loan",
+        "equity_financing",
     ]
     historical_fit = {k: [] for k in hist_fit_keys}
     historical_fit_years = []
@@ -2614,6 +2674,24 @@ def run_training_and_forecast(
             float(pred["non_current_liabilities"].numpy()) * amount_scale
         )
         historical_fit["equity"].append(float(pred["equity"].numpy()) * amount_scale)
+        historical_fit["depreciation"].append(
+            float(pred["depreciation"].numpy()) * amount_scale
+        )
+        historical_fit["dividends"].append(
+            float(pred["dividends"].numpy()) * amount_scale
+        )
+        historical_fit["stock_buyback"].append(
+            float(pred["stock_buyback"].numpy()) * amount_scale
+        )
+        historical_fit["new_short_term_loan"].append(
+            float(pred["new_short_term_loan"].numpy()) * amount_scale
+        )
+        historical_fit["new_long_term_loan"].append(
+            float(pred["new_long_term_loan"].numpy()) * amount_scale
+        )
+        historical_fit["equity_financing"].append(
+            float(pred["equity_financing"].numpy()) * amount_scale
+        )
 
         total_assets_pred = (
             pred["nca"]
@@ -2667,6 +2745,9 @@ def run_training_and_forecast(
         "current_liabilities": current_liabilities_hist,
         "non_current_liabilities": non_current_liabilities_hist,
         "equity": equity_hist,
+        "depreciation": depr_hist,
+        "dividends": dividends_hist,
+        "stock_buyback": stock_buyback_hist,
     }
 
     # Sales forecast in USD for the forecasted years
