@@ -20,6 +20,8 @@ cash_alpha = data["cash_alpha"]
 cash_beta = data["cash_beta"]
 income_tax_pct = data["income_tax_pct"]
 dividend_payout_ratio_pct = data["dividend_payout_ratio_pct"]
+dividend_adjustment_speed = data.get("dividend_adjustment_speed", "N/A (old file)")
+print("dividend_adjustment_speed: ", dividend_adjustment_speed)
 sb_alpha = data["sb_alpha"]
 sb_beta = data["sb_beta"]
 q_var_opex_loc = data["q_var_opex_loc"]

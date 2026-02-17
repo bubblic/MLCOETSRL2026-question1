@@ -98,6 +98,15 @@ class TrainableFinancialModel(tf.Module):
             dtype=tf.float64,
             name="div_pct",
         )  # %PR
+        # --- Dividend Smoothing (Lintner Model) ---
+        # D_t = α * (PayoutRatio * NI_t) + (1 - α) * D_{t-1}
+        # α=1.0 → pure payout ratio (no smoothing), α=0.0 → constant dividends
+        self.dividend_adjustment_speed = tfp.util.TransformedVariable(
+            initial_value=0.5,
+            bijector=tfb.Sigmoid(),
+            dtype=tf.float64,
+            name="div_adj_speed",
+        )  # α
         # --- Stock Buyback % Softplus-Linear Model ---
         # %BB(t) = softplus(sb_alpha + sb_beta * t), where t = year - base_year
         # Softplus ensures %BB stays positive (but can be > 1, since buybacks
@@ -223,6 +232,7 @@ class TrainableFinancialModel(tf.Module):
             "cash_beta": float(self.cash_beta.numpy()),
             "income_tax_pct": float(self.income_tax_pct.numpy()),
             "dividend_payout_ratio_pct": float(self.dividend_payout_ratio_pct.numpy()),
+            "dividend_adjustment_speed": float(self.dividend_adjustment_speed.numpy()),
             "sb_alpha": float(self.sb_alpha.numpy()),
             "sb_beta": float(self.sb_beta.numpy()),
             "q_var_opex_loc": float(self.q_var_opex_loc.numpy()),
@@ -270,6 +280,9 @@ class TrainableFinancialModel(tf.Module):
         self.cash_beta.assign(data["cash_beta"])
         self.income_tax_pct.assign(data["income_tax_pct"])
         self.dividend_payout_ratio_pct.assign(data["dividend_payout_ratio_pct"])
+        self.dividend_adjustment_speed.assign(
+            data.get("dividend_adjustment_speed", 1.0)
+        )
         self.sb_alpha.assign(data["sb_alpha"])
         self.sb_beta.assign(data["sb_beta"])
         self.q_var_opex_loc.assign(data["q_var_opex_loc"])
@@ -429,9 +442,11 @@ class TrainableFinancialModel(tf.Module):
         adv_pp_true = adv_pay_purch_tensor
         purchases_aligned_adv_pp = purchases_tensor
 
-        # 5. Dividends: div_t = ni_{t-1} * div_pct
+        # 5. Dividends (Lintner Smoothing):
+        #    D_t = α * (NI_{t-1} * PayoutRatio) + (1 - α) * D_{t-1}
         div_true = div_tensor[1:]
         ni_prev_aligned = ni_tensor[:-1]
+        div_prev_aligned = div_tensor[:-1]
 
         optimizer = tf.optimizers.Adam(learning_rate=learning_rate)
         print(f"Training on {len(historical_sales)} years of historical data...")
@@ -454,6 +469,7 @@ class TrainableFinancialModel(tf.Module):
             self.cash_beta,
             self.income_tax_pct.trainable_variables[0],
             self.dividend_payout_ratio_pct.trainable_variables[0],
+            self.dividend_adjustment_speed.trainable_variables[0],
             self.sb_alpha,
             self.sb_beta,
             # Cost Ratio Params (Logit-Linear)
@@ -550,11 +566,12 @@ class TrainableFinancialModel(tf.Module):
                 loss_tax = tf.reduce_mean(
                     tf.square(tax_tensor - ni_tensor * self.income_tax_pct)
                 )
-                loss_div = tf.reduce_mean(
-                    tf.square(
-                        div_true - ni_prev_aligned * self.dividend_payout_ratio_pct
-                    )
+                div_target = ni_prev_aligned * self.dividend_payout_ratio_pct
+                div_pred = (
+                    self.dividend_adjustment_speed * div_target
+                    + (1.0 - self.dividend_adjustment_speed) * div_prev_aligned
                 )
+                loss_div = tf.reduce_mean(tf.square(div_true - div_pred))
                 # %BB(t) = softplus(sb_alpha + sb_beta * t) (softplus-linear)
                 bb_pct_t = tf.math.softplus(self.sb_alpha + self.sb_beta * time_indices)
                 loss_bb = tf.reduce_mean(tf.square(bb_tensor - depr_tensor * bb_pct_t))
@@ -693,6 +710,7 @@ class TrainableFinancialModel(tf.Module):
         )
         print(f"Final %IT: {self.income_tax_pct.numpy():.5f}")
         print(f"Final %PR: {self.dividend_payout_ratio_pct.numpy():.5f}")
+        print(f"Final DivAdjSpeed (α): {self.dividend_adjustment_speed.numpy():.5f}")
         print(
             f"Stock Buyback % (softplus-linear): alpha={self.sb_alpha.numpy():.4f}, "
             f"beta={self.sb_beta.numpy():.6f}"
@@ -885,6 +903,7 @@ class TrainableFinancialModel(tf.Module):
         cash_t = tf.convert_to_tensor(historical_cash, dtype=tf.float64)
         ims_t = tf.convert_to_tensor(historical_ims, dtype=tf.float64)
         ni_t = tf.convert_to_tensor(historical_net_income, dtype=tf.float64)
+        div_t = tf.convert_to_tensor(historical_dividends, dtype=tf.float64)
         cl_t = tf.convert_to_tensor(historical_current_liabilities, dtype=tf.float64)
         ncl_t = tf.convert_to_tensor(
             historical_non_current_liabilities, dtype=tf.float64
@@ -948,6 +967,7 @@ class TrainableFinancialModel(tf.Module):
                         "non_current_liabilities": ncl_t[t],
                         "equity": equity_t[t],
                         "net_income": ni_t[t],
+                        "dividends": div_t[t],
                     }
 
                     # Inputs for predicting state at t+1
@@ -1082,6 +1102,8 @@ class TrainableFinancialModel(tf.Module):
         equity_prev = state["equity"]
         ## Net Income
         net_income_prev = state["net_income"]
+        ## Dividends (previous period, for Lintner smoothing)
+        dividends_prev_actual = state["dividends"]
 
         # Unpack current inputs (t)
         sales_t = inputs["sales_t"]
@@ -1096,7 +1118,12 @@ class TrainableFinancialModel(tf.Module):
         # %BB(t) = softplus(sb_alpha + sb_beta * t) — softplus-linear buyback policy
         bb_pct = tf.math.softplus(self.sb_alpha + self.sb_beta * time_index)
         stock_buyback = depreciation * bb_pct
-        dividends_prev = net_income_prev * self.dividend_payout_ratio_pct
+        # Lintner dividend smoothing: D_t = α * (PR * NI_{t-1}) + (1-α) * D_{t-1}
+        dividend_target = net_income_prev * self.dividend_payout_ratio_pct
+        dividends_prev = (
+            self.dividend_adjustment_speed * dividend_target
+            + (1.0 - self.dividend_adjustment_speed) * dividends_prev_actual
+        )
 
         # --- Derive purchases from cost ratio (Logit-Linear Model) ---
         # CR_t = sigmoid(alpha + beta * t)
@@ -2529,6 +2556,7 @@ def run_training_and_forecast(
         ),
         "equity": tf.constant(equity_hist_bil[-2], dtype=tf.float64),
         "net_income": tf.constant(net_income_hist_bil[-2], dtype=tf.float64),
+        "dividends": tf.constant(dividends_hist_bil[-2], dtype=tf.float64),
     }
 
     # Forecast Drivers: Sales is the sole exogenous driver.
@@ -2624,6 +2652,7 @@ def run_training_and_forecast(
             ),
             "equity": tf.constant(equity_hist_bil[t], dtype=tf.float64),
             "net_income": tf.constant(net_income_hist_bil[t], dtype=tf.float64),
+            "dividends": tf.constant(dividends_hist_bil[t], dtype=tf.float64),
         }
 
         # Sales at t+1 (current) and t+2 (lookahead for advance payments)
