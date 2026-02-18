@@ -113,13 +113,10 @@ class TrainableFinancialModel(tf.Module):
             dtype=tf.float64,
             name="div_adj_speed",
         )  # α
-        # --- Stock Buyback % Softplus-Linear Model ---
-        # %BB(t) = softplus(sb_alpha + sb_beta * t), where t = year - base_year
-        # Softplus ensures %BB stays positive (but can be > 1, since buybacks
-        # can exceed depreciation). Time trend allows buyback policy to evolve.
-        # Initialize alpha to inverse_softplus(7.5) ≈ 7.5 (for large x, softplus ≈ identity)
-        self.sb_alpha = tf.Variable(7.5, dtype=tf.float64, name="sb_alpha")
-        self.sb_beta = tf.Variable(0.0, dtype=tf.float64, name="sb_beta")
+        # --- Stock Buyback: Baseline + Ratio * Depreciation ---
+        # BB(t) = sb_baseline + sb_ratio * depreciation(t)
+        self.sb_baseline = tf.Variable(0.0, dtype=tf.float64, name="sb_baseline")
+        self.sb_ratio = tf.Variable(1.0, dtype=tf.float64, name="sb_ratio")
 
         # --- Cost Ratio Parameters (Logit-Linear Trend) ---
         # logit(CR_t) = alpha + beta * t  =>  CR_t = sigmoid(alpha + beta * t), where t = year - base_year
@@ -248,8 +245,8 @@ class TrainableFinancialModel(tf.Module):
             "income_tax_pct": float(self.income_tax_pct.numpy()),
             "dividend_payout_ratio_pct": float(self.dividend_payout_ratio_pct.numpy()),
             "dividend_adjustment_speed": float(self.dividend_adjustment_speed.numpy()),
-            "sb_alpha": float(self.sb_alpha.numpy()),
-            "sb_beta": float(self.sb_beta.numpy()),
+            "sb_baseline": float(self.sb_baseline.numpy()),
+            "sb_ratio": float(self.sb_ratio.numpy()),
             "q_var_opex_loc": float(self.q_var_opex_loc.numpy()),
             "q_var_opex_scale": float(self.q_var_opex_scale.numpy()),
             "q_base_opex_loc": float(self.q_base_opex_loc.numpy()),
@@ -300,8 +297,8 @@ class TrainableFinancialModel(tf.Module):
         self.dividend_adjustment_speed.assign(
             data.get("dividend_adjustment_speed", 1.0)
         )
-        self.sb_alpha.assign(data["sb_alpha"])
-        self.sb_beta.assign(data["sb_beta"])
+        self.sb_baseline.assign(data.get("sb_baseline", 0.0))
+        self.sb_ratio.assign(data.get("sb_ratio", 1.0))
         self.q_var_opex_loc.assign(data["q_var_opex_loc"])
         self.q_var_opex_scale.assign(data["q_var_opex_scale"])
         self.q_base_opex_loc.assign(data["q_base_opex_loc"])
@@ -493,8 +490,8 @@ class TrainableFinancialModel(tf.Module):
             self.income_tax_pct.trainable_variables[0],
             self.dividend_payout_ratio_pct.trainable_variables[0],
             self.dividend_adjustment_speed.trainable_variables[0],
-            self.sb_alpha,
-            self.sb_beta,
+            self.sb_baseline,
+            self.sb_ratio,
             # ST Debt Params (Logit-Linear)
             self.st_debt_alpha,
             self.st_debt_beta,
@@ -599,9 +596,8 @@ class TrainableFinancialModel(tf.Module):
                     + (1.0 - self.dividend_adjustment_speed) * div_prev_aligned
                 )
                 loss_div = tf.reduce_mean(tf.square(div_true - div_pred))
-                # %BB(t) = softplus(sb_alpha + sb_beta * t) (softplus-linear)
-                bb_pct_t = tf.math.softplus(self.sb_alpha + self.sb_beta * time_indices)
-                loss_bb = tf.reduce_mean(tf.square(bb_tensor - depr_tensor * bb_pct_t))
+                bb_pred = self.sb_baseline + self.sb_ratio * depr_tensor
+                loss_bb = tf.reduce_mean(tf.square(bb_tensor - bb_pred))
 
                 # --- Cost Ratio Loss (Logit-Linear) ---
                 # logit(CR_t) = alpha + beta * t
@@ -754,13 +750,8 @@ class TrainableFinancialModel(tf.Module):
         print(f"Final %PR: {self.dividend_payout_ratio_pct.numpy():.5f}")
         print(f"Final DivAdjSpeed (α): {self.dividend_adjustment_speed.numpy():.5f}")
         print(
-            f"Stock Buyback % (softplus-linear): alpha={self.sb_alpha.numpy():.4f}, "
-            f"beta={self.sb_beta.numpy():.6f}"
-        )
-        print(
-            f"  => %BB at t=0: {tf.math.softplus(self.sb_alpha).numpy():.4f}, "
-            f"%BB at t={len(historical_sales)-1}: "
-            f"{tf.math.softplus(self.sb_alpha + self.sb_beta * (len(historical_sales)-1)).numpy():.4f}"
+            f"Stock Buyback (baseline + ratio*depr): baseline={self.sb_baseline.numpy():.4f}, "
+            f"ratio={self.sb_ratio.numpy():.6f}"
         )
         print(
             f"ST Debt % of Sales (logit-linear): alpha={self.st_debt_alpha.numpy():.4f}, "
@@ -1166,9 +1157,7 @@ class TrainableFinancialModel(tf.Module):
         time_index = year - tf.constant(float(self.base_year), dtype=tf.float64)
 
         depreciation = nca_prev * self.depreciation_rate
-        # %BB(t) = softplus(sb_alpha + sb_beta * t) — softplus-linear buyback policy
-        bb_pct = tf.math.softplus(self.sb_alpha + self.sb_beta * time_index)
-        stock_buyback = depreciation * bb_pct
+        stock_buyback = self.sb_baseline + self.sb_ratio * depreciation
         # Lintner dividend smoothing: D_t = α * (PR * NI_{t-1}) + (1-α) * D_{t-1}
         dividend_target = net_income_prev * self.dividend_payout_ratio_pct
         dividends_prev = (
