@@ -77,7 +77,12 @@ class TrainableFinancialModel(tf.Module):
         # Initialize alpha to inverse_sigmoid(0.16) ≈ -1.66
         self.tl_alpha = tf.Variable(-1.66, dtype=tf.float64, name="tl_alpha")
         self.tl_beta = tf.Variable(0.0, dtype=tf.float64, name="tl_beta")
-        self.tl_baseline = tf.Variable(0.0, dtype=tf.float64, name="tl_baseline")
+        self.tl_baseline = tfp.util.TransformedVariable(
+            initial_value=0.0,
+            bijector=tfb.Softplus(),
+            dtype=tf.float64,
+            name="tl_baseline",
+        )
 
         # --- Cash % of Liquidity Logit-Linear Model ---
         # %Cash(t) = sigmoid(cash_alpha + cash_beta * t), where t = year - base_year
@@ -464,7 +469,7 @@ class TrainableFinancialModel(tf.Module):
             self.inventory_pct.trainable_variables[0],
             self.tl_alpha,
             self.tl_beta,
-            self.tl_baseline,
+            self.tl_baseline.trainable_variables[0],
             self.cash_alpha,
             self.cash_beta,
             self.income_tax_pct.trainable_variables[0],
