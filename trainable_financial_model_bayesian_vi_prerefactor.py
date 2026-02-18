@@ -2642,9 +2642,11 @@ def run_training_and_forecast(
     # Purchases are derived inside forecast_step from the learned cost ratio.
     n_hist = len(sales_hist)  # 8 (FY2018-FY2025)
     n_forecast_years = 10
-    sales_growth_rate = sales_hist_bil[-1] / sales_hist_bil[-2]
+    # Average linear growth per year from full historical data
+    yearly_deltas = np.diff(sales_hist_bil)
+    avg_linear_growth = np.mean(yearly_deltas)
     sales_forecast = np.array(
-        [sales_hist_bil[-1] * sales_growth_rate**i for i in range(n_forecast_years)],
+        [sales_hist_bil[-1] + avg_linear_growth * i for i in range(n_forecast_years)],
         dtype=np.float64,
     )
     # Forecast starts at FY2025 (last historical year) and continues forward
