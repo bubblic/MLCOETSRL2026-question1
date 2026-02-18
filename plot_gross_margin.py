@@ -113,8 +113,18 @@ gs = fig.add_gridspec(3, 2, hspace=0.35, wspace=0.35)
 
 # Row 0, col 0: Sales vs Year
 ax0 = fig.add_subplot(gs[0, 0])
-ax0.bar(years, sales_hist / 1e9, color="tab:green", edgecolor="black", alpha=0.85, width=0.6)
-ax0.plot(years, sales_hist / 1e9, "o-", color="darkgreen", linewidth=2, markersize=6, zorder=5)
+ax0.bar(
+    years, sales_hist / 1e9, color="tab:green", edgecolor="black", alpha=0.85, width=0.6
+)
+ax0.plot(
+    years,
+    sales_hist / 1e9,
+    "o-",
+    color="darkgreen",
+    linewidth=2,
+    markersize=6,
+    zorder=5,
+)
 ax0.set_xlabel("Fiscal Year", fontsize=11)
 ax0.set_ylabel("Revenue ($B)", fontsize=11)
 ax0.set_title("Apple Revenue (FY2018-FY2025)", fontsize=13, fontweight="bold")
@@ -135,7 +145,14 @@ for i, y in enumerate(years):
 # Row 0, col 1: Sales YoY Growth
 ax0b = fig.add_subplot(gs[0, 1])
 colors_growth = ["tab:green" if g >= 0 else "tab:red" for g in sales_growth]
-ax0b.bar(years[1:], sales_growth * 100, color=colors_growth, edgecolor="black", alpha=0.85, width=0.6)
+ax0b.bar(
+    years[1:],
+    sales_growth * 100,
+    color=colors_growth,
+    edgecolor="black",
+    alpha=0.85,
+    width=0.6,
+)
 ax0b.axhline(0, color="black", linewidth=0.8)
 ax0b.set_xlabel("Fiscal Year", fontsize=11)
 ax0b.set_ylabel("YoY Revenue Growth (%)", fontsize=11)
@@ -283,8 +300,17 @@ for i, y in enumerate(years):
 # Trend line
 z = np.polyfit(inflation_hist * 100, gross_margin_excl_depr * 100, 1)
 p = np.poly1d(z)
-x_fit = np.linspace(inflation_hist.min() * 100 - 0.5, inflation_hist.max() * 100 + 0.5, 50)
-ax3.plot(x_fit, p(x_fit), "--", color="gray", alpha=0.7, label=f"Linear fit (slope={z[0]:.2f})")
+x_fit = np.linspace(
+    inflation_hist.min() * 100 - 0.5, inflation_hist.max() * 100 + 0.5, 50
+)
+ax3.plot(
+    x_fit,
+    p(x_fit),
+    "--",
+    color="gray",
+    alpha=0.7,
+    label=f"Linear fit (slope={z[0]:.2f})",
+)
 ax3.set_xlabel("Annual Inflation Rate (%)", fontsize=11)
 ax3.set_ylabel("Gross Margin (%)", fontsize=11)
 ax3.set_title("Scatter: Gross Margin vs Inflation", fontsize=13, fontweight="bold")
@@ -313,8 +339,17 @@ for i in range(len(gm_change)):
 ax4.axhline(0, color="black", linewidth=0.8, linestyle="-")
 z2 = np.polyfit(inflation_hist[1:] * 100, gm_change * 100, 1)
 p2 = np.poly1d(z2)
-x_fit2 = np.linspace(inflation_hist[1:].min() * 100 - 0.5, inflation_hist[1:].max() * 100 + 0.5, 50)
-ax4.plot(x_fit2, p2(x_fit2), "--", color="gray", alpha=0.7, label=f"Linear fit (slope={z2[0]:.2f})")
+x_fit2 = np.linspace(
+    inflation_hist[1:].min() * 100 - 0.5, inflation_hist[1:].max() * 100 + 0.5, 50
+)
+ax4.plot(
+    x_fit2,
+    p2(x_fit2),
+    "--",
+    color="gray",
+    alpha=0.7,
+    label=f"Linear fit (slope={z2[0]:.2f})",
+)
 ax4.set_xlabel("Annual Inflation Rate (%)", fontsize=11)
 ax4.set_ylabel("YoY Gross Margin Change (pp)", fontsize=11)
 ax4.set_title(

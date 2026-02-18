@@ -1388,6 +1388,7 @@ class TrainableFinancialModel(tf.Module):
             "new_short_term_loan": new_short_term_loan,
             "new_long_term_loan": new_long_term_loan,
             "equity_financing": equity_financing,
+            "liquidity_deficit_st": liquidity_deficit_st,
             "liquidity_check": liquidity_check,
             "check": check,
         }
@@ -1425,6 +1426,7 @@ def run_monte_carlo_forecast(
     new_st_loan_trajectories = []
     new_lt_loan_trajectories = []
     equity_financing_trajectories = []
+    liq_deficit_st_trajectories = []
 
     for i in range(n_samples):
         current_state = initial_state.copy()
@@ -1447,6 +1449,7 @@ def run_monte_carlo_forecast(
         sample_new_st = []
         sample_new_lt = []
         sample_ef = []
+        sample_liq_deficit_st = []
 
         for t in range(len(sales_forecast) - 1):
             inputs = {
@@ -1489,6 +1492,7 @@ def run_monte_carlo_forecast(
             sample_new_st.append(current_state["new_short_term_loan"].numpy())
             sample_new_lt.append(current_state["new_long_term_loan"].numpy())
             sample_ef.append(current_state["equity_financing"].numpy())
+            sample_liq_deficit_st.append(current_state["liquidity_deficit_st"].numpy())
 
         ni_trajectories.append(sample_ni)
         equity_trajectories.append(sample_equity)
@@ -1509,6 +1513,7 @@ def run_monte_carlo_forecast(
         new_st_loan_trajectories.append(sample_new_st)
         new_lt_loan_trajectories.append(sample_new_lt)
         equity_financing_trajectories.append(sample_ef)
+        liq_deficit_st_trajectories.append(sample_liq_deficit_st)
 
     ni_trajectories = np.array(ni_trajectories)
     equity_trajectories = np.array(equity_trajectories)
@@ -1531,6 +1536,7 @@ def run_monte_carlo_forecast(
     new_st_loan_trajectories = np.array(new_st_loan_trajectories)
     new_lt_loan_trajectories = np.array(new_lt_loan_trajectories)
     equity_financing_trajectories = np.array(equity_financing_trajectories)
+    liq_deficit_st_trajectories = np.array(liq_deficit_st_trajectories)
 
     # Calculate Statistics
     def summarize_trajectories(name, trajectories):
@@ -1701,6 +1707,7 @@ def run_monte_carlo_forecast(
         "new_short_term_loan": new_st_loan_trajectories,
         "new_long_term_loan": new_lt_loan_trajectories,
         "equity_financing": equity_financing_trajectories,
+        "liquidity_deficit_st": liq_deficit_st_trajectories,
     }
 
 
@@ -2021,6 +2028,7 @@ def plot_historical_and_forecast(
         "new_short_term_loan": "New Short-Term Loan",
         "new_long_term_loan": "New Long-Term Loan",
         "equity_financing": "Equity Financing",
+        "liquidity_deficit_st": "Liquidity Deficit (Short-Term)",
     }
 
     ax_idx = 0
@@ -2626,6 +2634,7 @@ def run_training_and_forecast(
         "new_short_term_loan",
         "new_long_term_loan",
         "equity_financing",
+        "liquidity_deficit_st",
     ]
     historical_fit = {k: [] for k in hist_fit_keys}
     historical_fit_years = []
@@ -2727,6 +2736,9 @@ def run_training_and_forecast(
         )
         historical_fit["equity_financing"].append(
             float(pred["equity_financing"].numpy()) * amount_scale
+        )
+        historical_fit["liquidity_deficit_st"].append(
+            float(pred["liquidity_deficit_st"].numpy()) * amount_scale
         )
 
         total_assets_pred = (
