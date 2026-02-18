@@ -209,6 +209,15 @@ class TrainableFinancialModel(tf.Module):
             dtype=tf.float64,
             name="market_securities_return_pct",
         )  # %MSReturn
+        # --- Short-Term Debt % of Sales Logit-Linear Model ---
+        # %STDebt(t) = sigmoid(st_debt_alpha + st_debt_beta * t), where t = year - base_year
+        # new_short_term_loan = sales * %STDebt(t)
+        # Replaces deficit-driven ST borrowing: corporations maintain revolving
+        # credit / commercial paper as treasury policy, not just to cover deficits.
+        # Initialize alpha to inverse_sigmoid(0.17) ≈ -1.59 (Apple's avg ST debt/sales)
+        self.st_debt_alpha = tf.Variable(-1.59, dtype=tf.float64, name="st_debt_alpha")
+        self.st_debt_beta = tf.Variable(0.0, dtype=tf.float64, name="st_debt_beta")
+
         # --- Equity Financing % Logit-Linear Model ---
         # %EF(t) = sigmoid(ef_alpha + ef_beta * t), where t = year - base_year
         # Sigmoid ensures %EF stays in (0, 1), and allows the financing mix
@@ -259,6 +268,8 @@ class TrainableFinancialModel(tf.Module):
             ),
             "ef_alpha": float(self.ef_alpha.numpy()),
             "ef_beta": float(self.ef_beta.numpy()),
+            "st_debt_alpha": float(self.st_debt_alpha.numpy()),
+            "st_debt_beta": float(self.st_debt_beta.numpy()),
             "cost_ratio_alpha": float(self.cost_ratio_alpha.numpy()),
             "cost_ratio_beta": float(self.cost_ratio_beta.numpy()),
             "base_year": self.base_year,
@@ -303,6 +314,8 @@ class TrainableFinancialModel(tf.Module):
         self.market_securities_return_pct.assign(data["market_securities_return_pct"])
         self.ef_alpha.assign(data["ef_alpha"])
         self.ef_beta.assign(data["ef_beta"])
+        self.st_debt_alpha.assign(data.get("st_debt_alpha", -1.59))
+        self.st_debt_beta.assign(data.get("st_debt_beta", 0.0))
         self.cost_ratio_alpha.assign(data["cost_ratio_alpha"])
         self.cost_ratio_beta.assign(data["cost_ratio_beta"])
         if "base_year" in data:
@@ -363,6 +376,7 @@ class TrainableFinancialModel(tf.Module):
         historical_stock_buyback,
         historical_opex,
         historical_tax,
+        historical_st_debt=None,
         historical_inflation=None,
         historical_years=None,
         learning_rate=0.001,
@@ -398,6 +412,8 @@ class TrainableFinancialModel(tf.Module):
         bb_tensor = tf.convert_to_tensor(historical_stock_buyback, dtype=tf.float64)
         opex_tensor = tf.convert_to_tensor(historical_opex, dtype=tf.float64)
         tax_tensor = tf.convert_to_tensor(historical_tax, dtype=tf.float64)
+        if historical_st_debt is not None:
+            st_debt_tensor = tf.convert_to_tensor(historical_st_debt, dtype=tf.float64)
 
         if historical_inflation is None:
             historical_inflation = tf.zeros_like(sales_tensor)
@@ -479,6 +495,9 @@ class TrainableFinancialModel(tf.Module):
             self.dividend_adjustment_speed.trainable_variables[0],
             self.sb_alpha,
             self.sb_beta,
+            # ST Debt Params (Logit-Linear)
+            self.st_debt_alpha,
+            self.st_debt_beta,
             # Cost Ratio Params (Logit-Linear)
             self.cost_ratio_alpha,
             self.cost_ratio_beta,
@@ -516,6 +535,7 @@ class TrainableFinancialModel(tf.Module):
             "loss_div": [],
             "loss_bb": [],
             "loss_cost_ratio": [],
+            "loss_st_debt": [],
             "loss_prior_am": [],
         }
 
@@ -592,6 +612,19 @@ class TrainableFinancialModel(tf.Module):
                     tf.square(logit_cr_hist - logit_cr_pred)
                 )
 
+                # --- ST Debt Loss (Logit-Linear) ---
+                # %STDebt(t) = sigmoid(st_debt_alpha + st_debt_beta * t)
+                # new_short_term_loan = sales * %STDebt(t)
+                if historical_st_debt is not None:
+                    st_debt_pct_pred = tf.sigmoid(
+                        self.st_debt_alpha + self.st_debt_beta * time_indices
+                    )
+                    loss_st_debt = tf.reduce_mean(
+                        tf.square(st_debt_tensor - sales_tensor * st_debt_pct_pred)
+                    )
+                else:
+                    loss_st_debt = tf.constant(0.0, dtype=tf.float64)
+
                 # --- Bayesian OpEx Loss ---
                 # 1. Sample parameters
                 var_opex_sample, base_opex_sample = self.sample_opex_params()
@@ -642,6 +675,7 @@ class TrainableFinancialModel(tf.Module):
                     + loss_div
                     + loss_bb
                     + loss_cost_ratio
+                    + loss_st_debt
                     + loss_opex_bayes
                     + prior_loss_am
                 )
@@ -676,6 +710,7 @@ class TrainableFinancialModel(tf.Module):
                 simple_history["loss_div"].append(loss_div.numpy())
                 simple_history["loss_bb"].append(loss_bb.numpy())
                 simple_history["loss_cost_ratio"].append(loss_cost_ratio.numpy())
+                simple_history["loss_st_debt"].append(loss_st_debt.numpy())
                 simple_history["loss_prior_am"].append(prior_loss_am.numpy())
 
                 print(
@@ -726,6 +761,15 @@ class TrainableFinancialModel(tf.Module):
             f"  => %BB at t=0: {tf.math.softplus(self.sb_alpha).numpy():.4f}, "
             f"%BB at t={len(historical_sales)-1}: "
             f"{tf.math.softplus(self.sb_alpha + self.sb_beta * (len(historical_sales)-1)).numpy():.4f}"
+        )
+        print(
+            f"ST Debt % of Sales (logit-linear): alpha={self.st_debt_alpha.numpy():.4f}, "
+            f"beta={self.st_debt_beta.numpy():.6f}"
+        )
+        print(
+            f"  => %STDebt at t=0: {tf.sigmoid(self.st_debt_alpha).numpy():.4f}, "
+            f"%STDebt at t={len(historical_sales)-1}: "
+            f"{tf.sigmoid(self.st_debt_alpha + self.st_debt_beta * (len(historical_sales)-1)).numpy():.4f}"
         )
         print(
             f"Cost Ratio (logit-linear): alpha={self.cost_ratio_alpha.numpy():.4f}, "
@@ -1256,16 +1300,20 @@ class TrainableFinancialModel(tf.Module):
         # 3.4. Financing Net Liquidity Balance (Financing NLB)
         ## First, we need to figure out how much new short-term loan and long-term loan to issue this year.
         ## Note: The return from market securities investment is added to previous total liquidity balance because we always allocate a portion of total liquidity to market securities, instead of excess cash balance.
-        ## New short-term loan is found by:
+
+        # ST debt as policy-driven ratio of sales (logit-linear trend):
+        # %STDebt(t) = sigmoid(st_debt_alpha + st_debt_beta * t)
+        st_debt_pct = tf.sigmoid(self.st_debt_alpha + self.st_debt_beta * time_index)
+        new_short_term_loan = sales_t * st_debt_pct
+
+        # Diagnostic: what the old deficit-driven model would have computed
         liquidity_deficit_st = (
             total_liquidity_curr
             - (cash_prev + investment_in_market_securities_prev)
-            # - external_investment_nlb  # FIXED: This is accounted for when calculating long-term loan, like done in Pareja (09)
             - operating_nlb
             + principal_st
             + interest_st
         )
-        new_short_term_loan = tf.maximum(0.0, liquidity_deficit_st)
 
         ## New long-term loan is found by:
         liquidity_deficit_lt = (
@@ -2426,6 +2474,20 @@ def run_training_and_forecast(
         ],
         dtype=np.float64,
     )
+    # Short-Term Debt (Commercial Paper / Revolving Credit) from Balance Sheet
+    st_debt_hist = np.array(
+        [
+            45291000000,
+            43700000000,
+            47680000000,
+            53493000000,
+            70827000000,
+            64814000000,
+            88271000000,
+            74366000000,
+        ],
+        dtype=np.float64,
+    )
     # Inflation History
     inflation_hist = np.array(
         [0.024, 0.018, 0.012, 0.047, 0.08, 0.041, 0.029, 0.027],
@@ -2455,6 +2517,7 @@ def run_training_and_forecast(
     stock_buyback_hist_bil = stock_buyback_hist / amount_scale
     opex_hist_bil = opex_hist / amount_scale
     tax_hist_bil = tax_hist / amount_scale
+    st_debt_hist_bil = st_debt_hist / amount_scale
     current_liabilities_hist_bil = current_liabilities_hist / amount_scale
     non_current_liabilities_hist_bil = non_current_liabilities_hist / amount_scale
     equity_hist_bil = equity_hist / amount_scale
@@ -2487,7 +2550,8 @@ def run_training_and_forecast(
             stock_buyback_hist_bil[:-1],
             opex_hist_bil[:-1],
             tax_hist_bil[:-1],
-            inflation_hist[:-1],
+            historical_st_debt=st_debt_hist_bil[:-1],
+            historical_inflation=inflation_hist[:-1],
             historical_years=train_years,
             show_plot=False,
         )
@@ -2796,6 +2860,7 @@ def run_training_and_forecast(
         "depreciation": depr_hist,
         "dividends": dividends_hist,
         "stock_buyback": stock_buyback_hist,
+        "new_short_term_loan": st_debt_hist,
     }
 
     # Sales forecast in USD for the forecasted years
