@@ -453,9 +453,8 @@ class TrainableFinancialModel(tf.Module):
         depr_true = depr_tensor[1:]
         nca_prev_aligned = nca_tensor[:-1]
 
-        # 3. Advance Payments Sales: adv_ps_t = sales_{t+1} * adv_ps_pct
-        adv_ps_true = adv_pay_sales_tensor[:-1]
-        sales_next_aligned = sales_tensor[1:]
+        # 3. Advance Payments Sales: adv_ps_t = sales_t * adv_ps_pct
+        adv_ps_true = adv_pay_sales_tensor
 
         # 4. Advance Payments Purchases: adv_pp_t = purchases_t * adv_pp_pct
         adv_pp_true = adv_pay_purch_tensor
@@ -554,7 +553,7 @@ class TrainableFinancialModel(tf.Module):
                 loss_adv_ps = tf.reduce_mean(
                     tf.square(
                         adv_ps_true
-                        - sales_next_aligned * self.advance_payments_sales_pct
+                        - sales_tensor * self.advance_payments_sales_pct
                     )
                 )
                 loss_adv_pp = tf.reduce_mean(
@@ -991,8 +990,7 @@ class TrainableFinancialModel(tf.Module):
                 total_loss_cl = 0.0
                 total_loss_ncl = 0.0
                 total_loss_equity = 0.0
-                # We need t+1 for the target and t+2 for the lookahead inputs in forecast_step
-                num_transitions = len(historical_sales) - 2
+                num_transitions = len(historical_sales) - 1
 
                 for t in range(num_transitions):
                     # State at t
@@ -1016,7 +1014,6 @@ class TrainableFinancialModel(tf.Module):
                     # Purchases are derived inside forecast_step from cost ratio
                     inputs_curr = {
                         "sales_t": sales_t[t + 1],
-                        "sales_t_plus_1": sales_t[t + 2],
                         "year": years_t[t + 1],
                         "cum_inflation": cum_inf_t[t + 1],
                     }
@@ -1149,7 +1146,6 @@ class TrainableFinancialModel(tf.Module):
 
         # Unpack current inputs (t)
         sales_t = inputs["sales_t"]
-        sales_t_plus_1 = inputs["sales_t_plus_1"]
         year = inputs["year"]
         cum_inflation = inputs["cum_inflation"]
 
@@ -1259,11 +1255,11 @@ class TrainableFinancialModel(tf.Module):
         # 3.1. Operating Net Liquidity Balance (Operating NLB)
         # Inflows: Sales | Outflows: Purchases, OpEx, Tax, Interest
 
-        # Sales: cash flow from current year's sales + accounts receivable from previous year + advance payment for next year's sales
+        # Sales: cash flow from current year's sales + accounts receivable from previous year + advance payment from this year's sales
         sales_curr = (
             sales_t * (1 - self.account_receivables_pct) - advance_payments_sales_prev
         )
-        advance_payments_sales_curr = sales_t_plus_1 * self.advance_payments_sales_pct
+        advance_payments_sales_curr = sales_t * self.advance_payments_sales_pct
         inflows = sales_curr + accounts_receivable_prev + advance_payments_sales_curr
 
         # Purchases: cash flow from current year's purchases + cash flow from previous year's purchases + cash flow from next year's purchases
@@ -1360,7 +1356,7 @@ class TrainableFinancialModel(tf.Module):
 
         # 4.2. Advance Payments Sales (AdvPS)
         # Already calculated in Liquidity Budget
-        # advance_payments_sales_curr = sales_t_plus_1 * self.advance_payments_sales_pct
+        # advance_payments_sales_curr = sales_t * self.advance_payments_sales_pct
 
         # 4.3. Non-current Liabilities (NLiab)
         ## This is equal to the total long-term liabilities minus the effective principal due next year
@@ -1488,10 +1484,9 @@ def run_monte_carlo_forecast(
         sample_ef = []
         sample_liq_deficit_st = []
 
-        for t in range(len(sales_forecast) - 1):
+        for t in range(len(sales_forecast)):
             inputs = {
                 "sales_t": tf.constant(sales_forecast[t]),
-                "sales_t_plus_1": tf.constant(sales_forecast[t + 1]),
                 "year": tf.constant(float(forecast_years[t]), dtype=tf.float64),
                 "cum_inflation": tf.constant(cum_inf_forecast[t]),
             }
@@ -2726,17 +2721,10 @@ def run_training_and_forecast(
             "dividends": tf.constant(dividends_hist_bil[t], dtype=tf.float64),
         }
 
-        # Sales at t+1 (current) and t+2 (lookahead for advance payments)
         sales_t1 = sales_hist_bil[t + 1]
-        if t + 2 < n_hist_points:
-            sales_t2 = sales_hist_bil[t + 2]
-        else:
-            # For the last historical transition, use projected FY2026 sales
-            sales_t2 = sales_forecast[1]
 
         inputs_t = {
             "sales_t": tf.constant(sales_t1, dtype=tf.float64),
-            "sales_t_plus_1": tf.constant(sales_t2, dtype=tf.float64),
             "year": tf.constant(float(model.base_year + t + 1), dtype=tf.float64),
             "cum_inflation": tf.constant(cum_inf_hist[t + 1], dtype=tf.float64),
         }
@@ -2818,8 +2806,7 @@ def run_training_and_forecast(
     # --- 7. PLOT ALL ELEMENTS: HISTORICAL + FIT + FORECAST ---
     historical_years = np.arange(model.base_year, model.base_year + n_hist_points)
 
-    # Forecast years for plotting: FY2025, FY2026, ..., FY2033 (9 years)
-    n_forecast_steps = len(sales_forecast) - 1
+    n_forecast_steps = len(sales_forecast)
     forecast_year_start = model.base_year + n_hist_points - 1  # FY2025
     plot_forecast_years = np.arange(
         forecast_year_start, forecast_year_start + n_forecast_steps
@@ -2855,7 +2842,7 @@ def run_training_and_forecast(
     }
 
     # Sales forecast in USD for the forecasted years
-    sales_forecast_usd = sales_forecast[:n_forecast_steps] * amount_scale
+    sales_forecast_usd = sales_forecast * amount_scale
 
     plot_historical_and_forecast(
         historical_years=historical_years,
