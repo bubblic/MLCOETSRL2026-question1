@@ -471,40 +471,47 @@ class TrainableFinancialModel(tf.Module):
         print(f"Training on {len(historical_sales)} years of historical data...")
 
         # --- Training Loop ---
-        vars_to_train = [
-            # Policy params (unconstrained underlying variables via bijectors)
-            self.asset_growth.trainable_variables[0],
-            self.asset_maintain.trainable_variables[0],
-            self.depreciation_rate.trainable_variables[0],
-            self.advance_payments_sales_pct.trainable_variables[0],
-            self.advance_payments_purchases_pct.trainable_variables[0],
-            self.account_receivables_pct.trainable_variables[0],
-            self.account_payables_pct.trainable_variables[0],
-            self.inventory_pct.trainable_variables[0],
-            self.tl_alpha,
-            self.tl_beta,
-            self.tl_baseline,
-            # self.tl_baseline.trainable_variables[0],
-            self.cash_alpha,
-            self.cash_beta,
-            self.income_tax_pct.trainable_variables[0],
-            self.dividend_payout_ratio_pct.trainable_variables[0],
-            self.dividend_adjustment_speed.trainable_variables[0],
-            self.sb_baseline,
-            self.sb_ratio,
-            # ST Debt Params (Logit-Linear)
-            self.st_debt_alpha,
-            self.st_debt_beta,
-            # Cost Ratio Params (Logit-Linear)
-            self.cost_ratio_alpha,
-            self.cost_ratio_beta,
-            # Bayesian Params
-            self.q_var_opex_loc,
-            self.q_var_opex_scale.trainable_variables[0],
-            self.q_base_opex_loc,
-            self.q_base_opex_scale.trainable_variables[0],
-            self.noise_sigma.trainable_variables[0],
-        ]
+        vars_to_train = (
+            [
+                # Policy params (unconstrained underlying variables via bijectors)
+                self.asset_growth.trainable_variables[0],
+                self.asset_maintain.trainable_variables[0],
+                self.depreciation_rate.trainable_variables[0],
+                self.advance_payments_sales_pct.trainable_variables[0],
+                self.advance_payments_purchases_pct.trainable_variables[0],
+                self.account_receivables_pct.trainable_variables[0],
+                self.account_payables_pct.trainable_variables[0],
+                self.inventory_pct.trainable_variables[0],
+                self.tl_alpha,
+                self.tl_beta,
+                self.tl_baseline,
+                # self.tl_baseline.trainable_variables[0],
+                self.cash_alpha,
+                self.cash_beta,
+                self.income_tax_pct.trainable_variables[0],
+                self.dividend_payout_ratio_pct.trainable_variables[0],
+                self.dividend_adjustment_speed.trainable_variables[0],
+                self.sb_baseline,
+                self.sb_ratio,
+                # ST Debt Params (Logit-Linear) — include only if data exists
+            ]
+            + (
+                [self.st_debt_alpha, self.st_debt_beta]
+                if historical_st_debt is not None
+                else []
+            )
+            + [
+                # Cost Ratio Params (Logit-Linear)
+                self.cost_ratio_alpha,
+                self.cost_ratio_beta,
+                # Bayesian Params
+                self.q_var_opex_loc,
+                self.q_var_opex_scale.trainable_variables[0],
+                self.q_base_opex_loc,
+                self.q_base_opex_scale.trainable_variables[0],
+                self.noise_sigma.trainable_variables[0],
+            ]
+        )
 
         vi_history = {
             "epochs": [],
@@ -752,15 +759,17 @@ class TrainableFinancialModel(tf.Module):
             f"Stock Buyback (baseline + ratio*depr): baseline={self.sb_baseline.numpy():.4f}, "
             f"ratio={self.sb_ratio.numpy():.6f}"
         )
-        print(
-            f"ST Debt % of Sales (logit-linear): alpha={self.st_debt_alpha.numpy():.4f}, "
-            f"beta={self.st_debt_beta.numpy():.6f}"
-        )
-        print(
-            f"  => %STDebt at t=0: {tf.sigmoid(self.st_debt_alpha).numpy():.4f}, "
-            f"%STDebt at t={len(historical_sales)-1}: "
-            f"{tf.sigmoid(self.st_debt_alpha + self.st_debt_beta * (len(historical_sales)-1)).numpy():.4f}"
-        )
+        if historical_st_debt is not None:
+            print(
+                f"ST Debt % of Sales (logit-linear): alpha={self.st_debt_alpha.numpy():.4f}, "
+                f"beta={self.st_debt_beta.numpy():.6f}"
+            )
+            print(
+                f"  => %STDebt at t=0: {tf.sigmoid(self.st_debt_alpha).numpy():.4f}, "
+                f"%STDebt at t={len(historical_sales)-1}: "
+                f"{tf.sigmoid(self.st_debt_alpha + self.st_debt_beta * (len(historical_sales)-1)).numpy():.4f}"
+            )
+
         print(
             f"Cost Ratio (logit-linear): alpha={self.cost_ratio_alpha.numpy():.4f}, "
             f"beta={self.cost_ratio_beta.numpy():.4f}"
@@ -920,6 +929,7 @@ class TrainableFinancialModel(tf.Module):
         historical_current_liabilities,
         historical_non_current_liabilities,
         historical_equity,
+        historical_st_debt=None,
         historical_inflation=None,
         historical_years=None,
         learning_rate=0.001,
@@ -972,6 +982,15 @@ class TrainableFinancialModel(tf.Module):
             self.ef_alpha,
             self.ef_beta,
         ]
+
+        if historical_st_debt is None:
+            vars_to_train.extend(
+                [
+                    # ST Debt Params (Logit-Linear)
+                    self.st_debt_alpha,
+                    self.st_debt_beta,
+                ]
+            )
 
         structural_history = {
             "epochs": [],
@@ -1068,6 +1087,16 @@ class TrainableFinancialModel(tf.Module):
             f"%EF at t={num_transitions}: "
             f"{tf.sigmoid(self.ef_alpha + self.ef_beta * num_transitions).numpy():.4f}"
         )
+        if historical_st_debt is None:
+            print(
+                f"ST Debt % of Sales (logit-linear): alpha={self.st_debt_alpha.numpy():.4f}, "
+                f"beta={self.st_debt_beta.numpy():.6f}"
+            )
+            print(
+                f"  => %STDebt at t=0: {tf.sigmoid(self.st_debt_alpha).numpy():.4f}, "
+                f"%STDebt at t={len(historical_sales)-1}: "
+                f"{tf.sigmoid(self.st_debt_alpha + self.st_debt_beta * (len(historical_sales)-1)).numpy():.4f}"
+            )
         print("-" * 50)
 
         # --- Structural Parameters Training Diagnostics ---
@@ -2103,7 +2132,7 @@ def plot_historical_and_forecast(
         label = display_names.get(name, name)
 
         # Historical actual data
-        if name in historical_data:
+        if name in historical_data and historical_data[name] is not None:
             ax.plot(
                 historical_years,
                 historical_data[name],
@@ -2230,7 +2259,9 @@ def run_training_and_forecast(
     stock_buyback_hist_bil = stock_buyback_hist / amount_scale
     opex_hist_bil = opex_hist / amount_scale
     tax_hist_bil = tax_hist / amount_scale
-    st_debt_hist_bil = st_debt_hist / amount_scale
+    st_debt_hist_bil = None
+    if st_debt_hist is not None:
+        st_debt_hist_bil = st_debt_hist / amount_scale
     current_liabilities_hist_bil = current_liabilities_hist / amount_scale
     non_current_liabilities_hist_bil = non_current_liabilities_hist / amount_scale
     equity_hist_bil = equity_hist / amount_scale
@@ -2263,7 +2294,9 @@ def run_training_and_forecast(
             stock_buyback_hist_bil[:-1],
             opex_hist_bil[:-1],
             tax_hist_bil[:-1],
-            historical_st_debt=st_debt_hist_bil[:-1],
+            historical_st_debt=(
+                None if st_debt_hist_bil is None else st_debt_hist_bil[:-1]
+            ),
             historical_inflation=inflation_hist[:-1],
             historical_years=train_years,
             show_plot=False,
@@ -2289,6 +2322,7 @@ def run_training_and_forecast(
             current_liabilities_hist_bil[:-1],
             non_current_liabilities_hist_bil[:-1],
             equity_hist_bil[:-1],
+            (None if st_debt_hist_bil is None else st_debt_hist_bil[:-1]),
             inflation_hist[:-1],
             train_years,
         )
@@ -2393,28 +2427,32 @@ def run_training_and_forecast(
     n_hist_points = len(sales_hist)
     cum_inf_hist = np.cumprod(1 + inflation_hist)
 
-    hist_fit_keys = [
-        "net_income",
-        "total_assets",
-        "nca",
-        "advance_payments_purchases",
-        "accounts_receivable",
-        "inventory",
-        "cash",
-        "investment_in_market_securities",
-        "accounts_payable",
-        "advance_payments_sales",
-        "current_liabilities",
-        "non_current_liabilities",
-        "equity",
-        "depreciation",
-        "dividends",
-        "stock_buyback",
-        "new_short_term_loan",
-        "new_long_term_loan",
-        "equity_financing",
-        "liquidity_deficit_st",
-    ]
+    hist_fit_keys = (
+        [
+            "net_income",
+            "total_assets",
+            "nca",
+            "advance_payments_purchases",
+            "accounts_receivable",
+            "inventory",
+            "cash",
+            "investment_in_market_securities",
+            "accounts_payable",
+            "advance_payments_sales",
+            "current_liabilities",
+            "non_current_liabilities",
+            "equity",
+            "depreciation",
+            "dividends",
+            "stock_buyback",
+        ]
+        + (["new_short_term_loan"] if st_debt_hist_bil is not None else [])
+        + [
+            "new_long_term_loan",
+            "equity_financing",
+            "liquidity_deficit_st",
+        ]
+    )
     historical_fit = {k: [] for k in hist_fit_keys}
     historical_fit_years = []
 
@@ -2500,9 +2538,10 @@ def run_training_and_forecast(
         historical_fit["stock_buyback"].append(
             float(pred["stock_buyback"].numpy()) * amount_scale
         )
-        historical_fit["new_short_term_loan"].append(
-            float(pred["new_short_term_loan"].numpy()) * amount_scale
-        )
+        if st_debt_hist_bil is not None:
+            historical_fit["new_short_term_loan"].append(
+                float(pred["new_short_term_loan"].numpy()) * amount_scale
+            )
         historical_fit["new_long_term_loan"].append(
             float(pred["new_long_term_loan"].numpy()) * amount_scale
         )
@@ -2567,7 +2606,7 @@ def run_training_and_forecast(
         "depreciation": depr_hist,
         "dividends": dividends_hist,
         "stock_buyback": stock_buyback_hist,
-        "new_short_term_loan": st_debt_hist,
+        "new_short_term_loan": st_debt_hist if st_debt_hist_bil is not None else None,
     }
 
     # Sales forecast in USD for the forecasted years
