@@ -1,0 +1,55 @@
+{
+  "schema_version": "1.0",
+  "fields": [
+    "total_assets",
+    "advance_payments_for_purchases",
+    "accounts_receivable",
+    "inventory",
+    "cash",
+    "investment_in_market_securities",
+    "total_non_current_liabilities",
+    "total_current_liabilities",
+    "accounts_payable",
+    "advance_payments_from_sales",
+    "total_equity"
+  ],
+  "statement": {
+    "company_id": "exxon_2024",
+    "statement_type": "consolidated-balance-sheet",
+    "periods": [
+      {
+        "period": "December 31, 2024",
+        "values": {
+          "total_assets": 453475.0,
+          "advance_payments_for_purchases": null,
+          "accounts_receivable": 43681.0,
+          "inventory": 23524.0,
+          "cash": 23187.0,
+          "investment_in_market_securities": null,
+          "total_non_current_liabilities": 112562.0,
+          "total_current_liabilities": 70307.0,
+          "accounts_payable": 61297.0,
+          "advance_payments_from_sales": null,
+          "total_equity": 270606.0
+        }
+      },
+      {
+        "period": "December 31, 2023",
+        "values": {
+          "total_assets": 376317.0,
+          "advance_payments_for_purchases": null,
+          "accounts_receivable": 38015.0,
+          "inventory": 25120.0,
+          "cash": 31568.0,
+          "investment_in_market_securities": null,
+          "total_non_current_liabilities": 98463.0,
+          "total_current_liabilities": 65316.0,
+          "accounts_payable": 58037.0,
+          "advance_payments_from_sales": null,
+          "total_equity": 212538.0
+        }
+      }
+    ],
+    "source_file": "extracted_text/exxon_2024.consolidated-balance-sheet.llm.json"
+  }
+}

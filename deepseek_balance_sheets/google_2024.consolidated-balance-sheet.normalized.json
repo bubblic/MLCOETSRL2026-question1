@@ -1,0 +1,65 @@
+{
+  "schema_version": "1.0",
+  "fields": [
+    "total_assets",
+    "advance_payments_for_purchases",
+    "accounts_receivable",
+    "inventory",
+    "cash",
+    "investment_in_securities",
+    "total_liabilities",
+    "total_non_current_liabilities",
+    "total_current_liabilities",
+    "accounts_payable_and_or_other_liabilities",
+    "advance_payments_from_sales",
+    "short_term_debt",
+    "long_term_debt",
+    "total_equity"
+  ],
+  "statement": {
+    "company_id": "google_2024",
+    "statement_type": "consolidated-balance-sheet",
+    "periods": [
+      {
+        "period": "2023",
+        "values": {
+          "total_assets": 402392.0,
+          "advance_payments_for_purchases": null,
+          "accounts_receivable": 47964.0,
+          "inventory": null,
+          "cash": 24048.0,
+          "investment_in_securities": 86868.0,
+          "total_liabilities": 119013.0,
+          "total_non_current_liabilities": 37199.0,
+          "total_current_liabilities": 81814.0,
+          "accounts_payable_and_or_other_liabilities": 7493.0,
+          "advance_payments_from_sales": 4137.0,
+          "short_term_debt": null,
+          "long_term_debt": 11870.0,
+          "total_equity": 283379.0
+        }
+      },
+      {
+        "period": "2024",
+        "values": {
+          "total_assets": 450256.0,
+          "advance_payments_for_purchases": null,
+          "accounts_receivable": 52340.0,
+          "inventory": null,
+          "cash": 23466.0,
+          "investment_in_securities": 72191.0,
+          "total_liabilities": 125172.0,
+          "total_non_current_liabilities": 36050.0,
+          "total_current_liabilities": 89122.0,
+          "accounts_payable_and_or_other_liabilities": 7987.0,
+          "advance_payments_from_sales": 5036.0,
+          "short_term_debt": null,
+          "long_term_debt": 10883.0,
+          "total_equity": 325084.0
+        }
+      }
+    ],
+    "notes": "1. 'Marketable securities' mapped to 'investment_in_securities'. 2. 'Non-marketable securities' (non-current) not mapped to 'investment_in_securities' as they are typically less liquid; they are part of total assets but not broken out in the schema. 3. 'Total non-current liabilities' calculated as sum of: Long-term debt + Income taxes payable, non-current + Operating lease liabilities + Other long-term liabilities. 4. 'Deferred revenue' mapped to 'advance_payments_from_sales'. 5. No inventory or short-term debt line items present in statement. 6. 'Accrued expenses and other current liabilities' not mapped to 'accounts_payable_and_or_other_liabilities' as they are distinct from trade payables; only 'Accounts payable' mapped to that field. 7. 'Other current assets' and 'Other non-current assets' not specifically mapped to schema fields.",
+    "source_file": "extracted_text/google_2024.consolidated-balance-sheet.llm.json"
+  }
+}

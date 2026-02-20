@@ -1,0 +1,76 @@
+{
+  "schema_version": "1.0",
+  "fields": [
+    "total_assets",
+    "advance_payments_for_purchases",
+    "accounts_receivable",
+    "inventory",
+    "cash",
+    "investment_in_securities",
+    "total_liabilities",
+    "total_non_current_liabilities",
+    "total_current_liabilities",
+    "accounts_payable_and_or_other_liabilities",
+    "advance_payments_from_sales",
+    "total_equity"
+  ],
+  "statement": {
+    "company_id": "lvmh_dec_2024",
+    "statement_type": "consolidated-balance-sheet",
+    "periods": [
+      {
+        "period": "2024",
+        "values": {
+          "total_assets": 149190.0,
+          "advance_payments_for_purchases": null,
+          "accounts_receivable": 4730.0,
+          "inventory": 23669.0,
+          "cash": 9631.0,
+          "investment_in_securities": 1632.0,
+          "total_liabilities": 79903.0,
+          "total_non_current_liabilities": 46207.0,
+          "total_current_liabilities": 33696.0,
+          "accounts_payable_and_or_other_liabilities": 18642.0,
+          "advance_payments_from_sales": null,
+          "total_equity": 69287.0
+        }
+      },
+      {
+        "period": "2023",
+        "values": {
+          "total_assets": 143694.0,
+          "advance_payments_for_purchases": null,
+          "accounts_receivable": 4728.0,
+          "inventory": 22952.0,
+          "cash": 7774.0,
+          "investment_in_securities": 1363.0,
+          "total_liabilities": 80993.0,
+          "total_non_current_liabilities": 47848.0,
+          "total_current_liabilities": 33145.0,
+          "accounts_payable_and_or_other_liabilities": 18589.0,
+          "advance_payments_from_sales": null,
+          "total_equity": 62701.0
+        }
+      },
+      {
+        "period": "2022",
+        "values": {
+          "total_assets": 134646.0,
+          "advance_payments_for_purchases": null,
+          "accounts_receivable": 4258.0,
+          "inventory": 20319.0,
+          "cash": 7300.0,
+          "investment_in_securities": 1109.0,
+          "total_liabilities": 78041.0,
+          "total_non_current_liabilities": 46498.0,
+          "total_current_liabilities": 31543.0,
+          "accounts_payable_and_or_other_liabilities": 18341.0,
+          "advance_payments_from_sales": null,
+          "total_equity": 56604.0
+        }
+      }
+    ],
+    "notes": "Mapped 'Trade accounts receivable' to 'accounts_receivable'. Mapped 'Inventories and work in progress' to 'inventory'. Mapped 'Cash and cash equivalents' to 'cash'. Mapped 'Non-current available for sale financial assets' to 'investment_in_securities'. 'total_liabilities' calculated as sum of Non-current liabilities and Current liabilities from the statement, which balances with Total assets minus Total equity. 'accounts_payable_and_or_other_liabilities' calculated as sum of 'Trade accounts payable' and 'Current provisions and other liabilities'. Fields 'advance_payments_for_purchases' and 'advance_payments_from_sales' not found in statement.",
+    "source_file": "extracted_text/lvmh_dec_2024.consolidated-balance-sheet.llm.json"
+  }
+}

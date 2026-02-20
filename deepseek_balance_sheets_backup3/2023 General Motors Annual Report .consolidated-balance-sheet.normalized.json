@@ -1,0 +1,59 @@
+{
+  "schema_version": "1.0",
+  "fields": [
+    "total_assets",
+    "advance_payments_for_purchases",
+    "accounts_receivable",
+    "inventory",
+    "cash",
+    "investment_in_securities",
+    "total_liabilities",
+    "total_non_current_liabilities",
+    "total_current_liabilities",
+    "accounts_payable_and_or_other_liabilities",
+    "advance_payments_from_sales",
+    "total_equity"
+  ],
+  "statement": {
+    "company_id": "2023 General Motors Annual Report",
+    "statement_type": "consolidated-balance-sheet",
+    "periods": [
+      {
+        "period": "December 31, 2023",
+        "values": {
+          "total_assets": 273064.0,
+          "advance_payments_for_purchases": null,
+          "accounts_receivable": 12378.0,
+          "inventory": 16461.0,
+          "cash": 18853.0,
+          "investment_in_securities": 7613.0,
+          "total_liabilities": 204757.0,
+          "total_non_current_liabilities": 110312.0,
+          "total_current_liabilities": 94445.0,
+          "accounts_payable_and_or_other_liabilities": 55193.0,
+          "advance_payments_from_sales": null,
+          "total_equity": 68189.0
+        }
+      },
+      {
+        "period": "December 31, 2022",
+        "values": {
+          "total_assets": 264037.0,
+          "advance_payments_for_purchases": null,
+          "accounts_receivable": 13333.0,
+          "inventory": 15366.0,
+          "cash": 19153.0,
+          "investment_in_securities": 12150.0,
+          "total_liabilities": 191752.0,
+          "total_non_current_liabilities": 100579.0,
+          "total_current_liabilities": 91173.0,
+          "accounts_payable_and_or_other_liabilities": 52396.0,
+          "advance_payments_from_sales": null,
+          "total_equity": 71927.0
+        }
+      }
+    ],
+    "notes": "Mapped 'Accounts and notes receivable, net' to accounts_receivable (excluding GM Financial receivables, which are financing receivables). Mapped 'Marketable debt securities' to investment_in_securities. For accounts_payable_and_or_other_liabilities, used the sum of 'Accounts payable' and 'Accrued liabilities' (excluding debt portions) as these represent trade payables and other operational liabilities. 'Advance payments for purchases' and 'advance payments from sales' not found in statement. GM Financial receivables ($39,076 current, $45,043 non-current for 2023) were not mapped to accounts_receivable as they appear to be financing receivables. Equipment on operating leases ($30,582 for 2023) not mapped to any field as it's a specialized asset for an automotive financing business. Total equity includes noncontrolling interests.",
+    "source_file": "extracted_text/2023 General Motors Annual Report .consolidated-balance-sheet.llm.json"
+  }
+}

@@ -1,0 +1,55 @@
+{
+  "schema_version": "1.0",
+  "fields": [
+    "total_assets",
+    "advance_payments_for_purchases",
+    "accounts_receivable",
+    "inventory",
+    "cash",
+    "investment_in_market_securities",
+    "total_non_current_liabilities",
+    "total_current_liabilities",
+    "accounts_payable",
+    "advance_payments_from_sales",
+    "total_equity"
+  ],
+  "statement": {
+    "company_id": "microsoft_2025",
+    "statement_type": "consolidated-balance-sheet",
+    "periods": [
+      {
+        "period": "June 30, 2025",
+        "values": {
+          "total_assets": 619003.0,
+          "advance_payments_for_purchases": null,
+          "accounts_receivable": 69905.0,
+          "inventory": 938.0,
+          "cash": 30242.0,
+          "investment_in_market_securities": 64323.0,
+          "total_non_current_liabilities": 134306.0,
+          "total_current_liabilities": 141218.0,
+          "accounts_payable": 27724.0,
+          "advance_payments_from_sales": null,
+          "total_equity": 343479.0
+        }
+      },
+      {
+        "period": "June 30, 2024",
+        "values": {
+          "total_assets": 512163.0,
+          "advance_payments_for_purchases": null,
+          "accounts_receivable": 56924.0,
+          "inventory": 1246.0,
+          "cash": 18315.0,
+          "investment_in_market_securities": 57228.0,
+          "total_non_current_liabilities": 118400.0,
+          "total_current_liabilities": 125286.0,
+          "accounts_payable": 21996.0,
+          "advance_payments_from_sales": null,
+          "total_equity": 268477.0
+        }
+      }
+    ],
+    "source_file": "extracted_text/microsoft_2025.consolidated-balance-sheet.llm.json"
+  }
+}

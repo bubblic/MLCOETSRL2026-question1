@@ -1,0 +1,65 @@
+{
+  "schema_version": "1.0",
+  "fields": [
+    "total_assets",
+    "advance_payments_for_purchases",
+    "accounts_receivable",
+    "inventory",
+    "cash",
+    "investment_in_securities",
+    "total_liabilities",
+    "total_non_current_liabilities",
+    "total_current_liabilities",
+    "accounts_payable_and_or_other_liabilities",
+    "advance_payments_from_sales",
+    "short_term_debt",
+    "long_term_debt",
+    "total_equity"
+  ],
+  "statement": {
+    "company_id": "tencent_2024",
+    "statement_type": "consolidated-balance-sheet",
+    "periods": [
+      {
+        "period": "2024",
+        "values": {
+          "total_assets": 1780995.0,
+          "advance_payments_for_purchases": 101044.0,
+          "accounts_receivable": 48203.0,
+          "inventory": 440.0,
+          "cash": 132519.0,
+          "investment_in_securities": 823513.0,
+          "total_liabilities": 727099.0,
+          "total_non_current_liabilities": 330190.0,
+          "total_current_liabilities": 396909.0,
+          "accounts_payable_and_or_other_liabilities": 202744.0,
+          "advance_payments_from_sales": 106333.0,
+          "short_term_debt": 61508.0,
+          "long_term_debt": 277107.0,
+          "total_equity": 1053896.0
+        }
+      },
+      {
+        "period": "2023",
+        "values": {
+          "total_assets": 1577246.0,
+          "advance_payments_for_purchases": 88411.0,
+          "accounts_receivable": 46606.0,
+          "inventory": 456.0,
+          "cash": 172320.0,
+          "investment_in_securities": 710140.0,
+          "total_liabilities": 703565.0,
+          "total_non_current_liabilities": 351408.0,
+          "total_current_liabilities": 352157.0,
+          "accounts_payable_and_or_other_liabilities": 177543.0,
+          "advance_payments_from_sales": 89603.0,
+          "short_term_debt": 55698.0,
+          "long_term_debt": 292920.0,
+          "total_equity": 873681.0
+        }
+      }
+    ],
+    "notes": "Mapping notes: 1) 'advance_payments_for_purchases' mapped to 'Prepayments, deposits and other assets' under Current Assets. 2) 'cash' mapped to 'Cash and cash equivalents' only (excludes 'Restricted cash' and 'Term deposits' which are reported separately). 3) 'investment_in_securities' is the sum of: 'Investments in associates', 'Investments in joint ventures', 'Financial assets at fair value through profit or loss' (both current and non-current), 'Financial assets at fair value through other comprehensive income' (both current and non-current), and 'Other financial assets' (both current and non-current). 4) 'short_term_debt' is the sum of 'Borrowings' and 'Notes payable' under Current Liabilities. 5) 'long_term_debt' is the sum of 'Borrowings' and 'Notes payable' under Non-current Liabilities. 6) 'accounts_payable_and_or_other_liabilities' is the sum of 'Accounts payable' and 'Other payables and accruals'. 7) 'advance_payments_from_sales' is the sum of 'Deferred revenue' under both Current and Non-current Liabilities.",
+    "source_file": "extracted_text/tencent_2024.consolidated-balance-sheet.llm.json"
+  }
+}

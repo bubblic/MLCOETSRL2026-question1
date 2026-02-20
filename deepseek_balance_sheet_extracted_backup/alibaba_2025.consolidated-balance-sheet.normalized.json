@@ -1,0 +1,71 @@
+{
+  "schema_version": "1.0",
+  "fields": [
+    "total_assets",
+    "advance_payments_for_purchases",
+    "accounts_receivable",
+    "inventory",
+    "cash",
+    "investment_in_market_securities",
+    "total_non_current_liabilities",
+    "total_current_liabilities",
+    "accounts_payable",
+    "advance_payments_from_sales",
+    "total_equity"
+  ],
+  "statement": {
+    "company_id": "alibaba_2025",
+    "statement_type": "consolidated-balance-sheet",
+    "periods": [
+      {
+        "period": "2024 (RMB million)",
+        "values": {
+          "total_assets": 1764829.0,
+          "advance_payments_for_purchases": null,
+          "accounts_receivable": null,
+          "inventory": null,
+          "cash": 248125.0,
+          "investment_in_market_securities": 262955.0,
+          "total_non_current_liabilities": 230723.0,
+          "total_current_liabilities": 421507.0,
+          "accounts_payable": 297883.0,
+          "advance_payments_from_sales": 72818.0,
+          "total_equity": 1101871.0
+        }
+      },
+      {
+        "period": "2025 (RMB million)",
+        "values": {
+          "total_assets": 1804227.0,
+          "advance_payments_for_purchases": null,
+          "accounts_receivable": null,
+          "inventory": null,
+          "cash": 145487.0,
+          "investment_in_market_securities": 228826.0,
+          "total_non_current_liabilities": 278775.0,
+          "total_current_liabilities": 435346.0,
+          "accounts_payable": 332537.0,
+          "advance_payments_from_sales": 68335.0,
+          "total_equity": 1078393.0
+        }
+      },
+      {
+        "period": "2025 (USD million)",
+        "values": {
+          "total_assets": 248629.0,
+          "advance_payments_for_purchases": null,
+          "accounts_receivable": null,
+          "inventory": null,
+          "cash": 20049.0,
+          "investment_in_market_securities": 31533.0,
+          "total_non_current_liabilities": 38417.0,
+          "total_current_liabilities": 59992.0,
+          "accounts_payable": 45825.0,
+          "advance_payments_from_sales": 9417.0,
+          "total_equity": 148607.0
+        }
+      }
+    ],
+    "source_file": "extracted_text/alibaba_2025.consolidated-balance-sheet.llm.json"
+  }
+}

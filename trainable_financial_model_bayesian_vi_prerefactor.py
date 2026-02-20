@@ -11,6 +11,14 @@ tfd = tfp.distributions
 tfb = tfp.bijectors
 
 
+TRAINING_RESULTS_DIR = "training_results"
+
+
+def _get_training_results_path(filename):
+    os.makedirs(TRAINING_RESULTS_DIR, exist_ok=True)
+    return os.path.join(TRAINING_RESULTS_DIR, filename)
+
+
 # --- 1. Define the Trainable Model ---
 class TrainableFinancialModel(tf.Module):
     def __init__(self, base_year=2018):
@@ -842,7 +850,10 @@ class TrainableFinancialModel(tf.Module):
             fig.suptitle("Variational Inference Parameters and Loss Over Epochs")
             plt.tight_layout()
             timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-            plt.savefig(f"vi_training_diagnostics_{timestamp}.png", dpi=150)
+            plot_path = _get_training_results_path(
+                f"vi_training_diagnostics_{timestamp}.png"
+            )
+            plt.savefig(plot_path, dpi=150)
             if show_plot:
                 plt.show()
             else:
@@ -904,7 +915,10 @@ class TrainableFinancialModel(tf.Module):
             fig.suptitle("Simple Parameters Training Diagnostics")
             plt.tight_layout()
             timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-            plt.savefig(f"simple_training_diagnostics_{timestamp}.png", dpi=150)
+            plot_path = _get_training_results_path(
+                f"simple_training_diagnostics_{timestamp}.png"
+            )
+            plt.savefig(plot_path, dpi=150)
             if show_plot:
                 plt.show()
             else:
@@ -1135,7 +1149,10 @@ class TrainableFinancialModel(tf.Module):
             fig.suptitle("Structural Parameters Training Diagnostics")
             plt.tight_layout()
             timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-            plt.savefig(f"structural_training_diagnostics_{timestamp}.png", dpi=150)
+            plot_path = _get_training_results_path(
+                f"structural_training_diagnostics_{timestamp}.png"
+            )
+            plt.savefig(plot_path, dpi=150)
             if show_plot:
                 plt.show()
             else:
@@ -1887,7 +1904,10 @@ def plot_opex_fit_with_aleatoric_noise(
     plt.tight_layout()
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     tag = "gaussian_ci" if use_gaussian_ci else "monte_carlo"
-    plt.savefig(f"opex_probabilistic_fit_{timestamp}_{tag}.png", dpi=150)
+    plot_path = _get_training_results_path(
+        f"opex_probabilistic_fit_{timestamp}_{tag}.png"
+    )
+    plt.savefig(plot_path, dpi=150)
     if show_plot:
         plt.show()
     else:
@@ -2012,7 +2032,8 @@ def plot_opex_fit_with_aleatoric_noise(
     plt.tight_layout()
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     tag = "gaussian_ci" if use_gaussian_ci else "monte_carlo"
-    plt.savefig(f"opex_vs_sales_fit_{timestamp}_{tag}.png", dpi=150)
+    plot_path = _get_training_results_path(f"opex_vs_sales_fit_{timestamp}_{tag}.png")
+    plt.savefig(plot_path, dpi=150)
     if show_plot:
         plt.show()
     else:
@@ -2198,8 +2219,9 @@ def plot_historical_and_forecast(
     )
     plt.tight_layout()
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    plt.savefig(f"all_elements_forecast_{timestamp}.png", dpi=150, bbox_inches="tight")
-    print(f"\nPlot saved: all_elements_forecast_{timestamp}.png")
+    plot_path = _get_training_results_path(f"all_elements_forecast_{timestamp}.png")
+    plt.savefig(plot_path, dpi=150, bbox_inches="tight")
+    print(f"\nPlot saved: {plot_path}")
     if show_plot:
         plt.show()
     else:

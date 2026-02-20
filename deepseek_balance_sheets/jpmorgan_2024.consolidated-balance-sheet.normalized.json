@@ -1,0 +1,65 @@
+{
+  "schema_version": "1.0",
+  "fields": [
+    "total_assets",
+    "advance_payments_for_purchases",
+    "accounts_receivable",
+    "inventory",
+    "cash",
+    "investment_in_securities",
+    "total_liabilities",
+    "total_non_current_liabilities",
+    "total_current_liabilities",
+    "accounts_payable_and_or_other_liabilities",
+    "advance_payments_from_sales",
+    "short_term_debt",
+    "long_term_debt",
+    "total_equity"
+  ],
+  "statement": {
+    "company_id": "jpmorgan_2024",
+    "statement_type": "consolidated-balance-sheet",
+    "periods": [
+      {
+        "period": "2024",
+        "values": {
+          "total_assets": 4002814.0,
+          "advance_payments_for_purchases": null,
+          "accounts_receivable": 101223.0,
+          "inventory": null,
+          "cash": 23372.0,
+          "investment_in_securities": 681320.0,
+          "total_liabilities": 3658056.0,
+          "total_non_current_liabilities": null,
+          "total_current_liabilities": null,
+          "accounts_payable_and_or_other_liabilities": 280672.0,
+          "advance_payments_from_sales": null,
+          "short_term_debt": 52893.0,
+          "long_term_debt": 401418.0,
+          "total_equity": 344758.0
+        }
+      },
+      {
+        "period": "2023",
+        "values": {
+          "total_assets": 3875393.0,
+          "advance_payments_for_purchases": null,
+          "accounts_receivable": 107363.0,
+          "inventory": null,
+          "cash": 29066.0,
+          "investment_in_securities": 571552.0,
+          "total_liabilities": 3547515.0,
+          "total_non_current_liabilities": null,
+          "total_current_liabilities": null,
+          "accounts_payable_and_or_other_liabilities": 290307.0,
+          "advance_payments_from_sales": null,
+          "short_term_debt": 44712.0,
+          "long_term_debt": 391825.0,
+          "total_equity": 327878.0
+        }
+      }
+    ],
+    "notes": "Extraction for a banking institution. 'Cash' mapped to 'Cash and due from banks'. 'Accounts receivable' mapped to 'Accrued interest and accounts receivable'. 'Investment in securities' mapped to 'Investment securities, net of allowance for credit losses' (which is the sum of AFS and HTM securities). 'Short-term debt' mapped to 'Short-term borrowings'. 'Long-term debt' as given. 'Accounts payable and/or other liabilities' mapped to 'Accounts payable and other liabilities'. Fields 'total_non_current_liabilities' and 'total_current_liabilities' are null as the balance sheet does not provide these aggregates separately. 'Advance_payments_for_purchases' and 'advance_payments_from_sales' are not typical banking line items and were not found. 'Inventory' is not applicable for a bank.",
+    "source_file": "extracted_text/jpmorgan_2024.consolidated-balance-sheet.llm.json"
+  }
+}

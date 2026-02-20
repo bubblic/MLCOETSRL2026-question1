@@ -1,0 +1,55 @@
+{
+  "schema_version": "1.0",
+  "fields": [
+    "total_assets",
+    "advance_payments_for_purchases",
+    "accounts_receivable",
+    "inventory",
+    "cash",
+    "investment_in_market_securities",
+    "total_non_current_liabilities",
+    "total_current_liabilities",
+    "accounts_payable",
+    "advance_payments_from_sales",
+    "total_equity"
+  ],
+  "statement": {
+    "company_id": "volkswagen_2024",
+    "statement_type": "consolidated-balance-sheet",
+    "periods": [
+      {
+        "period": "Dec. 31, 2024",
+        "values": {
+          "total_assets": 632905.0,
+          "advance_payments_for_purchases": null,
+          "accounts_receivable": 21130.0,
+          "inventory": 56720.0,
+          "cash": 40296.0,
+          "investment_in_market_securities": 27326.0,
+          "total_non_current_liabilities": 219134.0,
+          "total_current_liabilities": 217039.0,
+          "accounts_payable": 29772.0,
+          "advance_payments_from_sales": null,
+          "total_equity": 196731.0
+        }
+      },
+      {
+        "period": "Dec. 31, 2023",
+        "values": {
+          "total_assets": 600649.0,
+          "advance_payments_for_purchases": null,
+          "accounts_receivable": 21849.0,
+          "inventory": 53601.0,
+          "cash": 43449.0,
+          "investment_in_market_securities": 26772.0,
+          "total_non_current_liabilities": 205427.0,
+          "total_current_liabilities": 206036.0,
+          "accounts_payable": 30901.0,
+          "advance_payments_from_sales": null,
+          "total_equity": 189186.0
+        }
+      }
+    ],
+    "source_file": "extracted_text/volkswagen_2024.consolidated-balance-sheet.llm.json"
+  }
+}
