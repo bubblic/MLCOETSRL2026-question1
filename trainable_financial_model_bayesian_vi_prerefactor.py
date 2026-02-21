@@ -1460,6 +1460,9 @@ class TrainableFinancialModel(tf.Module):
             "current_liabilities": current_liabilities_curr,
             "non_current_liabilities": non_current_liabilities_curr,
             "equity": equity_curr,
+            "cogs": cogs,
+            "opex": opex,
+            "tax": tax,
             "net_income": net_income_curr,
             "depreciation": depreciation,
             "dividends": dividends_prev,
@@ -1500,6 +1503,9 @@ def run_monte_carlo_forecast(
     ap_trajectories = []
     aps_trajectories = []
     depreciation_trajectories = []
+    cogs_trajectories = []
+    opex_trajectories = []
+    tax_trajectories = []
     dividends_trajectories = []
     stock_buyback_trajectories = []
     new_st_loan_trajectories = []
@@ -1523,6 +1529,9 @@ def run_monte_carlo_forecast(
         sample_ap = []
         sample_aps = []
         sample_depr = []
+        sample_cogs = []
+        sample_opex = []
+        sample_tax = []
         sample_div = []
         sample_bb = []
         sample_new_st = []
@@ -1565,6 +1574,9 @@ def run_monte_carlo_forecast(
             sample_ap.append(current_state["accounts_payable"].numpy())
             sample_aps.append(current_state["advance_payments_sales"].numpy())
             sample_depr.append(current_state["depreciation"].numpy())
+            sample_cogs.append(current_state["cogs"].numpy())
+            sample_opex.append(current_state["opex"].numpy())
+            sample_tax.append(current_state["tax"].numpy())
             sample_div.append(current_state["dividends"].numpy())
             sample_bb.append(current_state["stock_buyback"].numpy())
             sample_new_st.append(current_state["new_short_term_loan"].numpy())
@@ -1586,6 +1598,9 @@ def run_monte_carlo_forecast(
         ap_trajectories.append(sample_ap)
         aps_trajectories.append(sample_aps)
         depreciation_trajectories.append(sample_depr)
+        cogs_trajectories.append(sample_cogs)
+        opex_trajectories.append(sample_opex)
+        tax_trajectories.append(sample_tax)
         dividends_trajectories.append(sample_div)
         stock_buyback_trajectories.append(sample_bb)
         new_st_loan_trajectories.append(sample_new_st)
@@ -1609,6 +1624,9 @@ def run_monte_carlo_forecast(
     ap_trajectories = np.array(ap_trajectories)
     aps_trajectories = np.array(aps_trajectories)
     depreciation_trajectories = np.array(depreciation_trajectories)
+    cogs_trajectories = np.array(cogs_trajectories)
+    opex_trajectories = np.array(opex_trajectories)
+    tax_trajectories = np.array(tax_trajectories)
     dividends_trajectories = np.array(dividends_trajectories)
     stock_buyback_trajectories = np.array(stock_buyback_trajectories)
     new_st_loan_trajectories = np.array(new_st_loan_trajectories)
@@ -1651,6 +1669,9 @@ def run_monte_carlo_forecast(
     summarize_trajectories("Accounts Payable", ap_trajectories)
     summarize_trajectories("Advance Payments (Sales)", aps_trajectories)
     summarize_trajectories("Depreciation", depreciation_trajectories)
+    summarize_trajectories("COGS", cogs_trajectories)
+    summarize_trajectories("OpEx", opex_trajectories)
+    summarize_trajectories("Tax", tax_trajectories)
     summarize_trajectories("Dividends", dividends_trajectories)
     summarize_trajectories("Stock Buyback", stock_buyback_trajectories)
     summarize_trajectories("New Short-Term Loan", new_st_loan_trajectories)
@@ -1780,6 +1801,9 @@ def run_monte_carlo_forecast(
         "non_current_liabilities": non_current_liabilities_trajectories,
         "equity": equity_trajectories,
         "depreciation": depreciation_trajectories,
+        "cogs": cogs_trajectories,
+        "opex": opex_trajectories,
+        "tax": tax_trajectories,
         "dividends": dividends_trajectories,
         "stock_buyback": stock_buyback_trajectories,
         "new_short_term_loan": new_st_loan_trajectories,
@@ -2111,6 +2135,9 @@ def plot_historical_and_forecast(
         "new_long_term_loan": "New Long-Term Loan",
         "equity_financing": "Equity Financing",
         "liquidity_deficit_st": "Liquidity Deficit (Short-Term)",
+        "cogs": "COGS",
+        "opex": "OpEx",
+        "tax": "Tax",
     }
 
     ax_idx = 0
@@ -2465,6 +2492,9 @@ def run_training_and_forecast(
             "non_current_liabilities",
             "equity",
             "depreciation",
+            "cogs",
+            "opex",
+            "tax",
             "dividends",
             "stock_buyback",
         ]
@@ -2554,6 +2584,9 @@ def run_training_and_forecast(
         historical_fit["depreciation"].append(
             float(pred["depreciation"].numpy()) * amount_scale
         )
+        historical_fit["cogs"].append(float(pred["cogs"].numpy()) * amount_scale)
+        historical_fit["opex"].append(float(pred["opex"].numpy()) * amount_scale)
+        historical_fit["tax"].append(float(pred["tax"].numpy()) * amount_scale)
         historical_fit["dividends"].append(
             float(pred["dividends"].numpy()) * amount_scale
         )
@@ -2626,6 +2659,9 @@ def run_training_and_forecast(
         "non_current_liabilities": non_current_liabilities_hist,
         "equity": equity_hist,
         "depreciation": depr_hist,
+        "cogs": cogs_hist,
+        "opex": opex_hist,
+        "tax": tax_hist,
         "dividends": dividends_hist,
         "stock_buyback": stock_buyback_hist,
         "new_short_term_loan": st_debt_hist if st_debt_hist_bil is not None else None,
