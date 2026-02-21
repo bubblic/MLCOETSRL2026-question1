@@ -862,7 +862,7 @@ class TrainableFinancialModel(tf.Module):
         # --- Simple Parameters Training Diagnostics ---
         if plot_vi and simple_history["epochs"]:
             epochs_hist = np.array(simple_history["epochs"])
-            fig, axs = plt.subplots(3, 1, figsize=(10, 12), sharex=True)
+            fig, axs = plt.subplots(4, 1, figsize=(10, 15))
 
             # Panel 1: Total loss
             axs[0].plot(
@@ -911,6 +911,28 @@ class TrainableFinancialModel(tf.Module):
             axs[2].set_yscale("log")
             axs[2].legend(fontsize=8)
             axs[2].grid(True, alpha=0.3)
+
+            # Panel 4: Final fitted logit(CR) vs historical logit(CR)
+            if historical_years is not None:
+                cr_x = np.array(historical_years)
+                axs[3].set_xlabel("Year")
+            else:
+                cr_x = np.arange(len(historical_sales))
+                axs[3].set_xlabel("Time Index")
+            final_logit_cr_pred = (
+                self.cost_ratio_alpha + self.cost_ratio_beta * time_indices
+            )
+            axs[3].plot(cr_x, logit_cr_hist.numpy(), marker="o", label="logit_cr_hist")
+            axs[3].plot(
+                cr_x,
+                final_logit_cr_pred.numpy(),
+                marker="x",
+                linestyle="--",
+                label="logit_cr_pred",
+            )
+            axs[3].set_ylabel("logit(CR)")
+            axs[3].legend(fontsize=8)
+            axs[3].grid(True, alpha=0.3)
 
             fig.suptitle("Simple Parameters Training Diagnostics")
             plt.tight_layout()
