@@ -1185,6 +1185,8 @@ class TrainableFinancialModel(tf.Module):
         state,
         inputs,
         use_mean_opex=False,
+        sampled_var_opex=None,
+        sampled_base_opex=None,
     ):
         """
         Calculate t based on t-1 state and t inputs.
@@ -1285,8 +1287,17 @@ class TrainableFinancialModel(tf.Module):
             base_opex = self.q_base_opex_loc
             noise = 0.0
         else:
-            # Sample for Monte Carlo forecasting
-            var_opex, base_opex = self.sample_opex_params()
+            # Use trajectory-fixed structural parameters and sample only annual noise
+            var_opex = (
+                sampled_var_opex
+                if sampled_var_opex is not None
+                else self.q_var_opex_loc
+            )
+            base_opex = (
+                sampled_base_opex
+                if sampled_base_opex is not None
+                else self.q_base_opex_loc
+            )
             noise = tfd.Normal(0.0, self.noise_sigma).sample()
 
         # Center sales by subtracting the offset used during training
@@ -1537,6 +1548,8 @@ def run_monte_carlo_forecast(
 
     for i in range(n_samples):
         current_state = initial_state.copy()
+        # Sample this trajectory's structural OpEx parameters once
+        var_opex_sample, base_opex_sample = model.sample_opex_params()
         sample_ni = []
         sample_equity = []
         sample_assets = []
@@ -1572,6 +1585,8 @@ def run_monte_carlo_forecast(
                 current_state,
                 inputs,
                 use_mean_opex=False,
+                sampled_var_opex=var_opex_sample,
+                sampled_base_opex=base_opex_sample,
             )
 
             sample_ni.append(current_state["net_income"].numpy())
@@ -2473,14 +2488,18 @@ def run_training_and_forecast(
         last_hist_year, last_hist_year + n_forecast_years, dtype=np.float64
     )
 
-    # Year 1 to 4 inflation rate (2025-2028)
+    # Continue forecast inflation compounding from the historical baseline
+    cum_inf_hist = np.cumprod(1 + inflation_hist)
+    last_historical_cum_inf = cum_inf_hist[-1]
+
+    # Forecast inflation rate assumptions
     inflation_forecast = np.array(
         [0.03, 0.03, 0.03, 0.03, 0.03, 0.03, 0.03, 0.03, 0.03, 0.03],
         dtype=np.float64,
     )
     if not use_inflation:
         inflation_forecast = np.zeros_like(inflation_forecast)
-    cum_inf_forecast = np.cumprod(1 + inflation_forecast)
+    cum_inf_forecast = last_historical_cum_inf * np.cumprod(1 + inflation_forecast)
 
     # --- Execute Monte Carlo Forecast ---
     forecast_trajectories = run_monte_carlo_forecast(
@@ -2496,8 +2515,6 @@ def run_training_and_forecast(
     # For each year t+1, use actual state at t and predict state at t+1
     # This shows how well the model's learned parameters fit the historical data.
     n_hist_points = len(sales_hist)
-    cum_inf_hist = np.cumprod(1 + inflation_hist)
-
     hist_fit_keys = (
         [
             "net_income",
