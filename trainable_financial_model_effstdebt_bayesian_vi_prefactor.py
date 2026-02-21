@@ -1075,7 +1075,7 @@ class TrainableFinancialModel(tf.Module):
                     # Targets are values at t+1
                     loss_ni = tf.square(state_pred["net_income"] - ni_t[t + 1])
                     loss_cl = tf.square(
-                        state_pred["current_liabilities"] - eff_st_t[t + 1]
+                        state_pred["effective_st_debt"] - eff_st_t[t + 1]
                     )
                     loss_ncl = tf.square(
                         state_pred["non_current_liabilities"] - ncl_t[t + 1]
@@ -1095,7 +1095,7 @@ class TrainableFinancialModel(tf.Module):
                     # Total loss to minimize
                     total_loss += loss_ni + loss_cl + loss_ncl + loss_equity
                     total_loss_ni += loss_ni
-                    total_loss_cl += loss_cl
+                    # total_loss_cl += loss_cl
                     total_loss_ncl += loss_ncl
                     total_loss_equity += loss_equity
                     total_loss_interest += loss_interest
