@@ -1546,6 +1546,8 @@ def run_monte_carlo_forecast(
     cogs_trajectories = []
     opex_trajectories = []
     tax_trajectories = []
+    ms_return_trajectories = []
+    interest_payment_trajectories = []
     dividends_trajectories = []
     stock_buyback_trajectories = []
     # new_st_loan_trajectories = []
@@ -1575,6 +1577,8 @@ def run_monte_carlo_forecast(
         sample_cogs = []
         sample_opex = []
         sample_tax = []
+        sample_ms_return = []
+        sample_interest_payment = []
         sample_div = []
         sample_bb = []
         sample_curr_lt_debt = []
@@ -1623,6 +1627,8 @@ def run_monte_carlo_forecast(
             sample_cogs.append(current_state["cogs"].numpy())
             sample_opex.append(current_state["opex"].numpy())
             sample_tax.append(current_state["tax"].numpy())
+            sample_ms_return.append(current_state["ms_return"].numpy())
+            sample_interest_payment.append(current_state["interest_payment"].numpy())
             sample_div.append(current_state["dividends"].numpy())
             sample_bb.append(current_state["stock_buyback"].numpy())
             # sample_new_st.append(current_state["new_short_term_loan"].numpy())
@@ -1648,6 +1654,8 @@ def run_monte_carlo_forecast(
         cogs_trajectories.append(sample_cogs)
         opex_trajectories.append(sample_opex)
         tax_trajectories.append(sample_tax)
+        ms_return_trajectories.append(sample_ms_return)
+        interest_payment_trajectories.append(sample_interest_payment)
         dividends_trajectories.append(sample_div)
         stock_buyback_trajectories.append(sample_bb)
         # new_st_loan_trajectories.append(sample_new_st)
@@ -1675,6 +1683,8 @@ def run_monte_carlo_forecast(
     cogs_trajectories = np.array(cogs_trajectories)
     opex_trajectories = np.array(opex_trajectories)
     tax_trajectories = np.array(tax_trajectories)
+    ms_return_trajectories = np.array(ms_return_trajectories)
+    interest_payment_trajectories = np.array(interest_payment_trajectories)
     dividends_trajectories = np.array(dividends_trajectories)
     stock_buyback_trajectories = np.array(stock_buyback_trajectories)
     # new_st_loan_trajectories = np.array(new_st_loan_trajectories)
@@ -1721,6 +1731,8 @@ def run_monte_carlo_forecast(
     summarize_trajectories("COGS", cogs_trajectories)
     summarize_trajectories("OpEx", opex_trajectories)
     summarize_trajectories("Tax", tax_trajectories)
+    summarize_trajectories("Return on Market Securities", ms_return_trajectories)
+    summarize_trajectories("Interest Payment", interest_payment_trajectories)
     summarize_trajectories("Dividends", dividends_trajectories)
     summarize_trajectories("Stock Buyback", stock_buyback_trajectories)
     summarize_trajectories("Current Portion of LT debt", current_lt_debt_trajectories)
@@ -1857,6 +1869,8 @@ def run_monte_carlo_forecast(
         "cogs": cogs_trajectories,
         "opex": opex_trajectories,
         "tax": tax_trajectories,
+        "ms_return": ms_return_trajectories,
+        "interest_payment": interest_payment_trajectories,
         "dividends": dividends_trajectories,
         "stock_buyback": stock_buyback_trajectories,
         # "new_short_term_loan": new_st_loan_trajectories,
@@ -2184,6 +2198,8 @@ def plot_historical_and_forecast(
         "depreciation": "Depreciation",
         "dividends": "Dividends",
         "stock_buyback": "Stock Buyback",
+        "ms_return": "Return on Market Securities",
+        "interest_payment": "Interest Payment",
         "new_short_term_loan": "New Short-Term Loan",
         "new_long_term_loan": "New Long-Term Loan",
         "equity_financing": "Equity Financing",
@@ -2563,6 +2579,8 @@ def run_training_and_forecast(
         "cogs",
         "opex",
         "tax",
+        "ms_return",
+        "interest_payment",
         "dividends",
         "stock_buyback",
         "new_long_term_loan",
@@ -2655,6 +2673,10 @@ def run_training_and_forecast(
         historical_fit["cogs"].append(float(pred["cogs"].numpy()) * amount_scale)
         historical_fit["opex"].append(float(pred["opex"].numpy()) * amount_scale)
         historical_fit["tax"].append(float(pred["tax"].numpy()) * amount_scale)
+        historical_fit["ms_return"].append(float(pred["ms_return"].numpy()) * amount_scale)
+        historical_fit["interest_payment"].append(
+            float(pred["interest_payment"].numpy()) * amount_scale
+        )
         historical_fit["dividends"].append(
             float(pred["dividends"].numpy()) * amount_scale
         )
@@ -2729,6 +2751,8 @@ def run_training_and_forecast(
         "cogs": cogs_hist,
         "opex": opex_hist,
         "tax": tax_hist,
+        "ms_return": ms_return_hist,
+        "interest_payment": interest_payment_hist,
         "dividends": dividends_hist,
         "stock_buyback": stock_buyback_hist,
         "effective_st_debt": effective_st_debt_hist,
