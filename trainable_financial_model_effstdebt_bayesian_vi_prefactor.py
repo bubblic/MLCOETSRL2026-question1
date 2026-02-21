@@ -2409,7 +2409,7 @@ def run_training_and_forecast(
             stock_buyback_hist_bil[:-1],
             opex_hist_bil[:-1],
             tax_hist_bil[:-1],
-            historical_eff_st_debt=effective_st_debt_hist_bil,
+            historical_eff_st_debt=effective_st_debt_hist_bil[:-1],
             historical_inflation=inflation_hist[:-1],
             historical_years=train_years,
             show_plot=False,
