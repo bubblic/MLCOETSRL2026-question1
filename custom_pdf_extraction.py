@@ -6,7 +6,7 @@ from pathlib import Path
 
 from sentence_transformers import SentenceTransformer
 
-from azure_balance_sheet_model import AzureDeepSeekClient
+from azure_balance_sheet_model import AzureLLMClient
 from pdf_extractor.pdfplumber import extract_text_pdfplumber
 from pdf_extractor.pymupdf4llm import extract_text_pymupdf4llm
 
@@ -153,7 +153,7 @@ def detect_language_heuristic(pages: dict[int, str | None]) -> str:
 
 def detect_language(
     pages: dict[int, str | None],
-    client: AzureDeepSeekClient,
+    client: AzureLLMClient,
     message: str,
     parameters: dict[str, object],
 ) -> str:
@@ -193,7 +193,7 @@ def detect_language(
 
 
 def rewrite_query_with_llm(
-    client: AzureDeepSeekClient,
+    client: AzureLLMClient,
     query: str,
     document_language: str,
     toc_context: str,
@@ -257,7 +257,7 @@ def rank_pages_by_query(
 
 
 def deepseek_page_contains_query(
-    client: AzureDeepSeekClient,
+    client: AzureLLMClient,
     query: str,
     page_text: str,
     message: str,
@@ -278,7 +278,7 @@ def deepseek_page_contains_query(
 
 
 def deepseek_format_balance_sheet(
-    client: AzureDeepSeekClient,
+    client: AzureLLMClient,
     balance_sheet_text: str,
     message: str,
     parameters: dict[str, object],
@@ -308,7 +308,7 @@ def run_balance_sheet_pipeline(
 
     pages = extractor(str(pdf_path))
     model = SentenceTransformer(embedding_model)
-    client = AzureDeepSeekClient(endpoint=azure_endpoint)
+    client = AzureLLMClient(endpoint=azure_endpoint)
     document_language = detect_language(
         pages,
         client=client,

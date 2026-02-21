@@ -59,7 +59,7 @@
         }
       }
     ],
-    "notes": "1. 'Marketable securities' mapped to 'investment_in_securities'. 2. 'Non-marketable securities' (non-current) not mapped to 'investment_in_securities' as they are typically less liquid; they are part of total assets but not broken out in the schema. 3. 'Total non-current liabilities' calculated as sum of: Long-term debt + Income taxes payable, non-current + Operating lease liabilities + Other long-term liabilities. 4. 'Deferred revenue' mapped to 'advance_payments_from_sales'. 5. No inventory or short-term debt line items present in statement. 6. 'Accrued expenses and other current liabilities' not mapped to 'accounts_payable_and_or_other_liabilities' as they are distinct from trade payables; only 'Accounts payable' mapped to that field. 7. 'Other current assets' and 'Other non-current assets' not specifically mapped to schema fields.",
+    "notes": "Mapped 'Marketable securities' to 'investment_in_securities'. Mapped 'Deferred revenue' to 'advance_payments_from_sales'. Calculated 'total_non_current_liabilities' as total liabilities minus total current liabilities. 'Short-term debt' not found explicitly. 'Advance payments for purchases' and 'inventory' not present for this technology company. 'Accounts payable and/or other liabilities' mapped to 'Accounts payable' line item only.",
     "source_file": "extracted_text/google_2024.consolidated-balance-sheet.llm.json"
   }
 }

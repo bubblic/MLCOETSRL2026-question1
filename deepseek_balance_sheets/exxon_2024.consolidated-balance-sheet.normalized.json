@@ -59,7 +59,7 @@
         }
       }
     ],
-    "notes": "1. 'inventory' is the sum of 'Crude oil, products and merchandise' and 'Materials and supplies' for each period. 2. 'cash' is the sum of 'Cash and cash equivalents' and 'Cash and cash equivalents – restricted' for each period. 3. 'investment_in_securities' is mapped from 'Investments, advances and long-term receivables'. 4. 'total_non_current_liabilities' is calculated as Total Liabilities minus Total Current Liabilities. 5. 'accounts_payable_and_or_other_liabilities' is mapped from 'Accounts payable and accrued liabilities'. 6. No explicit lines for 'advance_payments_for_purchases' or 'advance_payments_from_sales' were found in the statement.",
+    "notes": "inventory field calculated as sum of 'Crude oil, products and merchandise' and 'Materials and supplies' (19,444 + 4,080 = 23,524 for 2024; 20,528 + 4,592 = 25,120 for 2023). cash field calculated as sum of 'Cash and cash equivalents' and 'Cash and cash equivalents – restricted' (23,029 + 158 = 23,187 for 2024; 31,539 + 29 = 31,568 for 2023). total_non_current_liabilities calculated as total_liabilities minus total_current_liabilities (182,869 - 70,307 = 112,562 for 2024; 163,779 - 65,316 = 98,463 for 2023). investment_in_securities mapped to 'Investments, advances and long-term receivables'. accounts_payable_and_or_other_liabilities mapped to 'Accounts payable and accrued liabilities'. short_term_debt mapped to 'Notes and loans payable' under current liabilities. No direct matches found for advance_payments_for_purchases or advance_payments_from_sales.",
     "source_file": "extracted_text/exxon_2024.consolidated-balance-sheet.llm.json"
   }
 }

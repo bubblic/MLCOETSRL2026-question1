@@ -13,7 +13,7 @@ import json
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
-from azure_balance_sheet_model import AzureDeepSeekClient
+from azure_balance_sheet_model import AzureLLMClient
 
 
 SUPPORTED_STATEMENTS = {
@@ -96,7 +96,7 @@ def build_prompt(
 
 
 def compare_one_pair(
-    client: AzureDeepSeekClient,
+    client: AzureLLMClient,
     company_id: str,
     statement_type: str,
     extracted_statement: str,
@@ -246,7 +246,7 @@ def main() -> None:
     extracted_files = sorted(extracted_dir.glob("*.llm.json"))
     backup_lookup = {p.name: p for p in backup_dir.glob("*.llm.json")}
 
-    client = AzureDeepSeekClient()
+    client = AzureLLMClient()
     parameters = {
         "temperature": args.temperature,
         "max_tokens": args.max_tokens,

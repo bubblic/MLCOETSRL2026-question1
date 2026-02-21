@@ -1,0 +1,18 @@
+{
+  "query": "Consolidated Income Statement",
+  "selected_pages": [
+    64,
+    65,
+    66,
+    67,
+    68,
+    69,
+    244,
+    309,
+    318,
+    319
+  ],
+  "extraction": {
+    "raw_response": "Based on the provided pages, the Consolidated Income Statement (合併利潤表) is found on page 244. Below is the table presented in a clear tabular format. All monetary figures are in millions, except for per-share data.\n\n| Line Item | 2023 RMB (million) | 2024 RMB (million) | 2025 RMB (million) | 2025 USD (million) |\n| :--- | :--- | :--- | :--- | :--- |\n| **Revenue** | 868,687 | 941,168 | 996,347 | 137,300 |\n| Operating costs | (549,695) | (586,323) | (598,285) | (82,446) |\n| Product development expenses | (56,744) | (52,256) | (57,151) | (7,876) |\n| Sales and marketing expenses | (103,496) | (115,141) | (144,021) | (19,847) |\n| General and administrative expenses | (42,183) | (41,985) | (44,239) | (6,096) |\n| Amortization and impairment of intangible assets | (13,504) | (21,592) | (6,336) | (873) |\n| Goodwill impairment | (2,714) | (10,521) | (6,171) | (850) |\n| Other net income | — | — | 761 | 105 |\n| **Operating profit** | **100,351** | **113,350** | **140,905** | **19,417** |\n| Interest and investment income, net | (11,071) | (9,964) | 20,759 | 2,861 |\n| Interest expense | (5,918) | (7,947) | (9,596) | (1,323) |\n| Other net income and expense | 5,823 | 6,157 | 3,387 | 467 |\n| **Profit before income tax and equity in earnings of investees** | **89,185** | **101,596** | **155,455** | **21,422** |\n| Income tax expense | (15,549) | (22,529) | (35,445) | (4,884) |\n| Equity in earnings of investees | (8,063) | (7,735) | 5,966 | 822 |\n| **Net profit** | **65,573** | **71,332** | **125,976** | **17,360** |\n| Net loss attributable to non-controlling interests | 7,210 | 8,677 | 4,133 | 569 |\n| **Net profit attributable to Alibaba Group Holding Limited shareholders** | **72,783** | **80,009** | **130,109** | **17,929** |\n| Increase in mezzanine equity | (274) | (268) | (639) | (88) |\n| **Net profit attributable to ordinary shareholders** | **72,509** | **79,741** | **129,470** | **17,841** |\n| **Earnings per share attributable to ordinary shareholders** | | | | |\n| Basic (RMB/USD per share) | 3.46 / — | 3.95 / — | 6.89 / 0.95 | — |\n| Diluted (RMB/USD per share) | 3.43 / — | 3.91 / — | 6.70 / 0.92 | — |\n| **Earnings per ADS attributable to ordinary shareholders (1)** | | | | |\n| Basic (RMB/USD per ADS) | 27.65 / — | 31.61 / — | 55.12 / 7.60 | — |\n| Diluted (RMB/USD per ADS) | 27.46 / — | 31.24 / — | 53.59 / 7.38 | — |\n\n**(1)** Each ADS represents eight ordinary shares."
+  }
+}

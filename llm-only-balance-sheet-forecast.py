@@ -1,0 +1,480 @@
+"""
+LLM-only balance-sheet forecasting with accounting identity enforcement.
+
+This script:
+1) pulls historical balance-sheet data from historical_data.py,
+2) calls Azure reasoning LLM for a 10-year projection,
+3) enforces the accounting identity exactly for every forecast year,
+4) plots all predicted elements in a multi-panel chart.
+"""
+
+from __future__ import annotations
+
+import json
+import os
+from dataclasses import dataclass
+from datetime import datetime
+from typing import Any, Dict, Optional
+
+import matplotlib.pyplot as plt
+import numpy as np
+from dotenv import load_dotenv
+
+from azure_balance_sheet_model import AzureLLMClient
+from historical_data import get_apple_historical_data
+
+load_dotenv()
+
+BALANCE_SHEET_KEYS = [
+    "inventory",
+    "nca",
+    "accounts_receivable",
+    "cash",
+    "investment_in_market_securities",
+    "advance_payments_purchases",
+    "accounts_payable",
+    "advance_payments_sales",
+    "current_liabilities",
+    "non_current_liabilities",
+    "equity",
+]
+
+ADDITIONAL_FORECAST_KEYS = [
+    "dividends",
+    "net_income",
+    "sales",
+    "cogs",
+    "depreciation",
+    "opex",
+    "tax",
+    "stock_buyback",
+    "st_debt",
+]
+
+ELEMENT_KEYS = BALANCE_SHEET_KEYS + ADDITIONAL_FORECAST_KEYS
+LLM_AMOUNT_SCALE = 1e12
+
+
+@dataclass(frozen=True)
+class ForecastInputs:
+    """Inputs for multi-year balance-sheet forecasting."""
+
+    historical_values: Dict[str, np.ndarray]
+    historical_years: np.ndarray
+    forecast_horizon: int
+    blind_mode: bool = True
+    company_name: Optional[str] = None
+    ticker: Optional[str] = None
+    currency: str = "USD"
+
+
+class AzureReasoningBalanceSheetForecaster:
+    """Uses Azure reasoning LLM to forecast balance-sheet elements."""
+
+    def __init__(
+        self,
+        endpoint: Optional[str] = None,
+        timeout_seconds: int = 900,
+    ) -> None:
+        self.client = AzureLLMClient(endpoint=endpoint, timeout_seconds=timeout_seconds)
+
+    def forecast(
+        self,
+        inputs: ForecastInputs,
+        message: str,
+        parameters: Optional[Dict[str, Any]] = None,
+    ) -> Dict[str, np.ndarray]:
+        """Generate forecast arrays for each element key."""
+        params = parameters or {"temperature": 0, "max_tokens": 12000, "top_k": 1}
+        prompt = self._build_prompt(inputs)
+        print("Waiting for LLM response...")
+        data = self.client.ask_json(
+            message=message,
+            prompt=json.dumps(prompt),
+            parameters=params,
+            reasoning=True,
+        )
+        # Parse + enforce in scaled (trillion) units for numeric stability.
+        forecast_scaled = self._parse_multi_year_response(data, inputs.forecast_horizon)
+        self._enforce_identity_inplace(forecast_scaled)
+        self._validate_identity(forecast_scaled)
+        # Return values back in original USD scale.
+        return self._rescale_forecast(forecast_scaled, LLM_AMOUNT_SCALE)
+
+    def _build_prompt(self, inputs: ForecastInputs) -> Dict[str, Any]:
+        historical_rows: Dict[str, Dict[str, float]] = {}
+        n_hist = len(inputs.historical_values[ELEMENT_KEYS[0]])
+        for idx in range(n_hist):
+            row_key = (
+                f"t{idx + 1}"
+                if inputs.blind_mode
+                else str(int(inputs.historical_years[idx]))
+            )
+            historical_rows[row_key] = {
+                key: float(inputs.historical_values[key][idx] / LLM_AMOUNT_SCALE)
+                for key in ELEMENT_KEYS
+            }
+
+        prompt: Dict[str, Any] = {
+            "task": "Forecast all required financial elements for future years. Return ONLY valid JSON (no markdown).",
+            "historical_facts": historical_rows,
+            "value_units": "trillions_of_usd",
+            "value_scale_to_usd": LLM_AMOUNT_SCALE,
+            "required_elements": ELEMENT_KEYS,
+            "accounting_identity": (
+                "inventory + nca + accounts_receivable + cash + "
+                "investment_in_market_securities + advance_payments_purchases = "
+                "accounts_payable + advance_payments_sales + current_liabilities + "
+                "non_current_liabilities + equity"
+            ),
+            "output_schema": {
+                "forecast": [
+                    {
+                        "inventory": "float",
+                        "nca": "float",
+                        "accounts_receivable": "float",
+                        "cash": "float",
+                        "investment_in_market_securities": "float",
+                        "advance_payments_purchases": "float",
+                        "accounts_payable": "float",
+                        "advance_payments_sales": "float",
+                        "current_liabilities": "float",
+                        "non_current_liabilities": "float",
+                        "equity": "float",
+                        "dividends": "float",
+                        "net_income": "float",
+                        "sales": "float",
+                        "cogs": "float",
+                        "depreciation": "float",
+                        "opex": "float",
+                        "tax": "float",
+                        "stock_buyback": "float",
+                        "st_debt": "float",
+                    }
+                ]
+            },
+        }
+        if inputs.blind_mode:
+            prompt["task"] = (
+                "Forecast all required financial elements for future years. "
+                "Do not infer company identity; extrapolate only from provided series. "
+                "Return ONLY valid JSON (no markdown)."
+            )
+            prompt["time_axis_note"] = (
+                "Historical rows are generic time steps (t1..tn), not calendar years."
+            )
+            prompt["forecast_horizon_steps"] = inputs.forecast_horizon
+        else:
+            start_year = int(inputs.historical_years[-1]) + 1
+            end_year = start_year + inputs.forecast_horizon - 1
+            prompt["company"] = {
+                "name": inputs.company_name or "Unknown",
+                "ticker": inputs.ticker or "N/A",
+                "currency": inputs.currency,
+            }
+            prompt["forecast_horizon_years"] = inputs.forecast_horizon
+            prompt["forecast_year_range"] = [start_year, end_year]
+            # Optional year in schema for easier non-blind parsing by the model.
+            prompt["output_schema"]["forecast"][0]["year"] = "int"
+
+        return prompt
+
+    def _parse_multi_year_response(
+        self, data: Dict[str, Any], horizon: int
+    ) -> Dict[str, np.ndarray]:
+        if "raw_response" in data:
+            raise ValueError(
+                f"Please try again. Model response was not JSON: {data['raw_response']}"
+            )
+
+        # Preferred shape: {"forecast": [{year, ...elements...}, ...]}
+        if isinstance(data.get("forecast"), list):
+            rows = data["forecast"]
+            if len(rows) < horizon:
+                raise ValueError(
+                    f"Forecast length {len(rows)} is shorter than required horizon {horizon}."
+                )
+            parsed = {
+                key: np.array(
+                    [self._safe_float(row.get(key), key) for row in rows[:horizon]],
+                    dtype=np.float64,
+                )
+                for key in ELEMENT_KEYS
+            }
+            return parsed
+
+        # Alternate shape: top-level arrays keyed by element name
+        if all(key in data for key in ELEMENT_KEYS):
+            parsed = {}
+            for key in ELEMENT_KEYS:
+                values = data[key]
+                if not isinstance(values, list) or len(values) < horizon:
+                    raise ValueError(
+                        f"Invalid list for '{key}'. Need at least {horizon} values."
+                    )
+                parsed[key] = np.array(
+                    [self._safe_float(v, key) for v in values[:horizon]],
+                    dtype=np.float64,
+                )
+            return parsed
+
+        raise ValueError(
+            "Unsupported forecast JSON shape. Expected {'forecast': [...]} "
+            "or top-level arrays for all required elements."
+        )
+
+    @staticmethod
+    def _safe_float(value: Any, field: str) -> float:
+        try:
+            return float(value)
+        except (TypeError, ValueError) as exc:
+            raise ValueError(f"Invalid value for '{field}': {value}") from exc
+
+    @staticmethod
+    def _enforce_identity_inplace(forecast: Dict[str, np.ndarray]) -> None:
+        lhs = (
+            forecast["inventory"]
+            + forecast["nca"]
+            + forecast["accounts_receivable"]
+            + forecast["cash"]
+            + forecast["investment_in_market_securities"]
+            + forecast["advance_payments_purchases"]
+        )
+        rhs_without_equity = (
+            forecast["accounts_payable"]
+            + forecast["advance_payments_sales"]
+            + forecast["current_liabilities"]
+            + forecast["non_current_liabilities"]
+        )
+        # Force exact identity by solving equity as residual.
+        forecast["equity"] = lhs - rhs_without_equity
+
+    @staticmethod
+    def _validate_identity(forecast: Dict[str, np.ndarray]) -> None:
+        lhs = (
+            forecast["inventory"]
+            + forecast["nca"]
+            + forecast["accounts_receivable"]
+            + forecast["cash"]
+            + forecast["investment_in_market_securities"]
+            + forecast["advance_payments_purchases"]
+        )
+        rhs = (
+            forecast["accounts_payable"]
+            + forecast["advance_payments_sales"]
+            + forecast["current_liabilities"]
+            + forecast["non_current_liabilities"]
+            + forecast["equity"]
+        )
+        if not np.allclose(lhs, rhs, rtol=0.0, atol=1e-6):
+            raise ValueError("Accounting identity validation failed after enforcement.")
+
+    @staticmethod
+    def _rescale_forecast(
+        forecast: Dict[str, np.ndarray], factor: float
+    ) -> Dict[str, np.ndarray]:
+        return {key: values * factor for key, values in forecast.items()}
+
+
+def load_historical_balance_sheet() -> Dict[str, np.ndarray]:
+    """Load and map historical Apple financial fields used by this script."""
+    data = get_apple_historical_data()
+    mapped = {
+        "inventory": data["inventory"],
+        "nca": data["nca"],
+        "accounts_receivable": data["accounts_receivable"],
+        "cash": data["cash"],
+        "investment_in_market_securities": data["ims"],
+        "advance_payments_purchases": data["advance_payments_purchases"],
+        "accounts_payable": data["accounts_payable"],
+        "advance_payments_sales": data["advance_payments_sales"],
+        "current_liabilities": data["current_liabilities"],
+        "non_current_liabilities": data["non_current_liabilities"],
+        "equity": data["equity"],
+        "dividends": data["dividends"],
+        "net_income": data["net_income"],
+        "sales": data["sales"],
+        "cogs": data["cogs"],
+        "depreciation": data["depreciation"],
+        "opex": data["opex"],
+        "tax": data["tax"],
+        "stock_buyback": data["stock_buyback"],
+        "st_debt": data["st_debt"],
+    }
+    mapped["years"] = data["years"]
+    return mapped
+
+
+def _get_output_path(file_name: str) -> str:
+    output_dir = "training_results"
+    os.makedirs(output_dir, exist_ok=True)
+    return os.path.join(output_dir, file_name)
+
+
+def plot_forecast_elements(
+    historical_years: np.ndarray,
+    historical_data: Dict[str, np.ndarray],
+    forecast_years: np.ndarray,
+    forecast_data: Dict[str, np.ndarray],
+    holdout_year: Optional[int] = None,
+    holdout_actual: Optional[Dict[str, float]] = None,
+    mode_label: str = "blind",
+    show_plot: bool = False,
+) -> None:
+    """Plot all elements in a style consistent with the training script."""
+    elements = list(forecast_data.keys())
+    n_elements = len(elements)
+    ncols = 3
+    nrows = (n_elements + ncols - 1) // ncols
+
+    display_names = {
+        "inventory": "Inventory",
+        "nca": "Non-Current Assets",
+        "accounts_receivable": "Accounts Receivable",
+        "cash": "Cash",
+        "investment_in_market_securities": "Investment in Market Securities",
+        "advance_payments_purchases": "Advance Payments (Purchases)",
+        "accounts_payable": "Accounts Payable",
+        "advance_payments_sales": "Advance Payments (Sales)",
+        "current_liabilities": "Current Liabilities",
+        "non_current_liabilities": "Non-Current Liabilities",
+        "equity": "Stockholders' Equity",
+        "dividends": "Dividends",
+        "net_income": "Net Income",
+        "sales": "Sales",
+        "cogs": "Cost of Goods Sold",
+        "depreciation": "Depreciation",
+        "opex": "Operating Expenses",
+        "tax": "Tax",
+        "stock_buyback": "Stock Buyback",
+        "st_debt": "Short-Term Debt",
+    }
+
+    fig, axs = plt.subplots(nrows, ncols, figsize=(7 * ncols, 4.5 * nrows))
+    axs = np.array(axs).reshape(-1)
+
+    for idx, key in enumerate(elements):
+        ax = axs[idx]
+        ax.plot(
+            historical_years,
+            historical_data[key],
+            "ko-",
+            label="Historical",
+            markersize=5,
+            linewidth=1.5,
+        )
+        ax.plot(
+            forecast_years,
+            forecast_data[key],
+            "s-",
+            color="tab:blue",
+            label="Forecast",
+            markersize=5,
+            linewidth=1.5,
+        )
+        if holdout_year is not None and holdout_actual is not None:
+            ax.plot(
+                [holdout_year],
+                [holdout_actual[key]],
+                "x",
+                color="tab:red",
+                label="Holdout Actual",
+                markersize=7,
+                markeredgewidth=2,
+            )
+        ax.set_title(display_names.get(key, key), fontsize=11, fontweight="bold")
+        ax.set_ylabel("USD")
+        ax.legend(fontsize=8)
+        ax.grid(True, alpha=0.3)
+        ax.ticklabel_format(style="scientific", axis="y", scilimits=(0, 0))
+        ax.tick_params(axis="x", rotation=45)
+
+    for idx in range(n_elements, len(axs)):
+        axs[idx].set_visible(False)
+
+    fig.suptitle(
+        f"LLM Financial Forecast ({mode_label}, Identity-Constrained)",
+        fontsize=16,
+        fontweight="bold",
+        y=1.01,
+    )
+    plt.tight_layout()
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    output_path = _get_output_path(
+        f"llm_financial_forecast_{mode_label}_{timestamp}.png"
+    )
+    plt.savefig(output_path, dpi=150, bbox_inches="tight")
+    print(f"\nPlot saved: {output_path}")
+    if show_plot:
+        plt.show()
+    else:
+        plt.close()
+
+
+def run_llm_balance_sheet_forecast(
+    horizon_years: int = 10,
+    message: str = "gen-ai-response",
+    blind_mode: bool = True,
+    show_plot: bool = False,
+) -> Dict[str, np.ndarray]:
+    """Run end-to-end LLM forecasting and plotting."""
+    hist = load_historical_balance_sheet()
+    all_years = hist["years"].astype(int)
+    all_values = {k: hist[k] for k in ELEMENT_KEYS}
+
+    # Hold out the final observed year from LLM inputs for a backtest point.
+    holdout_year = int(all_years[-1])
+    model_historical_years = all_years[:-1]
+    model_historical_values = {k: all_values[k][:-1] for k in ELEMENT_KEYS}
+    holdout_actual = {k: float(all_values[k][-1]) for k in ELEMENT_KEYS}
+
+    inputs = ForecastInputs(
+        historical_values=model_historical_values,
+        historical_years=model_historical_years,
+        forecast_horizon=horizon_years,
+        blind_mode=blind_mode,
+        company_name="Apple Inc.",
+        ticker="AAPL",
+        currency="USD",
+    )
+
+    mode_label = "blind" if blind_mode else "non_blind"
+    print(f"\nRunning mode: {mode_label}")
+
+    forecaster = AzureReasoningBalanceSheetForecaster()
+    forecast = forecaster.forecast(inputs=inputs, message=message)
+
+    forecast_years = np.arange(
+        holdout_year,
+        holdout_year + horizon_years,
+        dtype=int,
+    )
+
+    print("\n10-year LLM forecast (USD):")
+    for i, year in enumerate(forecast_years):
+        row = {key: float(forecast[key][i]) for key in ELEMENT_KEYS}
+        print(f"{year}: {json.dumps(row)}")
+
+    print(f"\nHoldout backtest ({holdout_year}) absolute percentage errors:")
+    for key in ELEMENT_KEYS:
+        actual = holdout_actual[key]
+        pred = float(forecast[key][0])
+        ape = abs(pred - actual) / max(abs(actual), 1.0)
+        print(f"{key}: {ape:.2%} (pred={pred:.3e}, actual={actual:.3e})")
+
+    plot_forecast_elements(
+        historical_years=model_historical_years,
+        historical_data=model_historical_values,
+        forecast_years=forecast_years,
+        forecast_data=forecast,
+        holdout_year=holdout_year,
+        holdout_actual=holdout_actual,
+        mode_label=mode_label,
+        show_plot=show_plot,
+    )
+
+    return forecast
+
+
+if __name__ == "__main__":
+    run_llm_balance_sheet_forecast(horizon_years=10, show_plot=False, blind_mode=True)

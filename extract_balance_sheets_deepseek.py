@@ -28,7 +28,7 @@ import re
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
-from azure_balance_sheet_model import AzureDeepSeekClient
+from azure_balance_sheet_model import AzureLLMClient
 
 
 REQUIRED_FIELDS = [
@@ -184,7 +184,7 @@ def normalize_periods(periods: Any) -> List[Dict[str, Any]]:
 
 
 def extract_one_statement(
-    client: AzureDeepSeekClient,
+    client: AzureLLMClient,
     company_id: str,
     statement_text: str,
     parameters: Dict[str, Any],
@@ -263,7 +263,7 @@ def main() -> None:
     if not files:
         raise ValueError(f"No consolidated balance sheet files found in: {input_dir}")
 
-    client = AzureDeepSeekClient()
+    client = AzureLLMClient()
     parameters = {
         "temperature": args.temperature,
         "max_tokens": args.max_tokens,

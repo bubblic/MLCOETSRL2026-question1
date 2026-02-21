@@ -21,7 +21,7 @@ import os
 import re
 from pathlib import Path
 
-from azure_balance_sheet_model import AzureDeepSeekClient
+from azure_balance_sheet_model import AzureLLMClient
 from pdf_extractor.pdfplumber import extract_text_pdfplumber
 
 WORKSPACE_DIR = Path(__file__).resolve().parent
@@ -184,7 +184,7 @@ def normalize_pages(payload: dict[str, object], valid_pages: set[int]) -> list[i
 
 
 def select_pages_with_llm(
-    client: AzureDeepSeekClient,
+    client: AzureLLMClient,
     message: str,
     parameters: dict[str, object],
     pages: dict[int, str | None],
@@ -218,7 +218,7 @@ def select_pages_with_llm(
 
 
 def extract_table_with_llm(
-    client: AzureDeepSeekClient,
+    client: AzureLLMClient,
     message: str,
     parameters: dict[str, object],
     query: str,
@@ -262,7 +262,7 @@ def run_pipeline(
     extractor = EXTRACTORS[extractor_name]
     pages = extractor(str(input_file))
 
-    client = AzureDeepSeekClient(endpoint=endpoint)
+    client = AzureLLMClient(endpoint=endpoint)
     extraction_parameters = dict(parameters)
 
     output_dir.mkdir(parents=True, exist_ok=True)
