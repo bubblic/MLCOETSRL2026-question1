@@ -386,7 +386,7 @@ class TrainableFinancialModel(tf.Module):
         historical_inflation=None,
         historical_years=None,
         learning_rate=0.001,
-        epochs=30000,
+        epochs=20000,
         plot_vi=True,
         plot_every=1000,
         show_plot=False,
@@ -962,7 +962,7 @@ class TrainableFinancialModel(tf.Module):
         historical_inflation=None,
         historical_years=None,
         learning_rate=0.001,
-        epochs=30000,
+        epochs=20000,
         plot_every=1000,
         show_plot=False,
     ):
