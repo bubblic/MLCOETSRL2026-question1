@@ -50,6 +50,9 @@ def get_apple_historical_data():
 
         Macro:
             inflation       – annual CPI inflation rates
+
+        Note:
+            Fields may contain np.nan for years where a value is unavailable.
     """
     years = np.arange(2018, 2026)
 
@@ -140,8 +143,8 @@ def get_apple_historical_data():
             2645e6,
             2931e6,
             3933e6,
-            0.0,
-            0.0,
+            np.nan,  # Placeholder removed: data unavailable for this fiscal year
+            np.nan,  # Placeholder removed: data unavailable for this fiscal year
         ],
         dtype=np.float64,
     )

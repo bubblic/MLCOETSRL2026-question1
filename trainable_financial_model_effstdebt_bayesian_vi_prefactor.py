@@ -1083,13 +1083,23 @@ class TrainableFinancialModel(tf.Module):
 
         optimizer = tf.optimizers.Adam(learning_rate=learning_rate)
         eps = tf.constant(1e-12, dtype=tf.float64)
+
+        def finite_std(values):
+            """Std over finite values only; fallback to 1.0 if insufficient data."""
+            finite_values = tf.boolean_mask(values, tf.math.is_finite(values))
+            return tf.cond(
+                tf.size(finite_values) > 1,
+                lambda: tf.math.reduce_std(finite_values) + eps,
+                lambda: tf.constant(1.0, dtype=tf.float64),
+            )
+
         if loss_scale_mode == "std":
             scale_ni = tf.math.reduce_std(ni_t[1:]) + eps
             scale_eff_st = tf.math.reduce_std(eff_st_t[1:]) + eps
             scale_curr_lt = tf.math.reduce_std(curr_lt_t[1:]) + eps
             scale_ncl = tf.math.reduce_std(ncl_t[1:]) + eps
             scale_equity = tf.math.reduce_std(equity_t[1:]) + eps
-            scale_interest = tf.math.reduce_std(interest_t[1:]) + eps
+            scale_interest = finite_std(interest_t[1:])
             scale_ms_return = tf.math.reduce_std(ms_return_t[1:]) + eps
         elif loss_scale_mode == "none":
             one = tf.constant(1.0, dtype=tf.float64)
@@ -1192,13 +1202,13 @@ class TrainableFinancialModel(tf.Module):
                     loss_equity = tf.square(
                         (state_pred["equity"] - equity_t[t + 1]) / scale_equity
                     )
-                    loss_interest = (
-                        0.0
-                        if interest_t[t + 1] == 0.0
-                        else tf.square(
+                    loss_interest = tf.where(
+                        tf.math.is_finite(interest_t[t + 1]),
+                        tf.square(
                             (state_pred["interest_payment"] - interest_t[t + 1])
                             / scale_interest
-                        )
+                        ),
+                        tf.constant(0.0, dtype=tf.float64),
                     )
                     loss_ms_return = tf.square(
                         (state_pred["ms_return"] - ms_return_t[t + 1]) / scale_ms_return
