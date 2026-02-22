@@ -117,7 +117,7 @@ class TrainableFinancialModel(tf.Module):
         # D_t = α * (PayoutRatio * NI_t) + (1 - α) * D_{t-1}
         # α=1.0 → pure payout ratio (no smoothing), α=0.0 → constant dividends
         self.dividend_adjustment_speed = tfp.util.TransformedVariable(
-            initial_value=0.5,
+            initial_value=0.01,
             bijector=tfb.Sigmoid(),
             dtype=tf.float64,
             name="div_adj_speed",
@@ -386,7 +386,7 @@ class TrainableFinancialModel(tf.Module):
         historical_inflation=None,
         historical_years=None,
         learning_rate=0.001,
-        epochs=20000,
+        epochs=25000,
         plot_vi=True,
         plot_every=1000,
         show_plot=False,
@@ -2557,6 +2557,7 @@ def run_training_and_forecast(
             historical_inflation=inflation_hist[:-1],
             historical_years=train_years,
             show_plot=False,
+            loss_scale_mode="std",
         )
 
         # --- 3. TRAIN STRUCTURAL PARAMETERS ---
@@ -2584,6 +2585,7 @@ def run_training_and_forecast(
             equity_hist_bil[:-1],
             inflation_hist[:-1],
             train_years,
+            loss_scale_mode="std",
         )
         model.save_parameters(parameters_path)
 
