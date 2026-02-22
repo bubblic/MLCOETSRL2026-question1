@@ -964,6 +964,7 @@ class TrainableFinancialModel(tf.Module):
         learning_rate=0.001,
         epochs=20000,
         plot_every=1000,
+        gradient_clip_norm=5.0,
         show_plot=False,
     ):
         """
@@ -1006,6 +1007,15 @@ class TrainableFinancialModel(tf.Module):
         time_idx_t = years_t - tf.constant(float(self.base_year), dtype=tf.float64)
 
         optimizer = tf.optimizers.Adam(learning_rate=learning_rate)
+        eps = tf.constant(1e-12, dtype=tf.float64)
+        scale_ni = tf.math.reduce_std(ni_t[1:]) + eps
+        scale_eff_st = tf.math.reduce_std(eff_st_t[1:]) + eps
+        scale_curr_lt = tf.math.reduce_std(curr_lt_t[1:]) + eps
+        scale_ncl = tf.math.reduce_std(ncl_t[1:]) + eps
+        scale_equity = tf.math.reduce_std(equity_t[1:]) + eps
+        scale_interest = tf.math.reduce_std(interest_t[1:]) + eps
+        scale_ms_return = tf.math.reduce_std(ms_return_t[1:]) + eps
+
         vars_to_train = [
             self.avg_short_term_interest_pct.trainable_variables[0],
             self.avg_long_term_interest_pct.trainable_variables[0],
@@ -1022,6 +1032,7 @@ class TrainableFinancialModel(tf.Module):
             # "loss_cl": [],
             "loss_interest": [],
             "loss_ms_return": [],
+            "loss_curr_lt": [],
             "loss_ncl": [],
             "loss_equity": [],
         }
@@ -1034,6 +1045,7 @@ class TrainableFinancialModel(tf.Module):
                 # total_loss_cl = 0.0
                 total_loss_interest = 0.0
                 total_loss_ms_return = 0.0
+                total_loss_curr_lt = 0.0
                 total_loss_ncl = 0.0
                 total_loss_equity = 0.0
                 num_transitions = len(historical_sales) - 1
@@ -1073,35 +1085,60 @@ class TrainableFinancialModel(tf.Module):
                     )
 
                     # Targets are values at t+1
-                    loss_ni = tf.square(state_pred["net_income"] - ni_t[t + 1])
-                    loss_cl = tf.square(
-                        state_pred["effective_st_debt"] - eff_st_t[t + 1]
+                    loss_ni = tf.square(
+                        (state_pred["net_income"] - ni_t[t + 1]) / scale_ni
+                    )
+                    loss_eff_st = tf.square(
+                        (state_pred["effective_st_debt"] - eff_st_t[t + 1])
+                        / scale_eff_st
+                    )
+                    loss_curr_lt = tf.square(
+                        (state_pred["current_lt_debt"] - curr_lt_t[t + 1])
+                        / scale_curr_lt
                     )
                     loss_ncl = tf.square(
-                        state_pred["non_current_liabilities"] - ncl_t[t + 1]
+                        (state_pred["non_current_liabilities"] - ncl_t[t + 1])
+                        / scale_ncl
                     )
-                    loss_equity = tf.square(state_pred["equity"] - equity_t[t + 1])
+                    loss_equity = tf.square(
+                        (state_pred["equity"] - equity_t[t + 1]) / scale_equity
+                    )
                     loss_interest = (
                         0.0
                         if interest_t[t + 1] == 0.0
                         else tf.square(
-                            state_pred["interest_payment"] - interest_t[t + 1]
+                            (state_pred["interest_payment"] - interest_t[t + 1])
+                            / scale_interest
                         )
                     )
                     loss_ms_return = tf.square(
-                        state_pred["ms_return"] - ms_return_t[t + 1]
+                        (state_pred["ms_return"] - ms_return_t[t + 1]) / scale_ms_return
                     )
 
                     # Total loss to minimize
-                    total_loss += loss_ni + loss_cl + loss_ncl + loss_equity
+                    total_loss += (
+                        loss_ni
+                        + loss_eff_st
+                        + loss_curr_lt
+                        + loss_ncl
+                        + loss_equity
+                        + loss_interest
+                        + loss_ms_return
+                    )
                     total_loss_ni += loss_ni
                     # total_loss_cl += loss_cl
+                    total_loss_curr_lt += loss_curr_lt
                     total_loss_ncl += loss_ncl
                     total_loss_equity += loss_equity
                     total_loss_interest += loss_interest
                     total_loss_ms_return += loss_ms_return
 
             grads = tape.gradient(total_loss, vars_to_train)
+            if gradient_clip_norm is not None and gradient_clip_norm > 0:
+                grads = [
+                    None if g is None else tf.clip_by_norm(g, gradient_clip_norm)
+                    for g in grads
+                ]
             optimizer.apply_gradients(zip(grads, vars_to_train))
 
             if i % plot_every == 0:
@@ -1113,6 +1150,7 @@ class TrainableFinancialModel(tf.Module):
                 structural_history["loss_ms_return"].append(
                     total_loss_ms_return.numpy()
                 )
+                structural_history["loss_curr_lt"].append(total_loss_curr_lt.numpy())
                 structural_history["loss_ncl"].append(total_loss_ncl.numpy())
                 structural_history["loss_equity"].append(total_loss_equity.numpy())
 
@@ -1158,6 +1196,7 @@ class TrainableFinancialModel(tf.Module):
                 ("loss_ni", "Net Income"),
                 ("loss_interest", "Interest Payment"),
                 ("loss_ms_return", "Return on Market Securities Investment"),
+                ("loss_curr_lt", "Current LT Debt"),
                 ("loss_ncl", "Non-Current Liabilities"),
                 ("loss_equity", "Equity"),
             ]
@@ -2673,7 +2712,9 @@ def run_training_and_forecast(
         historical_fit["cogs"].append(float(pred["cogs"].numpy()) * amount_scale)
         historical_fit["opex"].append(float(pred["opex"].numpy()) * amount_scale)
         historical_fit["tax"].append(float(pred["tax"].numpy()) * amount_scale)
-        historical_fit["ms_return"].append(float(pred["ms_return"].numpy()) * amount_scale)
+        historical_fit["ms_return"].append(
+            float(pred["ms_return"].numpy()) * amount_scale
+        )
         historical_fit["interest_payment"].append(
             float(pred["interest_payment"].numpy()) * amount_scale
         )
