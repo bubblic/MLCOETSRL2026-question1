@@ -391,6 +391,7 @@ class TrainableFinancialModel(tf.Module):
         plot_every=1000,
         show_plot=False,
         prior_strength_asset_maintain=1.0,
+        loss_scale_mode="std",
     ):
         """
         Trains simple policy parameters using historical data.
@@ -476,6 +477,47 @@ class TrainableFinancialModel(tf.Module):
         ni_prev_aligned = ni_tensor[:-1]
         div_prev_aligned = div_tensor[:-1]
 
+        # --- Loss Scaling (robustness across heterogeneous magnitudes) ---
+        eps = tf.constant(1e-12, dtype=tf.float64)
+        if loss_scale_mode == "std":
+            scale_growth = tf.math.reduce_std(delta_nca_true) + eps
+            scale_depr = tf.math.reduce_std(depr_true) + eps
+            scale_adv_ps = tf.math.reduce_std(adv_ps_true) + eps
+            scale_adv_pp = tf.math.reduce_std(adv_pp_true) + eps
+            scale_ar = tf.math.reduce_std(ar_tensor) + eps
+            scale_ap = tf.math.reduce_std(ap_tensor) + eps
+            scale_inv = tf.math.reduce_std(inv_tensor) + eps
+            scale_tl = tf.math.reduce_std(cash_tensor + ims_tensor) + eps
+            scale_cash = tf.math.reduce_std(cash_tensor) + eps
+            scale_tax = tf.math.reduce_std(tax_tensor) + eps
+            scale_div = tf.math.reduce_std(div_true) + eps
+            scale_bb = tf.math.reduce_std(bb_tensor) + eps
+            scale_cost_ratio = tf.math.reduce_std(logit_cr_hist) + eps
+            scale_eff_st = tf.math.reduce_std(eff_st_debt_tensor) + eps
+            scale_opex = tf.math.reduce_std(opex_tensor) + eps
+        elif loss_scale_mode == "none":
+            one = tf.constant(1.0, dtype=tf.float64)
+            scale_growth = one
+            scale_depr = one
+            scale_adv_ps = one
+            scale_adv_pp = one
+            scale_ar = one
+            scale_ap = one
+            scale_inv = one
+            scale_tl = one
+            scale_cash = one
+            scale_tax = one
+            scale_div = one
+            scale_bb = one
+            scale_cost_ratio = one
+            scale_eff_st = one
+            scale_opex = one
+        else:
+            raise ValueError(
+                f"Unsupported loss_scale_mode='{loss_scale_mode}'. Use 'std' or 'none'."
+            )
+        num_opex_obs = tf.cast(tf.size(opex_tensor), tf.float64)
+
         optimizer = tf.optimizers.Adam(learning_rate=learning_rate)
         print(f"Training on {len(historical_sales)} years of historical data...")
 
@@ -550,62 +592,89 @@ class TrainableFinancialModel(tf.Module):
                 # --- Deterministic Losses (MSE) ---
                 loss_growth = tf.reduce_mean(
                     tf.square(
-                        delta_nca_true
-                        - (
-                            (self.asset_maintain - 1) * depr_true
-                            + sales_aligned_growth * self.asset_growth
+                        (
+                            delta_nca_true
+                            - (
+                                (self.asset_maintain - 1) * depr_true
+                                + sales_aligned_growth * self.asset_growth
+                            )
                         )
+                        / scale_growth
                     )
                 )
                 loss_depr = tf.reduce_mean(
-                    tf.square(depr_true - nca_prev_aligned * self.depreciation_rate)
+                    tf.square(
+                        (depr_true - nca_prev_aligned * self.depreciation_rate)
+                        / scale_depr
+                    )
                 )
                 loss_adv_ps = tf.reduce_mean(
                     tf.square(
-                        adv_ps_true - sales_tensor * self.advance_payments_sales_pct
+                        (adv_ps_true - sales_tensor * self.advance_payments_sales_pct)
+                        / scale_adv_ps
                     )
                 )
                 loss_adv_pp = tf.reduce_mean(
                     tf.square(
-                        adv_pp_true
-                        - purchases_aligned_adv_pp * self.advance_payments_purchases_pct
+                        (
+                            adv_pp_true
+                            - purchases_aligned_adv_pp
+                            * self.advance_payments_purchases_pct
+                        )
+                        / scale_adv_pp
                     )
                 )
                 loss_ar = tf.reduce_mean(
-                    tf.square(ar_tensor - sales_tensor * self.account_receivables_pct)
+                    tf.square(
+                        (ar_tensor - sales_tensor * self.account_receivables_pct)
+                        / scale_ar
+                    )
                 )
                 loss_ap = tf.reduce_mean(
-                    tf.square(ap_tensor - purchases_tensor * self.account_payables_pct)
+                    tf.square(
+                        (ap_tensor - purchases_tensor * self.account_payables_pct)
+                        / scale_ap
+                    )
                 )
                 loss_inv = tf.reduce_mean(
-                    tf.square(inv_tensor - sales_tensor * self.inventory_pct)
+                    tf.square(
+                        (inv_tensor - sales_tensor * self.inventory_pct) / scale_inv
+                    )
                 )
                 # TL(t) = tl_baseline + sales_t * sigmoid(tl_alpha + tl_beta * t)
                 tl_pct_t_logit = self.tl_alpha + self.tl_beta * time_indices
                 tl_pct_t = tf.sigmoid(tl_pct_t_logit)
                 loss_tl = tf.reduce_mean(
                     tf.square(
-                        (cash_tensor + ims_tensor)
-                        - (self.tl_baseline + sales_tensor * tl_pct_t)
+                        (
+                            (cash_tensor + ims_tensor)
+                            - (self.tl_baseline + sales_tensor * tl_pct_t)
+                        )
+                        / scale_tl
                     )
                 )
                 # %Cash(t) = sigmoid(cash_alpha + cash_beta * t) (logit-linear)
                 cash_pct_t_logit = self.cash_alpha + self.cash_beta * time_indices
                 cash_pct_t = tf.sigmoid(cash_pct_t_logit)
                 loss_cash = tf.reduce_mean(
-                    tf.square(cash_tensor - (cash_tensor + ims_tensor) * cash_pct_t)
+                    tf.square(
+                        (cash_tensor - (cash_tensor + ims_tensor) * cash_pct_t)
+                        / scale_cash
+                    )
                 )
                 loss_tax = tf.reduce_mean(
-                    tf.square(tax_tensor - ni_tensor * self.income_tax_pct)
+                    tf.square(
+                        (tax_tensor - ni_tensor * self.income_tax_pct) / scale_tax
+                    )
                 )
                 div_target = ni_prev_aligned * self.dividend_payout_ratio_pct
                 div_pred = (
                     self.dividend_adjustment_speed * div_target
                     + (1.0 - self.dividend_adjustment_speed) * div_prev_aligned
                 )
-                loss_div = tf.reduce_mean(tf.square(div_true - div_pred))
+                loss_div = tf.reduce_mean(tf.square((div_true - div_pred) / scale_div))
                 bb_pred = self.sb_baseline + self.sb_ratio * depr_tensor
-                loss_bb = tf.reduce_mean(tf.square(bb_tensor - bb_pred))
+                loss_bb = tf.reduce_mean(tf.square((bb_tensor - bb_pred) / scale_bb))
 
                 # --- Cost Ratio Loss (Logit-Linear) ---
                 # logit(CR_t) = alpha + beta * t
@@ -613,7 +682,7 @@ class TrainableFinancialModel(tf.Module):
                     self.cost_ratio_alpha + self.cost_ratio_beta * time_indices
                 )
                 loss_cost_ratio = tf.reduce_mean(
-                    tf.square(logit_cr_hist - logit_cr_pred)
+                    tf.square((logit_cr_hist - logit_cr_pred) / scale_cost_ratio)
                 )
 
                 # --- ST Debt Loss (Logit-Linear) ---
@@ -623,7 +692,10 @@ class TrainableFinancialModel(tf.Module):
                     self.st_debt_alpha + self.st_debt_beta * time_indices
                 )
                 loss_eff_st_debt = tf.reduce_mean(
-                    tf.square(eff_st_debt_tensor - sales_tensor * st_debt_pct_pred)
+                    tf.square(
+                        (eff_st_debt_tensor - sales_tensor * st_debt_pct_pred)
+                        / scale_eff_st
+                    )
                 )
 
                 # --- Bayesian OpEx Loss ---
@@ -637,17 +709,19 @@ class TrainableFinancialModel(tf.Module):
                 )
 
                 # 3. Calculate Residuals (The Error)
-                residuals = opex_tensor - pred_opex_raw
+                residuals = (opex_tensor - pred_opex_raw) / scale_opex
 
                 # 4. Calculate Likelihood
-                likelihood_dist = tfd.Normal(loc=0.0, scale=self.noise_sigma)
+                likelihood_dist = tfd.Normal(
+                    loc=0.0, scale=(self.noise_sigma / scale_opex)
+                )
                 neg_log_likelihood = -tf.reduce_sum(likelihood_dist.log_prob(residuals))
 
                 # 5. KL Divergence
                 kl = self.get_opex_kl_divergence()
 
-                # 6. Final Sum
-                loss_opex_bayes = neg_log_likelihood + kl
+                # 6. Final Sum (normalized by number of observations)
+                loss_opex_bayes = (neg_log_likelihood + kl) / num_opex_obs
 
                 # --- Prior / Regularization Losses ---
                 # Quadratic prior on asset_maintain centered at 1.0:
@@ -966,6 +1040,7 @@ class TrainableFinancialModel(tf.Module):
         plot_every=1000,
         gradient_clip_norm=5.0,
         show_plot=False,
+        loss_scale_mode="std",
     ):
         """
         Trains structural parameters (interest rates, maturity, financing)
@@ -1008,13 +1083,27 @@ class TrainableFinancialModel(tf.Module):
 
         optimizer = tf.optimizers.Adam(learning_rate=learning_rate)
         eps = tf.constant(1e-12, dtype=tf.float64)
-        scale_ni = tf.math.reduce_std(ni_t[1:]) + eps
-        scale_eff_st = tf.math.reduce_std(eff_st_t[1:]) + eps
-        scale_curr_lt = tf.math.reduce_std(curr_lt_t[1:]) + eps
-        scale_ncl = tf.math.reduce_std(ncl_t[1:]) + eps
-        scale_equity = tf.math.reduce_std(equity_t[1:]) + eps
-        scale_interest = tf.math.reduce_std(interest_t[1:]) + eps
-        scale_ms_return = tf.math.reduce_std(ms_return_t[1:]) + eps
+        if loss_scale_mode == "std":
+            scale_ni = tf.math.reduce_std(ni_t[1:]) + eps
+            scale_eff_st = tf.math.reduce_std(eff_st_t[1:]) + eps
+            scale_curr_lt = tf.math.reduce_std(curr_lt_t[1:]) + eps
+            scale_ncl = tf.math.reduce_std(ncl_t[1:]) + eps
+            scale_equity = tf.math.reduce_std(equity_t[1:]) + eps
+            scale_interest = tf.math.reduce_std(interest_t[1:]) + eps
+            scale_ms_return = tf.math.reduce_std(ms_return_t[1:]) + eps
+        elif loss_scale_mode == "none":
+            one = tf.constant(1.0, dtype=tf.float64)
+            scale_ni = one
+            scale_eff_st = one
+            scale_curr_lt = one
+            scale_ncl = one
+            scale_equity = one
+            scale_interest = one
+            scale_ms_return = one
+        else:
+            raise ValueError(
+                f"Unsupported loss_scale_mode='{loss_scale_mode}'. Use 'std' or 'none'."
+            )
 
         vars_to_train = [
             self.avg_short_term_interest_pct.trainable_variables[0],
