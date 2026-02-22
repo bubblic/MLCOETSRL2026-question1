@@ -1202,13 +1202,19 @@ class TrainableFinancialModel(tf.Module):
                     loss_equity = tf.square(
                         (state_pred["equity"] - equity_t[t + 1]) / scale_equity
                     )
-                    loss_interest = tf.where(
+                    valid_interest = tf.cast(
+                        tf.math.is_finite(interest_t[t + 1]), tf.float64
+                    )
+                    # Replace missing target with prediction itself so residual=0
+                    # and no arithmetic ever involves NaN.
+                    interest_target = tf.where(
                         tf.math.is_finite(interest_t[t + 1]),
-                        tf.square(
-                            (state_pred["interest_payment"] - interest_t[t + 1])
-                            / scale_interest
-                        ),
-                        tf.constant(0.0, dtype=tf.float64),
+                        interest_t[t + 1],
+                        state_pred["interest_payment"],
+                    )
+                    loss_interest = valid_interest * tf.square(
+                        (state_pred["interest_payment"] - interest_target)
+                        / scale_interest
                     )
                     loss_ms_return = tf.square(
                         (state_pred["ms_return"] - ms_return_t[t + 1]) / scale_ms_return
