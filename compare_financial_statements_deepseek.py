@@ -13,7 +13,7 @@ import json
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
-from azure_balance_sheet_model import AzureLLMClient
+from azure_llm_client import AzureLLMClient
 
 
 SUPPORTED_STATEMENTS = {

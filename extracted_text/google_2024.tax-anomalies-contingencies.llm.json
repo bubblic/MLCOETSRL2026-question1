@@ -1,0 +1,32 @@
+{
+  "query": "Item 7 Management's Discussion and Analysis (MD&A), and Item 8 Financial Statements and Supplementary Data sections specifically covering \"Income Taxes\" and \"Commitments and Contingencies\".",
+  "selected_pages": [
+    33,
+    34,
+    35,
+    36,
+    37,
+    38,
+    39,
+    40,
+    41,
+    42,
+    43,
+    44,
+    45,
+    46,
+    83,
+    84,
+    85,
+    92,
+    93,
+    94,
+    95
+  ],
+  "extraction": {
+    "tax_onetime_amount": null,
+    "tax_onetime_note": null,
+    "tax_contingency_amount": 12.619,
+    "tax_contingency_note": "Gross unrecognized tax benefits of $12.619 billion as of December 31, 2024, of which $10.0 billion would affect the effective tax rate if recognized. The company does not expect a material change in the next 12 months."
+  }
+}

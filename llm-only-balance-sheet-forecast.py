@@ -20,7 +20,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from dotenv import load_dotenv
 
-from azure_balance_sheet_model import AzureLLMClient
+from azure_llm_client import AzureLLMClient
 from historical_data import get_apple_historical_data
 
 load_dotenv()

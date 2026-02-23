@@ -32,7 +32,7 @@
           "total_liabilities": 727099.0,
           "total_non_current_liabilities": 330190.0,
           "total_current_liabilities": 396909.0,
-          "accounts_payable_and_or_other_liabilities": 388484.0,
+          "accounts_payable_and_or_other_liabilities": 202744.0,
           "advance_payments_from_sales": 106333.0,
           "short_term_debt": 61508.0,
           "long_term_debt": 277107.0,
@@ -51,7 +51,7 @@
           "total_liabilities": 703565.0,
           "total_non_current_liabilities": 351408.0,
           "total_current_liabilities": 352157.0,
-          "accounts_payable_and_or_other_liabilities": 354947.0,
+          "accounts_payable_and_or_other_liabilities": 177543.0,
           "advance_payments_from_sales": 89603.0,
           "short_term_debt": 55698.0,
           "long_term_debt": 292920.0,
@@ -59,7 +59,7 @@
         }
       }
     ],
-    "notes": "1) 'cash' field mapped to 'Cash and cash equivalents' only; term deposits and restricted cash not included. 2) 'investment_in_securities' field calculated as sum of 'Financial assets at fair value through profit or loss' and 'Financial assets at fair value through other comprehensive income' from both current and non-current assets; excludes investments in associates/joint ventures. 3) 'short_term_debt' calculated as sum of current 'Borrowings' and 'Notes payable'. 4) 'long_term_debt' calculated as sum of non-current 'Borrowings' and 'Notes payable'. 5) 'accounts_payable_and_or_other_liabilities' calculated as total liabilities minus total debt (short_term + long_term). 6) 'advance_payments_from_sales' mapped to total 'Deferred revenue' (current + non-current). 7) 'advance_payments_for_purchases' not found in statement. 8) 'inventory' mapped to 'Inventories'. 9) All values in RMB millions as per statement.",
+    "notes": "Mappings made: 1) 'investment_in_securities' includes 'Financial assets at fair value through profit or loss' and 'Financial assets at fair value through other comprehensive income' from both current and non-current assets. 2) 'short_term_debt' is sum of current 'Borrowings' and 'Notes payable'. 3) 'long_term_debt' is sum of non-current 'Borrowings' and 'Notes payable'. 4) 'accounts_payable_and_or_other_liabilities' is sum of 'Accounts payable' and 'Other payables and accruals'. 5) 'advance_payments_from_sales' is sum of current and non-current 'Deferred revenue'. 6) 'advance_payments_for_purchases' not found as separate line; 'Prepayments, deposits and other assets' includes both advances for purchases and other items, so set to null.",
     "source_file": "extracted_text/tencent_2024.consolidated-balance-sheet.llm.json"
   }
 }

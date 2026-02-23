@@ -32,7 +32,7 @@
           "total_liabilities": 204757.0,
           "total_non_current_liabilities": 110312.0,
           "total_current_liabilities": 94445.0,
-          "accounts_payable_and_or_other_liabilities": 56449.0,
+          "accounts_payable_and_or_other_liabilities": 28114.0,
           "advance_payments_from_sales": null,
           "short_term_debt": 38968.0,
           "long_term_debt": 82773.0,
@@ -51,7 +51,7 @@
           "total_liabilities": 191752.0,
           "total_non_current_liabilities": 100579.0,
           "total_current_liabilities": 91173.0,
-          "accounts_payable_and_or_other_liabilities": 52396.0,
+          "accounts_payable_and_or_other_liabilities": 27486.0,
           "advance_payments_from_sales": null,
           "short_term_debt": 38778.0,
           "long_term_debt": 75921.0,
@@ -59,7 +59,7 @@
         }
       }
     ],
-    "notes": "For 'accounts_payable_and_or_other_liabilities', the sum of 'Accounts payable (principally trade)' and 'Accrued liabilities' (both current) is provided, as the schema does not have a separate field for accrued liabilities. GM Financial receivables and equity in affiliates are not mapped to the available fields. 'Short-term debt' is the sum of Automotive and GM Financial components under 'Short-term debt and current portion of long-term debt'. 'Long-term debt' is the sum of Automotive and GM Financial components under 'Long-term debt'. Non-operating liabilities (Postretirement benefits, Pensions, Other liabilities) are not included in the mapped fields.",
+    "notes": "Mapped 'Accounts and notes receivable, net' to accounts_receivable. Mapped 'Marketable debt securities' to investment_in_securities. Combined 'Short-term debt and current portion of long-term debt' for Automotive and GM Financial to calculate short_term_debt. Combined 'Long-term debt' for Automotive and GM Financial to calculate long_term_debt. Mapped 'Accounts payable (principally trade)' to accounts_payable_and_or_other_liabilities (excludes accrued and other liabilities). Did not find explicit line items for advance_payments_for_purchases or advance_payments_from_sales. GM Financial receivables, equipment on operating leases, and other financial/non-trade items were not mapped to the specified normalized fields as they are specific to the company's financing operations and are not standard trade/operating items.",
     "source_file": "extracted_text/2023 General Motors Annual Report .consolidated-balance-sheet.llm.json"
   }
 }

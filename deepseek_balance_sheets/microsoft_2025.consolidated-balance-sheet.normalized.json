@@ -28,11 +28,11 @@
           "accounts_receivable": 69905.0,
           "inventory": 938.0,
           "cash": 30242.0,
-          "investment_in_securities": 79356.0,
+          "investment_in_securities": 64323.0,
           "total_liabilities": 275524.0,
           "total_non_current_liabilities": 134306.0,
           "total_current_liabilities": 141218.0,
-          "accounts_payable_and_or_other_liabilities": 242777.0,
+          "accounts_payable_and_or_other_liabilities": 27940.0,
           "advance_payments_from_sales": 67265.0,
           "short_term_debt": 2999.0,
           "long_term_debt": 40152.0,
@@ -47,11 +47,11 @@
           "accounts_receivable": 56924.0,
           "inventory": 1246.0,
           "cash": 18315.0,
-          "investment_in_securities": 71828.0,
+          "investment_in_securities": 57228.0,
           "total_liabilities": 243686.0,
           "total_non_current_liabilities": 118400.0,
           "total_current_liabilities": 125286.0,
-          "accounts_payable_and_or_other_liabilities": 210609.0,
+          "accounts_payable_and_or_other_liabilities": 24181.0,
           "advance_payments_from_sales": 60184.0,
           "short_term_debt": 8942.0,
           "long_term_debt": 42688.0,
@@ -59,7 +59,7 @@
         }
       }
     ],
-    "notes": "Mapping notes: 1) 'investment_in_securities' set to sum of 'Short-term investments' and 'Equity and other investments' as both are typical securities holdings for a tech company. 2) 'short_term_debt' set to sum of 'Short-term debt' and 'Current portion of long-term debt'. 3) 'advance_payments_from_sales' set to sum of 'Short-term unearned revenue' and 'Long-term unearned revenue' as unearned revenue represents payments received for future services. 4) 'accounts_payable_and_or_other_liabilities' set to sum of 'Accounts payable', 'Accrued compensation', 'Short-term income taxes', 'Other current liabilities', 'Long-term income taxes', 'Deferred income taxes', 'Operating lease liabilities', and 'Other long-term liabilities', as this is a broad catch-all field. 5) 'total_non_current_liabilities' calculated as total liabilities minus total current liabilities. 6) Negative parentheses for 'Accumulated other comprehensive loss' handled in equity calculation; not a separate field. 7) 'Cash' maps to 'Cash and cash equivalents'. 8) 'Other current assets', 'Property and equipment', 'Operating lease right-of-use assets', 'Goodwill', 'Intangible assets', and 'Other long-term assets' have no direct mapping and are not included in the output schema.",
+    "notes": "Mapping notes: 1) 'investment_in_securities' mapped to 'Short-term investments'. 'Equity and other investments' is a separate long-term investment line but was not included to avoid duplication; 2) 'total_non_current_liabilities' calculated as Total Liabilities minus Total Current Liabilities; 3) 'short_term_debt' mapped as the sum of 'Short-term debt' and 'Current portion of long-term debt'; 4) 'accounts_payable_and_or_other_liabilities' mapped to 'Accounts payable' only. 'Other current liabilities' and 'Other long-term liabilities' were not included as they are a mix of items; 5) 'advance_payments_from_sales' mapped as the sum of 'Short-term unearned revenue' and 'Long-term unearned revenue'.",
     "source_file": "extracted_text/microsoft_2025.consolidated-balance-sheet.llm.json"
   }
 }

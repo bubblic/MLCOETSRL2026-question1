@@ -1,0 +1,65 @@
+{
+  "schema_version": "1.0",
+  "fields": [
+    "total_assets",
+    "advance_payments_for_purchases",
+    "accounts_receivable",
+    "inventory",
+    "cash",
+    "investment_in_securities",
+    "total_liabilities",
+    "total_non_current_liabilities",
+    "total_current_liabilities",
+    "accounts_payable_and_or_other_liabilities",
+    "advance_payments_from_sales",
+    "short_term_debt",
+    "long_term_debt",
+    "total_equity"
+  ],
+  "statement": {
+    "company_id": "2023 General Motors Annual Report",
+    "statement_type": "consolidated-balance-sheet",
+    "periods": [
+      {
+        "period": "December 31, 2023",
+        "values": {
+          "total_assets": 273064.0,
+          "advance_payments_for_purchases": null,
+          "accounts_receivable": 12378.0,
+          "inventory": 16461.0,
+          "cash": 18853.0,
+          "investment_in_securities": 7613.0,
+          "total_liabilities": 204757.0,
+          "total_non_current_liabilities": 110312.0,
+          "total_current_liabilities": 94445.0,
+          "accounts_payable_and_or_other_liabilities": 56449.0,
+          "advance_payments_from_sales": null,
+          "short_term_debt": 38968.0,
+          "long_term_debt": 82773.0,
+          "total_equity": 68189.0
+        }
+      },
+      {
+        "period": "December 31, 2022",
+        "values": {
+          "total_assets": 264037.0,
+          "advance_payments_for_purchases": null,
+          "accounts_receivable": 13333.0,
+          "inventory": 15366.0,
+          "cash": 19153.0,
+          "investment_in_securities": 12150.0,
+          "total_liabilities": 191752.0,
+          "total_non_current_liabilities": 100579.0,
+          "total_current_liabilities": 91173.0,
+          "accounts_payable_and_or_other_liabilities": 52396.0,
+          "advance_payments_from_sales": null,
+          "short_term_debt": 38778.0,
+          "long_term_debt": 75921.0,
+          "total_equity": 71927.0
+        }
+      }
+    ],
+    "notes": "For 'accounts_payable_and_or_other_liabilities', the sum of 'Accounts payable (principally trade)' and 'Accrued liabilities' (both current) is provided, as the schema does not have a separate field for accrued liabilities. GM Financial receivables and equity in affiliates are not mapped to the available fields. 'Short-term debt' is the sum of Automotive and GM Financial components under 'Short-term debt and current portion of long-term debt'. 'Long-term debt' is the sum of Automotive and GM Financial components under 'Long-term debt'. Non-operating liabilities (Postretirement benefits, Pensions, Other liabilities) are not included in the mapped fields.",
+    "source_file": "extracted_text/2023 General Motors Annual Report .consolidated-balance-sheet.llm.json"
+  }
+}
