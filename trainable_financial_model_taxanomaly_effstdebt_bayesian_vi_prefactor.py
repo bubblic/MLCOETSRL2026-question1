@@ -670,7 +670,9 @@ class TrainableFinancialModel(tf.Module):
                     )
                 )
                 # Tax-loss compares against total tax (baseline model tax + one-time tax).
-                tax_pred_total = ni_tensor * self.income_tax_pct + tax_onetime_tensor
+                tax_pred_total = (
+                    ni_tensor / (1 / self.income_tax_pct - 1) + tax_onetime_tensor
+                )
                 loss_tax = tf.reduce_mean(
                     tf.square((tax_tensor - tax_pred_total) / scale_tax)
                 )
