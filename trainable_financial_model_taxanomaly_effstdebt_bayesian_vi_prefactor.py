@@ -2800,6 +2800,9 @@ def run_training_and_forecast(
             "sales_t": tf.constant(sales_t1, dtype=tf.float64),
             "year": tf.constant(float(model.base_year + t + 1), dtype=tf.float64),
             "cum_inflation": tf.constant(cum_inf_hist[t + 1], dtype=tf.float64),
+            "tax_onetime_payment": tf.constant(
+                tax_onetime_payments_hist_bil[t + 1], dtype=tf.float64
+            ),
         }
 
         pred = model.forecast_step(state_t, inputs_t, use_mean_opex=True)
