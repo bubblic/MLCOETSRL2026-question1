@@ -383,6 +383,7 @@ class TrainableFinancialModel(tf.Module):
         historical_opex,
         historical_tax,
         historical_eff_st_debt,
+        historical_tax_onetime_payments=None,
         historical_inflation=None,
         historical_years=None,
         learning_rate=0.001,
@@ -419,6 +420,12 @@ class TrainableFinancialModel(tf.Module):
         bb_tensor = tf.convert_to_tensor(historical_stock_buyback, dtype=tf.float64)
         opex_tensor = tf.convert_to_tensor(historical_opex, dtype=tf.float64)
         tax_tensor = tf.convert_to_tensor(historical_tax, dtype=tf.float64)
+        if historical_tax_onetime_payments is None:
+            tax_onetime_tensor = tf.zeros_like(tax_tensor)
+        else:
+            tax_onetime_tensor = tf.convert_to_tensor(
+                historical_tax_onetime_payments, dtype=tf.float64
+            )
         eff_st_debt_tensor = tf.convert_to_tensor(
             historical_eff_st_debt, dtype=tf.float64
         )
@@ -662,10 +669,10 @@ class TrainableFinancialModel(tf.Module):
                         / scale_cash
                     )
                 )
+                # Tax-loss compares against total tax (baseline model tax + one-time tax).
+                tax_pred_total = ni_tensor * self.income_tax_pct + tax_onetime_tensor
                 loss_tax = tf.reduce_mean(
-                    tf.square(
-                        (tax_tensor - ni_tensor * self.income_tax_pct) / scale_tax
-                    )
+                    tf.square((tax_tensor - tax_pred_total) / scale_tax)
                 )
                 div_target = ni_prev_aligned * self.dividend_payout_ratio_pct
                 div_pred = (
@@ -1033,6 +1040,7 @@ class TrainableFinancialModel(tf.Module):
         historical_interest_payment,
         historical_ms_return,
         historical_equity,
+        historical_tax_onetime_payments=None,
         historical_inflation=None,
         historical_years=None,
         learning_rate=0.001,
@@ -1068,6 +1076,12 @@ class TrainableFinancialModel(tf.Module):
         interest_t = tf.convert_to_tensor(historical_interest_payment, dtype=tf.float64)
         ms_return_t = tf.convert_to_tensor(historical_ms_return, dtype=tf.float64)
         equity_t = tf.convert_to_tensor(historical_equity, dtype=tf.float64)
+        if historical_tax_onetime_payments is None:
+            tax_onetime_t = tf.zeros_like(ni_t)
+        else:
+            tax_onetime_t = tf.convert_to_tensor(
+                historical_tax_onetime_payments, dtype=tf.float64
+            )
 
         if historical_inflation is None:
             historical_inflation = tf.zeros_like(sales_t)
@@ -1174,6 +1188,7 @@ class TrainableFinancialModel(tf.Module):
                         "sales_t": sales_t[t + 1],
                         "year": years_t[t + 1],
                         "cum_inflation": cum_inf_t[t + 1],
+                        "tax_onetime_payment": tax_onetime_t[t + 1],
                     }
 
                     # IMPORTANT: Use mean (deterministic) OpEx for structural training
@@ -1469,7 +1484,10 @@ class TrainableFinancialModel(tf.Module):
             investment_in_market_securities_prev * self.market_securities_return_pct
         )
         ebt = ebitda - depreciation - (interest_st + interest_lt) + ms_return
-        tax = ebt * self.income_tax_pct
+        tax_onetime_payment = tf.cast(
+            inputs.get("tax_onetime_payment", 0.0), dtype=tf.float64
+        )
+        tax = ebt * self.income_tax_pct + tax_onetime_payment
         net_income_curr = ebt - tax
 
         # --- 3. Liquidity Budget (LB) ---
@@ -2497,6 +2515,7 @@ def run_training_and_forecast(
     stock_buyback_hist = data["stock_buyback"]
     opex_hist = data["opex"]
     tax_hist = data["tax"]
+    tax_onetime_payments_hist = data["tax_onetime_payments"]
     # st_debt_hist = data["st_debt"]
     inflation_hist = data["inflation"] if use_inflation else np.zeros(len(sales_hist))
     current_lt_debt_hist = data["current_lt_debt"]
@@ -2530,6 +2549,7 @@ def run_training_and_forecast(
     stock_buyback_hist_bil = stock_buyback_hist / amount_scale
     opex_hist_bil = opex_hist / amount_scale
     tax_hist_bil = tax_hist / amount_scale
+    tax_onetime_payments_hist_bil = tax_onetime_payments_hist / amount_scale
     # st_debt_hist_bil = None
     # if st_debt_hist is not None:
     #     st_debt_hist_bil = st_debt_hist / amount_scale
@@ -2569,6 +2589,7 @@ def run_training_and_forecast(
             stock_buyback_hist_bil[:-1],
             opex_hist_bil[:-1],
             tax_hist_bil[:-1],
+            historical_tax_onetime_payments=tax_onetime_payments_hist_bil[:-1],
             historical_eff_st_debt=effective_st_debt_hist_bil[:-1],
             historical_inflation=inflation_hist[:-1],
             historical_years=train_years,
@@ -2599,8 +2620,9 @@ def run_training_and_forecast(
             interest_payment_hist_bil[:-1],
             ms_return_hist_bil[:-1],
             equity_hist_bil[:-1],
-            inflation_hist[:-1],
-            train_years,
+            historical_tax_onetime_payments=tax_onetime_payments_hist_bil[:-1],
+            historical_inflation=inflation_hist[:-1],
+            historical_years=train_years,
             loss_scale_mode="std",
         )
         model.save_parameters(parameters_path)

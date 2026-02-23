@@ -18,13 +18,14 @@ def get_apple_historical_data():
             years             – fiscal year labels [2018..2025]
 
         Income Statement:
-            sales             – total revenues
-            cogs              – cost of goods sold (excl. depreciation)
-            depreciation      – reconciled depreciation
-            cost_of_revenue   – cogs + depreciation
-            opex              – operating expenses
-            net_income        – net income
-            tax               – income tax provision
+            sales                – total revenues
+            cogs                 – cost of goods sold (excl. depreciation)
+            depreciation         – reconciled depreciation
+            cost_of_revenue      – cogs + depreciation
+            opex                 – operating expenses
+            net_income           – net income
+            tax                  – income tax provision
+            tax_onetime_payments – one-time tax anomaly amounts in dollars (null -> 0)
 
         Balance Sheet:
             inventory_plus_one – inventory with one extra leading year (9 values)
@@ -132,6 +133,21 @@ def get_apple_historical_data():
             16741000000,
             29749000000,
             20719000000,
+        ],
+        dtype=np.float64,
+    )
+    # Extracted from extracted_text/apple_YYYY.tax-anomalies-contingencies.llm.json.
+    # Source values are in billions; null values are mapped to 0.0.
+    tax_onetime_payments = np.array(
+        [
+            1.5e9,  # 2018
+            0.0,  # 2019 (null)
+            -0.582e9,  # 2020
+            0.0,  # 2021 (null)
+            0.0,  # 2022 (null)
+            0.0,  # 2023 (null)
+            10.2e9,  # 2024
+            0.0,  # 2025 (null)
         ],
         dtype=np.float64,
     )
@@ -380,6 +396,7 @@ def get_apple_historical_data():
         "opex": opex,
         "net_income": net_income,
         "tax": tax,
+        "tax_onetime_payments": tax_onetime_payments,
         "interest_payment": interest_expense,
         "ms_return": ms_investment_return,
         # Balance Sheet
