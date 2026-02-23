@@ -2492,6 +2492,7 @@ def run_training_and_forecast(
     use_trained_parameters=False,
     parameters_path="trained_parameters.npz",
     use_inflation=True,
+    include_tax_anomalies=True,
 ):
     model = TrainableFinancialModel(base_year=2018)
 
@@ -2517,7 +2518,11 @@ def run_training_and_forecast(
     stock_buyback_hist = data["stock_buyback"]
     opex_hist = data["opex"]
     tax_hist = data["tax"]
-    tax_onetime_payments_hist = data["tax_onetime_payments"]
+    tax_onetime_payments_hist = (
+        data["tax_onetime_payments"]
+        if include_tax_anomalies
+        else np.zeros(len(sales_hist))
+    )
     # st_debt_hist = data["st_debt"]
     inflation_hist = data["inflation"] if use_inflation else np.zeros(len(sales_hist))
     current_lt_debt_hist = data["current_lt_debt"]
@@ -2953,6 +2958,7 @@ def run_training_and_forecast(
 if __name__ == "__main__":
     run_training_and_forecast(
         use_trained_parameters=False,
-        parameters_path="trained_parameters.npz",
+        parameters_path="trained_parameters_include_tax_anomalies.npz",
         use_inflation=True,  # Set to False to disable inflation (all rates → 0%)
+        include_tax_anomalies=True,
     )
