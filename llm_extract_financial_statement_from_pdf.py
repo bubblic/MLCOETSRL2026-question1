@@ -153,7 +153,7 @@ def build_supplementary_page_query(
 ) -> str:
     primary_context = json.dumps(primary_extraction, ensure_ascii=False)
     supplementary_query = (
-        f"Supplementary disclosures, breakdowns, expansions, and note tables for {query}. "
+        f"Supplementary tables for {query}. "
         f"Use this extracted primary statement as context to infer relevant line items and "
         f"find related supplementary pages: {primary_context}"
     )
