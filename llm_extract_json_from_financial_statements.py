@@ -79,10 +79,9 @@ def load_raw_statement(path: Path) -> str:
     with path.open("r", encoding="utf-8") as f:
         payload = json.load(f)
     extraction = payload.get("extraction", {})
-    raw = extraction.get("raw_response", "")
-    if isinstance(raw, str):
-        return raw
-    return str(raw)
+    if isinstance(extraction, str):
+        return extraction
+    return str(extraction)
 
 
 def build_prompt(
@@ -94,7 +93,7 @@ def build_prompt(
     fields_schema = ",\n".join(
         [f'        "{field}": number|null' for field in required_fields]
     )
-    return (
+    prompt = (
         "You are a financial statement extraction engine.\n"
         f"Extract normalized {statement_type} values from the statement text.\n\n"
         "Return ONLY valid JSON with this exact schema:\n"
@@ -122,6 +121,7 @@ def build_prompt(
         "statement_text:\n"
         f"{statement_text}\n"
     )
+    return prompt
 
 
 def to_float_or_none(value: Any) -> Optional[float]:

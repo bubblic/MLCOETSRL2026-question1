@@ -35,6 +35,8 @@ EXTRACTORS = {
     "pdfplumber": extract_text_pdfplumber,
 }
 
+SUPPLEMENTARY_EXTRACTION_MAX_PAGES = 50
+
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
@@ -188,21 +190,45 @@ def extract_supplementary_with_llm(
 ) -> dict[str, object]:
     if not page_numbers:
         return {"supplementary_tables": []}
-    joined_pages = []
-    for page_num in page_numbers:
-        joined_pages.append(f"Page {page_num}:\n{(pages[page_num] or '').strip()}")
-    pages_text = "\n\n---\n\n".join(joined_pages)
-    prompt = build_supplementary_extraction_prompt(
-        query, primary_extraction, pages_text
-    )
-    response = client.ask_json(
-        message="gen-ai-response", prompt=prompt, parameters=parameters, reasoning=True
-    )
-    if "raw_response" in response:
-        extracted = extract_json_from_text(str(response["raw_response"]))
-        if extracted:
-            return extracted
-    return response
+    aggregated_tables: list[object] = []
+    chunk_responses: list[dict[str, object]] = []
+
+    for start in range(0, len(page_numbers), SUPPLEMENTARY_EXTRACTION_MAX_PAGES):
+        chunk_page_numbers = page_numbers[
+            start : start + SUPPLEMENTARY_EXTRACTION_MAX_PAGES
+        ]
+        joined_pages = []
+        for page_num in chunk_page_numbers:
+            joined_pages.append(f"Page {page_num}:\n{(pages[page_num] or '').strip()}")
+        pages_text = "\n\n---\n\n".join(joined_pages)
+        prompt = build_supplementary_extraction_prompt(
+            query, primary_extraction, pages_text
+        )
+        response = client.ask_json(
+            message="gen-ai-response",
+            prompt=prompt,
+            parameters=parameters,
+            reasoning=True,
+        )
+        parsed_response = response
+        if "raw_response" in response:
+            extracted = extract_json_from_text(str(response["raw_response"]))
+            if extracted:
+                parsed_response = extracted
+        chunk_responses.append(parsed_response)
+
+        supplementary_tables = parsed_response.get("supplementary_tables")
+        if isinstance(supplementary_tables, list):
+            aggregated_tables.extend(supplementary_tables)
+
+    if aggregated_tables:
+        return {"supplementary_tables": aggregated_tables}
+    if len(chunk_responses) == 1:
+        return chunk_responses[0]
+    return {
+        "supplementary_tables": [],
+        "chunk_responses": chunk_responses,
+    }
 
 
 def run_pipeline(
