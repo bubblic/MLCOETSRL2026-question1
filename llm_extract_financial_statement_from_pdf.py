@@ -155,7 +155,7 @@ def build_supplementary_page_query(
     supplementary_query = (
         f"Supplementary tables for {query}. "
         f"Use this extracted primary statement as context to infer relevant line items and "
-        f"find related supplementary pages: {primary_context}"
+        f"find pages with related supplementary tables: {primary_context}"
     )
     return supplementary_query
 
