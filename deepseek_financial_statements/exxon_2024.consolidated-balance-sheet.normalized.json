@@ -2,7 +2,7 @@
   "schema_version": "1.0",
   "fields": [
     "cash_and_cash_equivalents",
-    "short_term_investment_in_market_securities",
+    "marketable_securities",
     "accounts_receivable",
     "total_current_liabilities",
     "total_debt_short_term_and_long_term",
@@ -14,10 +14,11 @@
     "statement_type": "consolidated-balance-sheet",
     "periods": [
       {
-        "period": "December 31, 2024",
+        "year": "2024",
+        "currency": "USD",
         "values": {
           "cash_and_cash_equivalents": 23029.0,
-          "short_term_investment_in_market_securities": null,
+          "marketable_securities": null,
           "accounts_receivable": 43681.0,
           "total_current_liabilities": 70307.0,
           "total_debt_short_term_and_long_term": 41710.0,
@@ -26,10 +27,11 @@
         }
       },
       {
-        "period": "December 31, 2023",
+        "year": "2023",
+        "currency": "USD",
         "values": {
           "cash_and_cash_equivalents": 31539.0,
-          "short_term_investment_in_market_securities": null,
+          "marketable_securities": null,
           "accounts_receivable": 38015.0,
           "total_current_liabilities": 65316.0,
           "total_debt_short_term_and_long_term": 41573.0,
@@ -38,7 +40,7 @@
         }
       }
     ],
-    "notes": "1. 'short_term_investment_in_market_securities' not found on the statement; field set to null.\n2. 'accounts_receivable' mapped from 'Notes and accounts receivable – net'.\n3. 'total_debt_short_term_and_long_term' calculated as the sum of 'Notes and loans payable' (listed under current liabilities) and 'Long-term debt'.",
-    "source_file": "extracted_text/exxon_2024.consolidated-balance-sheet.llm.json"
+    "notes": "1. 'Cash and cash equivalents' includes the unrestricted line item only. 'Cash and cash equivalents – restricted' (158 in 2024, 29 in 2023) is excluded as it is not considered a cash equivalent for liquidity purposes. 2. 'Marketable securities' is not explicitly listed. The 'Investments, advances and long-term receivables' line includes equity securities carried at fair value (343 in 2024, 177 in 2023 per Note 8), but these are long-term and not classified as marketable securities. Therefore, marketable_securities is set to null. 3. 'Accounts receivable' maps to 'Notes and accounts receivable – net'. 4. 'Total debt short-term and long-term' is calculated as the sum of 'Notes and loans payable' (current) and 'Long-term debt'. This yields 4,955 + 36,755 = 41,710 for 2024 and 4,090 + 37,483 = 41,573 for 2023. 5. 'Total equity' is taken directly from the statement. 6. 'Total assets' is taken directly from the statement.",
+    "source_file": "extracted_text_total_operating_cost_marketable_securities\\exxon_2024.consolidated-balance-sheet.llm.json"
   }
 }

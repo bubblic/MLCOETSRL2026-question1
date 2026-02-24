@@ -2,7 +2,7 @@
   "schema_version": "1.0",
   "fields": [
     "cash_and_cash_equivalents",
-    "short_term_investment_in_market_securities",
+    "marketable_securities",
     "accounts_receivable",
     "total_current_liabilities",
     "total_debt_short_term_and_long_term",
@@ -14,10 +14,11 @@
     "statement_type": "consolidated-balance-sheet",
     "periods": [
       {
-        "period": "2024",
+        "year": "2024",
+        "currency": "USD",
         "values": {
-          "cash_and_cash_equivalents": 23372.0,
-          "short_term_investment_in_market_securities": null,
+          "cash_and_cash_equivalents": 469317.0,
+          "marketable_securities": 681320.0,
           "accounts_receivable": 101223.0,
           "total_current_liabilities": null,
           "total_debt_short_term_and_long_term": 454311.0,
@@ -26,10 +27,11 @@
         }
       },
       {
-        "period": "2023",
+        "year": "2023",
+        "currency": "USD",
         "values": {
-          "cash_and_cash_equivalents": 29066.0,
-          "short_term_investment_in_market_securities": null,
+          "cash_and_cash_equivalents": 624151.0,
+          "marketable_securities": 571552.0,
           "accounts_receivable": 107363.0,
           "total_current_liabilities": null,
           "total_debt_short_term_and_long_term": 436537.0,
@@ -38,7 +40,7 @@
         }
       }
     ],
-    "notes": "For cash_and_cash_equivalents: Used 'Cash and due from banks' only, as 'Deposits with banks' appears to be a banking operational account. For accounts_receivable: Used 'Accrued interest and accounts receivable'. For total_debt_short_term_and_long_term: Summed 'Short-term borrowings' and 'Long-term debt'. For total_equity: Used 'Total stockholders' equity'. For total_assets: Used 'Total assets(a)'. Note: 'short_term_investment_in_market_securities' not directly found - bank balance sheet shows trading assets, AFS securities, and HTM securities but these are not clearly designated as short-term. 'total_current_liabilities' not provided as the balance sheet does not break out current vs non-current liabilities.",
-    "source_file": "extracted_text/jpmorgan_2024.consolidated-balance-sheet.llm.json"
+    "notes": "1) 'Cash and cash equivalents' is the sum of 'Cash and due from banks' and 'Deposits with banks'. 2) 'Marketable securities' is mapped to 'Investment securities, net of allowance for credit losses'. 3) 'Accounts receivable' is mapped to 'Accrued interest and accounts receivable'. 4) 'Total current liabilities' could not be determined as the statement does not provide a clear subtotal for current liabilities; short-term borrowings are listed but other current liabilities (like portions of deposits, trading liabilities, etc.) are not separately aggregated. 5) 'Total debt short-term and long-term' is the sum of 'Short-term borrowings' and 'Long-term debt'. 6) 'Total equity' is 'Total stockholders’ equity'. 7) 'Total assets' is provided directly.",
+    "source_file": "extracted_text_total_operating_cost_marketable_securities\\jpmorgan_2024.consolidated-balance-sheet.llm.json"
   }
 }

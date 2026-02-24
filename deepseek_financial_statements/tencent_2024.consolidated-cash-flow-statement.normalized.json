@@ -8,19 +8,21 @@
     "statement_type": "consolidated-cash-flow-statement",
     "periods": [
       {
-        "period": "2024",
+        "year": "2024",
+        "currency": "CNY",
         "values": {
-          "depreciation_and_amortization": null
+          "depreciation_and_amortization": 56213.0
         }
       },
       {
-        "period": "2023",
+        "year": "2023",
+        "currency": "CNY",
         "values": {
-          "depreciation_and_amortization": null
+          "depreciation_and_amortization": 59008.0
         }
       }
     ],
-    "notes": "The provided consolidated statement of cash flows does not contain an explicit line item for 'depreciation and amortization'. In a cash flow statement prepared using the indirect method, this is typically listed as an add-back to profit in the operating activities section. However, this statement appears to present operating cash flows using the direct method (starting with 'Cash generated from operations'), and the detailed reconciliation from profit including depreciation and amortization is not included in the provided text. Therefore, the value cannot be extracted and is set to null.",
-    "source_file": "extracted_text/tencent_2024.consolidated-cash-flow-statement.llm.json"
+    "notes": "The 'depreciation_and_amortization' field was calculated by summing the values from the supplementary note for 'Depreciation of property, plant and equipment, investment properties and right-of-use assets' and 'Amortisation of intangible assets and land use rights' for each year. The currency RMB is mapped to its formal 3-letter acronym CNY.",
+    "source_file": "extracted_text_total_operating_cost_marketable_securities\\tencent_2024.consolidated-cash-flow-statement.llm.json"
   }
 }

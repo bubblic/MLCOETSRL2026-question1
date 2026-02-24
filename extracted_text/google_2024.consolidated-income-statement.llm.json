@@ -1,0 +1,61 @@
+{
+  "query": "Consolidated Income Statement",
+  "selected_pages": {
+    "primary_statement_pages": [
+      57,
+      100
+    ],
+    "supplementary_pages": [
+      50,
+      54,
+      57,
+      58,
+      59,
+      60,
+      61,
+      62,
+      63,
+      64,
+      65,
+      66,
+      67,
+      68,
+      69,
+      70,
+      71,
+      72,
+      73,
+      74,
+      75,
+      76,
+      77,
+      78,
+      79,
+      80,
+      81,
+      82,
+      83,
+      84,
+      85,
+      86,
+      87,
+      88,
+      89,
+      90,
+      91,
+      92,
+      93,
+      94,
+      95,
+      96
+    ]
+  },
+  "extraction": {
+    "primary_statement": {
+      "raw_response": "Based on the provided pages, the **Consolidated Statements of Income** table is found on Page 57. Here it is presented in a clean tabular format.\n\n### Alphabet Inc.\n#### Consolidated Statements of Income\n**Year Ended December 31,**\n**(in millions, except per share amounts)**\n\n| Line Item | 2022 | 2023 | 2024 |\n| :--- | :---: | :---: | :---: |\n| **Revenues** | $282,836 | $307,394 | $350,018 |\n| **Costs and expenses:** | | | |\n| &nbsp;&nbsp;Cost of revenues | 126,203 | 133,332 | 146,306 |\n| &nbsp;&nbsp;Research and development | 39,500 | 45,427 | 49,326 |\n| &nbsp;&nbsp;Sales and marketing | 26,567 | 27,917 | 27,808 |\n| &nbsp;&nbsp;General and administrative | 15,724 | 16,425 | 14,188 |\n| **Total costs and expenses** | **207,994** | **223,101** | **237,628** |\n| **Income from operations** | **74,842** | **84,293** | **112,390** |\n| Other income (expense), net | (3,514) | 1,424 | 7,425 |\n| **Income before income taxes** | **71,328** | **85,717** | **119,815** |\n| Provision for income taxes | 11,356 | 11,922 | 19,697 |\n| **Net income** | **$59,972** | **$73,795** | **$100,118** |\n| **Basic net income per share (Note 12)** | $4.59 | $5.84 | $8.13 |\n| **Diluted net income per share (Note 12)** | $4.56 | $5.80 | $8.04 |\n\n*Source: Alphabet 2024 Annual Report, Page 57*"
+    },
+    "supplementary": {
+      "raw_response": "Based on the primary statement (Consolidated Income Statement) and the provided pages, I have identified the following line items that have supplementary disclosures:\n\n1. **Revenues** – Note 2 provides a detailed breakdown by type and geography.\n2. **Other income (expense), net** – Note 7 provides a detailed breakdown of its components.\n3. **Provision for income taxes** – Note 14 provides a detailed reconciliation and breakdown.\n\nBelow are the supplementary tables directly related to those line items:\n\n### Supplementary Table 1: Disaggregated Revenues (Note 2)\n**Year Ended December 31, (in millions)**\n\n| Revenue by Type                     | 2022        | 2023        | 2024        |\n|-------------------------------------|-------------|-------------|-------------|\n| Google Search & other               | $162,450    | $175,033    | $198,084    |\n| YouTube ads                         | 29,243      | 31,510      | 36,147      |\n| Google Network                      | 32,780      | 31,312      | 30,359      |\n| **Google advertising**              | **224,473** | **237,855** | **264,590** |\n| Google subscriptions, platforms, and devices | 29,055      | 34,688      | 40,340      |\n| **Google Services total**           | **253,528** | **272,543** | **304,930** |\n| Google Cloud                        | 26,280      | 33,088      | 43,229      |\n| Other Bets                          | 1,068       | 1,527       | 1,648       |\n| Hedging gains (losses)              | 1,960       | 236         | 211         |\n| **Total revenues**                  | **$282,836**| **$307,394**| **$350,018**|\n\n| Revenue by Geography                | 2022        | 2023        | 2024        |\n|-------------------------------------|-------------|-------------|-------------|\n| United States                       | $134,814 (48%) | $146,286 (47%) | $170,447 (49%) |\n| EMEA                                | 82,062 (29%)  | 91,038 (30%)   | 102,127 (29%)  |\n| APAC                                | 47,024 (16%)  | 51,514 (17%)   | 56,815 (16%)   |\n| Other Americas                      | 16,976 (6%)   | 18,320 (6%)    | 20,418 (6%)    |\n| Hedging gains (losses)              | 1,960 (1%)    | 236 (0%)       | 211 (0%)       |\n| **Total revenues**                  | **$282,836 (100%)** | **$307,394 (100%)** | **$350,018 (100%)** |\n\n### Supplementary Table 2: Other Income (Expense), Net Breakdown (Note 7)\n**Year Ended December 31, (in millions)**\n\n| Component                                      | 2022        | 2023        | 2024        |\n|------------------------------------------------|-------------|-------------|-------------|\n| Interest income                                | $2,174      | $3,865      | $4,482      |\n| Interest expense (net of capitalized interest) | (357)       | (308)       | (268)       |\n| Foreign currency exchange gain (loss), net     | (654)       | (1,238)     | (409)       |\n| Gain (loss) on debt securities, net            | (2,064)     | (1,215)     | (1,043)     |\n| Gain (loss) on equity securities, net          | (3,455)     | 392         | 3,714       |\n| Performance fees                               | 798         | 257         | 218         |\n| Income (loss) and impairment from equity method investments, net | (337)       | (628)       | (188)       |\n| Other                                          | 381         | 299         | 919         |\n| **Other income (expense), net**                | **$(3,514)**| **$1,424**  | **$7,425**  |\n\n### Supplementary Table 3: Income Tax Reconciliation (Note 14)\n**Year Ended December 31, (in millions)**\n\n| Description                                   | 2022        | 2023        | 2024        |\n|-----------------------------------------------|-------------|-------------|-------------|\n| Income before income taxes                    | $71,328     | $85,717     | $119,815    |\n| **Provision for income taxes:**               |             |             |             |\n| Current:                                      |             |             |             |\n| &nbsp;&nbsp; Federal and state               | $17,120     | $17,125     | $22,485     |\n| &nbsp;&nbsp; Foreign                         | 2,434       | 2,526       | 2,468       |\n| &nbsp;&nbsp; **Total current**               | **19,554**  | **19,651**  | **24,953**  |\n| Deferred:                                    |             |             |             |\n| &nbsp;&nbsp; Federal and state               | (8,052)     | (7,482)     | (5,350)     |\n| &nbsp;&nbsp; Foreign                         | (146)       | (247)       | 94          |\n| &nbsp;&nbsp; **Total deferred**              | **(8,198)** | **(7,729)** | **(5,256)** |\n| **Total provision for income taxes**          | **$11,356** | **$11,922** | **$19,697** |\n\n**Effective Tax Rate Reconciliation:**\n\n| Component                                    | 2022    | 2023    | 2024    |\n|----------------------------------------------|---------|---------|---------|\n| U.S. federal statutory tax rate              | 21.0%   | 21.0%   | 21.0%   |\n| Foreign income taxed at different rates      | 3.0%    | 0.3%    | 0.5%    |\n| Foreign-derived intangible income deduction  | (5.4%)  | (4.6%)  | (3.8%)  |\n| Stock-based compensation expense             | (1.2%)  | (0.8%)  | (1.5%)  |\n| Federal research credit                      | (2.2%)  | (1.8%)  | (1.5%)  |\n| Deferred tax asset valuation allowance       | 0.9%    | 0.6%    | 0.4%    |\n| State and local income taxes                 | 0.8%    | 1.0%    | 1.1%    |\n| Effect of tax law change                     | 0.0%    | (1.4%)  | 0.0%    |\n| Other                                        | (1.0%)  | (0.4%)  | 0.2%    |\n| **Effective tax rate**                       | **15.9%**| **13.9%**| **16.4%**|"
+    }
+  }
+}

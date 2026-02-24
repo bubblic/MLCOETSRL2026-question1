@@ -1,0 +1,110 @@
+{
+  "query": "Consolidated Income Statement",
+  "selected_pages": {
+    "primary_statement_pages": [
+      123
+    ],
+    "supplementary_pages": [
+      3,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16,
+      17,
+      18,
+      19,
+      20,
+      21,
+      123,
+      124,
+      134,
+      135,
+      136,
+      137,
+      138,
+      139,
+      140,
+      141,
+      142,
+      143,
+      144,
+      145,
+      146,
+      147,
+      148,
+      149,
+      150,
+      151,
+      152,
+      153,
+      154,
+      155,
+      156,
+      157,
+      158,
+      159,
+      160,
+      161,
+      162,
+      163,
+      164,
+      165,
+      166,
+      167,
+      168,
+      169,
+      170,
+      171,
+      172,
+      173,
+      174,
+      175,
+      176,
+      177,
+      178,
+      179,
+      180,
+      181,
+      182,
+      183,
+      184,
+      185,
+      186,
+      187,
+      188,
+      189,
+      190,
+      191,
+      192,
+      193,
+      194,
+      195,
+      196,
+      197,
+      198,
+      199
+    ]
+  },
+  "extraction": {
+    "primary_statement": {
+      "raw_response": "| Consolidated Income Statement | For the year ended 31 December 2024 |\n|----------------------------------|-----------------------------------|\n| **Year ended 31 December**       | **2024 (RMB’Million)** | **2023 (RMB’Million)** |\n| **Revenues**                     |                       |                       |\n| Value-added Services             | 319,168               | 298,375               |\n| Marketing Services*              | 121,374               | 101,482               |\n| FinTech and Business Services    | 211,956               | 203,763               |\n| Others                           | 7,759                 | 5,395                 |\n| **Total Revenues (Note 6)**      | **660,257**           | **609,015**           |\n| **Cost of revenues (Note 7)**    | (311,011)             | (315,906)             |\n| **Gross profit**                 | **349,246**           | **293,109**           |\n| Selling and marketing expenses (Note 7) | (36,388)        | (34,211)              |\n| General and administrative expenses (Note 7) | (112,761)      | (103,525)             |\n| Other gains/(losses), net (Note 8) | 8,002                | 4,701                 |\n| **Operating profit**             | **208,099**           | **160,074**           |\n| Net gains/(losses) from investments and others (Note 9) | 4,187          | (6,090)               |\n| Interest income (Note 10)        | 16,004                | 13,808                |\n| Finance costs (Note 11)          | (11,981)              | (12,268)              |\n| Share of profit/(loss) of associates and joint ventures, net | 25,176                | 5,800                 |\n| **Profit before income tax**     | **241,485**           | **161,324**           |\n| Income tax expense (Note 12(a))  | (45,018)              | (43,276)              |\n| **Profit for the year**          | **196,467**           | **118,048**           |\n| **Attributable to:**             |                       |                       |\n| Equity holders of the Company    | 194,073               | 115,216               |\n| Non-controlling interests        | 2,394                 | 2,832                 |\n|                                  | **196,467**           | **118,048**           |\n| **Earnings per share for profit attributable to equity holders of the Company (in RMB per share)** | | |\n| – basic (Note 13(a))             | 20.938                | 12.186                |\n| – diluted (Note 13(b))           | 20.486                | 11.887                |\n\n*Note: The Group has renamed this revenue segment from “Online Advertising” to “Marketing Services” during the year ended 31 December 2024 to better represent the breadth of the marketing solutions and accompanying technology services across the online marketing properties.*"
+    },
+    "supplementary": {
+      "supplementary_tables": [],
+      "chunk_responses": [
+        {
+          "raw_response": "Based on the primary Consolidated Income Statement provided, the key line items include:\n*   Revenues (with segment breakdown: Value-added Services, Marketing Services, FinTech and Business Services, Others)\n*   Cost of revenues\n*   Selling and marketing expenses\n*   General and administrative expenses\n*   Other gains/(losses), net\n*   Net gains/(losses) from investments and others\n*   Interest income\n*   Finance costs\n*   Share of profit/(loss) of associates and joint ventures, net\n*   Income tax expense\n\nFrom the provided pages, the following supplementary tables directly related to these line items were found. They provide breakdowns, reconciliations, or additional detail.\n\n### 1. Supplementary Table: Revenue by Segment (Page 8)\nThis table provides a detailed breakdown of the \"Revenues\" line item by business segment, including year-on-year change and percentage of total revenues.\n\n| Segment | Year ended 31 Dec 2024 (RMB millions) | Year ended 31 Dec 2023 (RMB millions) | Year-on-year change | % of total revenues 2024 | % of total revenues 2023 |\n| :--- | :--- | :--- | :--- | :--- | :--- |\n| **Value-added Services (VAS)** | 319,168 | 298,375 | 7% | 49% | 49% |\n| **Marketing Services** | 121,374 | 101,482 | 20% | 18% | 17% |\n| **FinTech and Business Services** | 211,956 | 203,763 | 4% | 32% | 33% |\n| **Others** | 7,759 | 5,395 | 44% | 1% | 1% |\n| **The Group** | **660,257** | **609,015** | **8%** | **100%** | **100%** |\n\n### 2. Supplementary Table: Gross Profit by Segment (Page 9)\nThis table provides a detailed breakdown of the \"Gross profit\" line item by business segment, including gross margin.\n\n| Segment | Year ended 31 Dec 2024 (RMB millions) | Year ended 31 Dec 2023 (RMB millions) | Year-on-year change | Gross Margin 2024 | Gross Margin 2023 |\n| :--- | :--- | :--- | :--- | :--- | :--- |\n| **Value-added Services (VAS)** | 181,657 | 161,919 | 12% | 57% | 54% |\n| **Marketing Services** | 67,232 | 51,344 | 31% | 55% | 51% |\n| **FinTech and Business Services** | 99,701 | 80,636 | 24% | 47% | 40% |\n| **Others** | 656 | (790) | NA | 8% | (15%) |\n| **The Group** | **349,246** | **293,109** | **19%** | **53%** | **48%** |\n\n### 3. Supplementary Table: Reconciliation to Non-IFRS Operating Profit (Page 19-21)\nThis table reconciles the reported \"Operating profit\" to the non-IFRS measure, detailing the adjustments made.\n\n| Adjustment Category | Year ended 31 Dec 2024 (RMB millions) | Year ended 31 Dec 2023 (RMB millions) |\n| :--- | :--- | :--- |\n| **Operating profit (As reported)** | **208,099** | **160,074** |\n| *Add: Share-based compensation* | 23,424 | 22,782 |\n| *Add: Amortisation of intangible assets* | 5,294 | 5,019 |\n| *Add: Impairment provisions/(reversals)* | - | - |\n| *Add: SSV & CPP* | 991 | 998 |\n| *Add: Others* | 3 | 3,013 |\n| **Non-IFRS operating profit** | **237,811** | **191,886** |\n\n### 4. Supplementary Table: Reconciliation of EBITDA and Adjusted EBITDA (Page 18)\nThis table provides a reconciliation from \"Operating profit\" to EBITDA and Adjusted EBITDA, which are supplementary financial measures.\n\n| Line Item | Year ended 31 Dec 2024 (RMB millions) | Year ended 31 Dec 2023 (RMB millions) |\n| :--- | :--- | :--- |\n| **Operating profit** | **208,099** | **160,074** |\n| *Adjustments:* | | |\n| Other (gains)/losses, net | (8,002) | (4,701) |\n| Depreciation of property, plant and equipment and investment properties | 21,141 | 19,908 |\n| Depreciation of right-of-use assets | 6,191 | 6,397 |\n| Amortisation of intangible assets and land use rights | 28,881 | 32,703 |\n| **EBITDA** | **256,310** | **214,381** |\n| *Add: Equity-settled share-based compensation* | 20,702 | 21,073 |\n| **Adjusted EBITDA** | **277,012** | **235,454** |\n\n### 5. Supplementary Table: Quarterly Income Statement (Page 11)\nThis table provides a quarterly breakdown of the full-year income statement figures for Q4 2024 vs. Q4 2023.\n\n| Line Item | Three months ended 31 Dec 2024 (RMB millions) | Three months ended 31 Dec 2023 (RMB millions) |\n| :--- | :--- | :--- |\n| **Revenues** | 172,446 | 155,196 |\n| **Cost of revenues** | (81,793) | (77,632) |\n| **Gross profit** | 90,653 | 77,564 |\n| Selling and marketing expenses | (10,285) | (10,971) |\n| General and administrative expenses | (31,403) | (27,175) |\n| Other gains/(losses), net | 2,513 | 1,983 |\n| **Operating profit** | 51,478 | 41,401 |\n| Net gains/(losses) from investments and others | 1,119 | (6,730) |\n| Interest income | 3,910 | 3,917 |\n| Finance costs | (2,512) | (3,543) |\n| Share of profit/(loss) of associates and joint ventures, net | 9,253 | 2,463 |\n| **Profit before income tax** | 63,248 | 37,508 |\n| Income tax expense | (11,781) | (9,658) |\n| **Profit for the period** | **51,467** | **27,850** |"
+        },
+        {
+          "raw_response": "Based on the primary Consolidated Income Statement and the provided pages, I have identified several line items that have supplementary disclosures. The main supplementary tables are related to the breakdown of expenses, other gains/(losses), net gains/(losses) from investments, finance costs, and segment information.\n\nHere are the extracted supplementary tables in a tabular format:\n\n### 1. Expenses by Nature (Note 7)\n| Nature of Expense                                                                 | 2024 (RMB’Million) | 2023 (RMB’Million) |\n|-----------------------------------------------------------------------------------|---------------------|---------------------|\n| Transaction costs (Note (a))                                                      | 134,954             | 134,864             |\n| Employee benefits expenses (Note (b) and Note 14)                                 | 112,826             | 107,675             |\n| Content costs (excluding amortisation of intangible assets)                       | 68,581              | 62,696              |\n| Amortisation of intangible assets (Note (c) and Note 21)                          | 28,765              | 32,623              |\n| Depreciation of property, plant and equipment, investment properties and right-of-use assets | 27,332              | 26,305              |\n| Bandwidth and server custody fees (excluding depreciation of right-of-use assets) | 26,419              | 24,248              |\n| Promotion and advertising expenses                                                | 25,062              | 22,836              |\n| **Auditor’s remuneration**                                                        |                     |                     |\n| – Audit and audit-related services                                                | 161                 | 155                 |\n| – Non-audit services                                                              | 53                  | 57                  |\n| – Tax advisory                                                                    | 32                  | 23                  |\n| – Due diligence service                                                           | 2                   | 2                   |\n| – Other services                                                                  | 19                  | 32                  |\n\n### 2. Other Gains/(Losses), Net (Note 8)\n| Item               | 2024 (RMB’Million) | 2023 (RMB’Million) |\n|--------------------|---------------------|---------------------|\n| Subsidies and tax rebates | 8,689               | 10,285              |\n| Tenpay-related fine        | –                   | (2,995)             |\n| Others                    | (687)               | (2,589)             |\n| **Total**                 | **8,002**           | **4,701**           |\n\n### 3. Net Gains/(Losses) from Investments and Others (Note 9)\n| Item                                                                                                      | 2024 (RMB’Million) | 2023 (RMB’Million) |\n|-----------------------------------------------------------------------------------------------------------|---------------------|---------------------|\n| Net gains on disposals and deemed disposals of investee companies (Note (a))                              | 12,810              | 4,283               |\n| Net fair value gains/(losses) on FVPL (Note (b) and Note 25)                                              | 3,533               | (1,954)             |\n| Impairment provisions for investments in associates (Note 22(c))                                          | (8,250)             | (6,847)             |\n| Impairment (provisions)/reversals for investments in joint ventures and others                            | (170)               | 752                 |\n| Impairment provisions for goodwill and other intangible assets arising from acquisitions (Note 21)        | (1,369)             | (95)                |\n| Other net fair value losses (Note (c))                                                                    | (892)               | (165)               |\n| Donations (Note (d))                                                                                      | (2,003)             | (2,952)             |\n| Dividend income                                                                                           | 715                 | 546                 |\n| Others (Note (e))                                                                                         | (187)               | 342                 |\n| **Total**                                                                                                 | **4,187**           | **(6,090)**         |\n\n### 4. Finance Costs (Note 11)\n| Item                          | 2024 (RMB’Million) | 2023 (RMB’Million) |\n|-------------------------------|---------------------|---------------------|\n| Interest and related expenses | 12,447              | 11,885              |\n| Exchange (gains)/losses, net  | (466)               | 383                 |\n| **Total**                     | **11,981**          | **12,268**          |\n\n### 5. Segment Information (Note 6)\n**Segment Revenues and Gross Profit**\n| Segment                     | 2024 Revenues (RMB’Million) | 2024 Gross Profit (RMB’Million) | 2023 Revenues (RMB’Million) | 2023 Gross Profit/(Loss) (RMB’Million) |\n|-----------------------------|-----------------------------|---------------------------------|-----------------------------|----------------------------------------|\n| VAS                         | 319,168                     | 181,657                        | 298,375                     | 161,919                                |\n| Marketing Services          | 121,374                     | 67,232                         | 101,482                     | 51,344                                 |\n| FinTech and Business Services | 211,956                   | 99,701                         | 203,763                     | 80,636                                 |\n| Others                      | 7,759                       | 656                            | 5,395                       | (790)                                  |\n| **Total**                   | **660,257**                 | **349,246**                    | **609,015**                 | **293,109**                            |\n\n**Disaggregation of Revenues by Source**\n| Revenue Source               | 2024 (RMB’Million) | 2023 (RMB’Million) |\n|------------------------------|---------------------|---------------------|\n| **VAS**                      | **319,168**         | **298,375**         |\n| – Games                      | 197,712             | 179,860             |\n| – Social networks            | 121,456             | 118,515             |\n| **Marketing Services**       | **121,374**         | **101,482**         |\n| **FinTech and Business Services** | **211,956**     | **203,763**         |\n| **Others**                   | **7,759**           | **5,395**           |\n| **Total**                    | **660,257**         | **609,015**         |\n\n**Geographical Breakdown of Revenues**\n| Geographical Location        | 2024 (RMB’Million) | 2023 (RMB’Million) |\n|------------------------------|---------------------|---------------------|\n| The Mainland of China        | 595,458             | 550,779             |\n| Others                       | 64,799              | 58,236              |\n| **Total**                    | **660,257**         | **609,015**         |\n\n### 6. Contract Liabilities (Note 6(c))\n| Segment                     | As at 31 Dec 2024 (RMB’Million) | As at 31 Dec 2023 (RMB’Million) |\n|-----------------------------|----------------------------------|----------------------------------|\n| VAS                         | 78,784                           | 62,890                           |\n| Marketing Services          | 833                              | 1,335                            |\n| FinTech and Business Services | 7,722                           | 6,733                            |\n| Others                      | 213                              | 172                              |\n| **Total**                   | **87,552**                       | **71,130**                       |\n\n### 7. Income Tax Reconciliation (Note 12(a))\n| Reconciliation Item                                                                 | 2024 (RMB’Million) | 2023 (RMB’Million) |\n|-------------------------------------------------------------------------------------|---------------------|---------------------|\n| Profit before income tax                                                            | 241,485             | 161,324             |\n| Share of (profit)/loss of associates and joint ventures, net                        | (25,176)            | (5,800)             |\n|                                                                                     | 216,309             | 155,524             |\n| Tax calculated at a tax rate of 25%                                                 | 54,077              | 38,881              |\n| Effects of different tax rates applicable to different subsidiaries of the Group     | (22,341)            | (13,971)            |\n| Effects of tax holiday and preferential tax benefits on assessable profits of subsidiaries | (5,806)            | (4,400)             |\n| Income not subject to tax                                                           | (146)               | (433)               |\n| Expenses not deductible for tax purposes                                            | 2,626               | 2,918               |\n| Withholding tax on earnings expected to be remitted by subsidiaries                 | 10,226              | 10,300              |\n| Unrecognised deferred income tax assets                                             | 6,434               | 9,983               |\n| Others                                                                              | (52)                | (2)                 |\n| **Income tax expense**                                                               | **45,018**          | **43,276**          |\n\nThese tables provide detailed breakdowns and supplementary information for the line items identified in the primary Consolidated Income Statement."
+        }
+      ]
+    }
+  }
+}

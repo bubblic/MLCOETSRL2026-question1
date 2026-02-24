@@ -2,7 +2,7 @@
   "schema_version": "1.0",
   "fields": [
     "revenue",
-    "operating_expenses",
+    "total_operating_cost",
     "net_income",
     "taxes",
     "interest_expenses"
@@ -12,47 +12,40 @@
     "statement_type": "consolidated-income-statement",
     "periods": [
       {
-        "period": "2023 RMB (million)",
+        "year": "2023",
+        "currency": "CNY",
         "values": {
           "revenue": 868687.0,
-          "operating_expenses": 768336.0,
-          "net_income": 72783.0,
-          "taxes": -15549.0,
-          "interest_expenses": -5918.0
+          "total_operating_cost": 767332.0,
+          "net_income": 65573.0,
+          "taxes": 15549.0,
+          "interest_expenses": 5918.0
         }
       },
       {
-        "period": "2024 RMB (million)",
+        "year": "2024",
+        "currency": "CNY",
         "values": {
           "revenue": 941168.0,
-          "operating_expenses": 827818.0,
-          "net_income": 80009.0,
-          "taxes": -22529.0,
-          "interest_expenses": -7947.0
+          "total_operating_cost": 828818.0,
+          "net_income": 71332.0,
+          "taxes": 22529.0,
+          "interest_expenses": 7947.0
         }
       },
       {
-        "period": "2025 RMB (million)",
+        "year": "2025",
+        "currency": "CNY",
         "values": {
           "revenue": 996347.0,
-          "operating_expenses": 855442.0,
-          "net_income": 130109.0,
-          "taxes": -35445.0,
-          "interest_expenses": -9596.0
-        }
-      },
-      {
-        "period": "2025 USD (million)",
-        "values": {
-          "revenue": 137300.0,
-          "operating_expenses": 117883.0,
-          "net_income": 17929.0,
-          "taxes": -4884.0,
-          "interest_expenses": -1323.0
+          "total_operating_cost": 856203.0,
+          "net_income": 125976.0,
+          "taxes": 35445.0,
+          "interest_expenses": 9596.0
         }
       }
     ],
-    "notes": "1) Operating expenses calculated as the sum of Operating costs, Product development expenses, Sales and marketing expenses, General and administrative expenses, Amortization and impairment of intangible assets, and Goodwill impairment, minus Other net income. This matches the line item calculation to derive Operating profit. 2) Net income mapped to 'Net profit attributable to Alibaba Group Holding Limited shareholders' as the primary consolidated bottom-line profit metric. 3) Taxes mapped to 'Income tax expense'. 4) Interest expenses mapped directly to 'Interest expense' line item.",
-    "source_file": "extracted_text/alibaba_2025.consolidated-income-statement.llm.json"
+    "notes": "Extracted from the primary consolidated income statement. 'total_operating_cost' is calculated as the sum of '营业成本', '产品开发费用', '销售和市场费用', '一般及行政费用', '无形资产摊销及减值', and '商誉减值'. This aligns with standard practice for technology/e-commerce companies where these are the primary operating expenses before operating profit. 'net_income' is the line item '净利润'. 'taxes' is '所得税费用'. 'interest_expenses' is '利息费用'. Values for 2025 USD columns were not used as the primary currency is CNY. All values are in RMB millions as per the statement.",
+    "source_file": "extracted_text_total_operating_cost_marketable_securities\\alibaba_2025.consolidated-income-statement.llm.json"
   }
 }

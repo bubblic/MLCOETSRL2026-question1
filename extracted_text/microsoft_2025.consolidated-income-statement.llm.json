@@ -1,0 +1,64 @@
+{
+  "query": "Consolidated Income Statement",
+  "selected_pages": {
+    "primary_statement_pages": [
+      35
+    ],
+    "supplementary_pages": [
+      23,
+      24,
+      25,
+      26,
+      27,
+      28,
+      29,
+      30,
+      31,
+      32,
+      33,
+      34,
+      35,
+      36,
+      40,
+      41,
+      42,
+      43,
+      44,
+      45,
+      46,
+      47,
+      48,
+      49,
+      50,
+      51,
+      52,
+      53,
+      54,
+      55,
+      56,
+      57,
+      58,
+      59,
+      60,
+      61,
+      62,
+      63,
+      64,
+      65,
+      66,
+      67,
+      68,
+      69,
+      70,
+      71
+    ]
+  },
+  "extraction": {
+    "primary_statement": {
+      "raw_response": "Based on the provided page, here is the **Consolidated Income Statement** in a tabular format:\n\n### Consolidated Income Statement  \n*(In millions, except per share amounts)*  \n\n| **Year Ended June 30**          | **2025**      | **2024**      | **2023**      |\n|---------------------------------|---------------|---------------|---------------|\n| **Revenue:**                    |               |               |               |\n| Product                         | $ 63,946      | $ 64,773      | $ 64,699      |\n| Service and other               | 217,778       | 180,349       | 147,216       |\n| **Total revenue**               | **281,724**   | **245,122**   | **211,915**   |\n|                                 |               |               |               |\n| **Cost of revenue:**            |               |               |               |\n| Product                         | 13,501        | 15,272        | 17,804        |\n| Service and other               | 74,330        | 58,842        | 48,059        |\n| **Total cost of revenue**       | **87,831**    | **74,114**    | **65,863**    |\n|                                 |               |               |               |\n| **Gross margin**                | **193,893**   | **171,008**   | **146,052**   |\n|                                 |               |               |               |\n| **Operating expenses:**         |               |               |               |\n| Research and development        | 32,488        | 29,510        | 27,195        |\n| Sales and marketing             | 25,654        | 24,456        | 22,759        |\n| General and administrative      | 7,223         | 7,609         | 7,575         |\n| **Operating income**            | **128,528**   | **109,433**   | **88,523**    |\n|                                 |               |               |               |\n| Other income (expense), net     | (4,901)       | (1,646)       | 788           |\n| **Income before income taxes**  | **123,627**   | **107,787**   | **89,311**    |\n| Provision for income taxes      | 21,795        | 19,651        | 16,950        |\n| **Net income**                  | **$ 101,832** | **$ 88,136**  | **$ 72,361**  |\n|                                 |               |               |               |\n| **Earnings per share:**         |               |               |               |\n| Basic                           | $ 13.70       | $ 11.86       | $ 9.72        |\n| Diluted                         | $ 13.64       | $ 11.80       | $ 9.68        |\n|                                 |               |               |               |\n| **Weighted average shares outstanding:** |               |               |               |\n| Basic                           | 7,433         | 7,431         | 7,446         |\n| Diluted                         | 7,465         | 7,469         | 7,472         |\n\n*Refer to accompanying notes.*"
+    },
+    "supplementary": {
+      "raw_response": "Based on the primary Consolidated Income Statement provided, the key line items include **Revenue**, **Cost of revenue**, **Gross margin**, **Operating expenses** (Research and development, Sales and marketing, General and administrative), **Operating income**, **Other income (expense), net**, **Income before income taxes**, **Provision for income taxes**, and **Net income**.\n\nFrom the provided pages, I have identified supplementary tables that directly expand on the following line items:\n\n1. **Other income (expense), net** – A detailed breakdown is provided on Page 27 and in Note 3 (Page 48).\n2. **Operating expenses** – Detailed tables for Research and development, Sales and marketing, and General and administrative are on Page 26.\n3. **Segment results** – A detailed segment breakdown of revenue, cost of revenue, operating expenses, and operating income is on Pages 24-25 and in Note 18 (Pages 70-71).\n4. **Provision for income taxes** – Detailed components and effective tax rate reconciliation are in Note 11 (Pages 59-60).\n\nHere are the extracted supplementary tables in a tabular format:\n\n### 1. Other Income (Expense), Net Breakdown\n*(In millions)*\n\n| Component                                 | Year Ended June 30, 2025 | Year Ended June 30, 2024 |\n|-------------------------------------------|--------------------------|--------------------------|\n| Interest and dividends income             | $2,647                   | $3,157                   |\n| Interest expense                          | (2,385)                  | (2,935)                  |\n| Net recognized losses on investments      | (349)                    | (118)                    |\n| Net losses on derivatives                 | (260)                    | (187)                    |\n| Net gains (losses) on foreign currency remeasurements | 171                      | (244)                    |\n| Other, net                                | (4,725)                  | (1,319)                  |\n| **Total other income (expense), net**     | **$(4,901)**             | **$(1,646)**             |\n\n*Source: Page 27 and Note 3 (Page 48)*\n\n### 2. Operating Expenses Breakdown\n*(In millions, except percentages)*\n\n| Expense Category          | 2025      | 2024      | Change |\n|---------------------------|-----------|-----------|--------|\n| **Research and development** | $32,488   | $29,510   | 10%    |\n| As a percent of revenue   | 12%       | 12%       | 0ppt   |\n| **Sales and marketing**     | $25,654   | $24,456   | 5%     |\n| As a percent of revenue   | 9%        | 10%       | (1)ppt |\n| **General and administrative** | $7,223    | $7,609    | (5)%   |\n| As a percent of revenue   | 3%        | 3%        | 0ppt   |\n\n*Source: Page 26*\n\n### 3. Segment Results\n*(In millions, except percentages)*\n\n| Segment                        | 2025      | 2024      | Change |\n|--------------------------------|-----------|-----------|--------|\n| **Productivity and Business Processes** |           |           |        |\n| Revenue                        | $120,810  | $106,820  | 13%    |\n| Cost of revenue                | 22,422    | 19,611    | 14%    |\n| Operating expenses             | 28,615    | 27,548    | 4%     |\n| Operating Income               | **$69,773**| **$59,661**| 17%    |\n| **Intelligent Cloud**          |           |           |        |\n| Revenue                        | $106,265  | $87,464   | 21%    |\n| Cost of revenue                | 40,171    | 29,611    | 36%    |\n| Operating expenses             | 21,505    | 20,040    | 7%     |\n| Operating Income               | **$44,589**| **$37,813**| 18%    |\n| **More Personal Computing**    |           |           |        |\n| Revenue                        | $54,649   | $50,838   | 7%     |\n| Cost of revenue                | 25,238    | 24,892    | 1%     |\n| Operating expenses             | 15,245    | 13,987    | 9%     |\n| Operating Income               | **$14,166**| **$11,959**| 18%    |\n| **Total**                      |           |           |        |\n| Revenue                        | $281,724  | $245,122  | 15%    |\n| Cost of revenue                | 87,831    | 74,114    | 19%    |\n| Operating expenses             | 65,365    | 61,575    | 6%     |\n| Operating Income               | **$128,528**| **$109,433**| 17%    |\n\n*Source: Pages 24-25 and Note 18 (Page 70)*\n\n### 4. Income Taxes - Effective Tax Rate Reconciliation\n*(In millions, except percentages)*\n\n| Component                                                                 | 2025   | 2024   | 2023   |\n|---------------------------------------------------------------------------|--------|--------|--------|\n| Income before income taxes: U.S.                                          | $69,212| $62,886| $52,917|\n| Income before income taxes: Foreign                                       | 54,415 | 44,901 | 36,394 |\n| **Total income before income taxes**                                      | **$123,627**| **$107,787**| **$89,311**|\n| **Provision for income taxes**                                            | **$21,795**| **$19,651**| **$16,950**|\n| **Effective tax rate**                                                    | **17.6%**| **18.2%**| **19.0%**|\n| *Reconciliation of U.S. federal statutory rate to effective rate:*        |        |        |        |\n| Federal statutory rate                                                    | 21.0%  | 21.0%  | 21.0%  |\n| Effect of:                                                                |        |        |        |\n| Foreign earnings taxed at lower rates                                     | (1.5)% | (1.4)% | (1.8)% |\n| Foreign-derived intangible income deduction                               | (1.0)% | (1.1)% | (1.3)% |\n| State income taxes, net of federal benefit                                | 1.5%   | 1.5%   | 1.6%   |\n| Research and development credit                                           | (1.1)% | (1.1)% | (1.1)% |\n| Excess tax benefits relating to stock-based compensation                  | (0.9)% | (1.1)% | (0.7)% |\n| Interest, net                                                             | 1.0%   | 1.1%   | 0.8%   |\n| Other reconciling items, net                                              | (1.4)% | (0.7)% | 0.5%   |\n\n*Source: Note 11 (Pages 59-60)*"
+    }
+  }
+}

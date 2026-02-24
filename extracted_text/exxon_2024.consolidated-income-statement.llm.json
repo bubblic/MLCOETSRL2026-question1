@@ -1,0 +1,83 @@
+{
+  "query": "Consolidated Income Statement",
+  "selected_pages": {
+    "primary_statement_pages": [
+      84,
+      116,
+      117,
+      119,
+      120,
+      121
+    ],
+    "supplementary_pages": [
+      84,
+      85,
+      89,
+      90,
+      91,
+      92,
+      93,
+      94,
+      95,
+      96,
+      97,
+      98,
+      99,
+      100,
+      101,
+      102,
+      103,
+      104,
+      105,
+      106,
+      107,
+      108,
+      109,
+      110,
+      111,
+      112,
+      113,
+      114,
+      115,
+      116,
+      117,
+      118,
+      119,
+      120,
+      121,
+      122,
+      123,
+      124,
+      125,
+      126,
+      128,
+      129,
+      130,
+      131,
+      132,
+      133,
+      134,
+      135,
+      136,
+      137,
+      138,
+      139
+    ]
+  },
+  "extraction": {
+    "primary_statement": {
+      "raw_response": "Based on the provided pages, the **Consolidated Statement of Income** is found on **Page 84**. Here is the data presented in a clean tabular format.\n\n### Consolidated Statement of Income\n**(millions of dollars)**\n\n| Line Item | Note | 2024 | 2023 | 2022 |\n| :--- | :--- | :---: | :---: | :---: |\n| **Revenues and other income** | | | | |\n| Sales and other operating revenue | 18 | 339,247 | 334,697 | 398,675 |\n| Income from equity affiliates | 7 | 6,194 | 6,385 | 11,463 |\n| Other income | | 4,144 | 3,500 | 3,542 |\n| **Total revenues and other income** | | **349,585** | **344,582** | **413,680** |\n| | | | | |\n| **Costs and other deductions** | | | | |\n| Crude oil and product purchases | | 199,454 | 193,029 | 228,959 |\n| Production and manufacturing expenses | | 39,609 | 36,885 | 42,609 |\n| Selling, general and administrative expenses | | 9,976 | 9,919 | 10,095 |\n| Depreciation and depletion (includes impairments) | 2, 9 | 23,442 | 20,641 | 24,040 |\n| Exploration expenses, including dry holes | | 826 | 751 | 1,025 |\n| Non-service pension and postretirement benefit expense | 17 | 121 | 714 | 482 |\n| Interest expense | | 996 | 849 | 798 |\n| Other taxes and duties | 19 | 26,288 | 29,011 | 27,919 |\n| **Total costs and other deductions** | | **300,712** | **291,799** | **335,927** |\n| | | | | |\n| **Income (loss) before income taxes** | | **48,873** | **52,783** | **77,753** |\n| Income tax expense (benefit) | 19 | 13,810 | 15,429 | 20,176 |\n| **Net income (loss) including noncontrolling interests** | | **35,063** | **37,354** | **57,577** |\n| Net income (loss) attributable to noncontrolling interests | | 1,383 | 1,344 | 1,837 |\n| **Net income (loss) attributable to ExxonMobil** | | **33,680** | **36,010** | **55,740** |\n| | | | | |\n| **Earnings (loss) per common share (dollars)** | | | | |\n| Basic | 12 | 7.84 | 8.89 | 13.26 |\n| Diluted | 12 | 7.84 | 8.89 | 13.26 |\n\n*The information in the Notes to Consolidated Financial Statements is an integral part of these statements.*"
+    },
+    "supplementary": {
+      "supplementary_tables": [],
+      "chunk_responses": [
+        {
+          "raw_response": "Based on the primary Consolidated Income Statement provided, the key line items that could have supplementary disclosures are:\n*   **Sales and other operating revenue** (Note 18)\n*   **Income from equity affiliates** (Note 7)\n*   **Other income**\n*   **Depreciation and depletion (includes impairments)** (Notes 2, 9)\n*   **Non-service pension and postretirement benefit expense** (Note 17)\n*   **Other taxes and duties** (Note 19)\n*   **Income tax expense (benefit)** (Note 19)\n\nFrom the provided pages, I found the following supplementary tables that provide breakdowns or expansions of these line items.\n\n### Supplementary Table 1: Breakdown of \"Other Income\" (Referenced from Note 5)\nThis note details components within \"Other income\" on the Income Statement.\n| Component (millions of dollars) | 2024 | 2023 | 2022 |\n| :--- | :---: | :---: | :---: |\n| Net (gain)/loss on asset sales and divestments | Included | Included | Included |\n| Foreign exchange transaction (losses) | (507) | (51) | (218) |\n| LIFO inventory gain | 176 | 366 | 367 |\n| *Reported in Consolidated Income Statement line \"Other income\"* | *4,144* | *3,500* | *3,542* |\n\n### Supplementary Table 2: Breakdown of \"Sales and other operating revenue\" (Referenced from Note 18)\nThis note breaks down revenue between ASC 606 and non-ASC 606 contracts, and provides a geographic breakdown.\n| Category (millions of dollars) | 2024 | 2023 | 2022 |\n| :--- | :---: | :---: | :---: |\n| **Revenue from contracts with customers (ASC 606)** | 245,143 | 256,455 | 304,758 |\n| **Revenue outside scope of ASC 606** | 94,104 | 78,242 | 93,917 |\n| **Total Sales and other operating revenue** | **339,247** | **334,697** | **398,675** |\n| | | | |\n| **Geographic Breakdown** | | | |\n| United States | 138,657 | 127,374 | 149,225 |\n| Non-U.S. | 200,590 | 207,323 | 249,450 |\n| **Total Sales and other operating revenue** | **339,247** | **334,697** | **398,675** |\n\n### Supplementary Table 3: Breakdown of \"Income from equity affiliates\" (Referenced from Note 7)\nThis note provides summarized financial information for equity companies.\n| Equity Company Financial Summary (ExxonMobil Share) | 2024 | 2023 | 2022 |\n| :--- | :---: | :---: | :---: |\n| Total revenues | 35,532 | 40,682 | 57,528 |\n| Income before income taxes | 9,304 | 10,078 | 19,279 |\n| Income taxes | 3,209 | 3,085 | 7,603 |\n| **Income from equity affiliates** | **6,095** | **6,993** | **11,676** |\n| Net assets | 32,195 | 32,988 | 33,431 |\n\n### Supplementary Table 4: Breakdown of \"Depreciation and depletion\" and Impairments (Referenced from Notes 2 & 9)\nThese notes detail impairment charges included within the \"Depreciation and depletion\" line.\n| Impairment Detail (Before-tax, millions of dollars) | 2024 | 2023 | 2022 |\n| :--- | :---: | :---: | :---: |\n| Russia/Sakhalin-1 exit (Note 2) | — | — | ~4,600 |\n| Upstream (excluding Sakhalin) | Immaterial | 300 | 1,500 |\n| Energy Products | — | — | 400 |\n| Chemical Products | — | 300 | — |\n| Specialty Products | — | 100 | — |\n| Idled Santa Ynez Unit (California) | — | ~3,300 | — |\n| **Total Impairment Charges** | **Immaterial** | **~3,700** | **~6,500** |\n| *Primary Income Statement Line* | *Depreciation & Depletion* | *Depreciation & Depletion* | *Depreciation & Depletion* |\n\n### Supplementary Table 5: Breakdown of \"Income tax expense (benefit)\" and \"Other taxes and duties\" (Referenced from Note 19)\nThis note provides a detailed breakdown of income taxes and other taxes.\n| Tax Detail (millions of dollars) | 2024 | 2023 | 2022 |\n| :--- | :---: | :---: | :---: |\n| **Income Tax Expense (Benefit)** | | | |\n| U.S. Federal & State Current | 2,459 | 2,059 | 1,457 |\n| U.S. Federal & State Deferred | (830) | 944 | 3,583 |\n| Non-U.S. Current | 11,940 | 12,111 | 15,071 |\n| Non-U.S. Deferred | (512) | 481 | (539) |\n| U.S. Tax on Non-U.S. Operations | 241 | 315 | 65 |\n| **Total Income Tax Expense** | **13,810** | **15,429** | **20,176** |\n| | | | |\n| **Other Taxes and Duties** | | | |\n| Reported in \"Other taxes and duties\" line | 26,288 | 29,011 | 27,919 |\n| Reported in Production expenses | 3,162 | 2,687 | 3,066 |\n| Reported in SG&A expenses | 444 | 493 | 470 |\n| **Total Other Taxes and Duties** | **29,894** | **32,191** | **31,455** |\n\n### Supplementary Table 6: Components of \"Non-service pension and postretirement benefit expense\" (Referenced from Note 17)\nThis note breaks down the net periodic benefit cost.\n| Pension & Postretirement Benefit Cost Components (millions of dollars) | 2024 | 2023 | 2022 |\n| :--- | :---: | :---: | :---: |\n| Service cost | 918 | 867 | 1,420 |\n| Interest cost | 1,744 | 1,862 | 1,408 |\n| Expected return on plan assets | (1,699) | (1,234) | (1,389) |\n| Amortization & other costs | 177 | 229 | 196 |\n| **Net Periodic Benefit Cost** | **1,140** | **1,724** | **1,635** |\n| *Reported in Income Statement as* | *\"Non-service pension and postretirement benefit expense\"* | *\"Non-service pension and postretirement benefit expense\"* | *\"Non-service pension and postretirement benefit expense\"* |"
+        },
+        {
+          "raw_response": "Based on the primary Consolidated Income Statement, the line items include \"Sales and other operating revenue,\" \"Income from equity affiliates,\" and \"Other income.\" The provided pages (138-139) contain supplementary disclosures related to oil and gas reserves and their standardized measure of discounted future cash flows. These are not direct breakdowns of the income statement line items but are supplementary financial disclosures often associated with the company's operations and reserves.\n\nHowever, since the request is for supplementary tables **directly related** to the inferred line items (like an expanded 'Other Income' table), and the provided pages do not contain such expansions, the appropriate response is:\n\n**No supplementary tables found.**"
+        }
+      ]
+    }
+  }
+}

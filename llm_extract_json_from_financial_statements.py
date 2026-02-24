@@ -25,7 +25,7 @@ STATEMENT_CONFIGS: Dict[str, Dict[str, Any]] = {
         "output_suffix": ".consolidated-balance-sheet.normalized.json",
         "fields": [
             "cash_and_cash_equivalents",
-            "short_term_investment_in_market_securities",
+            "marketable_securities",
             "accounts_receivable",
             "total_current_liabilities",
             "total_debt_short_term_and_long_term",
@@ -38,7 +38,7 @@ STATEMENT_CONFIGS: Dict[str, Dict[str, Any]] = {
         "output_suffix": ".consolidated-income-statement.normalized.json",
         "fields": [
             "revenue",
-            "operating_expenses",
+            "total_operating_cost",
             "net_income",
             "taxes",
             "interest_expenses",
@@ -101,7 +101,8 @@ def build_prompt(
         '  "company_id": "string",\n'
         '  "periods": [\n'
         "    {\n"
-        '      "period": "string",\n'
+        '      "year": "string",\n'
+        '      "currency": "string",\n'
         '      "values": {\n'
         f"{fields_schema}\n"
         "      }\n"
@@ -115,8 +116,9 @@ def build_prompt(
         "3) If a value cannot be directly mapped to a field, try to map number(s) to the corresponding field by taking into account the industry the company is in, and note what you did in notes field. If you cannot find a match, return null.\n"
         "4) If there are multiple close synonyms, use best accounting match.\n"
         "5) For parentheses negatives, return negative numbers.\n"
-        "6) Keep the period text exactly as shown in the statement.\n"
-        "7) Return JSON only.\n\n"
+        "6) For year, report the year of the period only.\n"
+        "7) For currency, report its formal 3-letter acronym.\n"
+        "8) Return JSON only.\n\n"
         f"company_id: {company_id}\n\n"
         "statement_text:\n"
         f"{statement_text}\n"
@@ -168,7 +170,8 @@ def normalize_periods(periods: Any, required_fields: List[str]) -> List[Dict[str
     for period_item in periods:
         if not isinstance(period_item, dict):
             continue
-        period_label = str(period_item.get("period", "")).strip()
+        period_label = str(period_item.get("year", "")).strip()
+        currency_label = str(period_item.get("currency", "")).strip()
         values = period_item.get("values", {})
         if not isinstance(values, dict):
             values = {}
@@ -179,7 +182,8 @@ def normalize_periods(periods: Any, required_fields: List[str]) -> List[Dict[str
 
         normalized.append(
             {
-                "period": period_label,
+                "year": period_label,
+                "currency": currency_label,
                 "values": normalized_values,
             }
         )

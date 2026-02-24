@@ -8,25 +8,28 @@
     "statement_type": "consolidated-cash-flow-statement",
     "periods": [
       {
-        "period": "2022",
+        "year": "2022",
+        "currency": "USD",
         "values": {
           "depreciation_and_amortization": 13475.0
         }
       },
       {
-        "period": "2023",
+        "year": "2023",
+        "currency": "USD",
         "values": {
           "depreciation_and_amortization": 11946.0
         }
       },
       {
-        "period": "2024",
+        "year": "2024",
+        "currency": "USD",
         "values": {
           "depreciation_and_amortization": 15311.0
         }
       }
     ],
-    "notes": "Mapped 'Depreciation of property and equipment' line item to 'depreciation_and_amortization' field. No separate amortization line was found in the provided cash flow statement. Used all three available periods (2022, 2023, 2024).",
-    "source_file": "extracted_text/google_2024.consolidated-cash-flow-statement.llm.json"
+    "notes": "The field 'depreciation_and_amortization' was mapped directly from the line item 'Depreciation of property and equipment' in the operating activities section. The statement does not list a separate 'amortization' line, which is common for technology companies where amortization of intangibles may be immaterial or combined. No other adjustments were made.",
+    "source_file": "extracted_text_total_operating_cost_marketable_securities\\google_2024.consolidated-cash-flow-statement.llm.json"
   }
 }

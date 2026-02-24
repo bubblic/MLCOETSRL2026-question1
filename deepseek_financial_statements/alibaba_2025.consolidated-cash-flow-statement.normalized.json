@@ -8,31 +8,28 @@
     "statement_type": "consolidated-cash-flow-statement",
     "periods": [
       {
-        "period": "2023 (RMB 百万)",
+        "year": "2023",
+        "currency": "CNY",
         "values": {
           "depreciation_and_amortization": 46938.0
         }
       },
       {
-        "period": "2024 (RMB 百万)",
+        "year": "2024",
+        "currency": "CNY",
         "values": {
-          "depreciation_and_amortization": 44504.0
+          "depreciation_and_amortization": 44404.0
         }
       },
       {
-        "period": "2025 (RMB 百万)",
+        "year": "2025",
+        "currency": "CNY",
         "values": {
           "depreciation_and_amortization": 42459.0
         }
-      },
-      {
-        "period": "2025 (USD 百万)",
-        "values": {
-          "depreciation_and_amortization": 5851.0
-        }
       }
     ],
-    "notes": "The field 'depreciation_and_amortization' is derived by summing the line items '物業及設備的折舊及減值以及與土地使用權有關的經營租賃成本' (depreciation and impairment of property and equipment and operating lease costs related to land use rights) and '無形資產及獲授權版權的攤銷' (amortization of intangible assets and licensed copyrights). This is a common aggregation for the 'depreciation and amortization' adjustment in the cash flow statement, even though the first line item includes impairment and lease costs. The calculated values for each period are: 2023 (RMB): 27,799 + 19,139 = 46,938; 2024 (RMB): 26,640 + 17,864 = 44,504; 2025 (RMB): 29,260 + 13,199 = 42,459; 2025 (USD): 4,032 + 1,819 = 5,851.",
-    "source_file": "extracted_text/alibaba_2025.consolidated-cash-flow-statement.llm.json"
+    "notes": "The 'depreciation_and_amortization' field was derived by summing the line items 'Depreciation and impairment of property and equipment and operating lease cost related to land use rights' and 'Amortization of intangible assets and licensed copyrights' from the provided cash flow statement. This is a standard consolidation for this field, as the statement does not have a single line item labeled 'Depreciation and amortization'. Values are taken from the RMB columns.",
+    "source_file": "extracted_text_total_operating_cost_marketable_securities\\alibaba_2025.consolidated-cash-flow-statement.llm.json"
   }
 }

@@ -2,7 +2,7 @@
   "schema_version": "1.0",
   "fields": [
     "revenue",
-    "operating_expenses",
+    "total_operating_cost",
     "net_income",
     "taxes",
     "interest_expenses"
@@ -12,37 +12,40 @@
     "statement_type": "consolidated-income-statement",
     "periods": [
       {
-        "period": "2024",
+        "year": "2024",
+        "currency": "USD",
         "values": {
           "revenue": 177556.0,
-          "operating_expenses": 91797.0,
+          "total_operating_cost": 102475.0,
           "net_income": 58471.0,
           "taxes": 16610.0,
           "interest_expenses": 101350.0
         }
       },
       {
-        "period": "2023",
+        "year": "2023",
+        "currency": "USD",
         "values": {
           "revenue": 158104.0,
-          "operating_expenses": 87172.0,
+          "total_operating_cost": 96492.0,
           "net_income": 49552.0,
           "taxes": 12060.0,
           "interest_expenses": 81321.0
         }
       },
       {
-        "period": "2022",
+        "year": "2022",
+        "currency": "USD",
         "values": {
           "revenue": 128695.0,
-          "operating_expenses": 76140.0,
+          "total_operating_cost": 82529.0,
           "net_income": 37676.0,
           "taxes": 8490.0,
           "interest_expenses": 26097.0
         }
       }
     ],
-    "notes": "For a bank, 'Total net revenue' (Noninterest revenue + Net interest income) is mapped to 'revenue'. 'Total noninterest expense' is mapped to 'operating_expenses'. 'Net income' and 'Income tax expense' are directly mapped. 'Interest expense' is directly mapped.",
-    "source_file": "extracted_text/jpmorgan_2024.consolidated-income-statement.llm.json"
+    "notes": "Revenue mapped from 'Total net revenue'. Total operating cost calculated as sum of 'Provision for credit losses' and 'Total noninterest expense'. Taxes mapped from 'Income tax expense'. Interest expenses mapped directly. All values sourced from the primary consolidated income statement table.",
+    "source_file": "extracted_text_total_operating_cost_marketable_securities\\jpmorgan_2024.consolidated-income-statement.llm.json"
   }
 }

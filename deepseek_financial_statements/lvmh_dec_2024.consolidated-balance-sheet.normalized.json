@@ -2,7 +2,7 @@
   "schema_version": "1.0",
   "fields": [
     "cash_and_cash_equivalents",
-    "short_term_investment_in_market_securities",
+    "marketable_securities",
     "accounts_receivable",
     "total_current_liabilities",
     "total_debt_short_term_and_long_term",
@@ -14,10 +14,11 @@
     "statement_type": "consolidated-balance-sheet",
     "periods": [
       {
-        "period": "2024",
+        "year": "2024",
+        "currency": "EUR",
         "values": {
           "cash_and_cash_equivalents": 9631.0,
-          "short_term_investment_in_market_securities": null,
+          "marketable_securities": 3956.0,
           "accounts_receivable": 4730.0,
           "total_current_liabilities": 33696.0,
           "total_debt_short_term_and_long_term": 22942.0,
@@ -26,10 +27,11 @@
         }
       },
       {
-        "period": "2023",
+        "year": "2023",
+        "currency": "EUR",
         "values": {
           "cash_and_cash_equivalents": 7774.0,
-          "short_term_investment_in_market_securities": null,
+          "marketable_securities": 3490.0,
           "accounts_receivable": 4728.0,
           "total_current_liabilities": 33145.0,
           "total_debt_short_term_and_long_term": 21907.0,
@@ -38,10 +40,11 @@
         }
       },
       {
-        "period": "2022",
+        "year": "2022",
+        "currency": "EUR",
         "values": {
           "cash_and_cash_equivalents": 7300.0,
-          "short_term_investment_in_market_securities": null,
+          "marketable_securities": 3552.0,
           "accounts_receivable": 4258.0,
           "total_current_liabilities": 31543.0,
           "total_debt_short_term_and_long_term": 19739.0,
@@ -50,7 +53,7 @@
         }
       }
     ],
-    "notes": "Extracted values directly from labeled line items. 'Accounts receivable' mapped from 'Trade accounts receivable'. 'Total debt (short and long term)' calculated as sum of 'Short-term borrowings' and 'Long-term borrowings' (10,851 + 12,091 = 22,942 for 2024, etc.). No line item for 'short term investment in market securities' was found; considered 'Non-current available for sale financial assets' but it is non-current. 'Total equity' taken from the 'Equity' line which is the sum of 'Equity, Group share' and 'Minority interests'.",
-    "source_file": "extracted_text/lvmh_dec_2024.consolidated-balance-sheet.llm.json"
+    "notes": "1. 'Marketable securities' mapped from 'Current available for sale financial assets' in supplementary Note 19.1 (Net financial debt table). 2. 'Accounts receivable' mapped from 'Trade accounts receivable' on the primary balance sheet. 3. 'Total debt short term and long term' mapped from the sum of 'Long-term borrowings' and 'Short-term borrowings' (Gross borrowings) from supplementary Note 19.1.",
+    "source_file": "extracted_text_total_operating_cost_marketable_securities\\lvmh_dec_2024.consolidated-balance-sheet.llm.json"
   }
 }

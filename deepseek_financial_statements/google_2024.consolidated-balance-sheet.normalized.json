@@ -2,7 +2,7 @@
   "schema_version": "1.0",
   "fields": [
     "cash_and_cash_equivalents",
-    "short_term_investment_in_market_securities",
+    "marketable_securities",
     "accounts_receivable",
     "total_current_liabilities",
     "total_debt_short_term_and_long_term",
@@ -14,10 +14,11 @@
     "statement_type": "consolidated-balance-sheet",
     "periods": [
       {
-        "period": "2023",
+        "year": "2023",
+        "currency": "USD",
         "values": {
           "cash_and_cash_equivalents": 24048.0,
-          "short_term_investment_in_market_securities": 86868.0,
+          "marketable_securities": 86868.0,
           "accounts_receivable": 47964.0,
           "total_current_liabilities": 81814.0,
           "total_debt_short_term_and_long_term": 11870.0,
@@ -26,10 +27,11 @@
         }
       },
       {
-        "period": "2024",
+        "year": "2024",
+        "currency": "USD",
         "values": {
           "cash_and_cash_equivalents": 23466.0,
-          "short_term_investment_in_market_securities": 72191.0,
+          "marketable_securities": 72191.0,
           "accounts_receivable": 52340.0,
           "total_current_liabilities": 89122.0,
           "total_debt_short_term_and_long_term": 10883.0,
@@ -38,7 +40,7 @@
         }
       }
     ],
-    "notes": "Mapped 'Marketable securities' (current assets) to 'short_term_investment_in_market_securities'. No separate short-term debt line item was found in current liabilities; only 'Long-term debt' is present and mapped to 'total_debt_short_term_and_long_term'.",
-    "source_file": "extracted_text/google_2024.consolidated-balance-sheet.llm.json"
+    "notes": "All values extracted directly from the primary statement. 'Total debt short-term and long-term' mapped to the 'Long-term debt' line item, as no short-term debt is listed separately. 'Accounts receivable' mapped to 'Accounts receivable, net'. 'Total equity' mapped to 'Total stockholders’ equity'.",
+    "source_file": "extracted_text_total_operating_cost_marketable_securities\\google_2024.consolidated-balance-sheet.llm.json"
   }
 }

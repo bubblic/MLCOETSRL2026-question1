@@ -1,0 +1,66 @@
+{
+  "query": "Consolidated Income Statement",
+  "selected_pages": {
+    "primary_statement_pages": [
+      60
+    ],
+    "supplementary_pages": [
+      33,
+      34,
+      35,
+      36,
+      37,
+      60,
+      64,
+      65,
+      66,
+      67,
+      68,
+      69,
+      70,
+      71,
+      72,
+      73,
+      74,
+      75,
+      76,
+      77,
+      78,
+      79,
+      80,
+      81,
+      82,
+      83,
+      84,
+      85,
+      86,
+      87,
+      88,
+      89,
+      90,
+      91,
+      92,
+      93,
+      94,
+      95,
+      96,
+      97,
+      98,
+      99,
+      100,
+      101,
+      102,
+      103,
+      104,
+      109
+    ]
+  },
+  "extraction": {
+    "primary_statement": {
+      "raw_response": "| Line Item | 2023 | 2022 | 2021 |\n|-----------|------|------|------|\n| Net sales and revenue | | | |\n| &nbsp;&nbsp;Automotive | $157,658 | $143,975 | $113,590 |\n| &nbsp;&nbsp;GM Financial | 14,184 | 12,760 | 13,414 |\n| Total net sales and revenue (Note 3) | 171,842 | 156,735 | 127,004 |\n| Costs and expenses | | | |\n| &nbsp;&nbsp;Automotive and other cost of sales | 141,330 | 126,892 | 100,544 |\n| &nbsp;&nbsp;GM Financial interest, operating and other expenses | 11,374 | 8,862 | 8,582 |\n| &nbsp;&nbsp;Automotive and other selling, general and administrative expense | 9,840 | 10,667 | 8,554 |\n| Total costs and expenses | 162,544 | 146,421 | 117,680 |\n| Operating income (loss) | 9,298 | 10,315 | 9,324 |\n| Automotive interest expense | 911 | 987 | 950 |\n| Interest income and other non-operating income, net (Note 19) | 1,537 | 1,432 | 3,041 |\n| Equity income (loss) (Note 8) | 480 | 837 | 1,301 |\n| Income (loss) before income taxes | 10,403 | 11,597 | 12,716 |\n| Income tax expense (benefit) (Note 17) | 563 | 1,888 | 2,771 |\n| Net income (loss) | 9,840 | 9,708 | 9,945 |\n| Net loss (income) attributable to noncontrolling interests | 287 | 226 | 74 |\n| Net income (loss) attributable to stockholders | $10,127 | $9,934 | $10,019 |\n| Net income (loss) attributable to common stockholders | $10,022 | $8,915 | $9,837 |\n| Earnings per share (Note 21) | | | |\n| &nbsp;&nbsp;Basic earnings per common share | $7.35 | $6.17 | $6.78 |\n| &nbsp;&nbsp;Weighted-average common shares outstanding – basic | 1,364 | 1,445 | 1,451 |\n| &nbsp;&nbsp;Diluted earnings per common share | $7.32 | $6.13 | $6.70 |\n| &nbsp;&nbsp;Weighted-average common shares outstanding – diluted | 1,369 | 1,454 | 1,468 |\n\n*Note: Amounts are in millions, except per share data. Dollar signs are shown as in the original statement.*"
+    },
+    "supplementary": {
+      "raw_response": "Based on the primary Consolidated Income Statement and the provided pages, the following supplementary tables related to the inferred line items have been identified.\n\n### **Supplementary Tables**\n\n**1. Supplementary Breakdown: Total Net Sales and Revenue (Related to Primary Statement Line: \"Total net sales and revenue\")**\n*Source: Page 71, Note 3. Revenue*\n| Year / Segment       | GMNA | GMI  | Corporate | Total Automotive | Cruise | GM Financial | Eliminations/Reclassifications | **Total Net Sales and Revenue** |\n| :------------------- | :---: | :--: | :-------: | :--------------: | :----: | :----------: | :---------------------------: | :----------------------------: |\n| **2023**             |       |      |           |                  |        |              |                               |                                |\n| Vehicle, parts & acc.|136,983|14,424|    113    |     151,520      |   —    |      —       |             (10)              |            151,510             |\n| Used vehicles        |  954  |  37  |     —     |       991        |   —    |      —       |              —                |              991               |\n| Services and other   | 3,508 | 1,487|    160    |      5,155       |  102   |      —       |             (100)             |             5,157              |\n| *Automotive Revenue* |141,445|15,949|    273    |     157,667      |  102   |      —       |             (110)             |            **157,658**         |\n| Leased vehicle income|   —   |  —   |     —     |        —         |   —    |    7,266     |              —                |             7,266              |\n| Finance charge income|   —   |  —   |     —     |        —         |   —    |    6,204     |             (18)              |             6,187              |\n| Other income         |   —   |  —   |     —     |        —         |   —    |     754      |             (23)              |              732               |\n| *GM Financial Revenue*|  —   |  —   |     —     |        —         |   —    |    14,225    |             (41)              |            **14,184**          |\n| **TOTAL 2023**       |141,445|15,949|    273    |     157,667      |  102   |    14,225    |            **(151)**          |          **171,842**           |\n|                      |       |      |           |                  |        |              |                               |                                |\n| **2022**             |       |      |           |                  |        |              |                               |                                |\n| ... (Similar breakdown for 2022) | | | | | | | | |\n| **TOTAL 2022**       |128,378|15,420|    177    |     143,974      |  102   |    12,766    |            **(107)**          |          **156,735**           |\n\n---\n\n**2. Supplementary Breakdown: Automotive and Other Cost of Sales Variance (Related to Primary Statement Line: \"Automotive and other cost of sales\")**\n*Source: Page 35, MD&A Section*\n| Segment | 2023 (in billions) | 2022 (in billions) | Variance (Unfavorable) | Variance Due To (in billions) |\n| :------ | :----------------: | :----------------: | :--------------------: | :---------------------------: |\n|         |                    |                    |                        | **Volume** | **Mix** | **Cost** | **Other** |\n| GMNA    |      $123,577      |      $109,651      |       $(13,926)        |   $(6.1)   | $(1.6)  |  $(6.2)  |    $—     |\n| GMI     |      $14,164       |      $14,166       |           $2           |    $0.5    | $(0.3)  |  $(0.3)  |   $0.1    |\n| Corporate|       $513         |       $500         |        $(13)           |     $—     |  $(0.1) |   $0.1   |    —      |\n| Cruise  |      $3,088        |      $2,576        |        $(512)          |     $—     |    —    |  $(0.5)  |    —      |\n| Eliminations |      $(12)        |       $(2)         |         $10            |     $—     |    —    |     —    |    —      |\n| **Total** |    **$141,330**    |    **$126,892**    |      **$(14,438)**     |  **$(5.6)**| **$(2.0)**| **$(7.0)**|  **$0.2** |\n\n---\n\n**3. Supplementary Breakdown: GM Financial Interest, Operating and Other Expenses (Related to Primary Statement Line: \"GM Financial interest, operating and other expenses\")**\n*Source: Page 34, GM Financial Summary and Outlook*\n| Description | Year Ended Dec 31, 2023 | Year Ended Dec 31, 2022 |\n| :---------- | :---------------------: | :---------------------: |\n| Gains on terminations of leased vehicles (included in GM Financial interest, operating and other expenses) | $0.9 billion | $1.2 billion |\n\n---\n\n**4. Supplementary Breakdown: Equity Income (loss) (Related to Primary Statement Line: \"Equity income (loss)\")**\n*Source: Page 78, Note 8. Equity in Net Assets of Nonconsolidated Affiliates*\n| Component | 2023 | 2022 | 2021 |\n| :--- | :---: | :---: | :---: |\n| Automotive China joint ventures equity income (loss) | $446 | $677 | $1,098 |\n| Other joint ventures equity income (loss) | $327 | $159 | $203 |\n| **Total Equity Income (loss)** | **$773** | **$836** | **$1,301** |\n\n---\n\n**5. Supplementary Breakdown: Interest Income and Other Non-operating Income, net (Related to Primary Statement Line: \"Interest income and other non-operating income, net\")**\n*Source: Page 36, MD&A Section; Page 97, Note 19*\n*Table 1: Variance Explanation (Page 36)*\n| Primary Driver of Change in 2023 vs. 2022 | Effect (Favorable/ (Unfavorable)) |\n| :--- | :---: |\n| Absence of loss related to shutdown of Russia business | $0.7 billion |\n| Increase in interest income | $0.6 billion |\n| Absence of losses related to Stellantis N.V. warrants | $0.4 billion |\n| Decrease in non-service pension income | $(1.3) billion |\n| Absence of gains related to revaluation of investments | $(0.3) billion |\n\n*Table 2: Detailed Composition (Page 97)*\n| Component | 2023 | 2022 | 2021 |\n| :--- | :---: | :---: | :---: |\n| Non-service pension and OPEB income (loss) | $184 | $1,512 | $1,909 |\n| Interest income | $1,109 | $460 | $146 |\n| Licensing agreements income | $172 | $238 | $195 |\n| Revaluation of investments | $(77) | $(236) | $571 |\n| Other | $149 | $(542) | $220 |\n| **Total** | **$1,537** | **$1,432** | **$3,041** |"
+    }
+  }
+}

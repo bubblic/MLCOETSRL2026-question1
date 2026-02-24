@@ -1,0 +1,44 @@
+{
+  "schema_version": "1.0",
+  "fields": [
+    "cash_and_cash_equivalents",
+    "short_term_investment_in_market_securities",
+    "accounts_receivable",
+    "total_current_liabilities",
+    "total_debt_short_term_and_long_term",
+    "total_equity",
+    "total_assets"
+  ],
+  "statement": {
+    "company_id": "2023 General Motors Annual Report",
+    "statement_type": "consolidated-balance-sheet",
+    "periods": [
+      {
+        "period": "December 31, 2023",
+        "values": {
+          "cash_and_cash_equivalents": 18853.0,
+          "short_term_investment_in_market_securities": 7613.0,
+          "accounts_receivable": 12378.0,
+          "total_current_liabilities": 94445.0,
+          "total_debt_short_term_and_long_term": 121740.0,
+          "total_equity": 68189.0,
+          "total_assets": 273064.0
+        }
+      },
+      {
+        "period": "December 31, 2022",
+        "values": {
+          "cash_and_cash_equivalents": 19153.0,
+          "short_term_investment_in_market_securities": 12150.0,
+          "accounts_receivable": 13333.0,
+          "total_current_liabilities": 91173.0,
+          "total_debt_short_term_and_long_term": 114698.0,
+          "total_equity": 71927.0,
+          "total_assets": 264037.0
+        }
+      }
+    ],
+    "notes": "1. 'Marketable debt securities' from the primary statement is mapped to 'short_term_investment_in_market_securities'. 2. 'Accounts and notes receivable, net' is mapped to 'accounts_receivable'. 'GM Financial receivables, net' is a separate, larger financing-related receivable and is not included in the standard accounts receivable field. 3. 'Total current liabilities' is taken directly from the statement. 4. 'Total_debt_short_term_and_long_term' is calculated by summing all debt components: For each period, Automotive short-term debt (428 for 2023, 1959 for 2022) + GM Financial short-term debt (38540 for 2023, 36819 for 2022) + Automotive long-term debt (15985 for 2023, 15885 for 2022) + GM Financial long-term debt (66788 for 2023, 60036 for 2022). 5. 'Total Equity' is taken directly from the statement. 6. 'Total Assets' is taken directly from the statement.",
+    "source_file": "extracted_text\\2023 General Motors Annual Report .consolidated-balance-sheet.llm.json"
+  }
+}

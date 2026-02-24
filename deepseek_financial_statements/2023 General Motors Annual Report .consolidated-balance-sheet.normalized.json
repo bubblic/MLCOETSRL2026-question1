@@ -2,7 +2,7 @@
   "schema_version": "1.0",
   "fields": [
     "cash_and_cash_equivalents",
-    "short_term_investment_in_market_securities",
+    "marketable_securities",
     "accounts_receivable",
     "total_current_liabilities",
     "total_debt_short_term_and_long_term",
@@ -14,31 +14,33 @@
     "statement_type": "consolidated-balance-sheet",
     "periods": [
       {
-        "period": "December 31, 2023",
+        "year": "2023",
+        "currency": "USD",
         "values": {
           "cash_and_cash_equivalents": 18853.0,
-          "short_term_investment_in_market_securities": 7613.0,
+          "marketable_securities": 7613.0,
           "accounts_receivable": 12378.0,
           "total_current_liabilities": 94445.0,
-          "total_debt_short_term_and_long_term": 121741.0,
+          "total_debt_short_term_and_long_term": 122128.0,
           "total_equity": 68189.0,
           "total_assets": 273064.0
         }
       },
       {
-        "period": "December 31, 2022",
+        "year": "2022",
+        "currency": "USD",
         "values": {
           "cash_and_cash_equivalents": 19153.0,
-          "short_term_investment_in_market_securities": 12150.0,
+          "marketable_securities": 12150.0,
           "accounts_receivable": 13333.0,
           "total_current_liabilities": 91173.0,
-          "total_debt_short_term_and_long_term": 114699.0,
+          "total_debt_short_term_and_long_term": 114803.0,
           "total_equity": 71927.0,
           "total_assets": 264037.0
         }
       }
     ],
-    "notes": "1. Mapped 'Marketable debt securities' to 'short_term_investment_in_market_securities' as it represents short-term investments in marketable securities. 2. Mapped 'Accounts and notes receivable, net' to 'accounts_receivable', excluding the separate 'GM Financial receivables' line which is more characteristic of finance operations in an automotive company. 3. Total debt calculated as sum of: Short-term debt (Automotive + GM Financial) and Long-term debt (Automotive + GM Financial) from the debt breakdown in liabilities.",
-    "source_file": "extracted_text/2023 General Motors Annual Report .consolidated-balance-sheet.llm.json"
+    "notes": "1. 'Accounts and notes receivable, net' is mapped to 'accounts_receivable'. 2. 'Total debt short term and long term' is calculated by summing all debt components: For 2023: Short-term debt (Automotive $428 + GM Financial $38,540) + Long-term debt (Automotive $15,985 + GM Financial $66,788) = $122,128. For 2022: Short-term debt (Automotive $1,959 + GM Financial $36,819) + Long-term debt (Automotive $15,885 + GM Financial $60,036) = $114,803. 3. 'Total Equity' is taken directly from the statement. 4. 'Total Assets' is taken directly from the statement. 5. 'Total Current Liabilities' is taken directly from the statement.",
+    "source_file": "extracted_text_total_operating_cost_marketable_securities\\2023 General Motors Annual Report .consolidated-balance-sheet.llm.json"
   }
 }

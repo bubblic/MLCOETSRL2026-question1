@@ -2,7 +2,7 @@
   "schema_version": "1.0",
   "fields": [
     "cash_and_cash_equivalents",
-    "short_term_investment_in_market_securities",
+    "marketable_securities",
     "accounts_receivable",
     "total_current_liabilities",
     "total_debt_short_term_and_long_term",
@@ -14,10 +14,11 @@
     "statement_type": "consolidated-balance-sheet",
     "periods": [
       {
-        "period": "June 30, 2025",
+        "year": "2025",
+        "currency": "USD",
         "values": {
           "cash_and_cash_equivalents": 30242.0,
-          "short_term_investment_in_market_securities": 64323.0,
+          "marketable_securities": 64323.0,
           "accounts_receivable": 69905.0,
           "total_current_liabilities": 141218.0,
           "total_debt_short_term_and_long_term": 43151.0,
@@ -26,19 +27,20 @@
         }
       },
       {
-        "period": "June 30, 2024",
+        "year": "2024",
+        "currency": "USD",
         "values": {
           "cash_and_cash_equivalents": 18315.0,
-          "short_term_investment_in_market_securities": 57228.0,
+          "marketable_securities": 57228.0,
           "accounts_receivable": 56924.0,
           "total_current_liabilities": 125286.0,
-          "total_debt_short_term_and_long_term": 51630.0,
+          "total_debt_short_term_and_long_term": 44937.0,
           "total_equity": 268477.0,
           "total_assets": 512163.0
         }
       }
     ],
-    "notes": "Mapped 'Short-term investments' to short_term_investment_in_market_securities. Total debt (short_term_and_long_term) calculated as the sum of 'Short-term debt', 'Current portion of long-term debt', and 'Long-term debt'.",
-    "source_file": "extracted_text/microsoft_2025.consolidated-balance-sheet.llm.json"
+    "notes": "1. 'Short-term investments' mapped to 'marketable_securities'. 2. 'Total debt short-term and long-term' calculated as the sum of 'Short-term debt' and 'Long-term debt' from the primary statement. The supplementary debt table provides a 'Total debt' figure which includes unamortized discounts and adjustments; this value was used for consistency as it represents the total debt obligation on the balance sheet. For 2025: Total debt $43,151 (from supplementary table). For 2024: Total debt $44,937 (from supplementary table). 3. 'Total stockholders’ equity' mapped to 'total_equity'. 4. All values extracted directly from the primary statement except total debt, which was taken from the supplementary note for accuracy.",
+    "source_file": "extracted_text_total_operating_cost_marketable_securities\\microsoft_2025.consolidated-balance-sheet.llm.json"
   }
 }

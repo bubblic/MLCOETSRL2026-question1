@@ -1,0 +1,108 @@
+{
+  "query": "Consolidated Income Statement",
+  "selected_pages": {
+    "primary_statement_pages": [
+      1,
+      83,
+      87,
+      92,
+      93,
+      100,
+      205,
+      348,
+      349
+    ],
+    "supplementary_pages": [
+      83,
+      92,
+      93,
+      94,
+      95,
+      100,
+      101,
+      102,
+      103,
+      104,
+      105,
+      106,
+      107,
+      108,
+      109,
+      110,
+      111,
+      112,
+      113,
+      114,
+      115,
+      116,
+      117,
+      118,
+      119,
+      120,
+      121,
+      122,
+      123,
+      205,
+      210,
+      211,
+      212,
+      213,
+      214,
+      215,
+      216,
+      217,
+      218,
+      219,
+      220,
+      221,
+      222,
+      223,
+      224,
+      225,
+      226,
+      227,
+      228,
+      229,
+      230,
+      231,
+      242,
+      243,
+      244,
+      245,
+      246,
+      247,
+      248,
+      249,
+      250,
+      251,
+      262,
+      346,
+      347,
+      348,
+      349,
+      350,
+      351,
+      355,
+      356,
+      357,
+      358,
+      359
+    ]
+  },
+  "extraction": {
+    "primary_statement": {
+      "raw_response": "Looking at the provided pages, the most complete and standard **Consolidated Income Statement** is found on **Page 205**, titled \"JPMorgan Chase & Co. Consolidated statements of income.\"\n\nHere is that table presented in a clean, tabular format:\n\n### Consolidated Statements of Income\n**JPMorgan Chase & Co.**  \n**Year ended December 31, (in millions, except per share data)**\n\n| Line Item | 2024 | 2023 | 2022 |\n| :--- | :--- | :--- | :--- |\n| **Revenue** | | | |\n| Investment banking fees | $ 8,910 | $ 6,519 | $ 6,686 |\n| Principal transactions | 24,787 | 24,460 | 19,912 |\n| Lending- and deposit-related fees | 7,606 | 7,413 | 7,098 |\n| Asset management fees | 17,801 | 15,220 | 14,096 |\n| Commissions and other fees | 7,530 | 6,836 | 6,581 |\n| Investment securities losses | (1,021) | (3,180) | (2,380) |\n| Mortgage fees and related income | 1,401 | 1,176 | 1,250 |\n| Card income | 5,497 | 4,784 | 4,420 |\n| Other income | 12,462 | 5,609 | 4,322 |\n| **Noninterest revenue** | **84,973** | **68,837** | **61,985** |\n| Interest income | 193,933 | 170,588 | 92,807 |\n| Interest expense | 101,350 | 81,321 | 26,097 |\n| **Net interest income** | **92,583** | **89,267** | **66,710** |\n| **Total net revenue** | **177,556** | **158,104** | **128,695** |\n| Provision for credit losses | 10,678 | 9,320 | 6,389 |\n| **Noninterest expense** | | | |\n| Compensation expense | 51,357 | 46,465 | 41,636 |\n| Occupancy expense | 5,026 | 4,590 | 4,696 |\n| Technology, communications and equipment expense | 9,831 | 9,246 | 9,358 |\n| Professional and outside services | 11,057 | 10,235 | 10,174 |\n| Marketing | 4,974 | 4,591 | 3,911 |\n| Other expense | 9,552 | 12,045 | 6,365 |\n| **Total noninterest expense** | **91,797** | **87,172** | **76,140** |\n| **Income before income tax expense** | **75,081** | **61,612** | **46,166** |\n| Income tax expense | 16,610 | 12,060 | 8,490 |\n| **Net income** | **$ 58,471** | **$ 49,552** | **$ 37,676** |\n| Net income applicable to common stockholders | $ 56,868 | $ 47,760 | $ 35,892 |\n| **Net income per common share data** | | | |\n| Basic earnings per share | $ 19.79 | $ 16.25 | $ 12.10 |\n| Diluted earnings per share | $ 19.75 | $ 16.23 | $ 12.09 |\n| Weighted-average basic shares | 2,873.9 | 2,938.6 | 2,965.8 |\n| Weighted-average diluted shares | 2,879.0 | 2,943.1 | 2,970.0 |\n\n*Source: JPMorgan Chase & Co. 2024 Form 10-K, Page 205.*"
+    },
+    "supplementary": {
+      "supplementary_tables": [],
+      "chunk_responses": [
+        {
+          "raw_response": "Based on the primary Consolidated Income Statement provided, the key line items include various revenue components (Investment banking fees, Principal transactions, Lending- and deposit-related fees, etc.), noninterest expense components (Compensation, Occupancy, Technology, etc.), and other items like Provision for credit losses.\n\nFrom the provided pages, I identified several supplementary tables that provide breakdowns or expansions of these line items. Here are the relevant supplementary tables extracted in a clean tabular format:\n\n### 1. Provision for Credit Losses Breakdown (Page 94)\nThis table breaks down the provision for credit losses by consumer (excluding credit card), credit card, wholesale, and investment securities.\n\n| Line Item | 2024 | 2023 | 2022 |\n| :--- | :--- | :--- | :--- |\n| Consumer, excluding credit card | $631 | $935 | $506 |\n| Credit card | 9,292 | 6,048 | 3,353 |\n| **Total consumer** | **9,923** | **6,983** | **3,859** |\n| Wholesale | 731 | 2,299 | 2,476 |\n| Investment securities | 24 | 38 | 54 |\n| **Total provision for credit losses** | **$10,678** | **$9,320** | **$6,389** |\n\n### 2. Noninterest Expense - Other Expense Components (Page 95)\nThis table provides a breakdown of certain components within \"Other expense.\"\n\n| Component | 2024 | 2023 | 2022 |\n| :--- | :--- | :--- | :--- |\n| Legal expense | $740 | $1,436 | $266 |\n| FDIC-related expense | 1,893 | 4,203 | 860 |\n| Operating losses | 1,417 | 1,228 | 1,101 |\n\n### 3. Managed Basis Reconciliation (Page 100)\nThis table reconciles reported GAAP results to managed basis (non-GAAP), showing adjustments primarily to Other income, Net interest income, and Total net revenue.\n\n| Line Item | 2024 Reported | 2024 Adjustments | 2024 Managed | 2023 Reported | 2023 Adjustments | 2023 Managed | 2022 Reported | 2022 Adjustments | 2022 Managed |\n| :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |\n| Other income | $12,462 | $2,560 | $15,022 | $5,609 | $3,782 | $9,391 | $4,322 | $3,148 | $7,470 |\n| Total noninterest revenue | 84,973 | 2,560 | 87,533 | 68,837 | 3,782 | 72,619 | 61,985 | 3,148 | 65,133 |\n| Net interest income | 92,583 | 477 | 93,060 | 89,267 | 480 | 89,747 | 66,710 | 434 | 67,144 |\n| **Total net revenue** | **177,556** | **3,037** | **180,593** | **158,104** | **4,262** | **162,366** | **128,695** | **3,582** | **132,277** |\n| Total noninterest expense | 91,797 | — | 91,797 | 87,172 | — | 87,172 | 76,140 | — | 76,140 |\n| Pre-provision profit | 85,759 | 3,037 | 88,796 | 70,932 | 4,262 | 75,194 | 52,555 | 3,582 | 56,137 |\n| Provision for credit losses | 10,678 | — | 10,678 | 9,320 | — | 9,320 | 6,389 | — | 6,389 |\n| Income before income tax expense | 75,081 | 3,037 | 78,118 | 61,612 | 4,262 | 65,874 | 46,166 | 3,582 | 49,748 |\n| Income tax expense | 16,610 | 3,037 | 19,647 | 12,060 | 4,262 | 16,322 | 8,490 | 3,582 | 12,072 |\n| **Net income** | **$58,471** | **—** | **$58,471** | **$49,552** | **—** | **$49,552** | **$37,676** | **—** | **$37,676** |\n| Overhead ratio | 52% | NM | 51% | 55% | NM | 54% | 59% | NM | 58% |\n\n### 4. Net Interest Income and Noninterest Revenue Excluding Markets (Page 101)\nThis table shows Net interest income and Noninterest revenue excluding Markets (a non-GAAP measure).\n\n| Line Item | 2024 | 2023 | 2022 |\n| :--- | :--- | :--- | :--- |\n| **Net interest income – reported** | $92,583 | $89,267 | $66,710 |\n| Fully taxable-equivalent adjustments | 477 | 480 | 434 |\n| Net interest income – managed basis | 93,060 | 89,747 | 67,144 |\n| Less: Markets net interest income | 641 | (294) | 4,789 |\n| **Net interest income excluding Markets** | **$92,419** | **$90,041** | **$62,355** |\n| **Noninterest revenue – reported** | $84,973 | $68,837 | $61,985 |\n| Fully taxable-equivalent adjustments | 2,560 | 3,782 | 3,148 |\n| Noninterest revenue – managed basis | 87,533 | 72,619 | 65,133 |\n| Less: Markets noninterest revenue | 29,366 | 28,258 | 24,373 |\n| **Noninterest revenue excluding Markets** | **$58,167** | **$44,361** | **$40,760** |\n| *Memo: Total Markets net revenue* | *$30,007* | *$27,964* | *$29,162* |\n\n### 5. Tangible Common Equity (TCE) Reconciliation (Page 102)\nThis table reconciles Common stockholders’ equity to Tangible common equity (non-GAAP).\n\n| Line Item | Period-end Dec 31, 2024 | Period-end Dec 31, 2023 | Average 2024 | Average 2023 | Average 2022 |\n| :--- | :--- | :--- | :--- | :--- | :--- |\n| Common stockholders’ equity | $324,708 | $300,474 | $312,370 | $282,056 | $253,068 |\n| Less: Goodwill | 52,565 | 52,634 | 52,627 | 52,258 | 50,952 |\n| Less: Other intangible assets | 2,874 | 3,225 | 3,042 | 2,572 | 1,112 |\n| Add: Certain deferred tax liabilities | 2,943 | 2,996 | 2,970 | 2,883 | 2,505 |\n| **Tangible common equity** | **$272,212** | **$247,611** | **$259,671** | **$230,109** | **$203,509** |\n| Return on tangible common equity | NA | NA | 22% | 21% | 18% |\n| Tangible book value per share | $97.30 | $86.08 | NA | NA | NA |\n\n### 6. Segment Results - Managed Basis (Page 105)\nThis table shows Total net revenue, Total noninterest expense, Pre-provision profit, Provision for credit losses, and Net income for each reportable segment and Corporate.\n\n| Segment | Year | Total Net Revenue | Total Noninterest Expense | Pre-provision Profit/(Loss) | Provision for Credit Losses | Net Income/(Loss) | ROE |\n| :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |\n| **Consumer & Community Banking** | 2024 | $71,507 | $38,036 | $33,471 | $9,974 | $17,603 | 32% |\n| | 2023 | 70,148 | 34,819 | 35,329 | 6,899 | 21,232 | 38% |\n| | 2022 | 54,814 | 31,208 | 23,606 | 3,813 | 14,916 | 29% |\n| **Commercial & Investment Bank** | 2024 | $70,114 | $35,353 | $34,761 | $762 | $24,846 | 18% |\n| | 2023 | 64,353 | 33,972 | 30,381 | 2,091 | 20,272 | 14% |\n| | 2022 | 59,635 | 32,069 | 27,566 | 2,426 | 19,138 | 14% |\n| **Asset & Wealth Management** | 2024 | $21,578 | $14,414 | $7,164 | $(68) | $5,421 | 34% |\n| | 2023 | 19,827 | 12,780 | 7,047 | 159 | 5,227 | 31% |\n| | 2022 | 17,748 | 11,829 | 5,919 | 128 | 4,365 | 25% |\n| **Corporate** | 2024 | $17,394 | $3,994 | $13,400 | $10 | $10,601 | NM |\n| | 2023 | 8,038 | 5,601 | 2,437 | 171 | 2,821 | NM |\n| | 2022 | 80 | 1,034 | (954) | 22 | (743) | NM |\n| **Total** | 2024 | **$180,593** | **$91,797** | **$88,796** | **$10,678** | **$58,471** | 18% |\n| | 2023 | 162,366 | 87,172 | 75,194 | 9,320 | 49,552 | 17% |\n| | 2022 | 132,277 | 76,140 | 56,137 | 6,389 | 37,676 | 14% |\n\nThese tables provide detailed breakdowns and reconciliations that supplement the primary income statement line items."
+        },
+        {
+          "raw_response": "Based on the primary Consolidated Income Statement, the key line items include **Principal transactions**, **Other income**, **Net interest income**, and various **Noninterest expense** categories (Compensation, Occupancy, Technology, Professional services, Marketing, Other expense).  \n\nFrom the provided pages, I identified several supplementary tables that provide breakdowns or additional details related to these line items. Here are the relevant supplementary tables in a clean tabular format:\n\n---\n\n### 1. Credit and Funding Adjustments – Derivatives (Page 231)  \nThis table breaks down the impact of credit and funding adjustments on **Principal transactions revenue**.  \n\n| Year ended December 31, (in millions) | 2024 | 2023 | 2022 |\n|---------------------------------------|------|------|------|\n| **Credit and funding adjustments:**    |      |      |      |\n| Derivatives CVA                        | $29  | $221 | $22  |\n| Derivatives FVA                        | $99  | $114 | $42  |\n\n---\n\n### 2. Fair Value Hedge Gains and Losses (Page 251)  \nThis table provides details on gains/(losses) from derivatives used in fair value hedge accounting, which impact **Principal transactions revenue** and **Net interest income**.  \n\n#### Year ended December 31, 2024  \n| (in millions)                          | Derivatives | Hedged items | Income statement impact |\n|----------------------------------------|-------------|--------------|-------------------------|\n| Interest rate                          | $711        | $(65)        | $646                    |\n| Foreign exchange                       | $(177)      | $402         | $225                    |\n| Commodity                              | $293        | $(160)       | $133                    |\n| **Total**                              | **$827**    | **$177**     | **$1,004**              |\n\n#### Year ended December 31, 2023  \n| (in millions)                          | Derivatives | Hedged items | Income statement impact |\n|----------------------------------------|-------------|--------------|-------------------------|\n| Interest rate                          | $1,554      | $(1,248)     | $306                    |\n| Foreign exchange                       | $722        | $(483)       | $239                    |\n| Commodity                              | $1,227      | $(706)       | $521                    |\n| **Total**                              | **$3,503**  | **$(2,437)** | **$1,066**              |\n\n#### Year ended December 31, 2022  \n| (in millions)                          | Derivatives | Hedged items | Income statement impact |\n|----------------------------------------|-------------|--------------|-------------------------|\n| Interest rate                          | $(14,352)   | $14,047      | $(305)                  |\n| Foreign exchange                       | $(1,317)    | $1,423       | $106                    |\n| Commodity                              | $106        | $(70)        | $36                     |\n| **Total**                              | **$(15,563)**| **$15,400**  | **$(163)**              |\n\n---\n\n### 3. Components of Interest Income and Interest Expense (Page 262)  \nThis table provides a detailed breakdown of **Interest income** and **Interest expense**, which are components of **Net interest income**.  \n\n| Year ended December 31, (in millions) | 2024       | 2023       | 2022       |\n|---------------------------------------|------------|------------|------------|\n| **Interest income**                   |            |            |            |\n| Loans                                 | $92,353    | $83,384    | $52,736    |\n| Taxable securities                    | $21,947    | $17,390    | $10,372    |\n| Non-taxable securities                | $1,197     | $1,336     | $975       |\n| Trading assets - debt instruments     | $20,327    | $15,950    | $9,053     |\n| Federal funds sold and resale agreements | $18,299  | $15,079    | $4,632     |\n| Securities borrowed                   | $9,208     | $7,983     | $2,237     |\n| Deposits with banks                   | $22,297    | $21,797    | $9,039     |\n| All other interest-earning assets     | $8,305     | $7,669     | $3,763     |\n| **Total interest income**             | **$193,933**| **$170,588**| **$92,807**|\n|                                       |            |            |            |\n| **Interest expense**                  |            |            |            |\n| Interest bearing deposits             | $49,559    | $40,016    | $10,082    |\n| Federal funds purchased and repurchase agreements | $19,149 | $13,259    | $3,721     |\n| Short-term borrowings                 | $2,101     | $1,894     | $747       |\n| Trading liabilities - debt and other  | $10,238    | $9,396     | $3,246     |\n| Long-term debt                        | $18,920    | $15,803    | $8,075     |\n| Beneficial interest issued by VIEs    | $1,383     | $953       | $226       |\n| **Total interest expense**            | **$101,350**| **$81,321**| **$26,097**|\n|                                       |            |            |            |\n| **Net interest income**               | **$92,583** | **$89,267**| **$66,710**|\n\n---\n\n### 4. Segment Results – Noninterest Expense Breakdown (Page 348-349)  \nThis table provides a breakdown of **Noninterest expense** by business segment, which aligns with the total noninterest expense in the income statement.  \n\n| As of or for the year ended December 31, (in millions) | 2024       | 2023       | 2022       |\n|--------------------------------------------------------|------------|------------|------------|\n| **Consumer & Community Banking**                       |            |            |            |\n| Compensation expense                                   | $17,045    | $15,171    | $13,092    |\n| Noncompensation expense                                | $20,991    | $19,648    | $18,116    |\n| **Total noninterest expense**                          | **$38,036**| **$34,819**| **$31,208**|\n|                                                       |            |            |            |\n| **Commercial & Investment Bank**                       |            |            |            |\n| Compensation expense                                   | $18,191    | $17,105    | $16,214    |\n| Noncompensation expense                                | $17,162    | $16,867    | $15,855    |\n| **Total noninterest expense**                          | **$35,353**| **$33,972**| **$32,069**|\n|                                                       |            |            |            |\n| **Asset & Wealth Management**                          |            |            |            |\n| Compensation expense                                   | $7,984     | $7,115     | $6,336     |\n| Noncompensation expense                                | $6,430     | $5,665     | $5,493     |\n| **Total noninterest expense**                          | **$14,414**| **$12,780**| **$11,829**|\n|                                                       |            |            |            |\n| **Corporate**                                          |            |            |            |\n| Total noninterest expense                              | **$3,994** | **$5,601** | **$1,034** |\n|                                                       |            |            |            |\n| **Total Firm Noninterest Expense**                     | **$91,797**| **$87,172**| **$76,140**|\n\n---\n\nThese tables provide supplementary details that expand on the line items reported in the primary Consolidated Income Statement."
+        }
+      ]
+    }
+  }
+}
