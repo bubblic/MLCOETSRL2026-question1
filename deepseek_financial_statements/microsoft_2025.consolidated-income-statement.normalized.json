@@ -16,10 +16,10 @@
         "currency": "USD",
         "values": {
           "revenue": 281724.0,
-          "total_operating_cost": 153196.0,
+          "total_operating_cost": 153419.0,
           "net_income": 101832.0,
           "taxes": 21795.0,
-          "interest_expenses": null
+          "interest_expenses": 2385.0
         }
       },
       {
@@ -30,7 +30,7 @@
           "total_operating_cost": 135689.0,
           "net_income": 88136.0,
           "taxes": 19651.0,
-          "interest_expenses": null
+          "interest_expenses": 2935.0
         }
       },
       {
@@ -38,14 +38,14 @@
         "currency": "USD",
         "values": {
           "revenue": 211915.0,
-          "total_operating_cost": 123392.0,
+          "total_operating_cost": 122617.0,
           "net_income": 72361.0,
           "taxes": 16950.0,
           "interest_expenses": null
         }
       }
     ],
-    "notes": "Currency inferred as USD based on standard reporting for Microsoft. 'Total operating cost' calculated as the sum of 'Total cost of revenue' and 'Total operating expenses' from the primary statement. 'Interest expenses' not explicitly listed; 'Other income (expense), net' includes interest but is a net figure, so field set to null.",
-    "source_file": "extracted_text_total_operating_cost_marketable_securities\\microsoft_2025.consolidated-income-statement.llm.json"
+    "notes": "1. 'total_operating_cost' is calculated as 'Total cost of revenue' plus the sum of 'Research and development', 'Sales and marketing', and 'General and administrative' expenses. 2. 'taxes' is mapped from 'Provision for income taxes'. 3. 'interest_expenses' for 2025 and 2024 are taken directly from the 'Other Income (Expense), Net Breakdown' table. This value is not provided for 2023 in the supplementary data, so it is set to null.",
+    "source_file": "extracted_text_microsoftonly\\microsoft_2025.consolidated-income-statement.llm.json"
   }
 }

@@ -29,7 +29,7 @@
         }
       }
     ],
-    "notes": "Extracted the value from the line item 'Depreciation, amortization, and other' in the 'Adjustments to reconcile net income to net cash from operations' section of the cash flow statement. This is the standard mapping for the 'depreciation_and_amortization' field in a cash flow context.",
-    "source_file": "extracted_text_total_operating_cost_marketable_securities\\microsoft_2025.consolidated-cash-flow-statement.llm.json"
+    "notes": "Extracted 'Depreciation, amortization, and other' line item directly from the 'Adjustments to reconcile net income to net cash from operations' section of the cash flow statement.",
+    "source_file": "extracted_text_microsoftonly\\microsoft_2025.consolidated-cash-flow-statement.llm.json"
   }
 }
