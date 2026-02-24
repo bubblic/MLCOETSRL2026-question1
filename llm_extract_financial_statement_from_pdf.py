@@ -7,6 +7,8 @@ Env vars:
   AZURE_DEEPSEEK_ENDPOINT for both page selection and table extraction
 """
 
+from __future__ import annotations
+
 # python llm_extract_financial_statement_from_pdf.py --input-file "./annual_reports/alibaba_2025.pdf"  --query "Consolidated Balance Sheet" --query "Consolidated Income Statement"
 # python llm_extract_financial_statement_from_pdf.py --input-file "./annual_reports/2023 General Motors Annual Report .pdf" --query "Consolidated Balance Sheet" --query "Consolidated Income Statement"
 # python llm_extract_financial_statement_from_pdf.py --input-file "./annual_reports/lvmh_dec_2024.pdf" --query "Consolidated Balance Sheet" --query "Consolidated Income Statement"

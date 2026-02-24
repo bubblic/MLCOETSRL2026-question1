@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from azure_llm_client import AzureLLMClient
 import re
 import json

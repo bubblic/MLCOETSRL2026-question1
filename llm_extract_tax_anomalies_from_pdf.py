@@ -6,6 +6,8 @@ Example usage:
   python llm_extract_tax_anomalies_from_pdf.py --input-dir ./annual_reports
 """
 
+from __future__ import annotations
+
 import argparse
 import json
 import os
