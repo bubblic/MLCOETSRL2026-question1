@@ -1,0 +1,46 @@
+{
+  "schema_version": "1.0",
+  "fields": [
+    "cash_and_cash_equivalents",
+    "marketable_securities",
+    "accounts_receivable",
+    "total_current_liabilities",
+    "total_debt_short_term_and_long_term",
+    "total_equity",
+    "total_assets"
+  ],
+  "statement": {
+    "company_id": "exxon_2024",
+    "statement_type": "consolidated-balance-sheet",
+    "periods": [
+      {
+        "year": "2024",
+        "currency": "USD",
+        "values": {
+          "cash_and_cash_equivalents": 23187.0,
+          "marketable_securities": 343.0,
+          "accounts_receivable": 43681.0,
+          "total_current_liabilities": 70307.0,
+          "total_debt_short_term_and_long_term": 41702.0,
+          "total_equity": 270606.0,
+          "total_assets": 453475.0
+        }
+      },
+      {
+        "year": "2023",
+        "currency": "USD",
+        "values": {
+          "cash_and_cash_equivalents": 31568.0,
+          "marketable_securities": 177.0,
+          "accounts_receivable": 38015.0,
+          "total_current_liabilities": 65316.0,
+          "total_debt_short_term_and_long_term": 41582.0,
+          "total_equity": 212538.0,
+          "total_assets": 376317.0
+        }
+      }
+    ],
+    "notes": "1) 'Cash and cash equivalents' is the sum of 'Cash and cash equivalents' and 'Cash and cash equivalents – restricted'. 2) 'Marketable securities' is mapped from 'Equity securities carried at fair value and other investments at adjusted cost basis' within the supplementary table for 'Investments, advances and long-term receivables' (Note 8). 3) 'Accounts receivable' is mapped from 'Notes and accounts receivable – net'. 4) 'Total current liabilities' is taken directly. 5) 'Total debt short-term and long-term' is the sum of 'Notes and loans payable' (which includes 'Long-term debt due within one year') and 'Long-term debt'. 6) 'Total equity' and 'Total assets' are taken directly.",
+    "source_file": "extracted_text/exxon_2024.consolidated-balance-sheet.llm.json"
+  }
+}

@@ -17,30 +17,69 @@
         "year": "2024",
         "currency": "CNY",
         "values": {
-          "cash_and_cash_equivalents": 132519.0,
-          "marketable_securities": 210567.0,
-          "accounts_receivable": 48203.0,
-          "total_current_liabilities": 396909.0,
-          "total_debt_short_term_and_long_term": 199406.0,
-          "total_equity": 1053896.0,
-          "total_assets": 1780995.0
+          "cash_and_cash_equivalents": [
+            132519.0
+          ],
+          "marketable_securities": [
+            204999.0,
+            302360.0,
+            9568.0,
+            3345.0
+          ],
+          "accounts_receivable": [
+            48203.0
+          ],
+          "total_current_liabilities": [
+            396909.0
+          ],
+          "total_debt_short_term_and_long_term": [
+            146521.0,
+            130586.0,
+            52885.0,
+            8623.0
+          ],
+          "total_equity": [
+            1053896.0
+          ],
+          "total_assets": [
+            1780995.0
+          ]
         }
       },
       {
         "year": "2023",
         "currency": "CNY",
         "values": {
-          "cash_and_cash_equivalents": 172320.0,
-          "marketable_securities": 226048.0,
-          "accounts_receivable": 46606.0,
-          "total_current_liabilities": 352157.0,
-          "total_debt_short_term_and_long_term": 197356.0,
-          "total_equity": 873681.0,
-          "total_assets": 1577246.0
+          "cash_and_cash_equivalents": [
+            172320.0
+          ],
+          "marketable_securities": [
+            211145.0,
+            213951.0,
+            14903.0
+          ],
+          "accounts_receivable": [
+            46606.0
+          ],
+          "total_current_liabilities": [
+            352157.0
+          ],
+          "total_debt_short_term_and_long_term": [
+            155819.0,
+            137101.0,
+            41537.0,
+            14161.0
+          ],
+          "total_equity": [
+            873681.0
+          ],
+          "total_assets": [
+            1577246.0
+          ]
         }
       }
     ],
-    "notes": "Currency identified as RMB (Chinese Yuan), formal acronym CNY used. 'Marketable Securities' mapped from 'Financial assets at fair value through profit or loss' (FVPL) on both current and non-current portions, as these are liquid, tradable financial instruments. For 2024: Non-current FVPL (204,999) + Current FVPL (9,568) = 214,567. For 2023: Non-current FVPL (211,145) + Current FVPL (14,903) = 226,048. 'Total Debt' mapped from the sum of 'Borrowings' (current and non-current) and 'Notes Payable' (current and non-current), as these represent the core financial debt obligations. For 2024: Borrowings (199,406) + Notes Payable (139,209) = 338,615. However, the schema field is named 'total_debt_short_term_and_long_term', which typically excludes operating liabilities like notes payable from trade. Therefore, only 'Borrowings' (199,406 for 2024, 197,356 for 2023) is used as the best match for financial debt. All other values mapped directly from primary statement line items.",
-    "source_file": "extracted_text_total_operating_cost_marketable_securities\\tencent_2024.consolidated-balance-sheet.llm.json"
+    "notes": "Currency identified as Chinese Yuan (CNY) from 'RMB in Millions'. 'Marketable Securities' includes 'Financial assets at fair value through profit or loss' and 'Financial assets at fair value through other comprehensive income' from both current and non-current assets. For 2023, 'Financial assets at fair value through other comprehensive income' under current assets was '–' (dash), interpreted as 0, so not included in the array. 'Total Debt' includes 'Borrowings' and 'Notes Payable' from both current and non-current liabilities, as per standard classification of short-term and long-term debt. All values extracted directly from the primary statement table.",
+    "source_file": "extracted_text/tencent_2024.consolidated-balance-sheet.llm.json"
   }
 }

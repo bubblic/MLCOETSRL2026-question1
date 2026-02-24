@@ -11,18 +11,26 @@
         "year": "2024",
         "currency": "EUR",
         "values": {
-          "depreciation_and_amortization": 32056.0
+          "depreciation_and_amortization": [
+            12858.0,
+            7209.0,
+            11279.0
+          ]
         }
       },
       {
         "year": "2023",
         "currency": "EUR",
         "values": {
-          "depreciation_and_amortization": 28282.0
+          "depreciation_and_amortization": [
+            11727.0,
+            5184.0,
+            10655.0
+          ]
         }
       }
     ],
-    "notes": "The 'depreciation_and_amortization' field was mapped from the 'Depreciation and amortization expense' line item in Supplementary Table 1 (Page 127), which provides a consolidated total for the Volkswagen Group. This figure is the sum of the detailed depreciation and amortization line items (including impairment losses) found in the primary cash flow statement on Page 477.",
-    "source_file": "extracted_text_total_operating_cost_marketable_securities\\volkswagen_2024.consolidated-cash-flow-statement.llm.json"
+    "notes": "The 'depreciation_and_amortization' field was populated using the three distinct line items from the primary cash flow statement that constitute total depreciation and amortization expense: 1) 'Depreciation and amortization of, and impairment losses on, intangible assets, property, plant and equipment, and investment property', 2) 'Amortization of and impairment losses on capitalized development costs', and 3) 'Depreciation of and impairment losses on lease assets'. The values are reported as separate numbers in an array per the instruction to not add them up. The supplementary table shows a consolidated 'Depreciation and amortization expense' figure, but the primary statement breakdown was used for granularity. The currency is identified as Euro (EUR).",
+    "source_file": "extracted_text/volkswagen_2024.consolidated-cash-flow-statement.llm.json"
   }
 }

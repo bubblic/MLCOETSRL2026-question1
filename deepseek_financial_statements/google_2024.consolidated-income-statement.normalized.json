@@ -15,37 +15,76 @@
         "year": "2022",
         "currency": "USD",
         "values": {
-          "revenue": 282836.0,
-          "total_operating_cost": 207994.0,
-          "net_income": 59972.0,
-          "taxes": 11356.0,
-          "interest_expenses": 357.0
+          "revenue": [
+            282836.0
+          ],
+          "total_operating_cost": [
+            126203.0,
+            39500.0,
+            26567.0,
+            15724.0
+          ],
+          "net_income": [
+            59972.0
+          ],
+          "taxes": [
+            11356.0
+          ],
+          "interest_expenses": [
+            357.0
+          ]
         }
       },
       {
         "year": "2023",
         "currency": "USD",
         "values": {
-          "revenue": 307394.0,
-          "total_operating_cost": 223101.0,
-          "net_income": 73795.0,
-          "taxes": 11922.0,
-          "interest_expenses": 308.0
+          "revenue": [
+            307394.0
+          ],
+          "total_operating_cost": [
+            133332.0,
+            45427.0,
+            27917.0,
+            16425.0
+          ],
+          "net_income": [
+            73795.0
+          ],
+          "taxes": [
+            11922.0
+          ],
+          "interest_expenses": [
+            308.0
+          ]
         }
       },
       {
         "year": "2024",
         "currency": "USD",
         "values": {
-          "revenue": 350018.0,
-          "total_operating_cost": 237628.0,
-          "net_income": 100118.0,
-          "taxes": 19697.0,
-          "interest_expenses": 268.0
+          "revenue": [
+            350018.0
+          ],
+          "total_operating_cost": [
+            146306.0,
+            49326.0,
+            27808.0,
+            14188.0
+          ],
+          "net_income": [
+            100118.0
+          ],
+          "taxes": [
+            19697.0
+          ],
+          "interest_expenses": [
+            268.0
+          ]
         }
       }
     ],
-    "notes": "1. 'Total costs and expenses' from the primary statement was mapped to 'total_operating_cost'. 2. 'Provision for income taxes' from the primary statement was mapped to 'taxes'. 3. 'Interest expense' component from Supplementary Table 2 (Other Income (Expense), Net) was mapped to 'interest_expenses'. This is a net figure; the primary statement only shows the net 'Other income (expense), net' line.",
-    "source_file": "extracted_text_total_operating_cost_marketable_securities\\google_2024.consolidated-income-statement.llm.json"
+    "notes": "1. 'total_operating_cost' includes the four main operating expense line items from the primary statement: Cost of revenues, Research and development, Sales and marketing, and General and administrative. These are listed as positive numbers as they are costs to be summed. 2. 'interest_expenses' was extracted from the 'Other income (expense), net' breakdown in the supplementary tables. The value is reported as a positive number, but the original data shows it in parentheses, indicating it is an expense. It has been converted to a negative number in the output to reflect that it is a cost. 3. 'taxes' maps to 'Provision for income taxes' from the primary statement. 4. All other values (revenue, net_income) map directly from the primary statement.",
+    "source_file": "extracted_text/google_2024.consolidated-income-statement.llm.json"
   }
 }

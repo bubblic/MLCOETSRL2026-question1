@@ -15,37 +15,85 @@
         "year": "2024",
         "currency": "USD",
         "values": {
-          "revenue": 339247.0,
-          "total_operating_cost": 300712.0,
-          "net_income": 33680.0,
-          "taxes": 13810.0,
-          "interest_expenses": 996.0
+          "revenue": [
+            339247.0
+          ],
+          "total_operating_cost": [
+            199454.0,
+            39609.0,
+            9976.0,
+            23442.0,
+            826.0,
+            121.0,
+            26288.0
+          ],
+          "net_income": [
+            33680.0
+          ],
+          "taxes": [
+            13810.0
+          ],
+          "interest_expenses": [
+            996.0
+          ]
         }
       },
       {
         "year": "2023",
         "currency": "USD",
         "values": {
-          "revenue": 334697.0,
-          "total_operating_cost": 291799.0,
-          "net_income": 36010.0,
-          "taxes": 15429.0,
-          "interest_expenses": 849.0
+          "revenue": [
+            334697.0
+          ],
+          "total_operating_cost": [
+            193029.0,
+            36885.0,
+            9919.0,
+            20641.0,
+            751.0,
+            714.0,
+            29011.0
+          ],
+          "net_income": [
+            36010.0
+          ],
+          "taxes": [
+            15429.0
+          ],
+          "interest_expenses": [
+            849.0
+          ]
         }
       },
       {
         "year": "2022",
         "currency": "USD",
         "values": {
-          "revenue": 398675.0,
-          "total_operating_cost": 335927.0,
-          "net_income": 55740.0,
-          "taxes": 20176.0,
-          "interest_expenses": 798.0
+          "revenue": [
+            398675.0
+          ],
+          "total_operating_cost": [
+            228959.0,
+            42609.0,
+            10095.0,
+            24040.0,
+            1025.0,
+            482.0,
+            27919.0
+          ],
+          "net_income": [
+            55740.0
+          ],
+          "taxes": [
+            20176.0
+          ],
+          "interest_expenses": [
+            798.0
+          ]
         }
       }
     ],
-    "notes": "Mapped 'Sales and other operating revenue' to 'revenue'. Mapped 'Total costs and other deductions' to 'total_operating_cost'. Mapped 'Net income (loss) attributable to ExxonMobil' to 'net_income'. Mapped 'Income tax expense (benefit)' to 'taxes'. Mapped 'Interest expense' to 'interest_expenses'. All values are in millions of dollars as per the statement header.",
-    "source_file": "extracted_text_total_operating_cost_marketable_securities\\exxon_2024.consolidated-income-statement.llm.json"
+    "notes": "Extracted from the primary Consolidated Statement of Income. For 'revenue', used 'Sales and other operating revenue' as the primary revenue figure, excluding 'Income from equity affiliates' and 'Other income' to align with standard presentation. For 'total_operating_cost', included all listed cost and deduction items from the statement up to 'Other taxes and duties', as these are standard operating costs for an integrated oil & gas company (Cost of goods sold, production, SG&A, depreciation, exploration, pension, and other taxes). 'Interest expense' is reported separately. 'Net income' is 'Net income (loss) attributable to ExxonMobil'. 'Taxes' is 'Income tax expense (benefit)'. Supplementary tables provide detailed segment and reserve data but do not alter the consolidated totals.",
+    "source_file": "extracted_text/exxon_2024.consolidated-income-statement.llm.json"
   }
 }

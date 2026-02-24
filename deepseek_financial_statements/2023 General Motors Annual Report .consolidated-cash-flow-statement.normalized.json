@@ -11,25 +11,34 @@
         "year": "2023",
         "currency": "USD",
         "values": {
-          "depreciation_and_amortization": 11888.0
+          "depreciation_and_amortization": [
+            4904.0,
+            6984.0
+          ]
         }
       },
       {
         "year": "2022",
         "currency": "USD",
         "values": {
-          "depreciation_and_amortization": 11290.0
+          "depreciation_and_amortization": [
+            4839.0,
+            6451.0
+          ]
         }
       },
       {
         "year": "2021",
         "currency": "USD",
         "values": {
-          "depreciation_and_amortization": 12051.0
+          "depreciation_and_amortization": [
+            6076.0,
+            5975.0
+          ]
         }
       }
     ],
-    "notes": "The 'depreciation_and_amortization' field was calculated by summing two line items from the cash flow statement: 'Depreciation and impairment of Equipment on operating leases, net' and 'Depreciation, amortization and impairment charges on Property, net'. This approach was taken because the statement does not have a single line item for total depreciation and amortization. The values are: 2023 = 4904 + 6984 = 11888; 2022 = 4839 + 6451 = 11290; 2021 = 6076 + 5975 = 12051.",
-    "source_file": "extracted_text_total_operating_cost_marketable_securities\\2023 General Motors Annual Report .consolidated-cash-flow-statement.llm.json"
+    "notes": "The 'depreciation_and_amortization' field was populated using the two distinct depreciation/amortization/impairment line items from the cash flow statement: 'Depreciation and impairment of Equipment on operating leases, net' and 'Depreciation, amortization and impairment charges on Property, net'. Both are non-cash add-backs to net income in the operating activities section and are standard components of total depreciation and amortization. They are reported as separate array elements per the instruction to not add them up.",
+    "source_file": "extracted_text/2023 General Motors Annual Report .consolidated-cash-flow-statement.llm.json"
   }
 }

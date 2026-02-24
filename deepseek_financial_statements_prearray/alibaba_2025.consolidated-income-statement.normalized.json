@@ -1,0 +1,51 @@
+{
+  "schema_version": "1.0",
+  "fields": [
+    "revenue",
+    "total_operating_cost",
+    "net_income",
+    "taxes",
+    "interest_expenses"
+  ],
+  "statement": {
+    "company_id": "alibaba_2025",
+    "statement_type": "consolidated-income-statement",
+    "periods": [
+      {
+        "year": "2023",
+        "currency": "CNY",
+        "values": {
+          "revenue": 868687.0,
+          "total_operating_cost": -549695.0,
+          "net_income": 65573.0,
+          "taxes": -15549.0,
+          "interest_expenses": -5918.0
+        }
+      },
+      {
+        "year": "2024",
+        "currency": "CNY",
+        "values": {
+          "revenue": 941168.0,
+          "total_operating_cost": -586323.0,
+          "net_income": 71332.0,
+          "taxes": -22529.0,
+          "interest_expenses": -7947.0
+        }
+      },
+      {
+        "year": "2025",
+        "currency": "CNY",
+        "values": {
+          "revenue": 996347.0,
+          "total_operating_cost": -598285.0,
+          "net_income": 125976.0,
+          "taxes": -35445.0,
+          "interest_expenses": -9596.0
+        }
+      }
+    ],
+    "notes": "Extracted values from the primary consolidated income statement in RMB. 'total_operating_cost' mapped directly to the line item 'Operating costs'. 'taxes' mapped to 'Income tax expense'. 'interest_expenses' mapped to 'Interest expense'. All values are in millions of RMB (CNY). The US$ columns were not used as the primary reporting currency is RMB.",
+    "source_file": "extracted_text/alibaba_2025.consolidated-income-statement.llm.json"
+  }
+}

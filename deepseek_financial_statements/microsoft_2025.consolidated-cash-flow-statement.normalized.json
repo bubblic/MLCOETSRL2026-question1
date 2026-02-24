@@ -11,25 +11,31 @@
         "year": "2025",
         "currency": "USD",
         "values": {
-          "depreciation_and_amortization": 34153.0
+          "depreciation_and_amortization": [
+            34153.0
+          ]
         }
       },
       {
         "year": "2024",
         "currency": "USD",
         "values": {
-          "depreciation_and_amortization": 22287.0
+          "depreciation_and_amortization": [
+            22287.0
+          ]
         }
       },
       {
         "year": "2023",
         "currency": "USD",
         "values": {
-          "depreciation_and_amortization": 13861.0
+          "depreciation_and_amortization": [
+            13861.0
+          ]
         }
       }
     ],
-    "notes": "Extracted 'Depreciation, amortization, and other' line item directly from the 'Adjustments to reconcile net income to net cash from operations' section of the cash flow statement.",
-    "source_file": "extracted_text_microsoftonly\\microsoft_2025.consolidated-cash-flow-statement.llm.json"
+    "notes": "Extracted 'Depreciation, amortization, and other' line item from the operating cash flow adjustments as the value for 'depreciation_and_amortization'. The value is a single number per period, returned as an array per the schema.",
+    "source_file": "extracted_text/microsoft_2025.consolidated-cash-flow-statement.llm.json"
   }
 }

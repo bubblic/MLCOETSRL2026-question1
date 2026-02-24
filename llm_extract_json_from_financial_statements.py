@@ -11,6 +11,7 @@ one normalized JSON output file for the matching statement type.
 """
 
 import argparse
+from concurrent.futures import ThreadPoolExecutor, as_completed
 import json
 import re
 from pathlib import Path
@@ -88,14 +89,14 @@ def build_prompt(
     company_id: str,
     statement_type: str,
     required_fields: List[str],
-    statement_text: str,
+    statement_and_supplementary_tables: str,
 ) -> str:
     fields_schema = ",\n".join(
-        [f'        "{field}": number|null' for field in required_fields]
+        [f'        "{field}": number[]' for field in required_fields]
     )
     prompt = (
         "You are a financial statement extraction engine.\n"
-        f"Extract normalized {statement_type} values from the statement text.\n\n"
+        f"Extract normalized {statement_type} values from the statement and supplementary tables.\n\n"
         "Return ONLY valid JSON with this exact schema:\n"
         "{\n"
         '  "company_id": "string",\n'
@@ -112,16 +113,18 @@ def build_prompt(
         "}\n\n"
         "Rules:\n"
         "1) Use every period/column available in the statement.\n"
-        "2) Return numeric values only (no commas, no currency symbols, no percent signs).\n"
-        "3) If a value cannot be directly mapped to a field, try to map number(s) to the corresponding field by taking into account the industry the company is in, and note what you did in notes field. If you cannot find a match, return null.\n"
-        "4) If there are multiple close synonyms, use best accounting match.\n"
-        "5) For parentheses negatives, return negative numbers.\n"
-        "6) For year, report the year of the period only.\n"
-        "7) For currency, report its formal 3-letter acronym.\n"
-        "8) Return JSON only.\n\n"
+        "2) Return numeric array values only (no commas, no currency symbols, no percent signs).\n"
+        "3) If a value cannot be directly mapped to a field, try to map number(s) to the corresponding field by taking into account the industry the company is in, and note what you did in notes field. If you cannot find a match, return an empty array.\n"
+        "4) If multiple numbers make up a field, return them in an array without adding them up.\n"
+        "5) If there are multiple close synonyms, use best accounting match.\n"
+        "6) For parentheses negatives, return negative numbers.\n"
+        "7) For year, report the year of the period only.\n"
+        "8) For currency, report its formal 3-letter acronym.\n"
+        "9) For total_operating_cost, list all elements that should be included in standard practice for the industry the company is in. Elements that should be subtracted should be negative. The sign convention should be such that if an element is a cost, it should be negative, and if it is an income, it should be positive.\n"
+        "10) Return JSON only.\n\n"
         f"company_id: {company_id}\n\n"
-        "statement_text:\n"
-        f"{statement_text}\n"
+        "statement and supplementary tables:\n"
+        f"{statement_and_supplementary_tables}\n"
     )
     return prompt
 
@@ -162,6 +165,21 @@ def to_float_or_none(value: Any) -> Optional[float]:
     return parsed
 
 
+def to_float_list(value: Any) -> List[float]:
+    if isinstance(value, list):
+        normalized: List[float] = []
+        for item in value:
+            parsed = to_float_or_none(item)
+            if parsed is not None:
+                normalized.append(parsed)
+        return normalized
+
+    parsed_scalar = to_float_or_none(value)
+    if parsed_scalar is None:
+        return []
+    return [parsed_scalar]
+
+
 def normalize_periods(periods: Any, required_fields: List[str]) -> List[Dict[str, Any]]:
     if not isinstance(periods, list):
         return []
@@ -176,9 +194,9 @@ def normalize_periods(periods: Any, required_fields: List[str]) -> List[Dict[str
         if not isinstance(values, dict):
             values = {}
 
-        normalized_values: Dict[str, Optional[float]] = {}
+        normalized_values: Dict[str, List[float]] = {}
         for field in required_fields:
-            normalized_values[field] = to_float_or_none(values.get(field))
+            normalized_values[field] = to_float_list(values.get(field))
 
         normalized.append(
             {
@@ -195,7 +213,7 @@ def extract_one_statement(
     company_id: str,
     statement_type: str,
     required_fields: List[str],
-    statement_text: str,
+    statement_and_supplementary_tables: str,
     parameters: Dict[str, Any],
     message: str,
 ) -> Dict[str, Any]:
@@ -203,7 +221,7 @@ def extract_one_statement(
         company_id=company_id,
         statement_type=statement_type,
         required_fields=required_fields,
-        statement_text=statement_text,
+        statement_and_supplementary_tables=statement_and_supplementary_tables,
     )
     result = client.ask_json(
         message=message,
@@ -267,6 +285,15 @@ def parse_args() -> argparse.Namespace:
         default="gen-ai-response",
         help="Message field sent to the Azure DeepSeek endpoint.",
     )
+    parser.add_argument(
+        "--max-workers",
+        type=int,
+        default=9,
+        help=(
+            "Number of statement files to process in parallel. "
+            "Set to 1 to run sequentially."
+        ),
+    )
     return parser.parse_args()
 
 
@@ -283,30 +310,28 @@ def main() -> None:
     if not files:
         raise ValueError(f"No statement files found in: {input_dir}")
 
-    client = AzureLLMClient()
     parameters = {
         "temperature": args.temperature,
         "max_tokens": args.max_tokens,
         "top_k": args.top_k,
     }
 
-    wrote = 0
-    failed = 0
-    for idx, path in enumerate(files, start=1):
+    def process_file(idx: int, path: Path) -> str:
         parsed = parse_filename(path.name)
         if not parsed:
-            continue
+            return "skipped"
         company_id, statement_type = parsed
         required_fields = STATEMENT_CONFIGS[statement_type]["fields"]
-        statement_text = load_raw_statement(path)
+        statement_and_supplementary_tables = load_raw_statement(path)
         print(f"[{idx}/{len(files)}] Extracting {path.name} ({statement_type})")
         try:
+            client = AzureLLMClient()
             extracted = extract_one_statement(
                 client=client,
                 company_id=company_id,
                 statement_type=statement_type,
                 required_fields=required_fields,
-                statement_text=statement_text,
+                statement_and_supplementary_tables=statement_and_supplementary_tables,
                 parameters=parameters,
                 message=args.message,
             )
@@ -321,11 +346,33 @@ def main() -> None:
             )
             with output_path.open("w", encoding="utf-8") as f:
                 json.dump(single_payload, f, ensure_ascii=False, indent=2)
-            wrote += 1
             print(f"  -> Wrote {output_path}")
+            return "wrote"
         except Exception as exc:
-            failed += 1
             print(f"  -> Failed for {path.name}: {exc}")
+            return "failed"
+
+    wrote = 0
+    failed = 0
+    if args.max_workers <= 1:
+        for idx, path in enumerate(files, start=1):
+            status = process_file(idx, path)
+            if status == "wrote":
+                wrote += 1
+            elif status == "failed":
+                failed += 1
+    else:
+        with ThreadPoolExecutor(max_workers=args.max_workers) as executor:
+            futures = [
+                executor.submit(process_file, idx, path)
+                for idx, path in enumerate(files, start=1)
+            ]
+            for future in as_completed(futures):
+                status = future.result()
+                if status == "wrote":
+                    wrote += 1
+                elif status == "failed":
+                    failed += 1
 
     print(f"Finished. Wrote {wrote} file(s) to {output_dir}. Failed: {failed}")
 

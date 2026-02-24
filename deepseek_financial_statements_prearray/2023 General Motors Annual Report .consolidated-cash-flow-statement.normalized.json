@@ -1,0 +1,35 @@
+{
+  "schema_version": "1.0",
+  "fields": [
+    "depreciation_and_amortization"
+  ],
+  "statement": {
+    "company_id": "2023 General Motors Annual Report",
+    "statement_type": "consolidated-cash-flow-statement",
+    "periods": [
+      {
+        "year": "2023",
+        "currency": "USD",
+        "values": {
+          "depreciation_and_amortization": 11888.0
+        }
+      },
+      {
+        "year": "2022",
+        "currency": "USD",
+        "values": {
+          "depreciation_and_amortization": 11290.0
+        }
+      },
+      {
+        "year": "2021",
+        "currency": "USD",
+        "values": {
+          "depreciation_and_amortization": 12051.0
+        }
+      }
+    ],
+    "notes": "The 'depreciation_and_amortization' field was derived by summing the two relevant line items from the cash flow statement: 'Depreciation and impairment of Equipment on operating leases, net' and 'Depreciation, amortization and impairment charges on Property, net'. This is a standard practice for automotive companies to combine these figures for a total depreciation and amortization value. The currency is assumed to be USD as the statement is in millions of dollars.",
+    "source_file": "extracted_text/2023 General Motors Annual Report .consolidated-cash-flow-statement.llm.json"
+  }
+}

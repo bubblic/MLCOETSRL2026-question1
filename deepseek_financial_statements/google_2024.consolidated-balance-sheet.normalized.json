@@ -17,30 +17,58 @@
         "year": "2023",
         "currency": "USD",
         "values": {
-          "cash_and_cash_equivalents": 24048.0,
-          "marketable_securities": 86868.0,
-          "accounts_receivable": 47964.0,
-          "total_current_liabilities": 81814.0,
-          "total_debt_short_term_and_long_term": 11870.0,
-          "total_equity": 283379.0,
-          "total_assets": 402392.0
+          "cash_and_cash_equivalents": [
+            24048.0
+          ],
+          "marketable_securities": [
+            86868.0
+          ],
+          "accounts_receivable": [
+            47964.0
+          ],
+          "total_current_liabilities": [
+            81814.0
+          ],
+          "total_debt_short_term_and_long_term": [
+            11870.0
+          ],
+          "total_equity": [
+            283379.0
+          ],
+          "total_assets": [
+            402392.0
+          ]
         }
       },
       {
         "year": "2024",
         "currency": "USD",
         "values": {
-          "cash_and_cash_equivalents": 23466.0,
-          "marketable_securities": 72191.0,
-          "accounts_receivable": 52340.0,
-          "total_current_liabilities": 89122.0,
-          "total_debt_short_term_and_long_term": 10883.0,
-          "total_equity": 325084.0,
-          "total_assets": 450256.0
+          "cash_and_cash_equivalents": [
+            23466.0
+          ],
+          "marketable_securities": [
+            72191.0
+          ],
+          "accounts_receivable": [
+            52340.0
+          ],
+          "total_current_liabilities": [
+            89122.0
+          ],
+          "total_debt_short_term_and_long_term": [
+            10883.0
+          ],
+          "total_equity": [
+            325084.0
+          ],
+          "total_assets": [
+            450256.0
+          ]
         }
       }
     ],
-    "notes": "All values extracted directly from the primary statement. 'Total debt short-term and long-term' mapped to the 'Long-term debt' line item, as no short-term debt is listed separately. 'Accounts receivable' mapped to 'Accounts receivable, net'. 'Total equity' mapped to 'Total stockholders’ equity'.",
-    "source_file": "extracted_text_total_operating_cost_marketable_securities\\google_2024.consolidated-balance-sheet.llm.json"
+    "notes": "All values extracted directly from the primary consolidated balance sheet. 'Total debt short-term and long-term' mapped to the 'Long-term debt' line item, as no short-term debt is listed separately. 'Marketable securities' includes only the line item explicitly named as such; non-marketable securities are a separate asset line. Values are reported in millions as per the statement. Parentheses for negatives (e.g., accumulated other comprehensive income) are handled as negative numbers in the source data but are not directly required for the requested fields.",
+    "source_file": "extracted_text/google_2024.consolidated-balance-sheet.llm.json"
   }
 }

@@ -11,18 +11,24 @@
         "year": "2024",
         "currency": "CNY",
         "values": {
-          "depreciation_and_amortization": 56213.0
+          "depreciation_and_amortization": [
+            27332.0,
+            28881.0
+          ]
         }
       },
       {
         "year": "2023",
         "currency": "CNY",
         "values": {
-          "depreciation_and_amortization": 59008.0
+          "depreciation_and_amortization": [
+            26305.0,
+            32703.0
+          ]
         }
       }
     ],
-    "notes": "The 'depreciation_and_amortization' field was calculated by summing the values from the supplementary note for 'Depreciation of property, plant and equipment, investment properties and right-of-use assets' and 'Amortisation of intangible assets and land use rights' for each year. The currency RMB is mapped to its formal 3-letter acronym CNY.",
-    "source_file": "extracted_text_total_operating_cost_marketable_securities\\tencent_2024.consolidated-cash-flow-statement.llm.json"
+    "notes": "The 'depreciation_and_amortization' field was populated using the values from the supplementary reconciliation note 43(a). The values correspond to 'Depreciation of property, plant and equipment, investment properties and right-of-use assets' and 'Amortisation of intangible assets and land use rights' for each year, as these are the standard components of D&A. The numbers were extracted directly without summation, as per the schema requirement for an array.",
+    "source_file": "extracted_text/tencent_2024.consolidated-cash-flow-statement.llm.json"
   }
 }

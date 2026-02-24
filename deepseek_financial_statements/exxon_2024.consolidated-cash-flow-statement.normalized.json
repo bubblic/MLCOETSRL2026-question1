@@ -11,25 +11,31 @@
         "year": "2024",
         "currency": "USD",
         "values": {
-          "depreciation_and_amortization": 23442.0
+          "depreciation_and_amortization": [
+            23442.0
+          ]
         }
       },
       {
         "year": "2023",
         "currency": "USD",
         "values": {
-          "depreciation_and_amortization": 20641.0
+          "depreciation_and_amortization": [
+            20641.0
+          ]
         }
       },
       {
         "year": "2022",
         "currency": "USD",
         "values": {
-          "depreciation_and_amortization": 24040.0
+          "depreciation_and_amortization": [
+            24040.0
+          ]
         }
       }
     ],
-    "notes": "Extracted the value from the line item 'Depreciation and depletion (includes impairments)' for each year. The field name 'depreciation_and_amortization' is used as the best accounting match for this combined depreciation, depletion, and impairment expense, which is a standard non-cash add-back in the operating activities section of a cash flow statement.",
-    "source_file": "extracted_text_total_operating_cost_marketable_securities\\exxon_2024.consolidated-cash-flow-statement.llm.json"
+    "notes": "Extracted 'Depreciation and depletion (includes impairments)' line item as the best match for 'depreciation_and_amortization'. The company is in the oil & gas industry, where 'depletion' is a standard non-cash charge similar to amortization for natural resources. Impairments are included as per the note.",
+    "source_file": "extracted_text/exxon_2024.consolidated-cash-flow-statement.llm.json"
   }
 }

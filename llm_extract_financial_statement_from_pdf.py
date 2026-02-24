@@ -16,8 +16,13 @@ from __future__ import annotations
 ## To extract all three statements from all annual reports in the annual_reports directory, run the following in Terminal:
 # python llm_extract_financial_statement_from_pdf.py --input-dir ./annual_reports --query "Consolidated Balance Sheet" --query "Consolidated Income Statement" --query "Consolidated Cash Flow Statement"
 
+# python llm_extract_financial_statement_from_pdf.py --input-dir ./annual_reports --query "Consolidated Balance Sheet"
+# python llm_extract_financial_statement_from_pdf.py --input-dir ./annual_reports --query "Consolidated Income Statement"
+# python llm_extract_financial_statement_from_pdf.py --input-dir ./annual_reports --query "Consolidated Cash Flow Statement"
+
 
 import argparse
+from concurrent.futures import ThreadPoolExecutor, as_completed
 import json
 import os
 import re
@@ -71,6 +76,14 @@ def parse_args() -> argparse.Namespace:
         type=int,
         default=100,
         help="Pages per prompt to the LLM.",
+    )
+    parser.add_argument(
+        "--max-workers",
+        type=int,
+        default=9,
+        help=(
+            "Number of PDFs to process in parallel. " "Set to 1 to run sequentially."
+        ),
     )
     parser.add_argument(
         "--endpoint",
@@ -170,9 +183,10 @@ def build_supplementary_extraction_prompt(
         "Primary statement extraction context:\n"
         f"{primary_context}\n\n"
         "Infer the line items from the primary statement context above. "
-        "Extract only supplementary tables directly related to those inferred line items "
+        "Extract supplementary tables related to those inferred line items "
         "(for example, breakdowns/expansions/schedules/notes such as an expanded "
-        "'Other Income' table).\n"
+        "'Other Income' table). "
+        "You can be generous with the supplementary tables you extract since it is better to have more than not have necessary information.\n"
         "Return in a nice tabular format.\n"
         'If none are found, return "No supplementary tables found".\n\n'
         f"Pages:\n{pages_text}"
@@ -329,9 +343,13 @@ def main() -> None:
     for pdf_path in pdf_files:
         if not pdf_path.is_file():
             raise FileNotFoundError(f"Input file does not exist: {pdf_path}")
+
+    output_dir = Path(args.output_dir)
+
+    def process_pdf(pdf_path: Path) -> None:
         run_pipeline(
             input_file=pdf_path,
-            output_dir=Path(args.output_dir),
+            output_dir=output_dir,
             queries=queries,
             batch_size=args.batch_size,
             endpoint=endpoint,
@@ -339,6 +357,22 @@ def main() -> None:
             selection_prompt=args.selection_prompt,
             extraction_prompt=args.extraction_prompt,
         )
+
+    if args.max_workers <= 1:
+        for pdf_path in pdf_files:
+            process_pdf(pdf_path)
+        return
+
+    with ThreadPoolExecutor(max_workers=args.max_workers) as executor:
+        futures = {
+            executor.submit(process_pdf, pdf_path): pdf_path for pdf_path in pdf_files
+        }
+        for future in as_completed(futures):
+            pdf_path = futures[future]
+            try:
+                future.result()
+            except Exception as exc:
+                raise RuntimeError(f"Failed processing {pdf_path}: {exc}") from exc
 
 
 if __name__ == "__main__":

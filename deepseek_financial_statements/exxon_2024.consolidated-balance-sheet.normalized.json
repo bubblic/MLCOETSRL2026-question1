@@ -17,30 +17,72 @@
         "year": "2024",
         "currency": "USD",
         "values": {
-          "cash_and_cash_equivalents": 23029.0,
-          "marketable_securities": null,
-          "accounts_receivable": 43681.0,
-          "total_current_liabilities": 70307.0,
-          "total_debt_short_term_and_long_term": 41710.0,
-          "total_equity": 270606.0,
-          "total_assets": 453475.0
+          "cash_and_cash_equivalents": [
+            23029.0,
+            158.0
+          ],
+          "marketable_securities": [
+            343.0
+          ],
+          "accounts_receivable": [
+            35282.0,
+            8399.0
+          ],
+          "total_current_liabilities": [
+            4955.0,
+            61297.0,
+            4055.0
+          ],
+          "total_debt_short_term_and_long_term": [
+            4892.0,
+            63.0,
+            36755.0
+          ],
+          "total_equity": [
+            263705.0,
+            6901.0
+          ],
+          "total_assets": [
+            453475.0
+          ]
         }
       },
       {
         "year": "2023",
         "currency": "USD",
         "values": {
-          "cash_and_cash_equivalents": 31539.0,
-          "marketable_securities": null,
-          "accounts_receivable": 38015.0,
-          "total_current_liabilities": 65316.0,
-          "total_debt_short_term_and_long_term": 41573.0,
-          "total_equity": 212538.0,
-          "total_assets": 376317.0
+          "cash_and_cash_equivalents": [
+            31539.0,
+            29.0
+          ],
+          "marketable_securities": [
+            177.0
+          ],
+          "accounts_receivable": [
+            30296.0,
+            7719.0
+          ],
+          "total_current_liabilities": [
+            4090.0,
+            58037.0,
+            3189.0
+          ],
+          "total_debt_short_term_and_long_term": [
+            4009.0,
+            75.0,
+            37483.0
+          ],
+          "total_equity": [
+            204802.0,
+            7736.0
+          ],
+          "total_assets": [
+            376317.0
+          ]
         }
       }
     ],
-    "notes": "1. 'Cash and cash equivalents' includes the unrestricted line item only. 'Cash and cash equivalents – restricted' (158 in 2024, 29 in 2023) is excluded as it is not considered a cash equivalent for liquidity purposes. 2. 'Marketable securities' is not explicitly listed. The 'Investments, advances and long-term receivables' line includes equity securities carried at fair value (343 in 2024, 177 in 2023 per Note 8), but these are long-term and not classified as marketable securities. Therefore, marketable_securities is set to null. 3. 'Accounts receivable' maps to 'Notes and accounts receivable – net'. 4. 'Total debt short-term and long-term' is calculated as the sum of 'Notes and loans payable' (current) and 'Long-term debt'. This yields 4,955 + 36,755 = 41,710 for 2024 and 4,090 + 37,483 = 41,573 for 2023. 5. 'Total equity' is taken directly from the statement. 6. 'Total assets' is taken directly from the statement.",
-    "source_file": "extracted_text_total_operating_cost_marketable_securities\\exxon_2024.consolidated-balance-sheet.llm.json"
+    "notes": "1. 'cash_and_cash_equivalents' includes 'Cash and cash equivalents' and 'Cash and cash equivalents – restricted' as per the statement. 2. 'marketable_securities' mapped from 'Equity securities carried at fair value and other investments at adjusted cost basis' within the supplementary table for Investments, Advances and Long-Term Receivables (Note 8). 3. 'accounts_receivable' mapped from the breakdown in supplementary table for Notes and Accounts Receivable (Note 6): 'Trade' and 'Other'. 4. 'total_current_liabilities' includes all listed current liabilities: 'Notes and loans payable', 'Accounts payable and accrued liabilities', and 'Income taxes payable'. 5. 'total_debt_short_term_and_long_term' includes short-term debt components from supplementary table for Notes and Loans Payable (Note 6): 'Long-term debt due within one year', 'Bank loans', and 'Commercial paper', plus 'Long-term debt' from the primary statement. 6. 'total_equity' includes 'ExxonMobil share of equity' and 'Noncontrolling interests' as per the statement. 7. 'total_assets' is taken directly from the 'Total Assets' line. 8. All values are in millions of dollars as per the statement. 9. 'Inventories' and 'Property, plant and equipment' are not part of the requested output schema.",
+    "source_file": "extracted_text/exxon_2024.consolidated-balance-sheet.llm.json"
   }
 }
