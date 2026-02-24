@@ -108,10 +108,11 @@ def resolve_endpoint(override: str | None) -> str:
 
 
 def build_extraction_prompt(query: str, pages_text: str) -> str:
-    return (
+    prompt = (
         f"Find the table that corresponds to {query} and output it in a nice tabular form from the following pages data.\n"
         f"Pages:\n{pages_text}"
     )
+    return prompt
 
 
 def extract_table_with_llm(
@@ -143,6 +144,65 @@ def extract_table_with_llm(
     return response
 
 
+def build_supplementary_page_query(
+    query: str, primary_extraction: dict[str, object]
+) -> str:
+    primary_context = json.dumps(primary_extraction, ensure_ascii=False)
+    supplementary_query = (
+        f"Supplementary disclosures, breakdowns, expansions, and note tables for {query}. "
+        f"Use this extracted primary statement as context to infer relevant line items and "
+        f"find related supplementary pages: {primary_context}"
+    )
+    return supplementary_query
+
+
+def build_supplementary_extraction_prompt(
+    query: str, primary_extraction: dict[str, object], pages_text: str
+) -> str:
+    primary_context = json.dumps(primary_extraction, ensure_ascii=False, indent=2)
+    prompt = (
+        "You are extracting supplementary financial disclosures from annual report pages.\n"
+        f"Primary statement: {query}\n"
+        "Primary statement extraction context:\n"
+        f"{primary_context}\n\n"
+        "Infer the line items from the primary statement context above. "
+        "Extract only supplementary tables directly related to those inferred line items "
+        "(for example, breakdowns/expansions/schedules/notes such as an expanded "
+        "'Other Income' table).\n"
+        "Return in a nice tabular format.\n"
+        'If none are found, return "No supplementary tables found".\n\n'
+        f"Pages:\n{pages_text}"
+    )
+    return prompt
+
+
+def extract_supplementary_with_llm(
+    client: AzureLLMClient,
+    parameters: dict[str, object],
+    query: str,
+    primary_extraction: dict[str, object],
+    page_numbers: list[int],
+    pages: dict[int, str | None],
+) -> dict[str, object]:
+    if not page_numbers:
+        return {"supplementary_tables": []}
+    joined_pages = []
+    for page_num in page_numbers:
+        joined_pages.append(f"Page {page_num}:\n{(pages[page_num] or '').strip()}")
+    pages_text = "\n\n---\n\n".join(joined_pages)
+    prompt = build_supplementary_extraction_prompt(
+        query, primary_extraction, pages_text
+    )
+    response = client.ask_json(
+        message="gen-ai-response", prompt=prompt, parameters=parameters, reasoning=True
+    )
+    if "raw_response" in response:
+        extracted = extract_json_from_text(str(response["raw_response"]))
+        if extracted:
+            return extracted
+    return response
+
+
 def run_pipeline(
     input_file: Path,
     output_dir: Path,
@@ -162,8 +222,10 @@ def run_pipeline(
     output_dir.mkdir(parents=True, exist_ok=True)
 
     for query in queries:
-        print(f"Selecting pages for {input_file.name} - {query}...")
-        selected_pages = select_pages_with_llm(
+        print(
+            f"Step 1/2 - selecting primary statement pages for {input_file.name} - {query}..."
+        )
+        primary_selected_pages = select_pages_with_llm(
             client=client,
             parameters=parameters,
             pages=pages,
@@ -172,26 +234,53 @@ def run_pipeline(
             is_financial_statement=True,
             prompt_override=selection_prompt,
         )
-        print(f"Selected pages: {selected_pages}")
-        extracted = extract_table_with_llm(
+        print(f"Primary statement pages: {primary_selected_pages}")
+        primary_extraction = extract_table_with_llm(
             client=client,
             parameters=extraction_parameters,
             query=query,
-            page_numbers=selected_pages,
+            page_numbers=primary_selected_pages,
             pages=pages,
             prompt_override=extraction_prompt,
         )
+        supplementary_query = build_supplementary_page_query(query, primary_extraction)
+        print(
+            f"Step 2/2 - selecting supplementary pages for {input_file.name} - {query}..."
+        )
+        supplementary_selected_pages = select_pages_with_llm(
+            client=client,
+            parameters=parameters,
+            pages=pages,
+            query=supplementary_query,
+            batch_size=batch_size,
+            is_financial_statement=False,
+        )
+        print(f"Supplementary pages: {supplementary_selected_pages}")
+        supplementary_extraction = extract_supplementary_with_llm(
+            client=client,
+            parameters=extraction_parameters,
+            query=query,
+            primary_extraction=primary_extraction,
+            page_numbers=supplementary_selected_pages,
+            pages=pages,
+        )
         result = {
             "query": query,
-            "selected_pages": selected_pages,
-            "extraction": extracted,
+            "selected_pages": {
+                "primary_statement_pages": primary_selected_pages,
+                "supplementary_pages": supplementary_selected_pages,
+            },
+            "extraction": {
+                "primary_statement": primary_extraction,
+                "supplementary": supplementary_extraction,
+            },
         }
         slug = re.sub(r"[^a-z0-9]+", "-", query.lower()).strip("-") or "query"
         output_path = output_dir / f"{input_file.stem}.{slug}.llm.json"
         with output_path.open("w", encoding="utf-8") as file_handle:
             json.dump(result, file_handle, ensure_ascii=False, indent=2)
             file_handle.write("\n")
-        print(extracted)
+        print(result["extraction"])
         print(f"Wrote {output_path}")
 
 

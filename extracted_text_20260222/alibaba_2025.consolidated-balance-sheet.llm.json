@@ -1,0 +1,19 @@
+{
+  "query": "Consolidated Balance Sheet",
+  "selected_pages": [
+    55,
+    82,
+    83,
+    85,
+    86,
+    246,
+    247,
+    317,
+    319,
+    320,
+    321
+  ],
+  "extraction": {
+    "raw_response": "| Item | 2024 (RMB million) | 2025 (RMB million) | 2025 (USD million) |\n|------|--------------------|--------------------|---------------------|\n| **Assets** | | | |\n| Current assets: | | | |\n|   Cash and cash equivalents | 248,125 | 145,487 | 20,049 |\n|   Short-term investments | 262,955 | 228,826 | 31,533 |\n|   Restricted cash and custodial receivables | 38,299 | 43,781 | 6,033 |\n|   Equity securities and other investments | 59,949 | 53,780 | 7,411 |\n|   Prepayments, receivables and other assets | 143,536 | 202,175 | 27,860 |\n|   Total current assets | 752,864 | 674,049 | 92,886 |\n| Equity securities and other investments (non-current) | 220,942 | 356,818 | 49,171 |\n| Prepayments, receivables and other assets (non-current) | 116,102 | 83,431 | 11,497 |\n| Equity method investments | 203,131 | 210,169 | 28,962 |\n| Property and equipment, net | 185,161 | 203,348 | 28,022 |\n| Intangible assets, net | 26,950 | 20,911 | 2,882 |\n| Goodwill | 259,679 | 255,501 | 35,209 |\n| **Total assets** | **1,764,829** | **1,804,227** | **248,629** |\n| | | | |\n| **Liabilities, mezzanine equity and shareholders' equity** | | | |\n| Current liabilities: | | | |\n|   Short-term bank borrowings | 12,749 | 22,562 | 3,109 |\n|   Short-term unsecured senior notes | 16,252 | — | — |\n|   Income taxes payable | 9,068 | 11,638 | 1,604 |\n|   Accrued expenses, accounts payable and other liabilities | 297,883 | 332,537 | 45,825 |\n|   Merchant deposits | 12,737 | 274 | 37 |\n|   Deferred revenue and customer advances | 72,818 | 68,335 | 9,417 |\n|   Total current liabilities | 421,507 | 435,346 | 59,992 |\n| Deferred revenue (non-current) | 4,069 | 4,536 | 625 |\n| Deferred tax liabilities | 53,012 | 48,454 | 6,677 |\n| Long-term bank borrowings | 55,686 | 49,909 | 6,878 |\n| Long-term unsecured senior notes | 86,089 | 122,398 | 16,867 |\n| Long-term convertible unsecured senior notes | — | 35,834 | 4,938 |\n| Other liabilities | 31,867 | 17,644 | 2,432 |\n| **Total liabilities** | **652,230** | **714,121** | **98,409** |\n| | | | |\n| Mezzanine equity | 10,728 | 11,713 | 1,613 |\n| | | | |\n| Shareholders' equity: | | | |\n|   Common stock | 1 | 1 | — |\n|   Additional paid-in capital | 397,999 | 381,379 | 52,555 |\n|   Treasury stock | (27,684) | (36,329) | (5,006) |\n|   Statutory reserves | 14,733 | 15,936 | 2,196 |\n|   Accumulated other comprehensive income (loss): | | | |\n|     Cumulative foreign currency translation adjustment | 3,635 | 3,286 | 453 |\n|     Unrealized gain (loss) on interest rate swaps and others | (37) | 107 | 15 |\n|   Retained earnings | 597,897 | 645,478 | 88,949 |\n|   **Total shareholders' equity** | **986,544** | **1,009,858** | **139,162** |\n| Non-controlling interests | 115,327 | 68,535 | 9,445 |\n| **Total equity** | **1,101,871** | **1,078,393** | **148,607** |\n| **Total liabilities, mezzanine equity and equity** | **1,764,829** | **1,804,227** | **248,629** |"
+  }
+}

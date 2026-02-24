@@ -1,0 +1,58 @@
+{
+  "schema_version": "1.0",
+  "fields": [
+    "revenue",
+    "operating_expenses",
+    "net_income",
+    "taxes",
+    "interest_expenses"
+  ],
+  "statement": {
+    "company_id": "alibaba_2025",
+    "statement_type": "consolidated-income-statement",
+    "periods": [
+      {
+        "period": "2023 RMB (million)",
+        "values": {
+          "revenue": 868687.0,
+          "operating_expenses": 768336.0,
+          "net_income": 72783.0,
+          "taxes": -15549.0,
+          "interest_expenses": -5918.0
+        }
+      },
+      {
+        "period": "2024 RMB (million)",
+        "values": {
+          "revenue": 941168.0,
+          "operating_expenses": 827818.0,
+          "net_income": 80009.0,
+          "taxes": -22529.0,
+          "interest_expenses": -7947.0
+        }
+      },
+      {
+        "period": "2025 RMB (million)",
+        "values": {
+          "revenue": 996347.0,
+          "operating_expenses": 855442.0,
+          "net_income": 130109.0,
+          "taxes": -35445.0,
+          "interest_expenses": -9596.0
+        }
+      },
+      {
+        "period": "2025 USD (million)",
+        "values": {
+          "revenue": 137300.0,
+          "operating_expenses": 117883.0,
+          "net_income": 17929.0,
+          "taxes": -4884.0,
+          "interest_expenses": -1323.0
+        }
+      }
+    ],
+    "notes": "1) Operating expenses calculated as the sum of Operating costs, Product development expenses, Sales and marketing expenses, General and administrative expenses, Amortization and impairment of intangible assets, and Goodwill impairment, minus Other net income. This matches the line item calculation to derive Operating profit. 2) Net income mapped to 'Net profit attributable to Alibaba Group Holding Limited shareholders' as the primary consolidated bottom-line profit metric. 3) Taxes mapped to 'Income tax expense'. 4) Interest expenses mapped directly to 'Interest expense' line item.",
+    "source_file": "extracted_text/alibaba_2025.consolidated-income-statement.llm.json"
+  }
+}

@@ -1,0 +1,56 @@
+{
+  "schema_version": "1.0",
+  "fields": [
+    "cash_and_cash_equivalents",
+    "short_term_investment_in_market_securities",
+    "accounts_receivable",
+    "total_current_liabilities",
+    "total_debt_short_term_and_long_term",
+    "total_equity",
+    "total_assets"
+  ],
+  "statement": {
+    "company_id": "alibaba_2025",
+    "statement_type": "consolidated-balance-sheet",
+    "periods": [
+      {
+        "period": "2024 (RMB million)",
+        "values": {
+          "cash_and_cash_equivalents": 248125.0,
+          "short_term_investment_in_market_securities": 262955.0,
+          "accounts_receivable": null,
+          "total_current_liabilities": 421507.0,
+          "total_debt_short_term_and_long_term": 170776.0,
+          "total_equity": 1101871.0,
+          "total_assets": 1764829.0
+        }
+      },
+      {
+        "period": "2025 (RMB million)",
+        "values": {
+          "cash_and_cash_equivalents": 145487.0,
+          "short_term_investment_in_market_securities": 228826.0,
+          "accounts_receivable": null,
+          "total_current_liabilities": 435346.0,
+          "total_debt_short_term_and_long_term": 230703.0,
+          "total_equity": 1078393.0,
+          "total_assets": 1804227.0
+        }
+      },
+      {
+        "period": "2025 (USD million)",
+        "values": {
+          "cash_and_cash_equivalents": 20049.0,
+          "short_term_investment_in_market_securities": 31533.0,
+          "accounts_receivable": null,
+          "total_current_liabilities": 59992.0,
+          "total_debt_short_term_and_long_term": 31792.0,
+          "total_equity": 148607.0,
+          "total_assets": 248629.0
+        }
+      }
+    ],
+    "notes": "Mapped 'Short-term investments' to 'short_term_investment_in_market_securities'. 'Accounts receivable' not separately stated; it is likely part of 'Prepayments, receivables and other assets' but could not be isolated, so set to null. 'Total debt' calculated as sum of: Short-term bank borrowings, Short-term unsecured senior notes, Long-term bank borrowings, Long-term unsecured senior notes, and Long-term convertible unsecured senior notes. 'Total equity' taken as 'Total equity' line which includes shareholders' equity and non-controlling interests.",
+    "source_file": "extracted_text/alibaba_2025.consolidated-balance-sheet.llm.json"
+  }
+}

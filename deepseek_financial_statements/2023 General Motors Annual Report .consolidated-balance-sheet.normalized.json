@@ -1,0 +1,44 @@
+{
+  "schema_version": "1.0",
+  "fields": [
+    "cash_and_cash_equivalents",
+    "short_term_investment_in_market_securities",
+    "accounts_receivable",
+    "total_current_liabilities",
+    "total_debt_short_term_and_long_term",
+    "total_equity",
+    "total_assets"
+  ],
+  "statement": {
+    "company_id": "2023 General Motors Annual Report",
+    "statement_type": "consolidated-balance-sheet",
+    "periods": [
+      {
+        "period": "December 31, 2023",
+        "values": {
+          "cash_and_cash_equivalents": 18853.0,
+          "short_term_investment_in_market_securities": 7613.0,
+          "accounts_receivable": 12378.0,
+          "total_current_liabilities": 94445.0,
+          "total_debt_short_term_and_long_term": 121741.0,
+          "total_equity": 68189.0,
+          "total_assets": 273064.0
+        }
+      },
+      {
+        "period": "December 31, 2022",
+        "values": {
+          "cash_and_cash_equivalents": 19153.0,
+          "short_term_investment_in_market_securities": 12150.0,
+          "accounts_receivable": 13333.0,
+          "total_current_liabilities": 91173.0,
+          "total_debt_short_term_and_long_term": 114699.0,
+          "total_equity": 71927.0,
+          "total_assets": 264037.0
+        }
+      }
+    ],
+    "notes": "1. Mapped 'Marketable debt securities' to 'short_term_investment_in_market_securities' as it represents short-term investments in marketable securities. 2. Mapped 'Accounts and notes receivable, net' to 'accounts_receivable', excluding the separate 'GM Financial receivables' line which is more characteristic of finance operations in an automotive company. 3. Total debt calculated as sum of: Short-term debt (Automotive + GM Financial) and Long-term debt (Automotive + GM Financial) from the debt breakdown in liabilities.",
+    "source_file": "extracted_text/2023 General Motors Annual Report .consolidated-balance-sheet.llm.json"
+  }
+}

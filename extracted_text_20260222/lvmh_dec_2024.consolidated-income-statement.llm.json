@@ -1,0 +1,9 @@
+{
+  "query": "Consolidated Income Statement",
+  "selected_pages": [
+    23
+  ],
+  "extraction": {
+    "raw_response": "CONSOLIDATED INCOME STATEMENT  \n(EUR millions, except for earnings per share)\n\n| Line item | Notes | 2024 | 2023 | 2022 |\n|-----------|-------|------|------|------|\n| Revenue | 24 | 84,683 | 86,153 | 79,184 |\n| Cost of sales | | (27,918) | (26,876) | (24,988) |\n| Gross margin | | 56,765 | 59,277 | 54,196 |\n| Marketing and selling expenses | | (31,002) | (30,768) | (28,151) |\n| General and administrative expenses | | (6,220) | (5,714) | (5,027) |\n| Income/(Loss) from joint ventures and associates | 8 | 28 | 7 | 37 |\n| Profit from recurring operations | 24 | 19,571 | 22,802 | 21,055 |\n| Other operating income and expenses | 25 | (664) | (242) | (54) |\n| Operating profit | | 18,907 | 22,560 | 21,001 |\n| Cost of net financial debt | | (442) | (367) | (17) |\n| Interest on lease liabilities | | (510) | (393) | (254) |\n| Other financial income and expenses | | 160 | (175) | (617) |\n| Net financial income/(expense) | 26 | (792) | (935) | (888) |\n| Income taxes | 27 | (5,157) | (5,673) | (5,362) |\n| Net profit before minority interests | | 12,958 | 15,952 | 14,751 |\n| Minority interests | 18 | (408) | (778) | (667) |\n| Net profit, Group share | | 12,550 | 15,174 | 14,084 |\n| Basic Group share of net earnings per share (EUR) | 28 | 25.13 | 30.34 | 28.05 |\n| Number of shares on which the calculation is based | | 499,412,515 | 500,056,586 | 502,120,694 |\n| Diluted Group share of net earnings per share (EUR) | 28 | 25.12 | 30.33 | 28.03 |\n| Number of shares on which the calculation is based | | 499,681,046 | 500,304,316 | 502,480,100 |"
+  }
+}
