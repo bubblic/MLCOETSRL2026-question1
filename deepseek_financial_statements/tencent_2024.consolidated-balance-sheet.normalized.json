@@ -87,7 +87,10 @@
           ],
           "total_equity": [
             {
-              "Total equity": 1053896.0
+              "Total equity attributable to equity holders": 973548.0
+            },
+            {
+              "Non-controlling interests": 80348.0
             }
           ],
           "total_assets": [
@@ -116,9 +119,6 @@
           "marketable_securities": [
             {
               "Financial assets at fair value through profit or loss (Current assets)": 14903.0
-            },
-            {
-              "Financial assets at fair value through other comprehensive income (Current assets)": 0.0
             }
           ],
           "total_accounts_receivable": [
@@ -171,7 +171,10 @@
           ],
           "total_equity": [
             {
-              "Total equity": 873681.0
+              "Total equity attributable to equity holders": 808591.0
+            },
+            {
+              "Non-controlling interests": 65090.0
             }
           ],
           "total_assets": [
@@ -182,7 +185,7 @@
         }
       }
     ],
-    "notes": "1. 'Cash and cash equivalents' is mapped from the primary statement line item and its detailed composition from Note 32. The detailed components are included in the array.\n2. 'Marketable securities' is mapped from the current portion of 'Financial assets at fair value through profit or loss' and 'Financial assets at fair value through other comprehensive income', as these represent liquid, unrestricted investments intended for trading or near-term sale. The non-current portions are considered long-term investments and are not included.\n3. 'Total accounts receivable' is mapped directly from the primary statement line item.\n4. 'Total current liabilities' is the sum of all items listed under 'Current liabilities' in the primary statement.\n5. 'Total debt short-term and long-term' is the sum of all 'Borrowings' and 'Notes payable' from both current and non-current liabilities, as per standard debt definition.\n6. 'Total equity' and 'Total assets' are mapped directly from the primary statement totals.\n7. The scale is 1,000,000 (RMB in Millions) as indicated in the statement header.\n8. Currency is CNY (Chinese Yuan Renminbi).\n9. For 2023, 'Financial assets at fair value through other comprehensive income (Current assets)' is reported as '–' in the primary statement, which is interpreted as 0.",
+    "notes": "1. 'Cash and cash equivalents' is mapped from the primary statement line and its detailed composition from supplementary Note 32. 2. 'Marketable securities' is mapped from the current portion of 'Financial assets at fair value through profit or loss' and 'Financial assets at fair value through other comprehensive income', as these represent the most liquid, unrestricted investments intended for near-term sale. The non-current portions are considered long-term investments and are not included. For 2023, the current FVOCI amount was '–' (zero), so the array contains only the FVPL item. 3. 'Total accounts receivable' is mapped directly from the primary statement line. 4. 'Total current liabilities' is the sum of all items listed under 'Current liabilities' in the primary statement. 5. 'Total debt short-term and long-term' is mapped from the sum of 'Borrowings' and 'Notes payable' from both current and non-current liabilities, as these represent the company's core financial debt obligations. 6. 'Total equity' is mapped from the sum of 'Total equity attributable to equity holders' and 'Non-controlling interests'. 7. 'Total assets' is mapped directly from the primary statement line. 8. Scale is 1,000,000 (millions) as indicated by '(RMB in Millions)'. 9. Currency is Chinese Yuan (CNY).",
     "source_file": "extracted_text/tencent_2024.consolidated-balance-sheet.llm.json"
   }
 }

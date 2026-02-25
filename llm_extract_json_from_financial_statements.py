@@ -129,7 +129,7 @@ def build_prompt(
         "11) For taxes, it is the tax assessed on the income. If a tax belongs to the cost of revenue, it should be part of total_operating_cost.\n"
         "12) Generally, numbers in parentheses are negative.\n"
         "13) For taxes, interest_expenses, and total_operating_cost, the sign convention is the opposite: if an element reduces income, it should be positive; and if it increases income, it should be negative.\n"
-        "14) For marketable_securities, these are liquid, unrestricted debt or equity investments intended to be sold in the near term (e.g., U.S. Treasuries, commercial paper, money market funds, publicly traded equities)\n"
+        "14) For marketable_securities, these are most liquid, unrestricted debt or equity investments intended to be sold in the near term (e.g., U.S. Treasuries, commercial paper, money market funds, publicly traded equities)\n"
         "15) Return JSON only.\n\n"
         f"company_id: {company_id}\n\n"
         "statement and supplementary tables:\n"

@@ -151,56 +151,9 @@
             }
           ]
         }
-      },
-      {
-        "year": "2025",
-        "currency": "USD",
-        "scale": 1000000,
-        "values": {
-          "total_revenue": [
-            {
-              "Revenue": 137300.0
-            }
-          ],
-          "total_operating_cost": [
-            {
-              "Cost of revenue": 82446.0
-            },
-            {
-              "Product development expenses": 7876.0
-            },
-            {
-              "Sales and marketing expenses": 19847.0
-            },
-            {
-              "General and administrative expenses": 6096.0
-            },
-            {
-              "Amortization and impairment of intangible assets": 873.0
-            },
-            {
-              "Goodwill impairment": 850.0
-            }
-          ],
-          "net_income": [
-            {
-              "Net income": 17360.0
-            }
-          ],
-          "taxes": [
-            {
-              "Income tax expense": 4884.0
-            }
-          ],
-          "interest_expenses": [
-            {
-              "Interest expense": 1323.0
-            }
-          ]
-        }
       }
     ],
-    "notes": "1. The primary consolidated income statement provides all required fields directly. 2. 'Other net income' is not included in total_operating_cost as it is a separate positive line item added after operating expenses to arrive at Operating profit. 3. 'Interest and investment income, net' and 'Other net income (expenses)' are not mapped as they are not part of the requested fields. 4. 'Share of results of equity method investees' is not mapped as it is not part of the requested fields. 5. The 'total_operating_cost' array includes all line items subtracted from Revenue to arrive at Operating profit, consistent with standard practice for a technology/e-commerce company. 6. Numbers in parentheses from the source are treated as positive values for cost/expense fields per rule 13. 7. Supplementary tables provide detailed breakdowns but are not required for the top-level mapping.",
+    "notes": "1. All values are extracted from the primary consolidated income statement. The scale is in millions (RMB). 2. For total_operating_cost, all operating expenses listed before 'Operating profit' are included, as per standard practice for a technology/e-commerce company. This includes Cost of revenue, Product development, Sales & marketing, General & administrative, Amortization/impairment of intangibles, and Goodwill impairment. 'Other net income' (761 in 2025) is not included as it is a non-operating item. 3. For taxes, 'Income tax expense' is used. 4. For interest_expenses, 'Interest expense' is used. 5. The sign convention for taxes, interest_expenses, and total_operating_cost follows rule 13: values that reduce income are reported as positive numbers. Therefore, all expense items (shown in parentheses in the source) are converted to positive numbers in the output. 6. The USD columns are not used as the primary reporting currency is CNY (RMB).",
     "source_file": "extracted_text/alibaba_2025.consolidated-income-statement.llm.json"
   }
 }

@@ -44,7 +44,7 @@
         }
       }
     ],
-    "notes": "The field 'depreciation_and_amortization' is directly mapped from the single line item 'Depreciation, amortization, and other' in the cash flow statement's 'Adjustments to reconcile net income to net cash from operations' section. No combination of elements is required.",
+    "notes": "The 'depreciation_and_amortization' field was directly mapped from the single line item 'Depreciation, amortization, and other' in the cash flow statement's 'Adjustments to reconcile net income to net cash from operations' section. No other elements from the statement or supplementary tables were required to make up this total. The supplementary tables provide detailed breakdowns of intangible assets and leases, but the cash flow statement already consolidates the total non-cash depreciation and amortization expense into this single line item.",
     "source_file": "extracted_text/microsoft_2025.consolidated-cash-flow-statement.llm.json"
   }
 }

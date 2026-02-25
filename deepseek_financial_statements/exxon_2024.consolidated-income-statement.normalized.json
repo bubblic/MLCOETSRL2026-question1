@@ -45,6 +45,9 @@
             },
             {
               "Non-service pension and postretirement benefit expense": 121.0
+            },
+            {
+              "Other taxes and duties": 26288.0
             }
           ],
           "net_income": [
@@ -98,6 +101,9 @@
             },
             {
               "Non-service pension and postretirement benefit expense": 714.0
+            },
+            {
+              "Other taxes and duties": 29011.0
             }
           ],
           "net_income": [
@@ -151,6 +157,9 @@
             },
             {
               "Non-service pension and postretirement benefit expense": 482.0
+            },
+            {
+              "Other taxes and duties": 27919.0
             }
           ],
           "net_income": [
@@ -171,7 +180,7 @@
         }
       }
     ],
-    "notes": "1. For total_revenue, the sum of 'Sales and other operating revenue', 'Income from equity affiliates', and 'Other income' equals the reported 'Total revenues and other income'.\n2. For total_operating_cost, the following line items from the 'Costs and other deductions' section are included as they represent the standard operating costs for an integrated oil & gas company: cost of goods sold (Crude oil and product purchases), production/manufacturing costs, SG&A, depreciation/depletion/impairment, exploration expenses, and non-service pension/postretirement costs. 'Other taxes and duties' and 'Interest expense' are excluded as they are reported separately.\n3. 'Other taxes and duties' is excluded from total_operating_cost as it is a separate tax line not directly tied to cost of revenue or operating expenses in this statement's presentation. It is also not included in the 'taxes' field, which is reserved for income tax expense.\n4. 'Net income' uses the line attributable to the parent company, 'Net income (loss) attributable to ExxonMobil'.\n5. 'Interest expense' is reported as a positive number as it reduces income.\n6. Supplementary tables for reserves and future cash flows are not directly mappable to income statement line items and are therefore not included in the extracted values.",
+    "notes": "1. For total_revenue, the primary statement line 'Total revenues and other income' is composed of the three listed sub-items. 2. For total_operating_cost, all items under 'Costs and other deductions' are included except for 'Interest expense', which is mapped separately. This follows standard practice for an integrated oil & gas company, where 'Other taxes and duties' (primarily production taxes, property taxes, excise duties) are considered operating costs. 3. 'Net income' is mapped to the line attributable to the parent company. 4. 'Taxes' is mapped to 'Income tax expense (benefit)'. 5. 'Interest expenses' is mapped directly. 6. Supplementary tables provide detailed breakdowns (e.g., components of Other Income, Depreciation, Taxes) but the primary statement values are used for the normalized fields as per the schema requirement for source labels from the statement.",
     "source_file": "extracted_text/exxon_2024.consolidated-income-statement.llm.json"
   }
 }

@@ -50,6 +50,9 @@
           ],
           "total_operating_cost": [
             {
+              "Provision for credit losses": 10678.0
+            },
+            {
               "Compensation expense": 51357.0
             },
             {
@@ -66,9 +69,6 @@
             },
             {
               "Other expense": 9552.0
-            },
-            {
-              "Provision for credit losses": 10678.0
             },
             {
               "Interest expense": 101350.0
@@ -130,6 +130,9 @@
           ],
           "total_operating_cost": [
             {
+              "Provision for credit losses": 9320.0
+            },
+            {
               "Compensation expense": 46465.0
             },
             {
@@ -146,9 +149,6 @@
             },
             {
               "Other expense": 12045.0
-            },
-            {
-              "Provision for credit losses": 9320.0
             },
             {
               "Interest expense": 81321.0
@@ -210,6 +210,9 @@
           ],
           "total_operating_cost": [
             {
+              "Provision for credit losses": 6389.0
+            },
+            {
               "Compensation expense": 41636.0
             },
             {
@@ -226,9 +229,6 @@
             },
             {
               "Other expense": 6365.0
-            },
-            {
-              "Provision for credit losses": 6389.0
             },
             {
               "Interest expense": 26097.0
@@ -252,7 +252,7 @@
         }
       }
     ],
-    "notes": "1. The company is a financial institution (bank). For total_revenue, all revenue line items from the statement are included, which sum to 'Total net revenue' (Noninterest revenue + Net interest income). 'Interest income' is included as a positive component of total revenue, while 'Interest expense' is included as a positive component of total_operating_cost. 2. For total_operating_cost, standard practice for a bank includes all operating expenses (noninterest expense), provision for credit losses, and interest expense. The listed noninterest expense line items (Compensation, Occupancy, Technology, Professional services, Marketing, Other) plus Provision for credit losses and Interest expense constitute the total cost of generating revenue. 3. 'Investment securities losses' is a negative revenue item and is included as such in total_revenue. 4. Taxes and interest_expenses are reported as positive numbers as they reduce income. 5. All numbers are extracted directly from the primary consolidated income statement on Page 205. Supplementary tables provide detailed breakdowns but do not alter the top-line figures used here.",
+    "notes": "The primary income statement is used for extraction. For a financial institution (JPMorgan Chase & Co.), total revenue is defined as total net revenue plus interest expense, which equals the sum of all revenue line items (noninterest revenue components and interest income). Total operating cost includes all expenses that reduce income: provision for credit losses, total noninterest expense (compensation, occupancy, technology, professional services, marketing, other), and interest expense. The sign convention for total_operating_cost, taxes, and interest_expenses follows rule 13: values that reduce income are positive. Therefore, all components of total_operating_cost are positive, as are taxes and interest_expenses. Investment securities losses are negative in the revenue section as they reduce revenue. The scale is millions (1E6) as indicated in the statement. Supplementary tables provide detailed breakdowns but do not alter the aggregated values required by the schema.",
     "source_file": "extracted_text/jpmorgan_2024.consolidated-income-statement.llm.json"
   }
 }

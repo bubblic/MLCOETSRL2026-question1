@@ -63,7 +63,13 @@
           ],
           "total_equity": [
             {
-              "Total equity": 196731.0
+              "Equity attributable to Volkswagen AG shareholders": 168404.0
+            },
+            {
+              "Equity attributable to Volkswagen AG hybrid capital investors": 13890.0
+            },
+            {
+              "Non-controlling interests": 14437.0
             }
           ],
           "total_assets": [
@@ -123,7 +129,13 @@
           ],
           "total_equity": [
             {
-              "Total equity": 189186.0
+              "Equity attributable to Volkswagen AG shareholders": 159813.0
+            },
+            {
+              "Equity attributable to Volkswagen AG hybrid capital investors": 15155.0
+            },
+            {
+              "Non-controlling interests": 14218.0
             }
           ],
           "total_assets": [
@@ -134,7 +146,7 @@
         }
       }
     ],
-    "notes": "1. For 'total_accounts_receivable', the field includes Trade receivables, Financial services receivables (current portion), and Other receivables (current portion) as these are the core components of receivables expected to be collected within the operating cycle. The non-current portion of Financial services receivables is excluded as it is a long-term asset. 2. For 'total_current_liabilities', the field includes all items listed under 'Current liabilities' in the primary statement. The value for 'Liabilities associated with assets held for sale' is 0 for 2024 and 31 for 2023, as shown. 3. For 'total_debt_short_term_and_long_term', the field is the sum of Financial liabilities under both Non-current and Current liabilities, representing total financial debt. 4. All values are sourced directly from the primary consolidated balance sheet table. The scale is in millions (€ million).",
+    "notes": "1. The primary balance sheet is used for all values. 2. 'Marketable securities and time deposits' is mapped to 'marketable_securities' as it represents liquid, unrestricted investments. 3. 'total_accounts_receivable' includes Trade receivables, Financial services receivables (current portion), and Other receivables (current portion). 4. 'total_current_liabilities' includes all listed current liabilities from the primary statement. For 2024, 'Liabilities associated with assets held for sale' is shown as 0 (dash in statement). 5. 'total_debt_short_term_and_long_term' is the sum of Financial liabilities under both non-current and current liabilities. 6. 'total_equity' is the sum of the three components listed in the primary statement. 7. Scale is 1E6 (millions) as indicated. 8. The supplementary tables provide detailed breakdowns but are not needed for the requested consolidated totals.",
     "source_file": "extracted_text/volkswagen_2024.consolidated-balance-sheet.llm.json"
   }
 }

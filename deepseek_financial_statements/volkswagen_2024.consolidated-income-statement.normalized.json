@@ -33,6 +33,9 @@
             },
             {
               "Other operating expenses": 20312.0
+            },
+            {
+              "Other operating income": -14974.0
             }
           ],
           "net_income": [
@@ -74,6 +77,9 @@
             },
             {
               "Other operating expenses": 19534.0
+            },
+            {
+              "Other operating income": -15152.0
             }
           ],
           "net_income": [
@@ -94,7 +100,7 @@
         }
       }
     ],
-    "notes": "1. Total operating cost includes Cost of sales, Distribution expenses, Administrative expenses, and Other operating expenses, as these are the standard operating cost components for an automotive manufacturing company. Other operating income is not included as it is a separate positive component of operating profit.\n2. Taxes are reported as a positive number as per the sign convention (expense that reduces income).\n3. Interest expenses are reported as a positive number as per the sign convention (expense that reduces income).\n4. All values are extracted directly from the primary consolidated income statement. Supplementary tables provide detailed breakdowns but are not needed for the aggregated fields requested.\n5. Scale is 1,000,000 (millions) as indicated by '€ million'.\n6. The 'Other operating expenses' line item from the primary statement is used, which matches the total from supplementary Note 6.",
+    "notes": "1. For total_operating_cost: Standard practice for an automotive manufacturer includes cost of sales, distribution, administrative, and other operating expenses. Other operating income is subtracted as it reduces total operating cost. 2. For taxes: The 'Income tax income/expense' line from the primary statement is used. According to Note 10, this is the sum of current tax expense and deferred tax income/expense. The sign convention is followed: tax expense reduces income, so it is reported as a positive number. 3. For interest_expenses: The 'Interest expenses' line from the primary statement is used. The sign convention is followed: interest expense reduces income, so it is reported as a positive number. 4. All numbers are extracted from the primary statement. Supplementary tables provide detail but are not used for the aggregated values in this normalized output. 5. Scale is 1E6 (millions) as indicated by '€ million'. 6. The 'Share of the result of equity-accounted investments', 'Interest income', and 'Other financial result' are part of the financial result below operating income and are not included in total_operating_cost.",
     "source_file": "extracted_text/volkswagen_2024.consolidated-income-statement.llm.json"
   }
 }

@@ -73,7 +73,16 @@
           ],
           "total_assets": [
             {
-              "Total Assets": 453475.0
+              "Total current assets": 91990.0
+            },
+            {
+              "Investments, advances and long-term receivables": 47200.0
+            },
+            {
+              "Property, plant and equipment, at cost, less accumulated depreciation and depletion": 294318.0
+            },
+            {
+              "Other assets, including intangibles – net": 19967.0
             }
           ]
         }
@@ -94,10 +103,10 @@
           "marketable_securities": [],
           "total_accounts_receivable": [
             {
-              "Trade, less reserves of $162 million and $170 million": 30296.0
+              "Trade, less reserves of $170 million and $101 million": 30296.0
             },
             {
-              "Other, less reserves of $314 million and $101 million": 7719.0
+              "Other, less reserves of $101 million and $101 million": 7719.0
             }
           ],
           "total_current_liabilities": [
@@ -138,13 +147,22 @@
           ],
           "total_assets": [
             {
-              "Total Assets": 376317.0
+              "Total current assets": 96609.0
+            },
+            {
+              "Investments, advances and long-term receivables": 47630.0
+            },
+            {
+              "Property, plant and equipment, at cost, less accumulated depreciation and depletion": 214940.0
+            },
+            {
+              "Other assets, including intangibles – net": 17138.0
             }
           ]
         }
       }
     ],
-    "notes": "1. 'Cash and cash equivalents' includes both unrestricted and restricted cash as per the balance sheet. 2. 'Marketable securities' is an empty array as no line items for short-term, liquid investments (e.g., commercial paper, U.S. Treasuries) were identified in the balance sheet or supplementary notes. The 'Investments, advances and long-term receivables' line appears to be long-term in nature. 3. 'Total accounts receivable' is composed of the detailed 'Trade' and 'Other' receivables from Note 6. 4. 'Total current liabilities' includes all items listed under the 'Current liabilities' section. 5. 'Total debt short-term and long-term' includes 'Notes and loans payable' (current) and 'Long-term debt' (non-current). 6. 'Total equity' is the sum of all equity components, including noncontrolling interests. The 'ExxonMobil share of equity' line is not used directly to avoid double-counting its components. 7. Scale is 1,000,000 (millions) as indicated in the statement headers. 8. Numbers in parentheses are treated as negative values.",
+    "notes": "1. 'Cash and cash equivalents' includes both unrestricted and restricted amounts as per the statement. 2. 'Marketable securities' is an empty array as no line items for short-term, liquid investments (e.g., commercial paper, U.S. Treasuries) were found in the provided balance sheet or supplementary tables. Investments listed (e.g., equity securities, long-term receivables) are not considered marketable securities as they are either long-term, illiquid, or held for strategic purposes. 3. 'Total accounts receivable' is built from the supplementary Note 6 breakdown of 'Notes and accounts receivable – net'. 4. 'Total current liabilities' is built from the sum of its listed components. 5. 'Total debt' includes short-term borrowings ('Notes and loans payable') and 'Long-term debt'. 6. 'Total equity' is built from all components of equity, including noncontrolling interests. 7. 'Total assets' is built from the sum of the major asset categories, which roll up to the reported total. 8. Numbers in parentheses are treated as negative values. 9. Scale is in millions (1E6) as indicated in the statement headers.",
     "source_file": "extracted_text/exxon_2024.consolidated-balance-sheet.llm.json"
   }
 }

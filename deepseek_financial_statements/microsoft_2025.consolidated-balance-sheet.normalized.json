@@ -194,7 +194,7 @@
         }
       }
     ],
-    "notes": "1. 'Short-term investments' from the primary statement is mapped to 'marketable_securities' as it represents liquid, unrestricted debt investments intended to be sold in the near term, consistent with the supplementary investment table details. 2. 'Total current liabilities' is the sum of all listed current liability line items. 3. 'Total debt_short_term_and_long_term' is the sum of short-term debt, current portion of long-term debt, and long-term debt. 4. 'Total equity' is the sum of the three listed stockholders' equity components. 5. 'Total assets' is the sum of all listed asset line items, which matches the reported total assets. 6. The supplementary tables provide detailed breakdowns but are not required for the aggregated values requested in the schema.",
+    "notes": "1. The 'Short-term investments' line from the primary statement is mapped to 'marketable_securities' as it represents liquid, unrestricted investments intended to be sold in the near term, consistent with the supplementary note detailing commercial paper, U.S. Treasuries, etc. 2. 'Total current liabilities' is built from all listed line items under that heading. 3. 'Total debt' combines short-term debt, current portion of long-term debt, and long-term debt. 4. 'Total equity' is built from the three listed components of stockholders' equity. 5. 'Total assets' is built from all listed asset categories, summing to the reported total. 6. The supplementary tables provide detailed breakdowns but are not required to construct the requested normalized fields from the primary statement.",
     "source_file": "extracted_text/microsoft_2025.consolidated-balance-sheet.llm.json"
   }
 }

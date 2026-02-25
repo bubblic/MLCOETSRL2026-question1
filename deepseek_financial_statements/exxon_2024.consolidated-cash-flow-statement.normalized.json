@@ -44,7 +44,7 @@
         }
       }
     ],
-    "notes": "Only the 'depreciation_and_amortization' field was requested for extraction. The provided line item 'Depreciation and depletion (includes impairments)' from the operating activities section is mapped to this field. The statement is for an oil and gas (energy) company, where 'depletion' is the industry-specific term analogous to amortization for natural resources. All other fields from the cash flow statement (e.g., net income, changes in working capital, investing/financing activities) were not requested and are therefore not included in the output.",
+    "notes": "Only the 'depreciation_and_amortization' field was requested for extraction. The provided statement contains a single, clearly labeled line item for this field: 'Depreciation and depletion (includes impairments)'. This item is mapped directly. The scale is 1E6 (millions) as indicated in the statement header. The currency is USD, inferred from the context of the company (ExxonMobil) and the use of the dollar symbol in the statement.",
     "source_file": "extracted_text/exxon_2024.consolidated-cash-flow-statement.llm.json"
   }
 }
