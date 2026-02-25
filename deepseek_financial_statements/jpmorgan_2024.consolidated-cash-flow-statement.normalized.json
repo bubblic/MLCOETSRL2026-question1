@@ -14,7 +14,7 @@
         "values": {
           "depreciation_and_amortization": [
             {
-              "Depreciation and amortization": 7938.0
+              "value": 7938.0
             }
           ]
         }
@@ -26,7 +26,7 @@
         "values": {
           "depreciation_and_amortization": [
             {
-              "Depreciation and amortization": 7512.0
+              "value": 7512.0
             }
           ]
         }
@@ -38,13 +38,13 @@
         "values": {
           "depreciation_and_amortization": [
             {
-              "Depreciation and amortization": 7051.0
+              "value": 7051.0
             }
           ]
         }
       }
     ],
-    "notes": "Only the 'Depreciation and amortization' line item was directly extractable from the provided cash flow statement. The supplementary tables contain data on operating leases (e.g., net rental expense, cash paid for lease liabilities) and parent company cash flows, but these are not standard components of the consolidated cash flow statement's 'depreciation_and_amortization' field. The 'depreciation_and_amortization' field in a cash flow statement is a single, consolidated non-cash adjustment figure, which is provided directly in the primary statement.",
+    "notes": "Extracted the 'Depreciation and amortization' line item directly from the Consolidated Statements of Cash Flows. The supplementary tables provide additional detail on operating lease components (e.g., right-of-use asset amortization) which are part of the consolidated depreciation and amortization figure, but are not listed separately in the primary cash flow statement. Therefore, only the single, consolidated value is mapped for each period.",
     "source_file": "extracted_text/jpmorgan_2024.consolidated-cash-flow-statement.llm.json"
   }
 }

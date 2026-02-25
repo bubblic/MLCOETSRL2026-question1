@@ -1,7 +1,7 @@
 {
   "schema_version": "1.0",
   "fields": [
-    "revenue",
+    "total_revenue",
     "total_operating_cost",
     "net_income",
     "taxes",
@@ -16,7 +16,7 @@
         "currency": "CNY",
         "scale": 1000000,
         "values": {
-          "revenue": [
+          "total_revenue": [
             {
               "Revenue": 868687.0
             }
@@ -63,7 +63,7 @@
         "currency": "CNY",
         "scale": 1000000,
         "values": {
-          "revenue": [
+          "total_revenue": [
             {
               "Revenue": 941168.0
             }
@@ -110,7 +110,7 @@
         "currency": "CNY",
         "scale": 1000000,
         "values": {
-          "revenue": [
+          "total_revenue": [
             {
               "Revenue": 996347.0
             }
@@ -153,7 +153,7 @@
         }
       }
     ],
-    "notes": "1. The primary consolidated income statement provides all required fields directly. 2. 'Other net income' is not included in total_operating_cost as it is a net add-back item after operating expenses. 3. 'Interest and investment income, net' is not an expense and is excluded from interest_expenses. 4. All values are extracted from the RMB columns. 5. The scale is 1,000,000 (millions) as indicated. 6. For total_operating_cost, all listed expense items that reduce operating income (Cost of revenue, Product development, Sales & marketing, General & administrative, Amortization/impairment of intangibles, Goodwill impairment) are included, consistent with standard practice for a technology/e-commerce company. 7. Numbers in parentheses from the source are treated as positive values for cost/expense items as they reduce income.",
+    "notes": "1. All values are extracted from the primary consolidated income statement. The scale is 'millions' as indicated (RMB in millions). 2. For 'total_operating_cost', all operating expenses listed before 'Operating profit' are included, as they are standard costs for a technology/e-commerce company. This includes Cost of revenue, Product development, Sales & marketing, General & administrative, Amortization/impairment of intangibles, and Goodwill impairment. 'Other net income' (761 for 2025) is excluded as it is a non-operating item added after operating costs. 3. 'Interest and investment income, net' and 'Other net income (expenses)' are not included in interest_expenses or taxes as they are non-operating financial items. 4. 'Share of results of equity method investees' is excluded from net_income as the target field is the consolidated net income before this allocation. 5. The USD columns are not used as the primary reporting currency is CNY (RMB). 6. Numbers in parentheses from the source are treated as positive values for cost/expense items, adhering to the rule that items reducing income are positive.",
     "source_file": "extracted_text/alibaba_2025.consolidated-income-statement.llm.json"
   }
 }

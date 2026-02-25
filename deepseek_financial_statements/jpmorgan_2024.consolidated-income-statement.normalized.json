@@ -1,7 +1,7 @@
 {
   "schema_version": "1.0",
   "fields": [
-    "revenue",
+    "total_revenue",
     "total_operating_cost",
     "net_income",
     "taxes",
@@ -16,7 +16,7 @@
         "currency": "USD",
         "scale": 1000000,
         "values": {
-          "revenue": [
+          "total_revenue": [
             {
               "Investment banking fees": 8910.0
             },
@@ -96,7 +96,7 @@
         "currency": "USD",
         "scale": 1000000,
         "values": {
-          "revenue": [
+          "total_revenue": [
             {
               "Investment banking fees": 6519.0
             },
@@ -176,7 +176,7 @@
         "currency": "USD",
         "scale": 1000000,
         "values": {
-          "revenue": [
+          "total_revenue": [
             {
               "Investment banking fees": 6686.0
             },
@@ -252,7 +252,7 @@
         }
       }
     ],
-    "notes": "1. Revenue: For a financial institution, revenue is defined as total net revenue, which is the sum of noninterest revenue and net interest income. The primary statement lists the components of noninterest revenue and then shows net interest income (interest income minus interest expense). To construct the 'revenue' field, all components of noninterest revenue (including items like 'Investment securities losses' which is negative) and 'Interest income' are listed individually. 'Net interest income' is not used as a component because it is a derived figure (interest income - interest expense).\n2. Total Operating Cost: For a bank, this includes all expenses that reduce operating income. This includes: Provision for credit losses, all noninterest expense components (Compensation, Occupancy, Technology, Professional services, Marketing, Other), and Interest expense. All values are positive as they reduce income.\n3. Taxes: 'Income tax expense' is directly mapped.\n4. Interest Expenses: 'Interest expense' is directly mapped as a positive number (reduces income).\n5. Net Income: 'Net income' is directly mapped.\n6. Scale: The statement indicates values are 'in millions', so scale is 1E6.\n7. Currency: The statement uses '$', which is USD.\n8. Sign Convention: Numbers in parentheses in the source are treated as negative. All values in 'total_operating_cost', 'taxes', and 'interest_expenses' are positive as they represent costs/expenses that reduce income.",
+    "notes": "1. Total revenue is constructed from all revenue line items (noninterest revenue components + interest income). 'Total net revenue' from the statement is the sum of Net interest income and Noninterest revenue, but to avoid redundancy, the components are listed individually. 2. Total operating cost includes all expenses that reduce income: Provision for credit losses, all noninterest expense components (Compensation, Occupancy, Technology, Professional services, Marketing, Other expense), and Interest expense. This follows standard banking industry practice where interest expense is a core operating cost. 3. Taxes and interest expenses are mapped directly from 'Income tax expense' and 'Interest expense'. 4. Numbers in parentheses in the source (e.g., Investment securities losses) are treated as negative values. 5. Scale is millions (1E6) as indicated in the statement. 6. All values are taken directly from the primary consolidated income statement on Page 205. Supplementary tables provide breakdowns but are not used for the core income statement mapping to avoid duplication and maintain consistency with the primary statement totals.",
     "source_file": "extracted_text/jpmorgan_2024.consolidated-income-statement.llm.json"
   }
 }

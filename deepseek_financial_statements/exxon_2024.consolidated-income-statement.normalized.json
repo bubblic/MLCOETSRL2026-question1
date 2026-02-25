@@ -1,7 +1,7 @@
 {
   "schema_version": "1.0",
   "fields": [
-    "revenue",
+    "total_revenue",
     "total_operating_cost",
     "net_income",
     "taxes",
@@ -16,7 +16,7 @@
         "currency": "USD",
         "scale": 1000000,
         "values": {
-          "revenue": [
+          "total_revenue": [
             {
               "Sales and other operating revenue": 339247.0
             },
@@ -72,7 +72,7 @@
         "currency": "USD",
         "scale": 1000000,
         "values": {
-          "revenue": [
+          "total_revenue": [
             {
               "Sales and other operating revenue": 334697.0
             },
@@ -128,7 +128,7 @@
         "currency": "USD",
         "scale": 1000000,
         "values": {
-          "revenue": [
+          "total_revenue": [
             {
               "Sales and other operating revenue": 398675.0
             },
@@ -180,7 +180,7 @@
         }
       }
     ],
-    "notes": "1. Revenue is mapped from 'Total revenues and other income' components: Sales and other operating revenue, Income from equity affiliates, and Other income. 2. Total operating cost includes all items under 'Costs and other deductions' except for Interest expense, which is reported separately. This is standard for an integrated oil & gas company and includes cost of goods sold (Crude oil and product purchases), operating expenses (Production, SG&A, Depreciation, Exploration), and other operating taxes (Other taxes and duties). 3. Net income is mapped to 'Net income (loss) attributable to ExxonMobil'. 4. Taxes is mapped to 'Income tax expense (benefit)'. 5. Interest expenses is mapped to 'Interest expense'. 6. All values are taken directly from the primary income statement. Supplementary tables provide detailed breakdowns (e.g., components of Other income, Depreciation, Other taxes) but do not change the top-line values reported in the primary statement. 7. The scale is 'millions of dollars' as stated in the statement header. 8. The sign convention follows the statement presentation: all cost and expense items are positive numbers as they reduce income. The 'Other income' line is positive as it increases income.",
+    "notes": "1. The 'total_revenue' field is mapped from the 'Total revenues and other income' line, which is the sum of its three listed components. Each component is listed individually in the array as per rule #4. 2. For 'total_operating_cost', all items listed under 'Costs and other deductions' are included, except for 'Interest expense' (which is mapped separately) and 'Income tax expense' (which is mapped separately). This follows standard practice for an integrated oil & gas company, where cost of goods sold (crude purchases), production, SG&A, depreciation, exploration, pension, and other operating taxes are all operating costs. 3. 'Other taxes and duties' is included in total_operating_cost as it is described as an operating cost in the supplementary notes (Note 19) and is part of the 'Costs and other deductions' section. 4. 'Net income' uses the line attributable to the parent company ('Net income (loss) attributable to ExxonMobil'). 5. 'Taxes' is mapped directly from 'Income tax expense (benefit)'. 6. 'Interest expenses' is mapped directly from 'Interest expense'. 7. All values are extracted from the primary statement. The supplementary tables provide detailed breakdowns but do not change the top-line values used for extraction. 8. The scale is 'millions of dollars' as stated in the statement header, so scale is 1E6.",
     "source_file": "extracted_text/exxon_2024.consolidated-income-statement.llm.json"
   }
 }

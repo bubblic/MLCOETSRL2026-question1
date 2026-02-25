@@ -125,7 +125,7 @@
         }
       }
     ],
-    "notes": "1. 'Marketable securities' includes current financial assets at FVPL, current financial assets at FVOCI, and current term deposits, as these are liquid assets readily convertible to cash. For 2023, current FVOCI was zero ('–'). 2. 'Total debt' is the sum of all borrowings and notes payable (both current and non-current portions). 3. 'Total accounts receivable' is the net carrying amount after loss allowance. 4. All values are extracted directly from the primary consolidated statement of financial position. 5. Scale is 1,000,000 (RMB in Millions).",
+    "notes": "1. 'Marketable securities' includes current financial assets at FVPL, current financial assets at FVOCI, and current term deposits, as these are highly liquid assets readily convertible to cash. Non-current term deposits and non-current financial assets are excluded as they are not considered current. For 2023, current FVOCI was zero ('–').\n2. 'Total debt' is defined as the sum of all borrowings and notes payable (both current and non-current portions). This aligns with the 'Total debts' line in the supplementary table (Note 4.2).\n3. All values are extracted directly from the primary consolidated statement of financial position. The scale is in millions (RMB).",
     "source_file": "extracted_text/tencent_2024.consolidated-balance-sheet.llm.json"
   }
 }

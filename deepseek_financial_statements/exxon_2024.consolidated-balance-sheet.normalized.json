@@ -26,15 +26,28 @@
               "Cash and cash equivalents – restricted": 158.0
             }
           ],
-          "marketable_securities": [],
+          "marketable_securities": [
+            {
+              "Equity securities carried at fair value and other investments at adjusted cost basis": 343.0
+            }
+          ],
           "total_accounts_receivable": [
             {
-              "Notes and accounts receivable – net": 43681.0
+              "Trade, less reserves of $162 million and $170 million": 35282.0
+            },
+            {
+              "Other, less reserves of $314 million and $101 million": 8399.0
             }
           ],
           "total_current_liabilities": [
             {
-              "Total current liabilities": 70307.0
+              "Notes and loans payable": 4955.0
+            },
+            {
+              "Accounts payable and accrued liabilities": 61297.0
+            },
+            {
+              "Income taxes payable": 4055.0
             }
           ],
           "total_debt_short_term_and_long_term": [
@@ -47,7 +60,10 @@
           ],
           "total_equity": [
             {
-              "Total Equity": 270606.0
+              "ExxonMobil share of equity": 263705.0
+            },
+            {
+              "Noncontrolling interests": 6901.0
             }
           ],
           "total_assets": [
@@ -70,15 +86,28 @@
               "Cash and cash equivalents – restricted": 29.0
             }
           ],
-          "marketable_securities": [],
+          "marketable_securities": [
+            {
+              "Equity securities carried at fair value and other investments at adjusted cost basis": 177.0
+            }
+          ],
           "total_accounts_receivable": [
             {
-              "Notes and accounts receivable – net": 38015.0
+              "Trade, less reserves of $162 million and $170 million": 30296.0
+            },
+            {
+              "Other, less reserves of $314 million and $101 million": 7719.0
             }
           ],
           "total_current_liabilities": [
             {
-              "Total current liabilities": 65316.0
+              "Notes and loans payable": 4090.0
+            },
+            {
+              "Accounts payable and accrued liabilities": 58037.0
+            },
+            {
+              "Income taxes payable": 3189.0
             }
           ],
           "total_debt_short_term_and_long_term": [
@@ -91,7 +120,10 @@
           ],
           "total_equity": [
             {
-              "Total Equity": 212538.0
+              "ExxonMobil share of equity": 204802.0
+            },
+            {
+              "Noncontrolling interests": 7736.0
             }
           ],
           "total_assets": [
@@ -102,7 +134,7 @@
         }
       }
     ],
-    "notes": "1. 'Cash and cash equivalents' includes both unrestricted and restricted amounts as per the primary statement.\n2. 'Marketable securities' field is empty as no specific line items for short-term, liquid investments (e.g., trading securities, available-for-sale securities) were identified in the provided balance sheet or supplementary tables. Investments listed (e.g., equity securities, long-term receivables) are non-current.\n3. 'Total accounts receivable' maps directly to 'Notes and accounts receivable – net'.\n4. 'Total current liabilities' maps directly to the aggregated line.\n5. 'Total debt short-term and long-term' combines 'Notes and loans payable' (current) and 'Long-term debt' (non-current).\n6. 'Total equity' and 'Total assets' map directly to the aggregated lines.\n7. All values are extracted as positive numbers; parentheses in the source (e.g., for Accumulated other comprehensive income) indicate negative equity components but are already netted within the 'Total Equity' figure provided.",
+    "notes": "1. 'Cash and cash equivalents' includes both unrestricted and restricted amounts as per the primary statement.\n2. 'Marketable securities' is mapped from the 'Equity securities carried at fair value and other investments at adjusted cost basis' line in Note 8, as it represents current liquid assets (excluding cash) that can be easily converted to cash. Other items in Note 8 (equity method investments, advances, long-term receivables) are non-current and not considered marketable securities.\n3. 'Total accounts receivable' is mapped from the detailed breakdown in Note 6, which sums to the 'Notes and accounts receivable – net' line on the primary statement.\n4. 'Total current liabilities' includes all items listed under 'Current liabilities' on the primary statement.\n5. 'Total debt short-term and long-term' includes 'Notes and loans payable' (current) and 'Long-term debt' (non-current).\n6. 'Total equity' includes 'ExxonMobil share of equity' and 'Noncontrolling interests' as per the primary statement.\n7. All values are in millions of dollars (scale: 1E6).",
     "source_file": "extracted_text/exxon_2024.consolidated-balance-sheet.llm.json"
   }
 }

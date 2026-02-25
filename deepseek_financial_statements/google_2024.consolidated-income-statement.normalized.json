@@ -1,7 +1,7 @@
 {
   "schema_version": "1.0",
   "fields": [
-    "revenue",
+    "total_revenue",
     "total_operating_cost",
     "net_income",
     "taxes",
@@ -16,7 +16,7 @@
         "currency": "USD",
         "scale": 1000000,
         "values": {
-          "revenue": [
+          "total_revenue": [
             {
               "Revenues": 282836.0
             }
@@ -57,7 +57,7 @@
         "currency": "USD",
         "scale": 1000000,
         "values": {
-          "revenue": [
+          "total_revenue": [
             {
               "Revenues": 307394.0
             }
@@ -98,7 +98,7 @@
         "currency": "USD",
         "scale": 1000000,
         "values": {
-          "revenue": [
+          "total_revenue": [
             {
               "Revenues": 350018.0
             }
@@ -135,7 +135,7 @@
         }
       }
     ],
-    "notes": "1. All values extracted from the primary Consolidated Statements of Income on page 57 and the supplementary table 'Components of Other Income (Expense), Net' on page 83. 2. For total_operating_cost, the four main operating expense categories (Cost of revenues, Research and development, Sales and marketing, General and administrative) are listed individually as they sum to 'Total costs and expenses'. This is standard for a technology/services company like Alphabet. 3. For taxes, 'Provision for income taxes' is used. 4. For interest_expenses, the value is taken from the 'Interest expense' line within 'Other income (expense), net'. The sign convention is followed: these expenses reduce income, so the positive numbers from the statement (which were shown in parentheses) are reported as positive numbers. 5. The scale is 1,000,000 (millions) as indicated in the statement. 6. All other supplementary data (e.g., segment breakdowns, revenue disaggregation, tax details) provide supporting detail but are not required for the core income statement fields requested.",
+    "notes": "1. All values extracted from the primary Consolidated Statements of Income on page 57, except for 'interest_expenses' which were sourced from the 'Components of Other Income (Expense), Net' table on page 83. 2. 'total_operating_cost' includes the four main operating expense categories listed in the primary statement (Cost of revenues, Research and development, Sales and marketing, General and administrative), which sum to the 'Total costs and expenses' line. 3. 'taxes' is mapped from 'Provision for income taxes'. 4. 'interest_expenses' is mapped from the 'Interest expense' component within 'Other income (expense), net'. The sign convention follows rule 12: these expenses reduce income and are reported as positive numbers in the source, so they are kept positive. 5. The scale is 1,000,000 (millions) as indicated in the statement header. 6. All other supplementary data (e.g., revenue breakdowns, segment details, tax reconciliation) provide supporting detail but are not required for the normalized fields requested.",
     "source_file": "extracted_text/google_2024.consolidated-income-statement.llm.json"
   }
 }

@@ -1,7 +1,7 @@
 {
   "schema_version": "1.0",
   "fields": [
-    "revenue",
+    "total_revenue",
     "total_operating_cost",
     "net_income",
     "taxes",
@@ -16,7 +16,7 @@
         "currency": "EUR",
         "scale": 1000000,
         "values": {
-          "revenue": [
+          "total_revenue": [
             {
               "Revenue": 84683.0
             }
@@ -60,7 +60,7 @@
         "currency": "EUR",
         "scale": 1000000,
         "values": {
-          "revenue": [
+          "total_revenue": [
             {
               "Revenue": 86153.0
             }
@@ -104,7 +104,7 @@
         "currency": "EUR",
         "scale": 1000000,
         "values": {
-          "revenue": [
+          "total_revenue": [
             {
               "Revenue": 79184.0
             }
@@ -144,7 +144,7 @@
         }
       }
     ],
-    "notes": "1. For total_operating_cost: Includes Cost of sales, Marketing and selling expenses, General and administrative expenses, and Other operating income and expenses (which is an operating cost). This follows standard practice for a luxury goods company where operating costs include all SG&A and other operating items. 2. For interest_expenses: Includes Cost of net financial debt and Interest on lease liabilities. 'Other financial income and expenses' is excluded as it contains non-interest items like fair value adjustments and dividends. 3. All values are extracted directly from the primary statement. Parentheses in the source indicate negative values (costs/expenses); these have been converted to positive numbers in the output per the sign convention rule (expenses that reduce income are positive). 4. The scale is 1,000,000 (EUR millions) as stated in the statement.",
+    "notes": "1. All values are in EUR millions (scale 1E6). 2. For total_operating_cost, standard practice for a luxury goods conglomerate includes cost of sales, selling & marketing, general & administrative, and other operating expenses. 'Other operating income and expenses' is included as a cost component (positive number as it reduces income). 3. 'Income/(Loss) from joint ventures and associates' is not included in total_operating_cost as it is non-operating income. 4. For interest_expenses, 'Cost of net financial debt' and 'Interest on lease liabilities' are the core interest costs. 'Other financial income and expenses' contains non-interest items (e.g., FX, fair value adjustments) and is not included. 5. All numbers are taken directly from the primary statement; parentheses indicate negative values (expenses) and have been converted to positive numbers for the fields where they reduce income, per the sign convention rule. 6. The supplementary tables provide detailed breakdowns but are not used for the core consolidated values as they are either segment details or component details already aggregated in the primary statement line items.",
     "source_file": "extracted_text/lvmh_dec_2024.consolidated-income-statement.llm.json"
   }
 }

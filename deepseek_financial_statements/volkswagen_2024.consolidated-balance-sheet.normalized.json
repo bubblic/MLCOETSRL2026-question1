@@ -104,7 +104,7 @@
         }
       }
     ],
-    "notes": "All values extracted directly from the primary consolidated balance sheet table. 'Marketable securities' is mapped from 'Marketable securities and time deposits'. 'Total accounts receivable' is mapped from 'Trade receivables'. 'Total debt short-term and long-term' is the sum of 'Financial liabilities' from both the non-current and current sections. All other fields map directly to single line items. The scale is in millions (€ million).",
+    "notes": "All values extracted directly from the primary consolidated balance sheet table. 'Marketable securities and time deposits' is mapped to 'marketable_securities' as it represents current liquid assets excluding cash. 'Total debt' is the sum of 'Financial liabilities' from both non-current and current sections. 'Total accounts receivable' is mapped from 'Trade receivables' as the primary component; other receivables (e.g., other financial assets, other receivables) are not included as they are not considered trade-related. The scale is 1,000,000 (millions) as indicated by '(€ million)'.",
     "source_file": "extracted_text/volkswagen_2024.consolidated-balance-sheet.llm.json"
   }
 }

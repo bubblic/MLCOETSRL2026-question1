@@ -44,7 +44,7 @@
         }
       }
     ],
-    "notes": "Only the 'depreciation_and_amortization' field was requested for extraction. The value was directly mapped from the line item 'Depreciation and depletion (includes impairments)' in the primary statement. All other cash flow statement line items were not requested and are therefore not included in the output.",
+    "notes": "Only the 'depreciation_and_amortization' field was requested for extraction. The value was directly mapped from the 'Depreciation and depletion (includes impairments)' line item in the Cash Flows from Operating Activities section. The statement provides values for 2024, 2023, and 2022 in millions of US dollars.",
     "source_file": "extracted_text/exxon_2024.consolidated-cash-flow-statement.llm.json"
   }
 }

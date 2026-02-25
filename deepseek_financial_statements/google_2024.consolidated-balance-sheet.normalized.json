@@ -98,7 +98,7 @@
         }
       }
     ],
-    "notes": "1. All values are extracted directly from the primary consolidated balance sheet. 2. The 'total_debt_short_term_and_long_term' field maps to 'Long-term debt' from the statement, as no short-term debt is listed separately. The supplementary table shows a total principal of $12,000M for 2024, which is greater than the $10,883M balance sheet value; the difference is likely unamortized discount/premium. The balance sheet value is used. 3. 'Marketable securities' includes all current liquid securities as per the primary statement. The supplementary table provides a detailed fair value breakdown. 4. 'Total accounts receivable' is net of an allowance for credit losses ($771M for 2023, $879M for 2024 per supplementary). 5. Scale is 1E6 (millions) as indicated in the statement header.",
+    "notes": "1. All values are extracted directly from the primary Consolidated Balance Sheet. 2. 'Total debt short-term and long-term' is mapped solely to the 'Long-term debt' line item, as no short-term debt is explicitly listed in the provided statement. 3. 'Marketable securities' is a distinct line item and does not include 'Non-marketable securities'. 4. 'Total accounts receivable' uses the 'Accounts receivable, net' line, which includes the allowance for credit losses. 5. The scale is 1E6 (millions) as indicated in the statement header. 6. The supplementary tables provide detailed breakdowns but are not required for the requested normalized fields.",
     "source_file": "extracted_text/google_2024.consolidated-balance-sheet.llm.json"
   }
 }

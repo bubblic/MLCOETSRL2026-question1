@@ -33,7 +33,7 @@
               "Accounts and notes receivable, net": 12378.0
             },
             {
-              "GM Financial receivables, net (current)": 39076.0
+              "GM Financial receivables, net": 39076.0
             }
           ],
           "total_current_liabilities": [
@@ -43,16 +43,16 @@
           ],
           "total_debt_short_term_and_long_term": [
             {
-              "Short-term debt and current portion of long-term debt - Automotive": 428.0
+              "Short-term debt and current portion of long-term debt Automotive": 428.0
             },
             {
-              "Short-term debt and current portion of long-term debt - GM Financial": 38540.0
+              "Short-term debt and current portion of long-term debt GM Financial": 38540.0
             },
             {
-              "Long-term debt - Automotive": 15985.0
+              "Long-term debt Automotive": 15985.0
             },
             {
-              "Long-term debt - GM Financial": 66788.0
+              "Long-term debt GM Financial": 66788.0
             }
           ],
           "total_equity": [
@@ -87,7 +87,7 @@
               "Accounts and notes receivable, net": 13333.0
             },
             {
-              "GM Financial receivables, net (current)": 33623.0
+              "GM Financial receivables, net": 33623.0
             }
           ],
           "total_current_liabilities": [
@@ -97,16 +97,16 @@
           ],
           "total_debt_short_term_and_long_term": [
             {
-              "Short-term debt and current portion of long-term debt - Automotive": 1959.0
+              "Short-term debt and current portion of long-term debt Automotive": 1959.0
             },
             {
-              "Short-term debt and current portion of long-term debt - GM Financial": 36819.0
+              "Short-term debt and current portion of long-term debt GM Financial": 36819.0
             },
             {
-              "Long-term debt - Automotive": 15885.0
+              "Long-term debt Automotive": 15885.0
             },
             {
-              "Long-term debt - GM Financial": 60036.0
+              "Long-term debt GM Financial": 60036.0
             }
           ],
           "total_equity": [
@@ -122,7 +122,7 @@
         }
       }
     ],
-    "notes": "1. 'total_accounts_receivable' includes both trade receivables ('Accounts and notes receivable, net') and the current portion of finance receivables ('GM Financial receivables, net') as both represent amounts due from customers. 2. 'total_debt_short_term_and_long_term' is the sum of all short-term and long-term debt components for both Automotive and GM Financial segments, as detailed in the primary statement and Note 13. 3. 'marketable_securities' is mapped directly to the 'Marketable debt securities' line item, which is a current, liquid asset. 4. The scale is 1E6 (millions) as stated in the primary statement. 5. All values are extracted directly from the primary statement, with debt components aggregated from their detailed breakdowns.",
+    "notes": "1. 'total_accounts_receivable' includes both 'Accounts and notes receivable, net' and the current portion of 'GM Financial receivables, net' as they are both receivables held by the consolidated entity. The non-current portion of GM Financial receivables is excluded as it is a non-current asset.\n2. 'total_debt_short_term_and_long_term' is constructed by summing the short-term and long-term debt components for both Automotive and GM Financial segments as presented in the balance sheet. The supplementary tables provide more detail but the totals align with the primary statement line items.\n3. 'marketable_securities' maps directly to 'Marketable debt securities' on the balance sheet.\n4. Scale is 1,000,000 (millions) as stated in the statement heading.\n5. All values are extracted directly from the primary consolidated balance sheet table. Parentheses in the source indicate negative numbers, but all extracted values here are positive magnitudes as they represent asset or liability balances.",
     "source_file": "extracted_text/2023 General Motors Annual Report .consolidated-balance-sheet.llm.json"
   }
 }

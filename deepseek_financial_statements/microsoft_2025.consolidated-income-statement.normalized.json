@@ -1,7 +1,7 @@
 {
   "schema_version": "1.0",
   "fields": [
-    "revenue",
+    "total_revenue",
     "total_operating_cost",
     "net_income",
     "taxes",
@@ -16,7 +16,7 @@
         "currency": "USD",
         "scale": 1000000,
         "values": {
-          "revenue": [
+          "total_revenue": [
             {
               "Product": 63946.0
             },
@@ -63,7 +63,7 @@
         "currency": "USD",
         "scale": 1000000,
         "values": {
-          "revenue": [
+          "total_revenue": [
             {
               "Product": 64773.0
             },
@@ -110,7 +110,7 @@
         "currency": "USD",
         "scale": 1000000,
         "values": {
-          "revenue": [
+          "total_revenue": [
             {
               "Product": 64699.0
             },
@@ -153,7 +153,7 @@
         }
       }
     ],
-    "notes": "1. Revenue is broken down into 'Product' and 'Service and other' as per the primary statement. 2. Total operating cost includes all line items from 'Cost of revenue' (Product, Service and other) and Operating Expenses (Research and development, Sales and marketing, General and administrative). This aligns with standard practice for a software/technology company where these are the primary costs of generating revenue and operating the business. 3. Taxes are mapped from 'Provision for income taxes'. 4. Interest expenses are mapped from the 'Interest expense' component within the supplementary table for 'Other Income (Expense), Net'. The sign convention is positive as it reduces income. 5. All values are in millions (scale 1E6).",
+    "notes": "1. The 'total_revenue' field is composed of the two main revenue components: 'Product' and 'Service and other', which sum to the reported 'Total revenue'. The total itself is not included to avoid redundancy (Rule 3). 2. The 'total_operating_cost' field includes all operating expenses: 'Total cost of revenue' (broken into its components 'Product' and 'Service and other'), 'Research and development', 'Sales and marketing', and 'General and administrative'. These are the standard operating cost components for a software/technology company. 3. 'Interest expense' is taken from the supplementary table for 'Other Income (Expense), Net'. The sign convention follows Rule 12: it is a cost that reduces income, so the positive number from the statement (presented in parentheses as a negative) is reported as a positive value. 4. 'Taxes' is mapped from 'Provision for income taxes'. 5. The scale is 1,000,000 (millions) as indicated in the statement header. 6. All values are extracted directly from the primary statement or the supplementary table for interest expense. No other fields from the supplementary tables (e.g., segment data, investment gains) are mapped to the requested normalized fields.",
     "source_file": "extracted_text/microsoft_2025.consolidated-income-statement.llm.json"
   }
 }

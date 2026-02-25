@@ -1,7 +1,7 @@
 {
   "schema_version": "1.0",
   "fields": [
-    "revenue",
+    "total_revenue",
     "total_operating_cost",
     "net_income",
     "taxes",
@@ -16,7 +16,7 @@
         "currency": "CNY",
         "scale": 1000000,
         "values": {
-          "revenue": [
+          "total_revenue": [
             {
               "Value-added Services": 319168.0
             },
@@ -63,7 +63,7 @@
         "currency": "CNY",
         "scale": 1000000,
         "values": {
-          "revenue": [
+          "total_revenue": [
             {
               "Value-added Services": 298375.0
             },
@@ -106,7 +106,7 @@
         }
       }
     ],
-    "notes": "The primary income statement provides all required fields. 'Total Revenues' is broken down into its segment components as per the statement. 'Total operating cost' is constructed from the sum of 'Cost of revenues', 'Selling and marketing expenses', and 'General and administrative expenses', which are the standard operating expense categories for a technology/services company like Tencent. 'Net income' is mapped to 'Profit for the year'. 'Taxes' is mapped to 'Income tax expense'. 'Interest expenses' is mapped to 'Finance costs', which is the standard accounting line for interest and related borrowing costs. All values are reported in RMB millions (scale 1E6). Numbers in parentheses from the source are treated as positive values for cost/expense items as they reduce income.",
+    "notes": "1. Total revenue is composed of the four reported revenue segments. 2. Total operating cost includes cost of revenues, selling & marketing, and general & administrative expenses, which are the primary operating expenses for a technology and services company. Items like 'Other gains/(losses), net' and 'Share of profit/(loss) of associates' are non-operating and are not included. 3. Finance costs are mapped to interest_expenses. The sign convention is followed: all cost/expense items are positive as they reduce income. 4. The scale is in millions (RMB'Million).",
     "source_file": "extracted_text/tencent_2024.consolidated-income-statement.llm.json"
   }
 }

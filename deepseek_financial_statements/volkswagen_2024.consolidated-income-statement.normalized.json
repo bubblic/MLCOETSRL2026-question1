@@ -1,7 +1,7 @@
 {
   "schema_version": "1.0",
   "fields": [
-    "revenue",
+    "total_revenue",
     "total_operating_cost",
     "net_income",
     "taxes",
@@ -16,7 +16,7 @@
         "currency": "EUR",
         "scale": 1000000,
         "values": {
-          "revenue": [
+          "total_revenue": [
             {
               "Sales revenue": 324656.0
             }
@@ -57,7 +57,7 @@
         "currency": "EUR",
         "scale": 1000000,
         "values": {
-          "revenue": [
+          "total_revenue": [
             {
               "Sales revenue": 322284.0
             }
@@ -94,7 +94,7 @@
         }
       }
     ],
-    "notes": "Extracted from the Consolidated Income Statement on Page 471. All values are in € million (scale: 1E6). For 'total_operating_cost', standard practice for an automotive manufacturer includes Cost of sales, Distribution expenses, Administrative expenses, and Other operating expenses. 'Other operating income' is not included in total_operating_cost as it is a separate income line that contributes to the Operating result. 'Taxes' is mapped to the 'Income tax income/expense' line. 'Interest expenses' is taken directly from the statement. All numbers are reported as positive per the sign convention where items that reduce income are positive. The 'Other operating expenses' line item includes all sub-components from Note 6.",
+    "notes": "1. 'Sales revenue' is mapped to total_revenue. 2. For total_operating_cost, standard practice for an automotive manufacturer includes cost of sales, distribution expenses, administrative expenses, and other operating expenses. 'Other operating income' is excluded as it is a separate income line that offsets operating costs; including it in total_operating_cost would understate the cost. 3. 'Net income' is mapped to 'Earnings after tax'. 4. 'Taxes' is mapped to 'Income tax income/expense' (the total tax line). 5. 'Interest expenses' is taken directly from the line item. All values are reported as positive numbers as they represent expenses that reduce income, consistent with the sign convention rule. The scale is millions (1E6) as indicated by '€ million'.",
     "source_file": "extracted_text/volkswagen_2024.consolidated-income-statement.llm.json"
   }
 }

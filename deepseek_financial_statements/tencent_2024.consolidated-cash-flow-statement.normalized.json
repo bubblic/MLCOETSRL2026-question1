@@ -38,7 +38,7 @@
         }
       }
     ],
-    "notes": "The 'depreciation_and_amortization' field was populated using the explicit line items from the supplementary reconciliation table (Note 43(a)). The values are reported as positive numbers as they are non-cash expenses added back to profit to arrive at cash from operations. The primary cash flow statement does not list these items directly, so the supplementary reconciliation was used. The scale is 1E6 (millions) as indicated by 'RMB' Million'. The currency is CNY (Chinese Yuan Renminbi).",
+    "notes": "The 'depreciation_and_amortization' field was populated using the explicit line items from the supplementary reconciliation table (Note 43(a)). The values for 'Depreciation of property, plant and equipment, investment properties and right-of-use assets' and 'Amortisation of intangible assets and land use rights' were combined as they are the standard components of depreciation and amortization expense. All other fields from the schema were omitted as they were not requested for extraction in this specific task. The scale is 1,000,000 (RMB' Million) as stated in the primary statement. The currency is CNY (Chinese Yuan Renminbi).",
     "source_file": "extracted_text/tencent_2024.consolidated-cash-flow-statement.llm.json"
   }
 }

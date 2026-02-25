@@ -110,7 +110,7 @@
         }
       }
     ],
-    "notes": "All values extracted directly from the primary Consolidated Balance Sheet. 'Short-term investments' is mapped to 'marketable_securities' as it represents current liquid assets (excluding cash and cash equivalents) that can be easily converted to cash. 'Total debt' is the sum of short-term debt, current portion of long-term debt, and long-term debt. The supplementary tables provide detailed breakdowns but were not needed for the requested normalized fields.",
+    "notes": "1. All values extracted directly from the primary Consolidated Balance Sheet. 2. 'Short-term investments' is mapped to 'marketable_securities' as it represents current liquid assets easily convertible to cash, excluding cash and cash equivalents. 3. 'Total debt' is the sum of 'Short-term debt', 'Current portion of long-term debt', and 'Long-term debt'. 4. The supplementary tables provide detailed breakdowns but are not required for the requested normalized fields.",
     "source_file": "extracted_text/microsoft_2025.consolidated-balance-sheet.llm.json"
   }
 }

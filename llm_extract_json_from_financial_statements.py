@@ -38,7 +38,7 @@ STATEMENT_CONFIGS: Dict[str, Dict[str, Any]] = {
         "suffix": ".consolidated-income-statement.llm.json",
         "output_suffix": ".consolidated-income-statement.normalized.json",
         "fields": [
-            "revenue",
+            "total_revenue",
             "total_operating_cost",
             "net_income",
             "taxes",
@@ -117,18 +117,19 @@ def build_prompt(
         "}\n\n"
         "Rules:\n"
         "1) Use every period/column available in the statement.\n"
-        "2) Return an array of maps for each field where each map is {source_label: number} where source_label is the direct copy of the label from the statement and the number is the value of the element (no commas, no currency symbols, no percent signs in numbers).\n"
-        "3) If multiple elements need to be combined to make up a field, return all of them individually in an array.\n"
-        "4) If a value(s) cannot be directly mapped to a field, try to map element(s) to the corresponding field by taking into account the industry the company is in, and note your reasoning in the notes field. If you cannot find a match, return an empty array.\n"
-        "5) If there are multiple close synonyms, use best accounting match.\n"
-        "6) For year, report the year of the period only.\n"
-        "7) For currency, report its formal 3-letter acronym.\n"
-        "8) For scale, report the scale of the values in the statement. For example, if the values are in millions, the scale should be 1E6.\n"
-        "9) For total_operating_cost, list all elements that should be included in standard practice for the industry the company is in.\n"
-        "10) For taxes, it is the tax assessed on the income. If a tax belongs to the cost of revenue, it should be part of total_operating_cost.\n"
-        "11) For taxes, interest_expenses, and total_operating_cost, the sign convention should be such that if an element REDUCES income, it should be POSITIVE, and if it INCREASES income, it should be NEGATIVE. Otherwise, generally, numbers in parentheses are negative.\n"
-        "12) For marketable_securities, it includes all current liquid assets (excluding cash and cash equivalents) that can be easily converted to cash.\n"
-        "13) Return JSON only.\n\n"
+        "2) Return an array of maps that make up each field where each map is {source_label: number} (source_label = actual label from the statement; no commas, no currency symbols, no percent signs in numbers).\n"
+        "3) Ensure that there aren't redundant elements in the array. For example, total_revenue shouldn't include both the total revenue and the components of the revenue since they will add up to greater than total revenue.\n"
+        "4) If multiple elements need to be combined to make up a field, return all of them individually in an array.\n"
+        "5) If a value(s) cannot be directly mapped to a field, try to map element(s) to the corresponding field by taking into account the industry the company is in, and note your reasoning in the notes field. If you cannot find a match, return an empty array.\n"
+        "6) If there are multiple close synonyms, use best accounting match.\n"
+        "7) For year, report the year of the period only.\n"
+        "8) For currency, report its formal 3-letter acronym.\n"
+        "9) For scale, report the scale of the values in the statement. For example, if the values are in millions, the scale should be 1E6.\n"
+        "10) For total_operating_cost, list all elements that should be included in standard practice for the industry the company is in.\n"
+        "11) For taxes, it is the tax assessed on the income. If a tax belongs to the cost of revenue, it should be part of total_operating_cost.\n"
+        "12) For taxes, interest_expenses, and total_operating_cost, the sign convention should be such that if an element REDUCES income, it should be POSITIVE, and if it INCREASES income, it should be NEGATIVE. Otherwise, generally, numbers in parentheses are negative.\n"
+        "13) For marketable_securities, it includes all current liquid assets (excluding cash and cash equivalents) that can be easily converted to cash.\n"
+        "14) Return JSON only.\n\n"
         f"company_id: {company_id}\n\n"
         "statement and supplementary tables:\n"
         f"{statement_and_supplementary_tables}\n"

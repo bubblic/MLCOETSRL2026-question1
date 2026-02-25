@@ -14,7 +14,7 @@
         "values": {
           "depreciation_and_amortization": [
             {
-              "source_label": 13475.0
+              "Depreciation of property and equipment": 13475.0
             }
           ]
         }
@@ -26,7 +26,7 @@
         "values": {
           "depreciation_and_amortization": [
             {
-              "source_label": 11946.0
+              "Depreciation of property and equipment": 11946.0
             }
           ]
         }
@@ -38,13 +38,13 @@
         "values": {
           "depreciation_and_amortization": [
             {
-              "source_label": 15311.0
+              "Depreciation of property and equipment": 15311.0
             }
           ]
         }
       }
     ],
-    "notes": "Only the 'Depreciation of property and equipment' line item from the primary cash flow statement was directly mapped to the 'depreciation_and_amortization' field. The supplementary tables contain detailed lease information and a schedule for valuation accounts, but these do not provide additional depreciation or amortization figures that are not already captured in the primary statement's single line item. The 'Other' line in operating activities could contain some amortization of intangibles, but it is not itemized, so it is not included.",
+    "notes": "Only the 'Depreciation of property and equipment' line item was directly mapped to 'depreciation_and_amortization'. The supplementary tables contain detailed lease information and a schedule for valuation accounts, but these do not provide additional depreciation or amortization figures beyond what is in the primary cash flow statement. The 'Other' line in operating activities could contain some amortization, but it is not itemized, so it is not included to avoid redundancy or incorrect aggregation.",
     "source_file": "extracted_text/google_2024.consolidated-cash-flow-statement.llm.json"
   }
 }
