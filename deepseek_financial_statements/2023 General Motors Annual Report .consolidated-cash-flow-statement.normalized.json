@@ -53,7 +53,7 @@
         }
       }
     ],
-    "notes": "The 'depreciation_and_amortization' field is constructed from two distinct line items in the cash flow statement: 'Depreciation and impairment of Equipment on operating leases, net' and 'Depreciation, amortization and impairment charges on Property, net'. These are the only elements directly provided for this field. The supplementary tables provide details for other line items (e.g., components of changes in operating assets/liabilities, cash paid for taxes and interest) but do not contain additional elements for depreciation and amortization.",
+    "notes": "The 'depreciation_and_amortization' field is constructed from two line items in the operating activities section of the cash flow statement: 'Depreciation and impairment of Equipment on operating leases, net' and 'Depreciation, amortization and impairment charges on Property, net'. These are the standard components for an automotive manufacturer like General Motors, which has significant property, plant & equipment and leased assets. The values are reported as positive numbers as they are non-cash add-backs to net income. No other fields were requested for extraction.",
     "source_file": "extracted_text/2023 General Motors Annual Report .consolidated-cash-flow-statement.llm.json"
   }
 }

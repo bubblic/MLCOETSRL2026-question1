@@ -38,7 +38,7 @@
         }
       }
     ],
-    "notes": "The 'depreciation_and_amortization' field is constructed from the two distinct line items in the supplementary reconciliation table (Note 43(a)): 'Depreciation of property, plant and equipment, investment properties and right-of-use assets' and 'Amortisation of intangible assets and land use rights'. These are the standard components for this field in a cash flow reconciliation. The primary cash flow statement does not list this field directly; it is derived from the operating cash flow reconciliation.",
+    "notes": "The 'depreciation_and_amortization' field is constructed by combining the two distinct line items from the supplementary reconciliation table (Note 43(a)): 'Depreciation of property, plant and equipment, investment properties and right-of-use assets' and 'Amortisation of intangible assets and land use rights'. These are the standard components for this field in a cash flow reconciliation. The primary cash flow statement does not list these items directly; they are found in the operating cash flow reconciliation. The scale is 1E6 as values are in RMB millions. Currency is CNY (Renminbi).",
     "source_file": "extracted_text/tencent_2024.consolidated-cash-flow-statement.llm.json"
   }
 }

@@ -14,7 +14,7 @@
         "values": {
           "depreciation_and_amortization": [
             {
-              "value": 7938.0
+              "Depreciation and amortization": 7938.0
             }
           ]
         }
@@ -26,7 +26,7 @@
         "values": {
           "depreciation_and_amortization": [
             {
-              "value": 7512.0
+              "Depreciation and amortization": 7512.0
             }
           ]
         }
@@ -38,13 +38,13 @@
         "values": {
           "depreciation_and_amortization": [
             {
-              "value": 7051.0
+              "Depreciation and amortization": 7051.0
             }
           ]
         }
       }
     ],
-    "notes": "The 'depreciation_and_amortization' field was directly mapped from the 'Depreciation and amortization' line item in the 'Adjustments to reconcile net income to net cash provided by operating activities' section of the primary cash flow statement. No other supplementary elements were required to make up this field. The scale is 1E6 as values are reported in millions. The sign convention for this field is standard (positive values as presented).",
+    "notes": "Only the 'depreciation_and_amortization' field was requested for extraction. The value is directly mapped from the 'Depreciation and amortization' line item in the 'Adjustments to reconcile net income to net cash provided by operating activities' section of the Consolidated Statements of Cash Flows. No other fields were requested, so their arrays are not included in the output.",
     "source_file": "extracted_text/jpmorgan_2024.consolidated-cash-flow-statement.llm.json"
   }
 }

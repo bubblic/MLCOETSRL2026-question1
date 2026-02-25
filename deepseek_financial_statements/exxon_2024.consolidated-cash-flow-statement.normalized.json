@@ -44,7 +44,7 @@
         }
       }
     ],
-    "notes": "Only the 'depreciation_and_amortization' field was requested for extraction. The provided cash flow statement contains a single, clearly labeled line item for this field: 'Depreciation and depletion (includes impairments)'. This item is mapped directly. The statement includes other line items (e.g., deferred taxes, working capital changes, investing/financing activities) which are not part of the requested schema for this extraction task.",
+    "notes": "Only the 'depreciation_and_amortization' field was requested for extraction. The provided line item 'Depreciation and depletion (includes impairments)' from the operating activities section is a direct match. The statement includes other cash flow components (e.g., changes in working capital, investing, financing activities), but they were not requested in the output schema.",
     "source_file": "extracted_text/exxon_2024.consolidated-cash-flow-statement.llm.json"
   }
 }

@@ -38,16 +38,7 @@
           ],
           "total_current_liabilities": [
             {
-              "Accounts payable (principally trade)": 28114.0
-            },
-            {
-              "Short-term debt and current portion of long-term debt Automotive": 428.0
-            },
-            {
-              "Short-term debt and current portion of long-term debt GM Financial": 38540.0
-            },
-            {
-              "Accrued liabilities": 27364.0
+              "Total current liabilities": 94445.0
             }
           ],
           "total_debt_short_term_and_long_term": [
@@ -66,10 +57,7 @@
           ],
           "total_equity": [
             {
-              "Total stockholders’ equity": 64286.0
-            },
-            {
-              "Noncontrolling interests": 3903.0
+              "Total Equity": 68189.0
             }
           ],
           "total_assets": [
@@ -104,16 +92,7 @@
           ],
           "total_current_liabilities": [
             {
-              "Accounts payable (principally trade)": 27486.0
-            },
-            {
-              "Short-term debt and current portion of long-term debt Automotive": 1959.0
-            },
-            {
-              "Short-term debt and current portion of long-term debt GM Financial": 36819.0
-            },
-            {
-              "Accrued liabilities": 24910.0
+              "Total current liabilities": 91173.0
             }
           ],
           "total_debt_short_term_and_long_term": [
@@ -132,10 +111,7 @@
           ],
           "total_equity": [
             {
-              "Total stockholders’ equity": 67792.0
-            },
-            {
-              "Noncontrolling interests": 4135.0
+              "Total Equity": 71927.0
             }
           ],
           "total_assets": [
@@ -146,7 +122,7 @@
         }
       }
     ],
-    "notes": "1. 'total_accounts_receivable' includes both trade receivables ('Accounts and notes receivable, net') and finance receivables ('GM Financial receivables, net') from the current assets section. The non-current portion of GM Financial receivables is excluded as it is not part of current accounts receivable. 2. 'total_current_liabilities' is the sum of all line items listed under 'Current Liabilities' in the primary statement. 3. 'total_debt_short_term_and_long_term' is the sum of all short-term and long-term debt components for both Automotive and GM Financial segments, as listed in the primary statement. 4. 'total_equity' is the sum of 'Total stockholders’ equity' and 'Noncontrolling interests' as presented. 5. Scale is 1E6 (millions) as indicated in the statement heading. 6. All values are taken directly from the primary consolidated balance sheet. Supplementary tables provide detailed breakdowns but are not used for the core extracted values to maintain consistency with the primary statement totals.",
+    "notes": "1. The 'total_accounts_receivable' field is composed of 'Accounts and notes receivable, net' and the current portion of 'GM Financial receivables, net' as reported in the Current Assets section. The non-current portion of GM Financial receivables is excluded as it is a non-current asset.\n2. The 'total_debt_short_term_and_long_term' field is composed of all short-term and long-term debt line items for both Automotive and GM Financial segments, as detailed in the Liabilities section and Note 13.\n3. 'Marketable securities' is mapped directly to the 'Marketable debt securities' line item. The supplementary Note 4 confirms these are primarily U.S. government, corporate, and sovereign debt securities, aligning with the definition of marketable securities.\n4. Scale is 1,000,000 (millions) as stated in the statement heading.\n5. All values are extracted directly from the primary consolidated balance sheet. Parentheses in the source indicate negative values, but no negative values are required for the requested fields in this extraction.",
     "source_file": "extracted_text/2023 General Motors Annual Report .consolidated-balance-sheet.llm.json"
   }
 }

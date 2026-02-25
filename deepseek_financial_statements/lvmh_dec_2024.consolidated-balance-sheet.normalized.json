@@ -77,43 +77,10 @@
           ],
           "total_assets": [
             {
-              "Brands and other intangible assets": 26280.0
+              "Total non-current assets": 101719.0
             },
             {
-              "Goodwill": 20307.0
-            },
-            {
-              "Property, plant and equipment": 29886.0
-            },
-            {
-              "Right-of-use assets": 16620.0
-            },
-            {
-              "Investments in joint ventures and associates": 1343.0
-            },
-            {
-              "Non-current available for sale financial assets": 1632.0
-            },
-            {
-              "Other non-current assets": 1106.0
-            },
-            {
-              "Deferred tax": 4545.0
-            },
-            {
-              "Inventories and work in progress": 23669.0
-            },
-            {
-              "Trade accounts receivable": 4730.0
-            },
-            {
-              "Income taxes": 986.0
-            },
-            {
-              "Other current assets": 8455.0
-            },
-            {
-              "Cash and cash equivalents": 9631.0
+              "Total current assets": 47471.0
             }
           ]
         }
@@ -182,43 +149,10 @@
           ],
           "total_assets": [
             {
-              "Brands and other intangible assets": 25589.0
+              "Total non-current assets": 99984.0
             },
             {
-              "Goodwill": 24022.0
-            },
-            {
-              "Property, plant and equipment": 27331.0
-            },
-            {
-              "Right-of-use assets": 15679.0
-            },
-            {
-              "Investments in joint ventures and associates": 991.0
-            },
-            {
-              "Non-current available for sale financial assets": 1363.0
-            },
-            {
-              "Other non-current assets": 1017.0
-            },
-            {
-              "Deferred tax": 3992.0
-            },
-            {
-              "Inventories and work in progress": 22952.0
-            },
-            {
-              "Trade accounts receivable": 4728.0
-            },
-            {
-              "Income taxes": 533.0
-            },
-            {
-              "Other current assets": 7723.0
-            },
-            {
-              "Cash and cash equivalents": 7774.0
+              "Total current assets": 43710.0
             }
           ]
         }
@@ -287,49 +221,16 @@
           ],
           "total_assets": [
             {
-              "Brands and other intangible assets": 25432.0
+              "Total non-current assets": 94906.0
             },
             {
-              "Goodwill": 24782.0
-            },
-            {
-              "Property, plant and equipment": 23055.0
-            },
-            {
-              "Right-of-use assets": 14615.0
-            },
-            {
-              "Investments in joint ventures and associates": 1066.0
-            },
-            {
-              "Non-current available for sale financial assets": 1109.0
-            },
-            {
-              "Other non-current assets": 1186.0
-            },
-            {
-              "Deferred tax": 3661.0
-            },
-            {
-              "Inventories and work in progress": 20319.0
-            },
-            {
-              "Trade accounts receivable": 4258.0
-            },
-            {
-              "Income taxes": 375.0
-            },
-            {
-              "Other current assets": 7488.0
-            },
-            {
-              "Cash and cash equivalents": 7300.0
+              "Total current assets": 39740.0
             }
           ]
         }
       }
     ],
-    "notes": "1. 'marketable_securities' is mapped to 'Current available for sale financial assets' from Note 14, as these are the most liquid, unrestricted investments intended for the near term. 'Non-current available for sale financial assets' are excluded as they are not considered current. 2. 'total_accounts_receivable' is mapped using the gross 'Trade accounts receivable, nominal amount' and the 'Provision for impairment' from Note 12, as the net amount is reported on the balance sheet. The provision is shown as a negative number as it reduces the gross receivable. 3. 'total_current_liabilities' includes all line items listed under 'Current liabilities' in the primary statement. 4. 'total_debt_short_term_and_long_term' is the sum of 'Long-term borrowings' and 'Short-term borrowings' from Note 19.1. 5. 'total_equity' is the sum of 'Equity, Group share' and 'Minority interests'. 6. 'total_assets' is constructed by listing all individual asset line items from the primary statement. 7. The scale is 1,000,000 (millions) as indicated in the statement. 8. Numbers in parentheses in the source are treated as negative values.",
+    "notes": "1. 'marketable_securities' is mapped to 'Current available for sale financial assets' from Note 14, as these are the most liquid, unrestricted investments intended for the near term. 'Non-current available for sale financial assets' (Note 9) are excluded as they are not considered current. 2. 'total_accounts_receivable' is mapped using the gross 'Trade accounts receivable, nominal amount' and the 'Provision for impairment' from Note 12, which together yield the net amount reported on the balance sheet. 3. 'total_current_liabilities' includes all line items listed under 'Current liabilities' in the primary statement. 4. 'total_debt_short_term_and_long_term' is the sum of 'Long-term borrowings' and 'Short-term borrowings' from the primary statement. 5. 'total_equity' is the sum of 'Equity, Group share' and 'Minority interests' from the primary statement. 6. 'total_assets' is the sum of 'Total non-current assets' and 'Total current assets' from the primary statement.",
     "source_file": "extracted_text/lvmh_dec_2024.consolidated-balance-sheet.llm.json"
   }
 }

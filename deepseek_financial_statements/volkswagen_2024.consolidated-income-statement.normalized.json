@@ -33,6 +33,9 @@
             },
             {
               "Other operating expenses": 20312.0
+            },
+            {
+              "Other operating income": -14974.0
             }
           ],
           "net_income": [
@@ -74,6 +77,9 @@
             },
             {
               "Other operating expenses": 19534.0
+            },
+            {
+              "Other operating income": -15152.0
             }
           ],
           "net_income": [
@@ -94,7 +100,7 @@
         }
       }
     ],
-    "notes": "1. Total revenue is mapped from 'Sales revenue'.\n2. Total operating cost is constructed from the sum of 'Cost of sales', 'Distribution expenses', 'Administrative expenses', and 'Other operating expenses'. This follows standard practice for an automotive manufacturer, where these are the primary operating cost categories. 'Other operating income' is not included as it is a separate income line.\n3. Net income is mapped from 'Earnings after tax'.\n4. Taxes are mapped from 'Income tax income/expense'. The sign convention is followed: the expense is reported as a positive number as it reduces income.\n5. Interest expenses are mapped directly from the 'Interest expenses' line. The sign convention is followed: the expense is reported as a positive number as it reduces income.\n6. All values are in € millions (scale: 1E6).\n7. The 'Other operating income' line (14,974 in 2024) is not included in total operating cost as it is an income item, not a cost. It is part of the calculation of Operating Result but is not a component of total operating cost.\n8. The 'Share of the result of equity-accounted investments', 'Interest income', and 'Other financial result' are part of the financial result and are not included in the operating cost or revenue fields.",
+    "notes": "1. Total operating cost is constructed as the sum of Cost of sales, Distribution expenses, Administrative expenses, and Other operating expenses, minus Other operating income (as it is a positive adjustment to operating costs). This follows standard automotive industry practice where operating costs include all expenses from core operations before financial results. 2. The sign convention for total_operating_cost, taxes, and interest_expenses follows rule 13: elements that reduce income are reported as positive numbers. Therefore, positive income items like 'Other operating income' are included as negative values in the total_operating_cost array. 3. 'Taxes' is mapped directly to 'Income tax income/expense' from the primary statement. 4. 'Interest expenses' is mapped directly to the line item from the primary statement. 5. All values are extracted from the primary consolidated income statement on Page 471. The scale is millions (EUR).",
     "source_file": "extracted_text/volkswagen_2024.consolidated-income-statement.llm.json"
   }
 }

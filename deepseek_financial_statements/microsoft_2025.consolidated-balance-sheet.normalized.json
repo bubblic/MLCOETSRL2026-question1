@@ -25,28 +25,7 @@
           ],
           "marketable_securities": [
             {
-              "Commercial paper": 941.0
-            },
-            {
-              "Certificates of deposit": 344.0
-            },
-            {
-              "U.S. government securities": 46745.0
-            },
-            {
-              "U.S. agency securities": 2190.0
-            },
-            {
-              "Foreign government bonds": 364.0
-            },
-            {
-              "Mortgage- and asset-backed securities": 2541.0
-            },
-            {
-              "Corporate notes and bonds": 10897.0
-            },
-            {
-              "Municipal securities": 291.0
+              "Short-term investments": 64323.0
             }
           ],
           "total_accounts_receivable": [
@@ -101,25 +80,7 @@
           ],
           "total_assets": [
             {
-              "Total current assets": 191131.0
-            },
-            {
-              "Property and equipment, net": 204966.0
-            },
-            {
-              "Operating lease right-of-use assets": 24823.0
-            },
-            {
-              "Equity and other investments": 15405.0
-            },
-            {
-              "Goodwill": 119509.0
-            },
-            {
-              "Intangible assets, net": 22604.0
-            },
-            {
-              "Other long-term assets": 40565.0
+              "Total assets": 619003.0
             }
           ]
         }
@@ -191,31 +152,13 @@
           ],
           "total_assets": [
             {
-              "Total current assets": 159734.0
-            },
-            {
-              "Property and equipment, net": 135591.0
-            },
-            {
-              "Operating lease right-of-use assets": 18961.0
-            },
-            {
-              "Equity and other investments": 14600.0
-            },
-            {
-              "Goodwill": 119220.0
-            },
-            {
-              "Intangible assets, net": 27597.0
-            },
-            {
-              "Other long-term assets": 36460.0
+              "Total assets": 512163.0
             }
           ]
         }
       }
     ],
-    "notes": "For 2025, 'marketable_securities' is constructed from the supplementary table 'Investments (Note 4)' by summing all debt investment components classified as 'Short-term Investments' (excluding those in 'Cash Equivalents' and 'Equity and Other Investments'). The components are: Commercial paper ($941), Certificates of deposit ($344), U.S. government securities ($46,745), U.S. agency securities ($2,190), Foreign government bonds ($364), Mortgage- and asset-backed securities ($2,541), Corporate notes and bonds ($10,897 - sum of Level 2 $10,786 and Level 3 $111), and Municipal securities ($291 - sum of Level 2 $201 and Level 3 $90). For 2024, the supplementary breakdown is not provided, so the primary statement line 'Short-term investments' ($57,228) is used. 'Total assets' is constructed by summing all asset line items from the primary statement. 'Total current liabilities' and 'total_debt_short_term_and_long_term' are constructed by summing their respective components from the primary statement.",
+    "notes": "1. The 'Short-term investments' line from the primary statement is mapped to 'marketable_securities'. The supplementary table confirms these are highly liquid debt securities (e.g., commercial paper, U.S. government securities) with maturities under one year, fitting the definition. 2. 'Total current liabilities' is built from the sum of all listed line items under 'Current liabilities' in the primary statement. 3. 'Total debt' is built from 'Short-term debt', 'Current portion of long-term debt', and 'Long-term debt'. 4. 'Total equity' is built from the three components listed under 'Stockholders’ equity'. 5. The 'total_assets' field uses the single 'Total assets' line from the statement. 6. The scale is 1,000,000 (millions) as indicated in the statement header. 7. Currency is USD as the statement is presented in U.S. dollars.",
     "source_file": "extracted_text/microsoft_2025.consolidated-balance-sheet.llm.json"
   }
 }

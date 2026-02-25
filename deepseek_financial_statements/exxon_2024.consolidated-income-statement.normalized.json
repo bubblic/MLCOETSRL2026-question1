@@ -45,9 +45,6 @@
             },
             {
               "Non-service pension and postretirement benefit expense": 121.0
-            },
-            {
-              "Other taxes and duties": 26288.0
             }
           ],
           "net_income": [
@@ -101,9 +98,6 @@
             },
             {
               "Non-service pension and postretirement benefit expense": 714.0
-            },
-            {
-              "Other taxes and duties": 29011.0
             }
           ],
           "net_income": [
@@ -157,9 +151,6 @@
             },
             {
               "Non-service pension and postretirement benefit expense": 482.0
-            },
-            {
-              "Other taxes and duties": 27919.0
             }
           ],
           "net_income": [
@@ -180,7 +171,7 @@
         }
       }
     ],
-    "notes": "1. For total_revenue, the primary statement line 'Total revenues and other income' is composed of three sub-items: Sales and other operating revenue, Income from equity affiliates, and Other income. All three are included as they sum to the total. 2. For total_operating_cost, the standard practice for the oil & gas industry includes all costs directly tied to operations before interest and taxes. This includes: cost of goods sold (Crude oil and product purchases), operating expenses (Production and manufacturing, Selling, general and administrative), depreciation/depletion/impairment, exploration costs, pension expense (non-service), and other operating taxes and duties. 'Other taxes and duties' are included as they are operating costs (e.g., production, property, severance taxes) per Note 19. 3. Interest expense is a separate financial cost, not an operating cost. 4. Income tax expense is the tax on income. 5. Net income is the final line attributable to the parent company. 6. All values are taken directly from the primary statement. Supplementary tables provide detail but do not change the totals used. 7. The sign convention for taxes, interest_expenses, and total_operating_cost follows rule 13: values that reduce income are reported as positive numbers. All extracted values are positive as they appear in the statement as deductions.",
+    "notes": "1. For total_revenue, the primary statement line 'Total revenues and other income' is broken into its three components as per the statement. 2. For total_operating_cost, all items listed under 'Costs and other deductions' except 'Interest expense' and 'Other taxes and duties' are included, as these are standard operating costs for an oil & gas company. 'Other taxes and duties' (e.g., property, severance, excise taxes) are considered part of the cost of revenue and are therefore included in total_operating_cost. 3. 'Interest expense' is mapped separately. 4. 'Income tax expense' is mapped to taxes. 5. 'Net income (loss) attributable to ExxonMobil' is mapped to net_income. 6. The supplementary tables contain detailed breakdowns (e.g., for Other income, Depreciation, Taxes) but do not change the aggregated values reported in the primary statement, so they are not listed as separate components in the arrays. 7. Numbers in parentheses in the source (e.g., net gain on asset sales) are treated as negative values in the supplementary notes but are already aggregated into the positive 'Other income' line in the primary statement.",
     "source_file": "extracted_text/exxon_2024.consolidated-income-statement.llm.json"
   }
 }

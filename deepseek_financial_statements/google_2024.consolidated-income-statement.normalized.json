@@ -135,7 +135,7 @@
         }
       }
     ],
-    "notes": "1. All values extracted from the primary Consolidated Statements of Income on page 57, except for 'interest_expenses' which were sourced from the 'Components of Other Income (Expense), Net' table on page 83. 2. 'total_operating_cost' is composed of the four main operating expense categories listed in the primary statement. 3. For 'interest_expenses', the sign convention is followed: the expense reduces income, so the positive number from the supplementary table (where it was shown in parentheses as negative) is used. 4. 'taxes' is the 'Provision for income taxes' from the primary statement. 5. 'total_revenue' is the 'Revenues' line from the primary statement. 6. 'net_income' is the 'Net income' line from the primary statement.",
+    "notes": "1. The primary statement provides all required fields directly. Total operating cost is the sum of the four listed cost and expense categories (Cost of revenues, Research and development, Sales and marketing, General and administrative). 2. Interest expense is extracted from the supplementary table 'Components of Other Income (Expense), Net'. According to rule 13, the extracted value is positive as it is an expense that reduces income (the original value in parentheses is shown as negative). 3. The 'taxes' field maps directly to 'Provision for income taxes' from the primary statement. 4. All other supplementary data (e.g., segment details, revenue breakdowns, tax reconciliation) provide supporting detail but are not required for the core normalized income statement fields requested.",
     "source_file": "extracted_text/google_2024.consolidated-income-statement.llm.json"
   }
 }

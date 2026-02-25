@@ -106,7 +106,7 @@
         }
       }
     ],
-    "notes": "1. All numbers are in RMB millions (scale: 1E6). 2. For total_operating_cost, the standard components for a technology/services company like Tencent are included: Cost of revenues, Selling and marketing expenses, and General and administrative expenses. 'Other gains/(losses), net' is excluded as it is a non-operating item. 3. For taxes, 'Income tax expense' is used. 4. For interest_expenses, 'Finance costs' is used, which includes interest and related expenses and exchange gains/losses. 5. Numbers in parentheses from the source are treated as positive values for cost/expense fields, per the sign convention rule (they reduce income).",
+    "notes": "The primary statement provides all necessary line items. 'Total operating cost' is constructed from the sum of 'Cost of revenues', 'Selling and marketing expenses', and 'General and administrative expenses', which are the standard operating expense categories for a technology and services company like Tencent. 'Other gains/(losses), net' and 'Share of profit/(loss) of associates and joint ventures, net' are non-operating items and are not included in total operating cost. 'Interest income' is a financial income item and is not included. Numbers in parentheses from the source are treated as positive values for cost/expense fields per rule 13. The scale is in millions (RMB'Million).",
     "source_file": "extracted_text/tencent_2024.consolidated-income-statement.llm.json"
   }
 }

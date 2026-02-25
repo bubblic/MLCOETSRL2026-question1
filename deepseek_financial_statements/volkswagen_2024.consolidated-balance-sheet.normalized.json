@@ -33,43 +33,34 @@
               "Trade receivables": 21130.0
             },
             {
-              "Financial services receivables": 68855.0
+              "Financial services receivables (Current)": 68855.0
             },
             {
-              "Other receivables": 10217.0
+              "Other receivables (Current)": 10217.0
             }
           ],
           "total_current_liabilities": [
             {
-              "Financial liabilities": 117020.0
+              "Financial liabilities (Current)": 117020.0
             },
             {
               "Trade payables": 29772.0
             },
             {
-              "Other liabilities": 70247.0
-            },
-            {
-              "Liabilities associated with assets held for sale": 0.0
+              "Other liabilities (Current)": 70247.0
             }
           ],
           "total_debt_short_term_and_long_term": [
             {
-              "Financial liabilities": 117020.0
+              "Financial liabilities (Non-current)": 137061.0
             },
             {
-              "Financial liabilities": 137061.0
+              "Financial liabilities (Current)": 117020.0
             }
           ],
           "total_equity": [
             {
-              "Equity attributable to Volkswagen AG shareholders": 168404.0
-            },
-            {
-              "Equity attributable to Volkswagen AG hybrid capital investors": 13890.0
-            },
-            {
-              "Non-controlling interests": 14437.0
+              "Total equity": 196731.0
             }
           ],
           "total_assets": [
@@ -99,21 +90,21 @@
               "Trade receivables": 21849.0
             },
             {
-              "Financial services receivables": 66381.0
+              "Financial services receivables (Current)": 66381.0
             },
             {
-              "Other receivables": 8799.0
+              "Other receivables (Current)": 8799.0
             }
           ],
           "total_current_liabilities": [
             {
-              "Financial liabilities": 110476.0
+              "Financial liabilities (Current)": 110476.0
             },
             {
               "Trade payables": 30901.0
             },
             {
-              "Other liabilities": 64628.0
+              "Other liabilities (Current)": 64628.0
             },
             {
               "Liabilities associated with assets held for sale": 31.0
@@ -121,21 +112,15 @@
           ],
           "total_debt_short_term_and_long_term": [
             {
-              "Financial liabilities": 110476.0
+              "Financial liabilities (Non-current)": 122323.0
             },
             {
-              "Financial liabilities": 122323.0
+              "Financial liabilities (Current)": 110476.0
             }
           ],
           "total_equity": [
             {
-              "Equity attributable to Volkswagen AG shareholders": 159813.0
-            },
-            {
-              "Equity attributable to Volkswagen AG hybrid capital investors": 15155.0
-            },
-            {
-              "Non-controlling interests": 14218.0
+              "Total equity": 189186.0
             }
           ],
           "total_assets": [
@@ -146,7 +131,7 @@
         }
       }
     ],
-    "notes": "1. The primary consolidated balance sheet was used for all values. 2. 'Marketable securities and time deposits' is mapped to 'marketable_securities' as it represents the most liquid, unrestricted investments. 3. 'Total accounts receivable' is the sum of 'Trade receivables', 'Financial services receivables' (current portion), and 'Other receivables' (current portion). 4. 'Total current liabilities' is the sum of all line items under the 'Current liabilities' section. 5. 'Total debt short-term and long-term' is the sum of 'Financial liabilities' from both the current and non-current sections. 6. 'Total equity' is the sum of the three equity components listed. 7. Values are in millions of Euros (scale 1E6). 8. For 2023, 'Liabilities associated with assets held for sale' is 31; for 2024 it is reported as '–' which is interpreted as 0.",
+    "notes": "1. 'total_accounts_receivable' includes Trade receivables, Financial services receivables (current portion), and Other receivables (current portion). The non-current portion of Financial services receivables and Other receivables are not included as they are classified as non-current assets. 2. 'total_current_liabilities' includes all line items listed under 'Current liabilities' in the primary statement. For 2023, this includes a small amount for 'Liabilities associated with assets held for sale'. 3. 'total_debt_short_term_and_long_term' is the sum of Financial liabilities from both the non-current and current sections, representing total financial debt. 4. 'marketable_securities' is mapped from 'Marketable securities and time deposits' as it represents the most liquid, unrestricted investments. 5. Scale is 1E6 (millions) as indicated by '(€ million)' in the statement.",
     "source_file": "extracted_text/volkswagen_2024.consolidated-balance-sheet.llm.json"
   }
 }

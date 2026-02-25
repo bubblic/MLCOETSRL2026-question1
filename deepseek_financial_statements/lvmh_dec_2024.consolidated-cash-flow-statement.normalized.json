@@ -53,7 +53,7 @@
         }
       }
     ],
-    "notes": "The 'depreciation_and_amortization' field is constructed from two line items in the primary statement: 'Net increase in depreciation, amortization and provisions' and 'Depreciation of right-of-use assets'. These are the only items directly related to depreciation and amortization. The 'Other adjustments and computed expenses' line is excluded as it is not a direct depreciation/amortization component and may include other non-cash or computed items.",
+    "notes": "The 'depreciation_and_amortization' field is constructed by combining two line items from the cash flow statement: 'Net increase in depreciation, amortization and provisions' and 'Depreciation of right-of-use assets'. This combination is standard under IFRS 16, where depreciation of leased assets is separated from other depreciation and amortization. The 'Other adjustments and computed expenses' line item is not included as it is a separate, non-cash adjustment that may include items other than depreciation and amortization.",
     "source_file": "extracted_text/lvmh_dec_2024.consolidated-cash-flow-statement.llm.json"
   }
 }

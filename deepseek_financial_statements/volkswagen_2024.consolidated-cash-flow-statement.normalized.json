@@ -44,7 +44,7 @@
         }
       }
     ],
-    "notes": "The 'depreciation_and_amortization' field is constructed from three distinct line items in the primary cash flow statement, as they collectively represent the total non-cash depreciation and amortization expense. The supplementary table 'Cash Flow Statement by Division' confirms this aggregation under the line 'Depreciation and amortization expense³', which sums to €32,056 million for 2024 and €28,282 million for 2023, matching the sum of the three individual components. The 'Impairment losses on equity investments¹' line (€710 million for 2024, €717 million for 2023) is not included as it relates specifically to equity investments and is a separate non-cash adjustment in the cash flow reconciliation.",
+    "notes": "The 'depreciation_and_amortization' field is constructed from three distinct line items in the primary cash flow statement, as they collectively represent the total non-cash depreciation and amortization expense. The supplementary table 'Cash Flow Statement by Division' confirms this aggregation under the line 'Depreciation and amortization expense³', which sums to €32,056 million for 2024 and €28,282 million for 2023, matching the sum of the three components extracted. The 'Impairment losses on equity investments¹' line (€710 million for 2024, €717 million for 2023) is not included as it relates specifically to equity investments and is a separate non-cash adjustment, not a depreciation/amortization of the company's own assets. All values are in millions of Euros (scale: 1E6).",
     "source_file": "extracted_text/volkswagen_2024.consolidated-cash-flow-statement.llm.json"
   }
 }

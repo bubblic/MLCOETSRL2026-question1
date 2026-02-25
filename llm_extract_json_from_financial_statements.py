@@ -258,6 +258,192 @@ def normalize_periods(periods: Any, required_fields: List[str]) -> List[Dict[str
     return normalized
 
 
+def parse_normalized_filename(filename: str) -> Optional[Tuple[str, str]]:
+    for statement_type, config in STATEMENT_CONFIGS.items():
+        output_suffix = config["output_suffix"]
+        if filename.endswith(output_suffix):
+            company_id = filename[: -len(output_suffix)].strip()
+            if not company_id:
+                return None
+            return company_id, statement_type
+    return None
+
+
+def sum_labeled_entries(items: Any) -> float:
+    if not isinstance(items, list):
+        return 0.0
+    total = 0.0
+    for entry in items:
+        if not isinstance(entry, dict):
+            continue
+        for value in entry.values():
+            parsed = to_float_or_none(value)
+            if parsed is not None:
+                total += parsed
+    return total
+
+
+def safe_divide(numerator: Optional[float], denominator: Optional[float]) -> Optional[float]:
+    if numerator is None or denominator is None:
+        return None
+    if denominator == 0:
+        return None
+    return numerator / denominator
+
+
+def sum_if_all_present(*values: Optional[float]) -> Optional[float]:
+    if any(value is None for value in values):
+        return None
+    return sum(value for value in values if value is not None)
+
+
+def statement_period_to_single_values(period: Dict[str, Any], fields: List[str]) -> Dict[str, float]:
+    values = period.get("values", {})
+    if not isinstance(values, dict):
+        values = {}
+    scale = to_float_or_none(period.get("scale"))
+    if scale is None:
+        scale = 1.0
+
+    single_values: Dict[str, float] = {}
+    for field in fields:
+        single_values[field] = sum_labeled_entries(values.get(field)) * scale
+    return single_values
+
+
+def calculate_financial_ratios(
+    flat_values: Dict[str, Optional[float]]
+) -> Tuple[Dict[str, Optional[float]], Dict[str, Optional[float]]]:
+    revenue = flat_values.get("total_revenue")
+    operating_cost = flat_values.get("total_operating_cost")
+    cash_and_cash_equivalents = flat_values.get("cash_and_cash_equivalents")
+    marketable_securities = flat_values.get("marketable_securities")
+    total_accounts_receivable = flat_values.get("total_accounts_receivable")
+    total_current_liabilities = flat_values.get("total_current_liabilities")
+    total_debt = flat_values.get("total_debt_short_term_and_long_term")
+    total_equity = flat_values.get("total_equity")
+    total_assets = flat_values.get("total_assets")
+    net_income = flat_values.get("net_income")
+    taxes = flat_values.get("taxes")
+    interest_expenses = flat_values.get("interest_expenses")
+    depreciation_and_amortization = flat_values.get("depreciation_and_amortization")
+
+    ebit = sum_if_all_present(net_income, interest_expenses, taxes)
+    ebitda = sum_if_all_present(ebit, depreciation_and_amortization)
+    quick_assets = sum_if_all_present(
+        cash_and_cash_equivalents, marketable_securities, total_accounts_receivable
+    )
+    debt_plus_equity = sum_if_all_present(total_debt, total_equity)
+
+    ratios = {
+        "cost_to_income_ratio": safe_divide(operating_cost, revenue),
+        "quick_ratio": safe_divide(quick_assets, total_current_liabilities),
+        "debt_to_equity_ratio": safe_divide(total_debt, total_equity),
+        "debt_to_assets_ratio": safe_divide(total_debt, total_assets),
+        "debt_to_capital_ratio": safe_divide(total_debt, debt_plus_equity),
+        "debt_to_ebitda_ratio": safe_divide(total_debt, ebitda),
+        "interest_coverage_ratio": safe_divide(ebit, interest_expenses),
+    }
+    derived_values = {
+        "ebit": ebit,
+        "ebitda": ebitda,
+        "quick_assets": quick_assets,
+        "debt_plus_equity": debt_plus_equity,
+    }
+    return derived_values, ratios
+
+
+def compute_ratios_from_normalized_files(input_dir: Path, output_file: Path) -> int:
+    files = sorted(input_dir.glob("*.normalized.json"))
+    if not files:
+        raise ValueError(f"No normalized files found in: {input_dir}")
+
+    company_periods: Dict[str, Dict[str, Dict[str, Any]]] = {}
+    for path in files:
+        parsed = parse_normalized_filename(path.name)
+        if not parsed:
+            continue
+        filename_company_id, statement_type = parsed
+        with path.open("r", encoding="utf-8") as f:
+            payload = json.load(f)
+        statement = payload.get("statement", {})
+        if not isinstance(statement, dict):
+            continue
+        company_id = str(statement.get("company_id", filename_company_id)).strip() or filename_company_id
+        periods = statement.get("periods", [])
+        if not isinstance(periods, list):
+            continue
+
+        fields = payload.get("fields")
+        if not isinstance(fields, list):
+            fields = STATEMENT_CONFIGS[statement_type]["fields"]
+        fields = [str(field) for field in fields]
+
+        company_years = company_periods.setdefault(company_id, {})
+        for period in periods:
+            if not isinstance(period, dict):
+                continue
+            year = str(period.get("year", "")).strip()
+            if not year:
+                continue
+            year_record = company_years.setdefault(
+                year,
+                {
+                    "currency": "",
+                    "field_values": {},
+                    "present_fields": set(),
+                },
+            )
+            currency = str(period.get("currency", "")).strip()
+            if currency:
+                year_record["currency"] = currency
+
+            single_values = statement_period_to_single_values(period, fields=fields)
+            year_record["field_values"].update(single_values)
+            year_record["present_fields"].update(fields)
+
+    companies_output: List[Dict[str, Any]] = []
+    total_periods = 0
+    for company_id in sorted(company_periods):
+        periods_out: List[Dict[str, Any]] = []
+        for year in sorted(company_periods[company_id]):
+            record = company_periods[company_id][year]
+            present_fields = record.get("present_fields", set())
+            if not isinstance(present_fields, set):
+                present_fields = set()
+            field_values: Dict[str, Optional[float]] = {}
+            for config in STATEMENT_CONFIGS.values():
+                for field in config["fields"]:
+                    if field in present_fields:
+                        field_values[field] = float(record["field_values"].get(field, 0.0))
+                    else:
+                        field_values[field] = None
+            derived_values, ratios = calculate_financial_ratios(field_values)
+            periods_out.append(
+                {
+                    "year": year,
+                    "currency": record.get("currency", ""),
+                    "field_values": field_values,
+                    "derived_values": derived_values,
+                    "ratios": ratios,
+                }
+            )
+            total_periods += 1
+        companies_output.append({"company_id": company_id, "periods": periods_out})
+
+    output_payload = {
+        "schema_version": "1.0",
+        "source_dir": str(input_dir),
+        "companies": companies_output,
+    }
+    with output_file.open("w", encoding="utf-8") as f:
+        json.dump(output_payload, f, ensure_ascii=False, indent=2)
+    print(
+        f"Finished ratios. Wrote {len(companies_output)} company file(s), {total_periods} period(s) to {output_file}"
+    )
+    return total_periods
+
+
 def extract_one_statement(
     client: AzureLLMClient,
     company_id: str,
@@ -344,87 +530,122 @@ def parse_args() -> argparse.Namespace:
             "Set to 1 to run sequentially."
         ),
     )
+    parser.add_argument(
+        "--skip-extraction",
+        action="store_true",
+        help="Skip LLM extraction and only run ratio calculation (if enabled).",
+    )
+    parser.add_argument(
+        "--compute-ratios",
+        action="store_true",
+        help="Compute single-value fields and financial ratios from *.normalized.json files.",
+    )
+    parser.add_argument(
+        "--ratios-input-dir",
+        default=None,
+        help=(
+            "Input directory containing *.normalized.json files. "
+            "Defaults to --output-dir."
+        ),
+    )
+    parser.add_argument(
+        "--ratios-output-file",
+        default="financial_ratios.json",
+        help="Output JSON file path for computed ratios.",
+    )
     return parser.parse_args()
 
 
 def main() -> None:
     args = parse_args()
-
-    input_dir = Path(args.input_dir)
     output_dir = Path(args.output_dir)
-    if not input_dir.exists() or not input_dir.is_dir():
-        raise ValueError(f"Invalid input dir: {input_dir}")
-    output_dir.mkdir(parents=True, exist_ok=True)
+    if not args.skip_extraction:
+        input_dir = Path(args.input_dir)
+        if not input_dir.exists() or not input_dir.is_dir():
+            raise ValueError(f"Invalid input dir: {input_dir}")
+        output_dir.mkdir(parents=True, exist_ok=True)
 
-    files = sorted(input_dir.glob("*.llm.json"))
-    if not files:
-        raise ValueError(f"No statement files found in: {input_dir}")
+        files = sorted(input_dir.glob("*.llm.json"))
+        if not files:
+            raise ValueError(f"No statement files found in: {input_dir}")
 
-    parameters = {
-        "temperature": args.temperature,
-        "max_tokens": args.max_tokens,
-        "top_k": args.top_k,
-    }
+        parameters = {
+            "temperature": args.temperature,
+            "max_tokens": args.max_tokens,
+            "top_k": args.top_k,
+        }
 
-    def process_file(idx: int, path: Path) -> str:
-        parsed = parse_filename(path.name)
-        if not parsed:
-            return "skipped"
-        company_id, statement_type = parsed
-        required_fields = STATEMENT_CONFIGS[statement_type]["fields"]
-        statement_and_supplementary_tables = load_raw_statement(path)
-        print(f"[{idx}/{len(files)}] Extracting {path.name} ({statement_type})")
-        try:
-            client = AzureLLMClient()
-            extracted = extract_one_statement(
-                client=client,
-                company_id=company_id,
-                statement_type=statement_type,
-                required_fields=required_fields,
-                statement_and_supplementary_tables=statement_and_supplementary_tables,
-                parameters=parameters,
-                message=args.message,
-            )
-            extracted["source_file"] = str(path)
-            single_payload = {
-                "schema_version": "1.0",
-                "fields": required_fields,
-                "statement": extracted,
-            }
-            output_path = output_dir / output_filename_for_source(
-                path.name, statement_type=statement_type
-            )
-            with output_path.open("w", encoding="utf-8") as f:
-                json.dump(single_payload, f, ensure_ascii=False, indent=2)
-            print(f"  -> Wrote {output_path}")
-            return "wrote"
-        except Exception as exc:
-            print(f"  -> Failed for {path.name}: {exc}")
-            return "failed"
+        def process_file(idx: int, path: Path) -> str:
+            parsed = parse_filename(path.name)
+            if not parsed:
+                return "skipped"
+            company_id, statement_type = parsed
+            required_fields = STATEMENT_CONFIGS[statement_type]["fields"]
+            statement_and_supplementary_tables = load_raw_statement(path)
+            print(f"[{idx}/{len(files)}] Extracting {path.name} ({statement_type})")
+            try:
+                client = AzureLLMClient()
+                extracted = extract_one_statement(
+                    client=client,
+                    company_id=company_id,
+                    statement_type=statement_type,
+                    required_fields=required_fields,
+                    statement_and_supplementary_tables=statement_and_supplementary_tables,
+                    parameters=parameters,
+                    message=args.message,
+                )
+                extracted["source_file"] = str(path)
+                single_payload = {
+                    "schema_version": "1.0",
+                    "fields": required_fields,
+                    "statement": extracted,
+                }
+                output_path = output_dir / output_filename_for_source(
+                    path.name, statement_type=statement_type
+                )
+                with output_path.open("w", encoding="utf-8") as f:
+                    json.dump(single_payload, f, ensure_ascii=False, indent=2)
+                print(f"  -> Wrote {output_path}")
+                return "wrote"
+            except Exception as exc:
+                print(f"  -> Failed for {path.name}: {exc}")
+                return "failed"
 
-    wrote = 0
-    failed = 0
-    if args.max_workers <= 1:
-        for idx, path in enumerate(files, start=1):
-            status = process_file(idx, path)
-            if status == "wrote":
-                wrote += 1
-            elif status == "failed":
-                failed += 1
-    else:
-        with ThreadPoolExecutor(max_workers=args.max_workers) as executor:
-            futures = [
-                executor.submit(process_file, idx, path)
-                for idx, path in enumerate(files, start=1)
-            ]
-            for future in as_completed(futures):
-                status = future.result()
+        wrote = 0
+        failed = 0
+        if args.max_workers <= 1:
+            for idx, path in enumerate(files, start=1):
+                status = process_file(idx, path)
                 if status == "wrote":
                     wrote += 1
                 elif status == "failed":
                     failed += 1
+        else:
+            with ThreadPoolExecutor(max_workers=args.max_workers) as executor:
+                futures = [
+                    executor.submit(process_file, idx, path)
+                    for idx, path in enumerate(files, start=1)
+                ]
+                for future in as_completed(futures):
+                    status = future.result()
+                    if status == "wrote":
+                        wrote += 1
+                    elif status == "failed":
+                        failed += 1
+        print(f"Extraction finished. Wrote {wrote} file(s) to {output_dir}. Failed: {failed}")
 
-    print(f"Finished. Wrote {wrote} file(s) to {output_dir}. Failed: {failed}")
+    if args.compute_ratios:
+        ratios_input_dir = Path(args.ratios_input_dir) if args.ratios_input_dir else output_dir
+        if not ratios_input_dir.exists() or not ratios_input_dir.is_dir():
+            raise ValueError(f"Invalid ratios input dir: {ratios_input_dir}")
+        ratios_output_file = Path(args.ratios_output_file)
+        if not ratios_output_file.is_absolute():
+            ratios_output_file = ratios_input_dir / ratios_output_file
+        ratios_output_file.parent.mkdir(parents=True, exist_ok=True)
+        compute_ratios_from_normalized_files(
+            input_dir=ratios_input_dir,
+            output_file=ratios_output_file,
+        )
 
 
 if __name__ == "__main__":
