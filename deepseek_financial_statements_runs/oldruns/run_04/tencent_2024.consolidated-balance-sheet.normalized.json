@@ -1,0 +1,137 @@
+{
+  "schema_version": "1.0",
+  "fields": [
+    "cash_and_cash_equivalents",
+    "marketable_securities",
+    "total_accounts_receivable",
+    "total_current_liabilities",
+    "total_debt_short_term_and_long_term",
+    "total_equity",
+    "total_assets"
+  ],
+  "statement": {
+    "company_id": "tencent_2024",
+    "statement_type": "consolidated-balance-sheet",
+    "periods": [
+      {
+        "year": "2024",
+        "currency": "CNY",
+        "scale": 1000000,
+        "values": {
+          "cash_and_cash_equivalents": [
+            {
+              "Cash and cash equivalents": 132519.0
+            },
+            {
+              "Bank balances and cash": 89183.0
+            },
+            {
+              "Term deposits and highly liquid investments (within three months)": 43336.0
+            }
+          ],
+          "marketable_securities": [
+            {
+              "Financial assets at fair value through profit or loss (Current assets)": 9568.0
+            },
+            {
+              "Financial assets at fair value through other comprehensive income (Current assets)": 3345.0
+            }
+          ],
+          "total_accounts_receivable": [
+            {
+              "Accounts receivable": 48203.0
+            }
+          ],
+          "total_current_liabilities": [
+            {
+              "Total current liabilities": 396909.0
+            }
+          ],
+          "total_debt_short_term_and_long_term": [
+            {
+              "Borrowings (Non-current)": 146521.0
+            },
+            {
+              "Borrowings (Current)": 52885.0
+            },
+            {
+              "Notes payable (Non-current)": 130586.0
+            },
+            {
+              "Notes payable (Current)": 8623.0
+            }
+          ],
+          "total_equity": [
+            {
+              "Total equity": 1053896.0
+            }
+          ],
+          "total_assets": [
+            {
+              "Total assets": 1780995.0
+            }
+          ]
+        }
+      },
+      {
+        "year": "2023",
+        "currency": "CNY",
+        "scale": 1000000,
+        "values": {
+          "cash_and_cash_equivalents": [
+            {
+              "Cash and cash equivalents": 172320.0
+            },
+            {
+              "Bank balances and cash": 127241.0
+            },
+            {
+              "Term deposits and highly liquid investments (within three months)": 45079.0
+            }
+          ],
+          "marketable_securities": [
+            {
+              "Financial assets at fair value through profit or loss (Current assets)": 14903.0
+            }
+          ],
+          "total_accounts_receivable": [
+            {
+              "Accounts receivable": 46606.0
+            }
+          ],
+          "total_current_liabilities": [
+            {
+              "Total current liabilities": 352157.0
+            }
+          ],
+          "total_debt_short_term_and_long_term": [
+            {
+              "Borrowings (Non-current)": 155819.0
+            },
+            {
+              "Borrowings (Current)": 41537.0
+            },
+            {
+              "Notes payable (Non-current)": 137101.0
+            },
+            {
+              "Notes payable (Current)": 14161.0
+            }
+          ],
+          "total_equity": [
+            {
+              "Total equity": 873681.0
+            }
+          ],
+          "total_assets": [
+            {
+              "Total assets": 1577246.0
+            }
+          ]
+        }
+      }
+    ],
+    "notes": "1. 'Cash and cash equivalents' is mapped from the primary statement line item and its detailed composition from Note 32. The detailed components are listed individually as per rule #2.\n2. 'Marketable securities' are mapped to the most liquid, unrestricted financial assets intended for near-term sale. This includes current portions of 'Financial assets at fair value through profit or loss' and 'Financial assets at fair value through other comprehensive income' (FVOCI). The FVOCI assets in current assets are considered marketable as they are likely treasury investments intended for liquidity management. Non-current portions of these asset classes are not included as they are considered longer-term investments.\n3. 'Total accounts receivable' is taken directly from the primary statement.\n4. 'Total current liabilities' is taken directly from the primary statement.\n5. 'Total debt short-term and long-term' is mapped to the sum of 'Borrowings' and 'Notes Payable' from both current and non-current liabilities, as these represent the company's core debt obligations. This aligns with the supplementary table 'Total debts' in Note 4.2.\n6. 'Total equity' and 'Total assets' are taken directly from the primary statement.\n7. Scale is 1,000,000 (millions) as indicated by '(RMB in Millions)'.\n8. Currency is CNY (Chinese Yuan Renminbi), formalized as its ISO code.",
+    "source_file": "extracted_text/tencent_2024.consolidated-balance-sheet.llm.json"
+  }
+}

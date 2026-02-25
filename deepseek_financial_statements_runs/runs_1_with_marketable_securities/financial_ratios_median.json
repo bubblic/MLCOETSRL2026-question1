@@ -1,0 +1,903 @@
+{
+  "schema_version": "1.0",
+  "aggregation": "median_across_runs",
+  "num_runs": 10,
+  "run_values_file": "deepseek_financial_statements_runs/extraction_run_values.json",
+  "companies": [
+    {
+      "company_id": "2023 General Motors Annual Report",
+      "periods": [
+        {
+          "year": "2021",
+          "currency": "USD",
+          "field_values": {
+            "cash_and_cash_equivalents": null,
+            "marketable_securities": null,
+            "total_accounts_receivable": null,
+            "total_current_liabilities": null,
+            "total_debt_short_term_and_long_term": null,
+            "total_equity": null,
+            "total_assets": null,
+            "total_revenue": 127004000000.0,
+            "total_operating_cost": 117680000000.0,
+            "net_income": 9945000000.0,
+            "taxes": 2771000000.0,
+            "interest_expenses": 950000000.0,
+            "depreciation_and_amortization": 12051000000.0
+          },
+          "derived_values": {
+            "ebit": 13666000000.0,
+            "ebitda": 25717000000.0,
+            "quick_assets": null,
+            "debt_plus_equity": null
+          },
+          "ratios": {
+            "cost_to_income_ratio": 0.9265849894491512,
+            "quick_ratio": null,
+            "debt_to_equity_ratio": null,
+            "debt_to_assets_ratio": null,
+            "debt_to_capital_ratio": null,
+            "debt_to_ebitda_ratio": null,
+            "interest_coverage_ratio": 14.385263157894737
+          }
+        },
+        {
+          "year": "2022",
+          "currency": "USD",
+          "field_values": {
+            "cash_and_cash_equivalents": 19153000000.0,
+            "marketable_securities": 12150000000.0,
+            "total_accounts_receivable": 46956000000.0,
+            "total_current_liabilities": 91174000000.0,
+            "total_debt_short_term_and_long_term": 114699000000.0,
+            "total_equity": 71927000000.0,
+            "total_assets": 264037000000.0,
+            "total_revenue": 156735000000.0,
+            "total_operating_cost": 146421000000.0,
+            "net_income": 9708000000.0,
+            "taxes": 1888000000.0,
+            "interest_expenses": 987000000.0,
+            "depreciation_and_amortization": 11290000000.0
+          },
+          "derived_values": {
+            "ebit": 12583000000.0,
+            "ebitda": 23873000000.0,
+            "quick_assets": 78259000000.0,
+            "debt_plus_equity": 186626000000.0
+          },
+          "ratios": {
+            "cost_to_income_ratio": 0.9341946597760551,
+            "quick_ratio": 0.8583477745848597,
+            "debt_to_equity_ratio": 1.5946584731741904,
+            "debt_to_assets_ratio": 0.43440502656824614,
+            "debt_to_capital_ratio": 0.6145928220076516,
+            "debt_to_ebitda_ratio": 4.804549072173585,
+            "interest_coverage_ratio": 12.74873353596758
+          }
+        },
+        {
+          "year": "2023",
+          "currency": "USD",
+          "field_values": {
+            "cash_and_cash_equivalents": 18853000000.0,
+            "marketable_securities": 7613000000.0,
+            "total_accounts_receivable": 51454000000.0,
+            "total_current_liabilities": 94446000000.0,
+            "total_debt_short_term_and_long_term": 121741000000.0,
+            "total_equity": 68189000000.0,
+            "total_assets": 273064000000.0,
+            "total_revenue": 171842000000.0,
+            "total_operating_cost": 162544000000.0,
+            "net_income": 9840000000.0,
+            "taxes": 563000000.0,
+            "interest_expenses": 911000000.0,
+            "depreciation_and_amortization": 11888000000.0
+          },
+          "derived_values": {
+            "ebit": 11314000000.0,
+            "ebitda": 23202000000.0,
+            "quick_assets": 77920000000.0,
+            "debt_plus_equity": 189930000000.0
+          },
+          "ratios": {
+            "cost_to_income_ratio": 0.9458921567486412,
+            "quick_ratio": 0.8250217055248502,
+            "debt_to_equity_ratio": 1.7853466101570634,
+            "debt_to_assets_ratio": 0.44583321126182873,
+            "debt_to_capital_ratio": 0.640978255146633,
+            "debt_to_ebitda_ratio": 5.247004568571675,
+            "interest_coverage_ratio": 12.419319429198683
+          }
+        }
+      ]
+    },
+    {
+      "company_id": "alibaba_2025",
+      "periods": [
+        {
+          "year": "2023",
+          "currency": "CNY",
+          "field_values": {
+            "cash_and_cash_equivalents": null,
+            "marketable_securities": null,
+            "total_accounts_receivable": null,
+            "total_current_liabilities": null,
+            "total_debt_short_term_and_long_term": null,
+            "total_equity": null,
+            "total_assets": null,
+            "total_revenue": 868687000000.0,
+            "total_operating_cost": 768336000000.0,
+            "net_income": 65573000000.0,
+            "taxes": 15549000000.0,
+            "interest_expenses": 5918000000.0,
+            "depreciation_and_amortization": 46938000000.0
+          },
+          "derived_values": {
+            "ebit": 87040000000.0,
+            "ebitda": 133978000000.0,
+            "quick_assets": null,
+            "debt_plus_equity": null
+          },
+          "ratios": {
+            "cost_to_income_ratio": 0.8844796802530716,
+            "quick_ratio": null,
+            "debt_to_equity_ratio": null,
+            "debt_to_assets_ratio": null,
+            "debt_to_capital_ratio": null,
+            "debt_to_ebitda_ratio": null,
+            "interest_coverage_ratio": 14.707671510645488
+          }
+        },
+        {
+          "year": "2024",
+          "currency": "CNY",
+          "field_values": {
+            "cash_and_cash_equivalents": 248125000000.0,
+            "marketable_securities": 262955000000.0,
+            "total_accounts_receivable": 29362000000.0,
+            "total_current_liabilities": 421507000000.0,
+            "total_debt_short_term_and_long_term": 170776000000.0,
+            "total_equity": 1101871000000.0,
+            "total_assets": 1764829000000.0,
+            "total_revenue": 941168000000.0,
+            "total_operating_cost": 827818000000.0,
+            "net_income": 71332000000.0,
+            "taxes": 22529000000.0,
+            "interest_expenses": 7947000000.0,
+            "depreciation_and_amortization": 44504000000.0
+          },
+          "derived_values": {
+            "ebit": 101808000000.0,
+            "ebitda": 146312000000.0,
+            "quick_assets": 540442000000.0,
+            "debt_plus_equity": 1272647000000.0
+          },
+          "ratios": {
+            "cost_to_income_ratio": 0.8795645410808697,
+            "quick_ratio": 1.282166132472296,
+            "debt_to_equity_ratio": 0.1549872898007117,
+            "debt_to_assets_ratio": 0.0967663156033814,
+            "debt_to_capital_ratio": 0.13418960638731714,
+            "debt_to_ebitda_ratio": 1.1672043304718684,
+            "interest_coverage_ratio": 12.810872027180068
+          }
+        },
+        {
+          "year": "2025",
+          "currency": "CNY",
+          "field_values": {
+            "cash_and_cash_equivalents": 145487000000.0,
+            "marketable_securities": 228826000000.0,
+            "total_accounts_receivable": 30652000000.0,
+            "total_current_liabilities": 435346000000.0,
+            "total_debt_short_term_and_long_term": 230703000000.0,
+            "total_equity": 1078393000000.0,
+            "total_assets": 1804227000000.0,
+            "total_revenue": 996347000000.0,
+            "total_operating_cost": 856203000000.0,
+            "net_income": 125976000000.0,
+            "taxes": 35445000000.0,
+            "interest_expenses": 9596000000.0,
+            "depreciation_and_amortization": 42459000000.0
+          },
+          "derived_values": {
+            "ebit": 171017000000.0,
+            "ebitda": 213476000000.0,
+            "quick_assets": 404965000000.0,
+            "debt_plus_equity": 1309096000000.0
+          },
+          "ratios": {
+            "cost_to_income_ratio": 0.8593421769724805,
+            "quick_ratio": 0.9302141285322479,
+            "debt_to_equity_ratio": 0.21393221209707408,
+            "debt_to_assets_ratio": 0.12786805651395305,
+            "debt_to_capital_ratio": 0.17623077299143836,
+            "debt_to_ebitda_ratio": 1.0806975959826866,
+            "interest_coverage_ratio": 17.821696540225094
+          }
+        }
+      ]
+    },
+    {
+      "company_id": "exxon_2024",
+      "periods": [
+        {
+          "year": "2022",
+          "currency": "USD",
+          "field_values": {
+            "cash_and_cash_equivalents": null,
+            "marketable_securities": null,
+            "total_accounts_receivable": null,
+            "total_current_liabilities": null,
+            "total_debt_short_term_and_long_term": null,
+            "total_equity": null,
+            "total_assets": null,
+            "total_revenue": 413680000000.0,
+            "total_operating_cost": 335129000000.0,
+            "net_income": 55740000000.0,
+            "taxes": 20176000000.0,
+            "interest_expenses": 798000000.0,
+            "depreciation_and_amortization": 24040000000.0
+          },
+          "derived_values": {
+            "ebit": 76714000000.0,
+            "ebitda": 100754000000.0,
+            "quick_assets": null,
+            "debt_plus_equity": null
+          },
+          "ratios": {
+            "cost_to_income_ratio": 0.8101165151808161,
+            "quick_ratio": null,
+            "debt_to_equity_ratio": null,
+            "debt_to_assets_ratio": null,
+            "debt_to_capital_ratio": null,
+            "debt_to_ebitda_ratio": null,
+            "interest_coverage_ratio": 96.1328320802005
+          }
+        },
+        {
+          "year": "2023",
+          "currency": "USD",
+          "field_values": {
+            "cash_and_cash_equivalents": 31568000000.0,
+            "marketable_securities": 0.0,
+            "total_accounts_receivable": 38015000000.0,
+            "total_current_liabilities": 65316000000.0,
+            "total_debt_short_term_and_long_term": 41573000000.0,
+            "total_equity": 212538000000.0,
+            "total_assets": 376317000000.0,
+            "total_revenue": 344582000000.0,
+            "total_operating_cost": 290950000000.0,
+            "net_income": 36010000000.0,
+            "taxes": 15429000000.0,
+            "interest_expenses": 849000000.0,
+            "depreciation_and_amortization": 20641000000.0
+          },
+          "derived_values": {
+            "ebit": 52288000000.0,
+            "ebitda": 72929000000.0,
+            "quick_assets": 69583000000.0,
+            "debt_plus_equity": 254111000000.0
+          },
+          "ratios": {
+            "cost_to_income_ratio": 0.8443563505928923,
+            "quick_ratio": 1.065328556555821,
+            "debt_to_equity_ratio": 0.19560266869924436,
+            "debt_to_assets_ratio": 0.11047335092488514,
+            "debt_to_capital_ratio": 0.163601733100889,
+            "debt_to_ebitda_ratio": 0.5700475805235229,
+            "interest_coverage_ratio": 61.58775029446407
+          }
+        },
+        {
+          "year": "2024",
+          "currency": "USD",
+          "field_values": {
+            "cash_and_cash_equivalents": 23187000000.0,
+            "marketable_securities": 0.0,
+            "total_accounts_receivable": 43681000000.0,
+            "total_current_liabilities": 70307000000.0,
+            "total_debt_short_term_and_long_term": 41710000000.0,
+            "total_equity": 270606000000.0,
+            "total_assets": 453475000000.0,
+            "total_revenue": 349585000000.0,
+            "total_operating_cost": 299716000000.0,
+            "net_income": 33680000000.0,
+            "taxes": 13810000000.0,
+            "interest_expenses": 996000000.0,
+            "depreciation_and_amortization": 23442000000.0
+          },
+          "derived_values": {
+            "ebit": 48486000000.0,
+            "ebitda": 71928000000.0,
+            "quick_assets": 66868000000.0,
+            "debt_plus_equity": 312316000000.0
+          },
+          "ratios": {
+            "cost_to_income_ratio": 0.8573479983408899,
+            "quick_ratio": 0.951085951612215,
+            "debt_to_equity_ratio": 0.1541355328411048,
+            "debt_to_assets_ratio": 0.09197860962566845,
+            "debt_to_capital_ratio": 0.1335506346136605,
+            "debt_to_ebitda_ratio": 0.5798854409965521,
+            "interest_coverage_ratio": 48.68072289156626
+          }
+        }
+      ]
+    },
+    {
+      "company_id": "google_2024",
+      "periods": [
+        {
+          "year": "2022",
+          "currency": "USD",
+          "field_values": {
+            "cash_and_cash_equivalents": null,
+            "marketable_securities": null,
+            "total_accounts_receivable": null,
+            "total_current_liabilities": null,
+            "total_debt_short_term_and_long_term": null,
+            "total_equity": null,
+            "total_assets": null,
+            "total_revenue": 282836000000.0,
+            "total_operating_cost": 207994000000.0,
+            "net_income": 59972000000.0,
+            "taxes": 11356000000.0,
+            "interest_expenses": 357000000.0,
+            "depreciation_and_amortization": 13475000000.0
+          },
+          "derived_values": {
+            "ebit": 71685000000.0,
+            "ebitda": 85160000000.0,
+            "quick_assets": null,
+            "debt_plus_equity": null
+          },
+          "ratios": {
+            "cost_to_income_ratio": 0.7353872915753299,
+            "quick_ratio": null,
+            "debt_to_equity_ratio": null,
+            "debt_to_assets_ratio": null,
+            "debt_to_capital_ratio": null,
+            "debt_to_ebitda_ratio": null,
+            "interest_coverage_ratio": 200.7983193277311
+          }
+        },
+        {
+          "year": "2023",
+          "currency": "USD",
+          "field_values": {
+            "cash_and_cash_equivalents": 24048000000.0,
+            "marketable_securities": 86868000000.0,
+            "total_accounts_receivable": 47964000000.0,
+            "total_current_liabilities": 81814000000.0,
+            "total_debt_short_term_and_long_term": 11870000000.0,
+            "total_equity": 283379000000.0,
+            "total_assets": 402392000000.0,
+            "total_revenue": 307394000000.0,
+            "total_operating_cost": 223101000000.0,
+            "net_income": 73795000000.0,
+            "taxes": 11922000000.0,
+            "interest_expenses": 308000000.0,
+            "depreciation_and_amortization": 11946000000.0
+          },
+          "derived_values": {
+            "ebit": 86025000000.0,
+            "ebitda": 97971000000.0,
+            "quick_assets": 158880000000.0,
+            "debt_plus_equity": 295249000000.0
+          },
+          "ratios": {
+            "cost_to_income_ratio": 0.7257818955477335,
+            "quick_ratio": 1.941965922702716,
+            "debt_to_equity_ratio": 0.04188736638918198,
+            "debt_to_assets_ratio": 0.02949859838167757,
+            "debt_to_capital_ratio": 0.040203353779352344,
+            "debt_to_ebitda_ratio": 0.12115830194649437,
+            "interest_coverage_ratio": 279.30194805194805
+          }
+        },
+        {
+          "year": "2024",
+          "currency": "USD",
+          "field_values": {
+            "cash_and_cash_equivalents": 23466000000.0,
+            "marketable_securities": 72191000000.0,
+            "total_accounts_receivable": 52340000000.0,
+            "total_current_liabilities": 89122000000.0,
+            "total_debt_short_term_and_long_term": 10883000000.0,
+            "total_equity": 325084000000.0,
+            "total_assets": 450256000000.0,
+            "total_revenue": 350018000000.0,
+            "total_operating_cost": 237628000000.0,
+            "net_income": 100118000000.0,
+            "taxes": 19697000000.0,
+            "interest_expenses": 268000000.0,
+            "depreciation_and_amortization": 15311000000.0
+          },
+          "derived_values": {
+            "ebit": 120083000000.0,
+            "ebitda": 135394000000.0,
+            "quick_assets": 147997000000.0,
+            "debt_plus_equity": 335967000000.0
+          },
+          "ratios": {
+            "cost_to_income_ratio": 0.678902227885423,
+            "quick_ratio": 1.6606112968739482,
+            "debt_to_equity_ratio": 0.033477501199689924,
+            "debt_to_assets_ratio": 0.02417069400518816,
+            "debt_to_capital_ratio": 0.03239306241386803,
+            "debt_to_ebitda_ratio": 0.08038022364358834,
+            "interest_coverage_ratio": 448.07089552238807
+          }
+        }
+      ]
+    },
+    {
+      "company_id": "jpmorgan_2024",
+      "periods": [
+        {
+          "year": "2022",
+          "currency": "USD",
+          "field_values": {
+            "cash_and_cash_equivalents": null,
+            "marketable_securities": null,
+            "total_accounts_receivable": null,
+            "total_current_liabilities": null,
+            "total_debt_short_term_and_long_term": null,
+            "total_equity": null,
+            "total_assets": null,
+            "total_revenue": 154792000000.0,
+            "total_operating_cost": 108626000000.0,
+            "net_income": 37676000000.0,
+            "taxes": 8490000000.0,
+            "interest_expenses": 26097000000.0,
+            "depreciation_and_amortization": 7051000000.0
+          },
+          "derived_values": {
+            "ebit": 72263000000.0,
+            "ebitda": 79314000000.0,
+            "quick_assets": null,
+            "debt_plus_equity": null
+          },
+          "ratios": {
+            "cost_to_income_ratio": 0.7017546126414802,
+            "quick_ratio": null,
+            "debt_to_equity_ratio": null,
+            "debt_to_assets_ratio": null,
+            "debt_to_capital_ratio": null,
+            "debt_to_ebitda_ratio": null,
+            "interest_coverage_ratio": 2.769015595662337
+          }
+        },
+        {
+          "year": "2023",
+          "currency": "USD",
+          "field_values": {
+            "cash_and_cash_equivalents": 624151000000.0,
+            "marketable_securities": 847743500000.0,
+            "total_accounts_receivable": 107363000000.0,
+            "total_current_liabilities": 3155690000000.0,
+            "total_debt_short_term_and_long_term": 436537000000.0,
+            "total_equity": 327878000000.0,
+            "total_assets": 3875393000000.0,
+            "total_revenue": 239425000000.0,
+            "total_operating_cost": 177813000000.0,
+            "net_income": 49552000000.0,
+            "taxes": 12060000000.0,
+            "interest_expenses": 81321000000.0,
+            "depreciation_and_amortization": 7512000000.0
+          },
+          "derived_values": {
+            "ebit": 142933000000.0,
+            "ebitda": 150445000000.0,
+            "quick_assets": 1579257500000.0,
+            "debt_plus_equity": 764415000000.0
+          },
+          "ratios": {
+            "cost_to_income_ratio": 0.7426668058891093,
+            "quick_ratio": 0.5004476041689773,
+            "debt_to_equity_ratio": 1.3314007039203606,
+            "debt_to_assets_ratio": 0.11264328546808026,
+            "debt_to_capital_ratio": 0.5710733044223361,
+            "debt_to_ebitda_ratio": 2.90163847253149,
+            "interest_coverage_ratio": 1.7576394781175835
+          }
+        },
+        {
+          "year": "2024",
+          "currency": "USD",
+          "field_values": {
+            "cash_and_cash_equivalents": 469317000000.0,
+            "marketable_securities": 1036865000000.0,
+            "total_accounts_receivable": 101223000000.0,
+            "total_current_liabilities": 3256638000000.0,
+            "total_debt_short_term_and_long_term": 454311000000.0,
+            "total_equity": 344758000000.0,
+            "total_assets": 4002814000000.0,
+            "total_revenue": 278906000000.0,
+            "total_operating_cost": 203825000000.0,
+            "net_income": 58471000000.0,
+            "taxes": 16610000000.0,
+            "interest_expenses": 101350000000.0,
+            "depreciation_and_amortization": 7938000000.0
+          },
+          "derived_values": {
+            "ebit": 176431000000.0,
+            "ebitda": 184369000000.0,
+            "quick_assets": 1607405000000.0,
+            "debt_plus_equity": 799069000000.0
+          },
+          "ratios": {
+            "cost_to_income_ratio": 0.7308017755085943,
+            "quick_ratio": 0.4935780396838703,
+            "debt_to_equity_ratio": 1.3177678255471954,
+            "debt_to_assets_ratio": 0.11349790422437815,
+            "debt_to_capital_ratio": 0.5685504005286152,
+            "debt_to_ebitda_ratio": 2.464139849974779,
+            "interest_coverage_ratio": 1.740809077454366
+          }
+        }
+      ]
+    },
+    {
+      "company_id": "lvmh_dec_2024",
+      "periods": [
+        {
+          "year": "2022",
+          "currency": "EUR",
+          "field_values": {
+            "cash_and_cash_equivalents": 7301000000.0,
+            "marketable_securities": 3552000000.0,
+            "total_accounts_receivable": 4258000000.0,
+            "total_current_liabilities": 31543000000.0,
+            "total_debt_short_term_and_long_term": 19739000000.0,
+            "total_equity": 56604000000.0,
+            "total_assets": 134646000000.0,
+            "total_revenue": 79184000000.0,
+            "total_operating_cost": 58220000000.0,
+            "net_income": 14084000000.0,
+            "taxes": 5362000000.0,
+            "interest_expenses": 271000000.0,
+            "depreciation_and_amortization": 6226000000.0
+          },
+          "derived_values": {
+            "ebit": 19717000000.0,
+            "ebitda": 25943000000.0,
+            "quick_assets": 15111000000.0,
+            "debt_plus_equity": 76343000000.0
+          },
+          "ratios": {
+            "cost_to_income_ratio": 0.7352495453626995,
+            "quick_ratio": 0.4790603303427068,
+            "debt_to_equity_ratio": 0.3487209384495795,
+            "debt_to_assets_ratio": 0.14659923057498922,
+            "debt_to_capital_ratio": 0.2585567766527383,
+            "debt_to_ebitda_ratio": 0.7608603476853101,
+            "interest_coverage_ratio": 72.75645756457564
+          }
+        },
+        {
+          "year": "2023",
+          "currency": "EUR",
+          "field_values": {
+            "cash_and_cash_equivalents": 7774000000.0,
+            "marketable_securities": 3490000000.0,
+            "total_accounts_receivable": 4728000000.0,
+            "total_current_liabilities": 33145000000.0,
+            "total_debt_short_term_and_long_term": 21907000000.0,
+            "total_equity": 62701000000.0,
+            "total_assets": 143694000000.0,
+            "total_revenue": 86153000000.0,
+            "total_operating_cost": 63600000000.0,
+            "net_income": 15174000000.0,
+            "taxes": 5673000000.0,
+            "interest_expenses": 760000000.0,
+            "depreciation_and_amortization": 7177000000.0
+          },
+          "derived_values": {
+            "ebit": 21607000000.0,
+            "ebitda": 28784000000.0,
+            "quick_assets": 15992000000.0,
+            "debt_plus_equity": 84608000000.0
+          },
+          "ratios": {
+            "cost_to_income_ratio": 0.7382215361043725,
+            "quick_ratio": 0.4824860461608086,
+            "debt_to_equity_ratio": 0.3493883670116904,
+            "debt_to_assets_ratio": 0.1524559132601222,
+            "debt_to_capital_ratio": 0.2589235060514372,
+            "debt_to_ebitda_ratio": 0.7610825458588104,
+            "interest_coverage_ratio": 28.430263157894736
+          }
+        },
+        {
+          "year": "2024",
+          "currency": "EUR",
+          "field_values": {
+            "cash_and_cash_equivalents": 9631000000.0,
+            "marketable_securities": 3956000000.0,
+            "total_accounts_receivable": 4731000000.0,
+            "total_current_liabilities": 33696000000.0,
+            "total_debt_short_term_and_long_term": 22942000000.0,
+            "total_equity": 69287000000.0,
+            "total_assets": 149190000000.0,
+            "total_revenue": 84683000000.0,
+            "total_operating_cost": 65804000000.0,
+            "net_income": 12550000000.0,
+            "taxes": 5157000000.0,
+            "interest_expenses": 952000000.0,
+            "depreciation_and_amortization": 7796000000.0
+          },
+          "derived_values": {
+            "ebit": 18659000000.0,
+            "ebitda": 26455000000.0,
+            "quick_assets": 18318000000.0,
+            "debt_plus_equity": 92229000000.0
+          },
+          "ratios": {
+            "cost_to_income_ratio": 0.7770626926301619,
+            "quick_ratio": 0.5436253561253561,
+            "debt_to_equity_ratio": 0.3311155050731017,
+            "debt_to_assets_ratio": 0.15377706280581807,
+            "debt_to_capital_ratio": 0.24875039304340282,
+            "debt_to_ebitda_ratio": 0.8672084672084672,
+            "interest_coverage_ratio": 19.599789915966387
+          }
+        }
+      ]
+    },
+    {
+      "company_id": "microsoft_2025",
+      "periods": [
+        {
+          "year": "2023",
+          "currency": "USD",
+          "field_values": {
+            "cash_and_cash_equivalents": null,
+            "marketable_securities": null,
+            "total_accounts_receivable": null,
+            "total_current_liabilities": null,
+            "total_debt_short_term_and_long_term": null,
+            "total_equity": null,
+            "total_assets": null,
+            "total_revenue": 211915000000.0,
+            "total_operating_cost": 123392000000.0,
+            "net_income": 72361000000.0,
+            "taxes": 16950000000.0,
+            "interest_expenses": 1968000000.0,
+            "depreciation_and_amortization": 13861000000.0
+          },
+          "derived_values": {
+            "ebit": 91279000000.0,
+            "ebitda": 105140000000.0,
+            "quick_assets": null,
+            "debt_plus_equity": null
+          },
+          "ratios": {
+            "cost_to_income_ratio": 0.582271193638959,
+            "quick_ratio": null,
+            "debt_to_equity_ratio": null,
+            "debt_to_assets_ratio": null,
+            "debt_to_capital_ratio": null,
+            "debt_to_ebitda_ratio": null,
+            "interest_coverage_ratio": 46.38160569105691
+          }
+        },
+        {
+          "year": "2024",
+          "currency": "USD",
+          "field_values": {
+            "cash_and_cash_equivalents": 18315000000.0,
+            "marketable_securities": 57228000000.0,
+            "total_accounts_receivable": 56924000000.0,
+            "total_current_liabilities": 125286000000.0,
+            "total_debt_short_term_and_long_term": 51630000000.0,
+            "total_equity": 268477000000.0,
+            "total_assets": 512163000000.0,
+            "total_revenue": 245122000000.0,
+            "total_operating_cost": 135689000000.0,
+            "net_income": 88136000000.0,
+            "taxes": 19651000000.0,
+            "interest_expenses": 2935000000.0,
+            "depreciation_and_amortization": 22287000000.0
+          },
+          "derived_values": {
+            "ebit": 110722000000.0,
+            "ebitda": 133009000000.0,
+            "quick_assets": 132467000000.0,
+            "debt_plus_equity": 320107000000.0
+          },
+          "ratios": {
+            "cost_to_income_ratio": 0.5535570042672628,
+            "quick_ratio": 1.0573168590265472,
+            "debt_to_equity_ratio": 0.19230697601656752,
+            "debt_to_assets_ratio": 0.10080775065750552,
+            "debt_to_capital_ratio": 0.16128981871686654,
+            "debt_to_ebitda_ratio": 0.38816922163161893,
+            "interest_coverage_ratio": 37.72470187393527
+          }
+        },
+        {
+          "year": "2025",
+          "currency": "USD",
+          "field_values": {
+            "cash_and_cash_equivalents": 30242000000.0,
+            "marketable_securities": 64323000000.0,
+            "total_accounts_receivable": 69905000000.0,
+            "total_current_liabilities": 141218000000.0,
+            "total_debt_short_term_and_long_term": 43151000000.0,
+            "total_equity": 343479000000.0,
+            "total_assets": 619003000000.0,
+            "total_revenue": 281724000000.0,
+            "total_operating_cost": 153196000000.0,
+            "net_income": 101832000000.0,
+            "taxes": 21795000000.0,
+            "interest_expenses": 2385000000.0,
+            "depreciation_and_amortization": 34153000000.0
+          },
+          "derived_values": {
+            "ebit": 126012000000.0,
+            "ebitda": 160165000000.0,
+            "quick_assets": 164470000000.0,
+            "debt_plus_equity": 386630000000.0
+          },
+          "ratios": {
+            "cost_to_income_ratio": 0.5437804375914015,
+            "quick_ratio": 1.1646532311744962,
+            "debt_to_equity_ratio": 0.12562922332951942,
+            "debt_to_assets_ratio": 0.06971048605580264,
+            "debt_to_capital_ratio": 0.11160799731008975,
+            "debt_to_ebitda_ratio": 0.2694159148378235,
+            "interest_coverage_ratio": 52.835220125786165
+          }
+        }
+      ]
+    },
+    {
+      "company_id": "tencent_2024",
+      "periods": [
+        {
+          "year": "2023",
+          "currency": "CNY",
+          "field_values": {
+            "cash_and_cash_equivalents": 172320000000.0,
+            "marketable_securities": 14903000000.0,
+            "total_accounts_receivable": 46606000000.0,
+            "total_current_liabilities": 352157000000.0,
+            "total_debt_short_term_and_long_term": 348618000000.0,
+            "total_equity": 873681000000.0,
+            "total_assets": 1577246000000.0,
+            "total_revenue": 609015000000.0,
+            "total_operating_cost": 453642000000.0,
+            "net_income": 118048000000.0,
+            "taxes": 43276000000.0,
+            "interest_expenses": 12268000000.0,
+            "depreciation_and_amortization": 59008000000.0
+          },
+          "derived_values": {
+            "ebit": 173592000000.0,
+            "ebitda": 232600000000.0,
+            "quick_assets": 233829000000.0,
+            "debt_plus_equity": 1222299000000.0
+          },
+          "ratios": {
+            "cost_to_income_ratio": 0.744878204970321,
+            "quick_ratio": 0.6639907768410113,
+            "debt_to_equity_ratio": 0.3990220686955536,
+            "debt_to_assets_ratio": 0.22102956672579926,
+            "debt_to_capital_ratio": 0.285214992403659,
+            "debt_to_ebitda_ratio": 1.4987876182287188,
+            "interest_coverage_ratio": 14.149983697424194
+          }
+        },
+        {
+          "year": "2024",
+          "currency": "CNY",
+          "field_values": {
+            "cash_and_cash_equivalents": 132519000000.0,
+            "marketable_securities": 12913000000.0,
+            "total_accounts_receivable": 48203000000.0,
+            "total_current_liabilities": 396909000000.0,
+            "total_debt_short_term_and_long_term": 338615000000.0,
+            "total_equity": 1053896000000.0,
+            "total_assets": 1780995000000.0,
+            "total_revenue": 660257000000.0,
+            "total_operating_cost": 460160000000.0,
+            "net_income": 196467000000.0,
+            "taxes": 45018000000.0,
+            "interest_expenses": 11981000000.0,
+            "depreciation_and_amortization": 56213000000.0
+          },
+          "derived_values": {
+            "ebit": 253466000000.0,
+            "ebitda": 309679000000.0,
+            "quick_assets": 193635000000.0,
+            "debt_plus_equity": 1392511000000.0
+          },
+          "ratios": {
+            "cost_to_income_ratio": 0.6969407367131284,
+            "quick_ratio": 0.4878574181991338,
+            "debt_to_equity_ratio": 0.3212983064742631,
+            "debt_to_assets_ratio": 0.19012686728486042,
+            "debt_to_capital_ratio": 0.24316863565171118,
+            "debt_to_ebitda_ratio": 1.093438689740021,
+            "interest_coverage_ratio": 21.155663133294382
+          }
+        }
+      ]
+    },
+    {
+      "company_id": "volkswagen_2024",
+      "periods": [
+        {
+          "year": "2023",
+          "currency": "EUR",
+          "field_values": {
+            "cash_and_cash_equivalents": 43449000000.0,
+            "marketable_securities": 26772000000.0,
+            "total_accounts_receivable": 97029000000.0,
+            "total_current_liabilities": 206036000000.0,
+            "total_debt_short_term_and_long_term": 232799000000.0,
+            "total_equity": 189186000000.0,
+            "total_assets": 600649000000.0,
+            "total_revenue": 322284000000.0,
+            "total_operating_cost": 314907000000.0,
+            "net_income": 17861000000.0,
+            "taxes": 5237000000.0,
+            "interest_expenses": 3640000000.0,
+            "depreciation_and_amortization": 27566000000.0
+          },
+          "derived_values": {
+            "ebit": 26738000000.0,
+            "ebitda": 54304000000.0,
+            "quick_assets": 167250000000.0,
+            "debt_plus_equity": 421985000000.0
+          },
+          "ratios": {
+            "cost_to_income_ratio": 0.9771102505864393,
+            "quick_ratio": 0.8117513444252461,
+            "debt_to_equity_ratio": 1.2305297432156714,
+            "debt_to_assets_ratio": 0.3875791019380703,
+            "debt_to_capital_ratio": 0.5516760074410227,
+            "debt_to_ebitda_ratio": 4.286958603417796,
+            "interest_coverage_ratio": 7.345604395604395
+          }
+        },
+        {
+          "year": "2024",
+          "currency": "EUR",
+          "field_values": {
+            "cash_and_cash_equivalents": 40296000000.0,
+            "marketable_securities": 27326000000.0,
+            "total_accounts_receivable": 100202000000.0,
+            "total_current_liabilities": 217039000000.0,
+            "total_debt_short_term_and_long_term": 254081000000.0,
+            "total_equity": 196731000000.0,
+            "total_assets": 632905000000.0,
+            "total_revenue": 324656000000.0,
+            "total_operating_cost": 320570000000.0,
+            "net_income": 12394000000.0,
+            "taxes": 4411000000.0,
+            "interest_expenses": 3446000000.0,
+            "depreciation_and_amortization": 31346000000.0
+          },
+          "derived_values": {
+            "ebit": 20251000000.0,
+            "ebitda": 51597000000.0,
+            "quick_assets": 167824000000.0,
+            "debt_plus_equity": 450812000000.0
+          },
+          "ratios": {
+            "cost_to_income_ratio": 0.9874143709033562,
+            "quick_ratio": 0.7732435184459936,
+            "debt_to_equity_ratio": 1.2915148095622957,
+            "debt_to_assets_ratio": 0.40145203466555013,
+            "debt_to_capital_ratio": 0.5636074461194467,
+            "debt_to_ebitda_ratio": 4.924336686241448,
+            "interest_coverage_ratio": 5.876668601276843
+          }
+        }
+      ]
+    }
+  ]
+}

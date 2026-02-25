@@ -1,0 +1,150 @@
+{
+  "schema_version": "1.0",
+  "fields": [
+    "total_revenue",
+    "total_operating_cost",
+    "net_income",
+    "taxes",
+    "interest_expenses"
+  ],
+  "statement": {
+    "company_id": "lvmh_dec_2024",
+    "statement_type": "consolidated-income-statement",
+    "periods": [
+      {
+        "year": "2024",
+        "currency": "EUR",
+        "scale": 1000000,
+        "values": {
+          "total_revenue": [
+            {
+              "Revenue": 84683.0
+            }
+          ],
+          "total_operating_cost": [
+            {
+              "Cost of sales": 27918.0
+            },
+            {
+              "Marketing and selling expenses": 31002.0
+            },
+            {
+              "General and administrative expenses": 6220.0
+            },
+            {
+              "Other operating income and expenses": 664.0
+            }
+          ],
+          "net_income": [
+            {
+              "Net profit, Group share": 12550.0
+            }
+          ],
+          "taxes": [
+            {
+              "Income taxes": 5157.0
+            }
+          ],
+          "interest_expenses": [
+            {
+              "Cost of net financial debt": 442.0
+            },
+            {
+              "Interest on lease liabilities": 510.0
+            }
+          ]
+        }
+      },
+      {
+        "year": "2023",
+        "currency": "EUR",
+        "scale": 1000000,
+        "values": {
+          "total_revenue": [
+            {
+              "Revenue": 86153.0
+            }
+          ],
+          "total_operating_cost": [
+            {
+              "Cost of sales": 26876.0
+            },
+            {
+              "Marketing and selling expenses": 30768.0
+            },
+            {
+              "General and administrative expenses": 5714.0
+            },
+            {
+              "Other operating income and expenses": 242.0
+            }
+          ],
+          "net_income": [
+            {
+              "Net profit, Group share": 15174.0
+            }
+          ],
+          "taxes": [
+            {
+              "Income taxes": 5673.0
+            }
+          ],
+          "interest_expenses": [
+            {
+              "Cost of net financial debt": 367.0
+            },
+            {
+              "Interest on lease liabilities": 393.0
+            }
+          ]
+        }
+      },
+      {
+        "year": "2022",
+        "currency": "EUR",
+        "scale": 1000000,
+        "values": {
+          "total_revenue": [
+            {
+              "Revenue": 79184.0
+            }
+          ],
+          "total_operating_cost": [
+            {
+              "Cost of sales": 24988.0
+            },
+            {
+              "Marketing and selling expenses": 28151.0
+            },
+            {
+              "General and administrative expenses": 5027.0
+            },
+            {
+              "Other operating income and expenses": 54.0
+            }
+          ],
+          "net_income": [
+            {
+              "Net profit, Group share": 14084.0
+            }
+          ],
+          "taxes": [
+            {
+              "Income taxes": 5362.0
+            }
+          ],
+          "interest_expenses": [
+            {
+              "Cost of net financial debt": 17.0
+            },
+            {
+              "Interest on lease liabilities": 254.0
+            }
+          ]
+        }
+      }
+    ],
+    "notes": "1. 'total_operating_cost' includes Cost of sales, Marketing and selling expenses, General and administrative expenses, and Other operating income and expenses (which is a net expense). This follows standard practice for a luxury goods conglomerate where operating costs encompass all costs directly tied to operations before financing and taxes. 2. 'interest_expenses' includes Cost of net financial debt and Interest on lease liabilities. 'Other financial income and expenses' is excluded as it contains significant non-interest components (e.g., fair value adjustments, dividends, forex costs). 3. 'net_income' is mapped to 'Net profit, Group share' as it represents the final consolidated profit attributable to the parent company's shareholders. 4. All values from the primary statement are used. Numbers in parentheses are treated as positive for expense fields (total_operating_cost, taxes, interest_expenses) as per the sign convention rule. 5. Supplementary tables provide detail but do not change the aggregated values used from the primary statement.",
+    "source_file": "extracted_text/lvmh_dec_2024.consolidated-income-statement.llm.json"
+  }
+}

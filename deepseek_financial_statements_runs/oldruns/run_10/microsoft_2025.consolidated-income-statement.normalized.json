@@ -1,0 +1,159 @@
+{
+  "schema_version": "1.0",
+  "fields": [
+    "total_revenue",
+    "total_operating_cost",
+    "net_income",
+    "taxes",
+    "interest_expenses"
+  ],
+  "statement": {
+    "company_id": "microsoft_2025",
+    "statement_type": "consolidated-income-statement",
+    "periods": [
+      {
+        "year": "2025",
+        "currency": "USD",
+        "scale": 1000000,
+        "values": {
+          "total_revenue": [
+            {
+              "Product": 63946.0
+            },
+            {
+              "Service and other": 217778.0
+            }
+          ],
+          "total_operating_cost": [
+            {
+              "Product": 13501.0
+            },
+            {
+              "Service and other": 74330.0
+            },
+            {
+              "Research and development": 32488.0
+            },
+            {
+              "Sales and marketing": 25654.0
+            },
+            {
+              "General and administrative": 7223.0
+            }
+          ],
+          "net_income": [
+            {
+              "Net income": 101832.0
+            }
+          ],
+          "taxes": [
+            {
+              "Provision for income taxes": 21795.0
+            }
+          ],
+          "interest_expenses": [
+            {
+              "Interest expense": 2385.0
+            }
+          ]
+        }
+      },
+      {
+        "year": "2024",
+        "currency": "USD",
+        "scale": 1000000,
+        "values": {
+          "total_revenue": [
+            {
+              "Product": 64773.0
+            },
+            {
+              "Service and other": 180349.0
+            }
+          ],
+          "total_operating_cost": [
+            {
+              "Product": 15272.0
+            },
+            {
+              "Service and other": 58842.0
+            },
+            {
+              "Research and development": 29510.0
+            },
+            {
+              "Sales and marketing": 24456.0
+            },
+            {
+              "General and administrative": 7609.0
+            }
+          ],
+          "net_income": [
+            {
+              "Net income": 88136.0
+            }
+          ],
+          "taxes": [
+            {
+              "Provision for income taxes": 19651.0
+            }
+          ],
+          "interest_expenses": [
+            {
+              "Interest expense": 2935.0
+            }
+          ]
+        }
+      },
+      {
+        "year": "2023",
+        "currency": "USD",
+        "scale": 1000000,
+        "values": {
+          "total_revenue": [
+            {
+              "Product": 64699.0
+            },
+            {
+              "Service and other": 147216.0
+            }
+          ],
+          "total_operating_cost": [
+            {
+              "Product": 17804.0
+            },
+            {
+              "Service and other": 48059.0
+            },
+            {
+              "Research and development": 27195.0
+            },
+            {
+              "Sales and marketing": 22759.0
+            },
+            {
+              "General and administrative": 7575.0
+            }
+          ],
+          "net_income": [
+            {
+              "Net income": 72361.0
+            }
+          ],
+          "taxes": [
+            {
+              "Provision for income taxes": 16950.0
+            }
+          ],
+          "interest_expenses": [
+            {
+              "Interest expense": 1968.0
+            }
+          ]
+        }
+      }
+    ],
+    "notes": "1. The company is a technology/software company. Total operating cost is defined as the sum of Cost of Revenue (Product, Service and other) and Operating Expenses (Research and development, Sales and marketing, General and administrative). This matches standard practice for the industry. 2. The 'Other income (expense), net' line includes interest expense, which is extracted separately for the 'interest_expenses' field. The sign convention for interest_expenses follows rule 13: the value is reported as a positive number as it reduces income. The raw value in the supplementary table is shown in parentheses ($2,385) for 2025, indicating a negative impact, so the extracted number is 2385. 3. Taxes are reported as 'Provision for income taxes' on the income statement. 4. All numbers are extracted without commas or currency symbols. 5. The scale is millions (1E6) as indicated in the statement header.",
+    "source_file": "extracted_text/microsoft_2025.consolidated-income-statement.llm.json"
+  }
+}

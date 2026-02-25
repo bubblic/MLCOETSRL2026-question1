@@ -1,0 +1,248 @@
+{
+  "schema_version": "1.0",
+  "fields": [
+    "cash_and_cash_equivalents",
+    "marketable_securities",
+    "total_accounts_receivable",
+    "total_current_liabilities",
+    "total_debt_short_term_and_long_term",
+    "total_equity",
+    "total_assets"
+  ],
+  "statement": {
+    "company_id": "exxon_2024",
+    "statement_type": "consolidated-balance-sheet",
+    "periods": [
+      {
+        "year": "2024",
+        "currency": "USD",
+        "scale": 1000000,
+        "values": {
+          "cash_and_cash_equivalents": [
+            {
+              "Cash and cash equivalents": 23029.0
+            },
+            {
+              "Cash and cash equivalents – restricted": 158.0
+            }
+          ],
+          "marketable_securities": [
+            {
+              "Equity securities carried at fair value and other investments at adjusted cost basis": 343.0
+            }
+          ],
+          "total_accounts_receivable": [
+            {
+              "Trade, less reserves of $162 million and $170 million": 35282.0
+            },
+            {
+              "Other, less reserves of $314 million and $101 million": 8399.0
+            }
+          ],
+          "total_current_liabilities": [
+            {
+              "Bank loans": 63.0
+            },
+            {
+              "Commercial paper": 0.0
+            },
+            {
+              "Long-term debt due within one year": 4892.0
+            },
+            {
+              "Trade payables": 36145.0
+            },
+            {
+              "Payables to equity companies": 10378.0
+            },
+            {
+              "Accrued taxes other than income taxes": 3577.0
+            },
+            {
+              "Other": 11197.0
+            },
+            {
+              "Income taxes payable": 4055.0
+            }
+          ],
+          "total_debt_short_term_and_long_term": [
+            {
+              "Bank loans": 63.0
+            },
+            {
+              "Commercial paper": 0.0
+            },
+            {
+              "Long-term debt due within one year": 4892.0
+            },
+            {
+              "Long-term debt": 36755.0
+            }
+          ],
+          "total_equity": [
+            {
+              "Common stock without par value": 46238.0
+            },
+            {
+              "Earnings reinvested": 470903.0
+            },
+            {
+              "Accumulated other comprehensive income": -14619.0
+            },
+            {
+              "Common stock held in treasury": -238817.0
+            },
+            {
+              "Noncontrolling interests": 6901.0
+            }
+          ],
+          "total_assets": [
+            {
+              "Cash and cash equivalents": 23029.0
+            },
+            {
+              "Cash and cash equivalents – restricted": 158.0
+            },
+            {
+              "Notes and accounts receivable – net": 43681.0
+            },
+            {
+              "Crude oil, products and merchandise": 19444.0
+            },
+            {
+              "Materials and supplies": 4080.0
+            },
+            {
+              "Other current assets": 1598.0
+            },
+            {
+              "Investments, advances and long-term receivables": 47200.0
+            },
+            {
+              "Property, plant and equipment, at cost, less accumulated depreciation and depletion": 294318.0
+            },
+            {
+              "Other assets, including intangibles – net": 19967.0
+            }
+          ]
+        }
+      },
+      {
+        "year": "2023",
+        "currency": "USD",
+        "scale": 1000000,
+        "values": {
+          "cash_and_cash_equivalents": [
+            {
+              "Cash and cash equivalents": 31539.0
+            },
+            {
+              "Cash and cash equivalents – restricted": 29.0
+            }
+          ],
+          "marketable_securities": [
+            {
+              "Equity securities carried at fair value and other investments at adjusted cost basis": 177.0
+            }
+          ],
+          "total_accounts_receivable": [
+            {
+              "Trade, less reserves of $162 million and $170 million": 30296.0
+            },
+            {
+              "Other, less reserves of $314 million and $101 million": 7719.0
+            }
+          ],
+          "total_current_liabilities": [
+            {
+              "Bank loans": 6.0
+            },
+            {
+              "Commercial paper": 75.0
+            },
+            {
+              "Long-term debt due within one year": 4009.0
+            },
+            {
+              "Trade payables": 31249.0
+            },
+            {
+              "Payables to equity companies": 11885.0
+            },
+            {
+              "Accrued taxes other than income taxes": 3817.0
+            },
+            {
+              "Other": 11086.0
+            },
+            {
+              "Income taxes payable": 3189.0
+            }
+          ],
+          "total_debt_short_term_and_long_term": [
+            {
+              "Bank loans": 6.0
+            },
+            {
+              "Commercial paper": 75.0
+            },
+            {
+              "Long-term debt due within one year": 4009.0
+            },
+            {
+              "Long-term debt": 37483.0
+            }
+          ],
+          "total_equity": [
+            {
+              "Common stock without par value": 17781.0
+            },
+            {
+              "Earnings reinvested": 453927.0
+            },
+            {
+              "Accumulated other comprehensive income": -11989.0
+            },
+            {
+              "Common stock held in treasury": -254917.0
+            },
+            {
+              "Noncontrolling interests": 7736.0
+            }
+          ],
+          "total_assets": [
+            {
+              "Cash and cash equivalents": 31539.0
+            },
+            {
+              "Cash and cash equivalents – restricted": 29.0
+            },
+            {
+              "Notes and accounts receivable – net": 38015.0
+            },
+            {
+              "Crude oil, products and merchandise": 20528.0
+            },
+            {
+              "Materials and supplies": 4592.0
+            },
+            {
+              "Other current assets": 1906.0
+            },
+            {
+              "Investments, advances and long-term receivables": 47630.0
+            },
+            {
+              "Property, plant and equipment, at cost, less accumulated depreciation and depletion": 214940.0
+            },
+            {
+              "Other assets, including intangibles – net": 17138.0
+            }
+          ]
+        }
+      }
+    ],
+    "notes": "1. 'cash_and_cash_equivalents' includes both unrestricted and restricted cash. 2. 'marketable_securities' is mapped from 'Equity securities carried at fair value and other investments at adjusted cost basis' within Note 8, as these are liquid, unrestricted investments. Other components of 'Investments, advances and long-term receivables' (e.g., equity method investments, long-term receivables) are not considered marketable securities. 3. 'total_accounts_receivable' is built from the detailed breakdown in Note 6, which sums to the primary statement line 'Notes and accounts receivable – net'. 4. 'total_current_liabilities' is built from the detailed breakdowns in Note 6 for 'Notes and loans payable' and 'Accounts payable and accrued liabilities', plus the separate line 'Income taxes payable' from the primary statement. 5. 'total_debt_short_term_and_long_term' includes all interest-bearing debt: short-term components from Note 6 ('Bank loans', 'Commercial paper', 'Long-term debt due within one year') and 'Long-term debt' from the primary statement. 6. 'total_equity' includes all components listed under the EQUITY section of the primary statement. 7. 'total_assets' is built from all asset line items in the primary statement. The supplementary tables provide detailed breakdowns but do not add new top-level asset categories.",
+    "source_file": "extracted_text/exxon_2024.consolidated-balance-sheet.llm.json"
+  }
+}

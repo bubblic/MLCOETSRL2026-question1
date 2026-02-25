@@ -1,0 +1,59 @@
+{
+  "schema_version": "1.0",
+  "fields": [
+    "depreciation_and_amortization"
+  ],
+  "statement": {
+    "company_id": "lvmh_dec_2024",
+    "statement_type": "consolidated-cash-flow-statement",
+    "periods": [
+      {
+        "year": "2024",
+        "currency": "EUR",
+        "scale": 1000000,
+        "values": {
+          "depreciation_and_amortization": [
+            {
+              "Net increase in depreciation, amortization and provisions": 4568.0
+            },
+            {
+              "Depreciation of right-of-use assets": 3228.0
+            }
+          ]
+        }
+      },
+      {
+        "year": "2023",
+        "currency": "EUR",
+        "scale": 1000000,
+        "values": {
+          "depreciation_and_amortization": [
+            {
+              "Net increase in depreciation, amortization and provisions": 4146.0
+            },
+            {
+              "Depreciation of right-of-use assets": 3031.0
+            }
+          ]
+        }
+      },
+      {
+        "year": "2022",
+        "currency": "EUR",
+        "scale": 1000000,
+        "values": {
+          "depreciation_and_amortization": [
+            {
+              "Net increase in depreciation, amortization and provisions": 3219.0
+            },
+            {
+              "Depreciation of right-of-use assets": 3007.0
+            }
+          ]
+        }
+      }
+    ],
+    "notes": "The 'depreciation_and_amortization' field is constructed from two line items in the primary statement: 'Net increase in depreciation, amortization and provisions' and 'Depreciation of right-of-use assets'. These are the only direct components provided. The 'Other adjustments and computed expenses' line is excluded as it is not a direct depreciation or amortization charge. The values are reported as positive numbers as they are non-cash add-backs to operating profit in the cash flow statement.",
+    "source_file": "extracted_text/lvmh_dec_2024.consolidated-cash-flow-statement.llm.json"
+  }
+}

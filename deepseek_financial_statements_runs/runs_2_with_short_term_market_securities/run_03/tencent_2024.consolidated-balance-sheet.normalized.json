@@ -1,0 +1,185 @@
+{
+  "schema_version": "1.0",
+  "fields": [
+    "cash_and_cash_equivalents",
+    "short_term_market_securities",
+    "total_accounts_receivable",
+    "total_current_liabilities",
+    "total_debt_short_term_and_long_term",
+    "total_equity",
+    "total_assets"
+  ],
+  "statement": {
+    "company_id": "tencent_2024",
+    "statement_type": "consolidated-balance-sheet",
+    "periods": [
+      {
+        "year": "2024",
+        "currency": "CNY",
+        "scale": 1000000,
+        "values": {
+          "cash_and_cash_equivalents": [
+            {
+              "Bank balances and cash": 89183.0
+            },
+            {
+              "Term deposits and highly liquid investments (within three months)": 43336.0
+            }
+          ],
+          "short_term_market_securities": [
+            {
+              "Financial assets at fair value through profit or loss (Current assets)": 9568.0
+            },
+            {
+              "Financial assets at fair value through other comprehensive income (Current assets)": 3345.0
+            }
+          ],
+          "total_accounts_receivable": [
+            {
+              "Accounts receivable": 48203.0
+            }
+          ],
+          "total_current_liabilities": [
+            {
+              "Accounts payable": 118712.0
+            },
+            {
+              "Other payables and accruals": 84032.0
+            },
+            {
+              "Borrowings (Current liabilities)": 52885.0
+            },
+            {
+              "Notes payable (Current liabilities)": 8623.0
+            },
+            {
+              "Current income tax liabilities": 16586.0
+            },
+            {
+              "Other tax liabilities": 4038.0
+            },
+            {
+              "Other financial liabilities (Current liabilities)": 6336.0
+            },
+            {
+              "Lease liabilities (Current liabilities)": 5600.0
+            },
+            {
+              "Deferred revenue (Current liabilities)": 100097.0
+            }
+          ],
+          "total_debt_short_term_and_long_term": [
+            {
+              "Borrowings (Non-current liabilities)": 146521.0
+            },
+            {
+              "Borrowings (Current liabilities)": 52885.0
+            },
+            {
+              "Notes payable (Non-current liabilities)": 130586.0
+            },
+            {
+              "Notes payable (Current liabilities)": 8623.0
+            }
+          ],
+          "total_equity": [
+            {
+              "Total equity attributable to equity holders": 973548.0
+            },
+            {
+              "Non-controlling interests": 80348.0
+            }
+          ],
+          "total_assets": [
+            {
+              "Total assets": 1780995.0
+            }
+          ]
+        }
+      },
+      {
+        "year": "2023",
+        "currency": "CNY",
+        "scale": 1000000,
+        "values": {
+          "cash_and_cash_equivalents": [
+            {
+              "Bank balances and cash": 127241.0
+            },
+            {
+              "Term deposits and highly liquid investments (within three months)": 45079.0
+            }
+          ],
+          "short_term_market_securities": [
+            {
+              "Financial assets at fair value through profit or loss (Current assets)": 14903.0
+            }
+          ],
+          "total_accounts_receivable": [
+            {
+              "Accounts receivable": 46606.0
+            }
+          ],
+          "total_current_liabilities": [
+            {
+              "Accounts payable": 100948.0
+            },
+            {
+              "Other payables and accruals": 76595.0
+            },
+            {
+              "Borrowings (Current liabilities)": 41537.0
+            },
+            {
+              "Notes payable (Current liabilities)": 14161.0
+            },
+            {
+              "Current income tax liabilities": 17664.0
+            },
+            {
+              "Other tax liabilities": 4372.0
+            },
+            {
+              "Other financial liabilities (Current liabilities)": 4558.0
+            },
+            {
+              "Lease liabilities (Current liabilities)": 6154.0
+            },
+            {
+              "Deferred revenue (Current liabilities)": 86168.0
+            }
+          ],
+          "total_debt_short_term_and_long_term": [
+            {
+              "Borrowings (Non-current liabilities)": 155819.0
+            },
+            {
+              "Borrowings (Current liabilities)": 41537.0
+            },
+            {
+              "Notes payable (Non-current liabilities)": 137101.0
+            },
+            {
+              "Notes payable (Current liabilities)": 14161.0
+            }
+          ],
+          "total_equity": [
+            {
+              "Total equity attributable to equity holders": 808591.0
+            },
+            {
+              "Non-controlling interests": 65090.0
+            }
+          ],
+          "total_assets": [
+            {
+              "Total assets": 1577246.0
+            }
+          ]
+        }
+      }
+    ],
+    "notes": "1. 'Cash and cash equivalents' is composed of the two line items explicitly detailed in Note 32. 'Term deposits and highly liquid investments (within three months)' are included as they meet the definition of cash equivalents (maturity <= 3 months). Other term deposits are classified as non-current or current assets separately and are not cash equivalents.\n2. 'Short_term_market_securities' includes current portions of 'Financial assets at fair value through profit or loss' and 'Financial assets at fair value through other comprehensive income'. These are considered liquid, unrestricted investments intended to be sold in the short term. For 2023, the FVOCI current asset was '–' (zero), so only the FVPL current asset is listed.\n3. 'Total_accounts_receivable' is the net carrying amount from the balance sheet.\n4. 'Total_current_liabilities' is the sum of all items listed under 'Current liabilities' in the balance sheet.\n5. 'Total_debt_short_term_and_long_term' includes all borrowings and notes payable (both current and non-current), as these represent the company's debt obligations. This aligns with the definition used in the supplementary 'Total debts' calculation (Note 4.2).\n6. 'Total_equity' is the sum of equity attributable to equity holders and non-controlling interests.\n7. 'Total_assets' is taken directly from the balance sheet total.\n8. Scale is 1,000,000 (millions) as indicated by '(RMB in Millions)'.\n9. Currency is Chinese Yuan Renminbi (CNY).",
+    "source_file": "extracted_text/tencent_2024.consolidated-balance-sheet.llm.json"
+  }
+}

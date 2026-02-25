@@ -1,0 +1,50 @@
+{
+  "schema_version": "1.0",
+  "fields": [
+    "depreciation_and_amortization"
+  ],
+  "statement": {
+    "company_id": "google_2024",
+    "statement_type": "consolidated-cash-flow-statement",
+    "periods": [
+      {
+        "year": "2022",
+        "currency": "USD",
+        "scale": 1000000,
+        "values": {
+          "depreciation_and_amortization": [
+            {
+              "Depreciation of property and equipment": 13475.0
+            }
+          ]
+        }
+      },
+      {
+        "year": "2023",
+        "currency": "USD",
+        "scale": 1000000,
+        "values": {
+          "depreciation_and_amortization": [
+            {
+              "Depreciation of property and equipment": 11946.0
+            }
+          ]
+        }
+      },
+      {
+        "year": "2024",
+        "currency": "USD",
+        "scale": 1000000,
+        "values": {
+          "depreciation_and_amortization": [
+            {
+              "Depreciation of property and equipment": 15311.0
+            }
+          ]
+        }
+      }
+    ],
+    "notes": "Only the 'Depreciation of property and equipment' line item was directly mapped to the 'depreciation_and_amortization' field. The supplementary tables contain detailed lease information, including lease assets, liabilities, and cash payments, but these do not directly map to the requested field. The 'Schedule II: Valuation and Qualifying Accounts' relates to accounts receivable allowances and is not relevant to depreciation and amortization. No amortization expense is separately identified in the provided cash flow statement; it may be included within 'Depreciation of property and equipment' or another line item.",
+    "source_file": "extracted_text/google_2024.consolidated-cash-flow-statement.llm.json"
+  }
+}

@@ -1,0 +1,50 @@
+{
+  "schema_version": "1.0",
+  "fields": [
+    "depreciation_and_amortization"
+  ],
+  "statement": {
+    "company_id": "google_2024",
+    "statement_type": "consolidated-cash-flow-statement",
+    "periods": [
+      {
+        "year": "2022",
+        "currency": "USD",
+        "scale": 1000000,
+        "values": {
+          "depreciation_and_amortization": [
+            {
+              "Depreciation of property and equipment": 13475.0
+            }
+          ]
+        }
+      },
+      {
+        "year": "2023",
+        "currency": "USD",
+        "scale": 1000000,
+        "values": {
+          "depreciation_and_amortization": [
+            {
+              "Depreciation of property and equipment": 11946.0
+            }
+          ]
+        }
+      },
+      {
+        "year": "2024",
+        "currency": "USD",
+        "scale": 1000000,
+        "values": {
+          "depreciation_and_amortization": [
+            {
+              "Depreciation of property and equipment": 15311.0
+            }
+          ]
+        }
+      }
+    ],
+    "notes": "The primary cash flow statement provides a single line item 'Depreciation of property and equipment' under adjustments to reconcile net income. This is the standard label for depreciation in Alphabet's statements. No separate 'Amortization' line is presented; it is common for technology companies like Alphabet to combine depreciation and amortization into this single line or include amortization within 'Other' expenses. Since the statement does not break it out separately and 'Other' is a separate adjustment line, the provided 'Depreciation of property and equipment' is mapped directly to the 'depreciation_and_amortization' field. The supplementary tables provide details on lease accounting but do not alter the depreciation values reported in the primary operating activities section.",
+    "source_file": "extracted_text/google_2024.consolidated-cash-flow-statement.llm.json"
+  }
+}

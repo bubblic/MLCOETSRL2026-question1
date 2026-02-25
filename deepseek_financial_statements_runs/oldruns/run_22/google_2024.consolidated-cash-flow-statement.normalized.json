@@ -1,0 +1,50 @@
+{
+  "schema_version": "1.0",
+  "fields": [
+    "depreciation_and_amortization"
+  ],
+  "statement": {
+    "company_id": "google_2024",
+    "statement_type": "consolidated-cash-flow-statement",
+    "periods": [
+      {
+        "year": "2022",
+        "currency": "USD",
+        "scale": 1000000,
+        "values": {
+          "depreciation_and_amortization": [
+            {
+              "Depreciation of property and equipment": 13475.0
+            }
+          ]
+        }
+      },
+      {
+        "year": "2023",
+        "currency": "USD",
+        "scale": 1000000,
+        "values": {
+          "depreciation_and_amortization": [
+            {
+              "Depreciation of property and equipment": 11946.0
+            }
+          ]
+        }
+      },
+      {
+        "year": "2024",
+        "currency": "USD",
+        "scale": 1000000,
+        "values": {
+          "depreciation_and_amortization": [
+            {
+              "Depreciation of property and equipment": 15311.0
+            }
+          ]
+        }
+      }
+    ],
+    "notes": "The primary statement provides a single line item for 'Depreciation of property and equipment' under the operating activities adjustments. This is mapped directly to the 'depreciation_and_amortization' field. The supplementary tables provide details on lease accounting but do not break out separate amortization figures for intangible assets or finance leases that would be additive to this field. Therefore, only the explicitly stated depreciation value is used.",
+    "source_file": "extracted_text/google_2024.consolidated-cash-flow-statement.llm.json"
+  }
+}
