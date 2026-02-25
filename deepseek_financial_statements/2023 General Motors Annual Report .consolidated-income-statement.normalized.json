@@ -14,74 +14,128 @@
       {
         "year": "2023",
         "currency": "USD",
+        "scale": 1000000,
         "values": {
           "revenue": [
-            171842.0
+            {
+              "Automotive": 157658.0
+            },
+            {
+              "GM Financial": 14184.0
+            }
           ],
           "total_operating_cost": [
-            141330.0,
-            11374.0,
-            9840.0
+            {
+              "Automotive and other cost of sales": 141330.0
+            },
+            {
+              "GM Financial interest, operating and other expenses": 11374.0
+            },
+            {
+              "Automotive and other selling, general and administrative expense": 9840.0
+            }
           ],
           "net_income": [
-            9840.0
+            {
+              "Net income (loss)": 9840.0
+            }
           ],
           "taxes": [
-            563.0
+            {
+              "Income tax expense (benefit)": 563.0
+            }
           ],
           "interest_expenses": [
-            911.0
+            {
+              "Automotive interest expense": 911.0
+            }
           ]
         }
       },
       {
         "year": "2022",
         "currency": "USD",
+        "scale": 1000000,
         "values": {
           "revenue": [
-            156735.0
+            {
+              "Automotive": 143975.0
+            },
+            {
+              "GM Financial": 12760.0
+            }
           ],
           "total_operating_cost": [
-            126892.0,
-            8862.0,
-            10667.0
+            {
+              "Automotive and other cost of sales": 126892.0
+            },
+            {
+              "GM Financial interest, operating and other expenses": 8862.0
+            },
+            {
+              "Automotive and other selling, general and administrative expense": 10667.0
+            }
           ],
           "net_income": [
-            9708.0
+            {
+              "Net income (loss)": 9708.0
+            }
           ],
           "taxes": [
-            1888.0
+            {
+              "Income tax expense (benefit)": 1888.0
+            }
           ],
           "interest_expenses": [
-            987.0
+            {
+              "Automotive interest expense": 987.0
+            }
           ]
         }
       },
       {
         "year": "2021",
         "currency": "USD",
+        "scale": 1000000,
         "values": {
           "revenue": [
-            127004.0
+            {
+              "Automotive": 113590.0
+            },
+            {
+              "GM Financial": 13414.0
+            }
           ],
           "total_operating_cost": [
-            100544.0,
-            8582.0,
-            8554.0
+            {
+              "Automotive and other cost of sales": 100544.0
+            },
+            {
+              "GM Financial interest, operating and other expenses": 8582.0
+            },
+            {
+              "Automotive and other selling, general and administrative expense": 8554.0
+            }
           ],
           "net_income": [
-            9945.0
+            {
+              "Net income (loss)": 9945.0
+            }
           ],
           "taxes": [
-            2771.0
+            {
+              "Income tax expense (benefit)": 2771.0
+            }
           ],
           "interest_expenses": [
-            950.0
+            {
+              "Automotive interest expense": 950.0
+            }
           ]
         }
       }
     ],
-    "notes": "Extracted from the primary Consolidated Income Statement. Revenue mapped from 'Total net sales and revenue'. Net income mapped from 'Net income (loss)'. Taxes mapped from 'Income tax expense (benefit)'. Interest expenses mapped from 'Automotive interest expense'. For total_operating_cost, mapped the three listed cost components: 'Automotive and other cost of sales', 'GM Financial interest, operating and other expenses', and 'Automotive and other selling, general and administrative expense'. These are all expenses that reduce operating income and are presented as positive numbers in the source. The supplementary tables provide detailed breakdowns but were not used for the core extraction as per the rules to avoid calculation or aggregation.",
+    "notes": "Extracted values are from the primary consolidated income statement. Revenue is the sum of 'Automotive' and 'GM Financial' lines under 'Net sales and revenue'. Total operating cost includes 'Automotive and other cost of sales', 'GM Financial interest, operating and other expenses', and 'Automotive and other selling, general and administrative expense', as these are the standard operating cost components for an automotive manufacturer with a captive finance arm. Net income is taken directly from the 'Net income (loss)' line before attribution adjustments. Taxes and interest expenses are taken directly from 'Income tax expense (benefit)' and 'Automotive interest expense' respectively. All values are reported in millions (scale 1E6). The sign convention follows the statement: parentheses indicate negatives, but all extracted values are positive as they represent costs that reduce income.",
     "source_file": "extracted_text/2023 General Motors Annual Report .consolidated-income-statement.llm.json"
   }
 }

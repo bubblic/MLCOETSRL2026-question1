@@ -10,35 +10,50 @@
       {
         "year": "2024",
         "currency": "EUR",
+        "scale": 1000000,
         "values": {
           "depreciation_and_amortization": [
-            4568.0,
-            3228.0
+            {
+              "source_label": 4568.0
+            },
+            {
+              "source_label": 3228.0
+            }
           ]
         }
       },
       {
         "year": "2023",
         "currency": "EUR",
+        "scale": 1000000,
         "values": {
           "depreciation_and_amortization": [
-            4146.0,
-            3031.0
+            {
+              "source_label": 4146.0
+            },
+            {
+              "source_label": 3031.0
+            }
           ]
         }
       },
       {
         "year": "2022",
         "currency": "EUR",
+        "scale": 1000000,
         "values": {
           "depreciation_and_amortization": [
-            3219.0,
-            3007.0
+            {
+              "source_label": 3219.0
+            },
+            {
+              "source_label": 3007.0
+            }
           ]
         }
       }
     ],
-    "notes": "The 'depreciation_and_amortization' field was populated using two line items from the cash flow statement: 'Net increase in depreciation, amortization and provisions' and 'Depreciation of right-of-use assets'. Both are non-cash expenses added back to operating profit to arrive at cash from operations. They are returned as separate numbers in an array as per the instruction not to add them up. The 'Other adjustments and computed expenses' line was not included as it is a separate adjustment item.",
+    "notes": "The 'depreciation_and_amortization' field is populated using two line items from the cash flow statement: 'Net increase in depreciation, amortization and provisions' and 'Depreciation of right-of-use assets'. These are the standard components for this field under IFRS. The 'Other adjustments and computed expenses' line was not included as it is not a direct depreciation or amortization charge. The scale is 1E6 (millions) as indicated. Only the 'depreciation_and_amortization' field was requested for extraction.",
     "source_file": "extracted_text/lvmh_dec_2024.consolidated-cash-flow-statement.llm.json"
   }
 }

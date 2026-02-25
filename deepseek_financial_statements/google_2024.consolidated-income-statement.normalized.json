@@ -14,77 +14,182 @@
       {
         "year": "2022",
         "currency": "USD",
+        "scale": 1000000,
         "values": {
           "revenue": [
-            282836.0
+            {
+              "Google Search & other": 162450.0
+            },
+            {
+              "YouTube ads": 29243.0
+            },
+            {
+              "Google Network": 32780.0
+            },
+            {
+              "Google subscriptions, platforms, and devices": 29055.0
+            },
+            {
+              "Google Cloud": 26280.0
+            },
+            {
+              "Other Bets": 1068.0
+            },
+            {
+              "Hedging gains (losses)": 1960.0
+            }
           ],
           "total_operating_cost": [
-            126203.0,
-            39500.0,
-            26567.0,
-            15724.0
+            {
+              "Cost of revenues": 126203.0
+            },
+            {
+              "Research and development": 39500.0
+            },
+            {
+              "Sales and marketing": 26567.0
+            },
+            {
+              "General and administrative": 15724.0
+            }
           ],
           "net_income": [
-            59972.0
+            {
+              "Net income": 59972.0
+            }
           ],
           "taxes": [
-            11356.0
+            {
+              "Provision for income taxes": 11356.0
+            }
           ],
           "interest_expenses": [
-            357.0
+            {
+              "Interest expense": 357.0
+            }
           ]
         }
       },
       {
         "year": "2023",
         "currency": "USD",
+        "scale": 1000000,
         "values": {
           "revenue": [
-            307394.0
+            {
+              "Google Search & other": 175033.0
+            },
+            {
+              "YouTube ads": 31510.0
+            },
+            {
+              "Google Network": 31312.0
+            },
+            {
+              "Google subscriptions, platforms, and devices": 34688.0
+            },
+            {
+              "Google Cloud": 33088.0
+            },
+            {
+              "Other Bets": 1527.0
+            },
+            {
+              "Hedging gains (losses)": 236.0
+            }
           ],
           "total_operating_cost": [
-            133332.0,
-            45427.0,
-            27917.0,
-            16425.0
+            {
+              "Cost of revenues": 133332.0
+            },
+            {
+              "Research and development": 45427.0
+            },
+            {
+              "Sales and marketing": 27917.0
+            },
+            {
+              "General and administrative": 16425.0
+            }
           ],
           "net_income": [
-            73795.0
+            {
+              "Net income": 73795.0
+            }
           ],
           "taxes": [
-            11922.0
+            {
+              "Provision for income taxes": 11922.0
+            }
           ],
           "interest_expenses": [
-            308.0
+            {
+              "Interest expense": 308.0
+            }
           ]
         }
       },
       {
         "year": "2024",
         "currency": "USD",
+        "scale": 1000000,
         "values": {
           "revenue": [
-            350018.0
+            {
+              "Google Search & other": 198084.0
+            },
+            {
+              "YouTube ads": 36147.0
+            },
+            {
+              "Google Network": 30359.0
+            },
+            {
+              "Google subscriptions, platforms, and devices": 40340.0
+            },
+            {
+              "Google Cloud": 43229.0
+            },
+            {
+              "Other Bets": 1648.0
+            },
+            {
+              "Hedging gains (losses)": 211.0
+            }
           ],
           "total_operating_cost": [
-            146306.0,
-            49326.0,
-            27808.0,
-            14188.0
+            {
+              "Cost of revenues": 146306.0
+            },
+            {
+              "Research and development": 49326.0
+            },
+            {
+              "Sales and marketing": 27808.0
+            },
+            {
+              "General and administrative": 14188.0
+            }
           ],
           "net_income": [
-            100118.0
+            {
+              "Net income": 100118.0
+            }
           ],
           "taxes": [
-            19697.0
+            {
+              "Provision for income taxes": 19697.0
+            }
           ],
           "interest_expenses": [
-            268.0
+            {
+              "Interest expense": 268.0
+            }
           ]
         }
       }
     ],
-    "notes": "1. 'total_operating_cost' includes the four main expense line items from the income statement: Cost of revenues, Research and development, Sales and marketing, and General and administrative. These are all costs that reduce operating income and are reported as positive numbers. 2. 'interest_expenses' is taken from the 'Components of Other Income (Expense), Net' supplementary table. It is a positive number as it reduces income. 3. 'taxes' is the 'Provision for income taxes' from the income statement. 4. All values are in millions of USD as per the statement. 5. The arrays contain the raw numbers without summation, as per the rules.",
+    "notes": "1. All values extracted from the primary consolidated income statement and supplementary tables. 2. Revenue is disaggregated into its components as provided in the supplementary table 'Disaggregated Revenues by Type'. 3. Total operating cost is composed of the four main operating expense categories listed in the primary statement: Cost of revenues, Research and development, Sales and marketing, and General and administrative. These are standard for a technology/services company like Alphabet. 4. Taxes are mapped from 'Provision for income taxes'. 5. Interest expenses are mapped from the 'Interest expense' component within 'Other income (expense), net'. The value is positive as it reduces income. 6. The 'Hedging gains (losses)' component of revenue is included as presented; it is a component of total revenue. 7. Scale is 1E6 (millions) as indicated in the statement. 8. All numbers are presented without commas or currency symbols as per the rules.",
     "source_file": "extracted_text/google_2024.consolidated-income-statement.llm.json"
   }
 }

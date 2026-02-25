@@ -14,83 +14,146 @@
       {
         "year": "2023",
         "currency": "CNY",
+        "scale": 1000000,
         "values": {
           "revenue": [
-            868687.0
+            {
+              "Revenue": 868687.0
+            }
           ],
           "total_operating_cost": [
-            549695.0,
-            56744.0,
-            103496.0,
-            42183.0,
-            13504.0,
-            2714.0
+            {
+              "Cost of revenue": 549695.0
+            },
+            {
+              "Product development expenses": 56744.0
+            },
+            {
+              "Sales and marketing expenses": 103496.0
+            },
+            {
+              "General and administrative expenses": 42183.0
+            },
+            {
+              "Amortization and impairment of intangible assets": 13504.0
+            },
+            {
+              "Goodwill impairment": 2714.0
+            }
           ],
           "net_income": [
-            65573.0
+            {
+              "Net income": 65573.0
+            }
           ],
           "taxes": [
-            15549.0
+            {
+              "Income tax expense": 15549.0
+            }
           ],
           "interest_expenses": [
-            5918.0
+            {
+              "Interest expense": 5918.0
+            }
           ]
         }
       },
       {
         "year": "2024",
         "currency": "CNY",
+        "scale": 1000000,
         "values": {
           "revenue": [
-            941168.0
+            {
+              "Revenue": 941168.0
+            }
           ],
           "total_operating_cost": [
-            586323.0,
-            52256.0,
-            115141.0,
-            41985.0,
-            21592.0,
-            10521.0
+            {
+              "Cost of revenue": 586323.0
+            },
+            {
+              "Product development expenses": 52256.0
+            },
+            {
+              "Sales and marketing expenses": 115141.0
+            },
+            {
+              "General and administrative expenses": 41985.0
+            },
+            {
+              "Amortization and impairment of intangible assets": 21592.0
+            },
+            {
+              "Goodwill impairment": 10521.0
+            }
           ],
           "net_income": [
-            71332.0
+            {
+              "Net income": 71332.0
+            }
           ],
           "taxes": [
-            22529.0
+            {
+              "Income tax expense": 22529.0
+            }
           ],
           "interest_expenses": [
-            7947.0
+            {
+              "Interest expense": 7947.0
+            }
           ]
         }
       },
       {
         "year": "2025",
         "currency": "CNY",
+        "scale": 1000000,
         "values": {
           "revenue": [
-            996347.0
+            {
+              "Revenue": 996347.0
+            }
           ],
           "total_operating_cost": [
-            598285.0,
-            57151.0,
-            144021.0,
-            44239.0,
-            6336.0,
-            6171.0
+            {
+              "Cost of revenue": 598285.0
+            },
+            {
+              "Product development expenses": 57151.0
+            },
+            {
+              "Sales and marketing expenses": 144021.0
+            },
+            {
+              "General and administrative expenses": 44239.0
+            },
+            {
+              "Amortization and impairment of intangible assets": 6336.0
+            },
+            {
+              "Goodwill impairment": 6171.0
+            }
           ],
           "net_income": [
-            125976.0
+            {
+              "Net income": 125976.0
+            }
           ],
           "taxes": [
-            35445.0
+            {
+              "Income tax expense": 35445.0
+            }
           ],
           "interest_expenses": [
-            9596.0
+            {
+              "Interest expense": 9596.0
+            }
           ]
         }
       }
     ],
-    "notes": "Extracted from the primary consolidated income statement. For 'total_operating_cost', included all line items that are subtracted from revenue to arrive at operating profit: Cost of revenue, Product development expenses, Sales and marketing expenses, General and administrative expenses, Amortization and impairment of intangible assets, and Goodwill impairment. 'Other net income' was excluded as it is an addition, not a cost. Values are in RMB millions as presented. The sign convention for costs is positive as they reduce income. The 'interest_expenses' field maps directly to the 'Interest expense' line item. The 'taxes' field maps directly to 'Income tax expense'. The 'net_income' field maps directly to 'Net income' (not the attributable to shareholders line).",
+    "notes": "1. All values are extracted from the primary consolidated income statement. The scale is in millions (RMB). 2. For 'total_operating_cost', all operating expense items that reduce income before arriving at 'Operating profit' are included. This includes Cost of revenue, Product development, Sales and marketing, General and administrative, Amortization/impairment of intangibles, and Goodwill impairment. 'Other net income' is excluded as it is a net add-back item. 3. 'Interest and investment income, net' and 'Share of results of equity method investees' are not included in total_operating_cost as they are non-operating items. 4. The sign convention for expenses (positive) and income (negative) is followed as per the statement's presentation (numbers in parentheses are negative). 5. The USD columns are not used as the primary reporting currency is CNY (RMB).",
     "source_file": "extracted_text/alibaba_2025.consolidated-income-statement.llm.json"
   }
 }

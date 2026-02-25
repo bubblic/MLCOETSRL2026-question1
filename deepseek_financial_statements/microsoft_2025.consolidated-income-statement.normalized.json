@@ -14,77 +14,146 @@
       {
         "year": "2025",
         "currency": "USD",
+        "scale": 1000000,
         "values": {
           "revenue": [
-            281724.0
+            {
+              "Product": 63946.0
+            },
+            {
+              "Service and other": 217778.0
+            }
           ],
           "total_operating_cost": [
-            87831.0,
-            32488.0,
-            25654.0,
-            7223.0
+            {
+              "Product cost of revenue": 13501.0
+            },
+            {
+              "Service and other cost of revenue": 74330.0
+            },
+            {
+              "Research and development": 32488.0
+            },
+            {
+              "Sales and marketing": 25654.0
+            },
+            {
+              "General and administrative": 7223.0
+            }
           ],
           "net_income": [
-            101832.0
+            {
+              "Net income": 101832.0
+            }
           ],
           "taxes": [
-            21795.0
+            {
+              "Provision for income taxes": 21795.0
+            }
           ],
           "interest_expenses": [
-            2385.0
+            {
+              "Interest expense": 2385.0
+            }
           ]
         }
       },
       {
         "year": "2024",
         "currency": "USD",
+        "scale": 1000000,
         "values": {
           "revenue": [
-            245122.0
+            {
+              "Product": 64773.0
+            },
+            {
+              "Service and other": 180349.0
+            }
           ],
           "total_operating_cost": [
-            74114.0,
-            29510.0,
-            24456.0,
-            7609.0
+            {
+              "Product cost of revenue": 15272.0
+            },
+            {
+              "Service and other cost of revenue": 58842.0
+            },
+            {
+              "Research and development": 29510.0
+            },
+            {
+              "Sales and marketing": 24456.0
+            },
+            {
+              "General and administrative": 7609.0
+            }
           ],
           "net_income": [
-            88136.0
+            {
+              "Net income": 88136.0
+            }
           ],
           "taxes": [
-            19651.0
+            {
+              "Provision for income taxes": 19651.0
+            }
           ],
           "interest_expenses": [
-            2935.0
+            {
+              "Interest expense": 2935.0
+            }
           ]
         }
       },
       {
         "year": "2023",
         "currency": "USD",
+        "scale": 1000000,
         "values": {
           "revenue": [
-            211915.0
+            {
+              "Product": 64699.0
+            },
+            {
+              "Service and other": 147216.0
+            }
           ],
           "total_operating_cost": [
-            65863.0,
-            27195.0,
-            22759.0,
-            7575.0
+            {
+              "Product cost of revenue": 17804.0
+            },
+            {
+              "Service and other cost of revenue": 48059.0
+            },
+            {
+              "Research and development": 27195.0
+            },
+            {
+              "Sales and marketing": 22759.0
+            },
+            {
+              "General and administrative": 7575.0
+            }
           ],
           "net_income": [
-            72361.0
+            {
+              "Net income": 72361.0
+            }
           ],
           "taxes": [
-            16950.0
+            {
+              "Provision for income taxes": 16950.0
+            }
           ],
           "interest_expenses": [
-            1968.0
+            {
+              "Interest expense": 1968.0
+            }
           ]
         }
       }
     ],
-    "notes": "Extracted from the provided Consolidated Income Statement and supplementary tables. For 'total_operating_cost', the array includes the following cost elements in order: Total cost of revenue, Research and development, Sales and marketing, and General and administrative. These are all expenses that reduce operating income and are reported as positive numbers. 'Interest expenses' was taken directly from the supplementary table for 'Other Income (Expense), Net', with the parentheses notation converted to a negative number in the source interpreted as a positive expense. 'Taxes' is the 'Provision for income taxes'. All values are in millions of USD as per the statement.",
+    "notes": "1. Revenue is broken down into 'Product' and 'Service and other' as per the primary statement. 2. Total operating cost includes all costs and operating expenses that reduce gross margin to arrive at operating income. This comprises Cost of Revenue (split into Product and Service and other), Research and development, Sales and marketing, and General and administrative. 3. Taxes are mapped from 'Provision for income taxes'. 4. Interest expenses are mapped from the 'Interest expense' line within the supplementary table for 'Other Income (Expense), Net'. The sign convention is followed: these are expenses that reduce income, so they are reported as positive numbers. 5. The scale is 'millions' as indicated in the statement header. 6. All values are extracted directly from the provided tables; no industry-specific adjustments were necessary.",
     "source_file": "extracted_text/microsoft_2025.consolidated-income-statement.llm.json"
   }
 }

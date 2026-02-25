@@ -16,67 +16,93 @@
       {
         "year": "2024",
         "currency": "USD",
+        "scale": 1000000,
         "values": {
           "cash_and_cash_equivalents": [
-            23029.0,
-            158.0
+            {
+              "Cash and cash equivalents": 23029.0
+            },
+            {
+              "Cash and cash equivalents – restricted": 158.0
+            }
           ],
           "marketable_securities": [],
           "accounts_receivable": [
-            35282.0,
-            8399.0
+            {
+              "Notes and accounts receivable – net": 43681.0
+            }
           ],
           "total_current_liabilities": [
-            4955.0,
-            61297.0,
-            4055.0
+            {
+              "Total current liabilities": 70307.0
+            }
           ],
           "total_debt_short_term_and_long_term": [
-            4955.0,
-            36755.0
+            {
+              "Notes and loans payable": 4955.0
+            },
+            {
+              "Long-term debt": 36755.0
+            }
           ],
           "total_equity": [
-            263705.0,
-            6901.0
+            {
+              "Total Equity": 270606.0
+            }
           ],
           "total_assets": [
-            453475.0
+            {
+              "Total Assets": 453475.0
+            }
           ]
         }
       },
       {
         "year": "2023",
         "currency": "USD",
+        "scale": 1000000,
         "values": {
           "cash_and_cash_equivalents": [
-            31539.0,
-            29.0
+            {
+              "Cash and cash equivalents": 31539.0
+            },
+            {
+              "Cash and cash equivalents – restricted": 29.0
+            }
           ],
           "marketable_securities": [],
           "accounts_receivable": [
-            30296.0,
-            7719.0
+            {
+              "Notes and accounts receivable – net": 38015.0
+            }
           ],
           "total_current_liabilities": [
-            4090.0,
-            58037.0,
-            3189.0
+            {
+              "Total current liabilities": 65316.0
+            }
           ],
           "total_debt_short_term_and_long_term": [
-            4090.0,
-            37483.0
+            {
+              "Notes and loans payable": 4090.0
+            },
+            {
+              "Long-term debt": 37483.0
+            }
           ],
           "total_equity": [
-            204802.0,
-            7736.0
+            {
+              "Total Equity": 212538.0
+            }
           ],
           "total_assets": [
-            376317.0
+            {
+              "Total Assets": 376317.0
+            }
           ]
         }
       }
     ],
-    "notes": "1) 'Cash and cash equivalents' includes both unrestricted and restricted amounts as separate line items. 2) 'Marketable securities' field is empty as no line item for short-term, liquid investments was identified in the provided balance sheet; 'Investments, advances and long-term receivables' is a non-current asset. 3) 'Accounts receivable' uses the detailed breakdown from Note 6 for 'Trade' and 'Other' receivables, net of reserves. 4) 'Total current liabilities' includes the detailed components: Notes and loans payable, Accounts payable and accrued liabilities, and Income taxes payable. 5) 'Total debt short-term and long-term' includes 'Notes and loans payable' (current) and 'Long-term debt' (non-current). 6) 'Total equity' includes 'ExxonMobil share of equity' and 'Noncontrolling interests' as separate components. 7) All values are in millions of dollars as per the statement. 8) Parentheses in the source indicate negative numbers; these have been converted to negative numeric values (e.g., Accumulated other comprehensive income).",
+    "notes": "1) 'Cash and cash equivalents' includes both unrestricted and restricted amounts as per the primary statement. 2) 'Marketable securities' field is empty as no line item for short-term, liquid investments (e.g., marketable securities, short-term investments) was identified in the provided balance sheet. 'Investments, advances and long-term receivables' (Note 8) is a non-current asset and includes equity method investments and long-term receivables, which are not considered readily marketable. 3) 'Total debt short-term and long-term' combines 'Notes and loans payable' (current) and 'Long-term debt' (non-current). 4) All values are in millions of dollars (scale: 1E6). 5) The sign convention for parentheses in the source (e.g., Accumulated other comprehensive income) indicates a negative value, but this is handled within the equity calculation. Extracted numbers are the raw, positive figures from the statement.",
     "source_file": "extracted_text/exxon_2024.consolidated-balance-sheet.llm.json"
   }
 }

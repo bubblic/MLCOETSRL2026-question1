@@ -10,32 +10,41 @@
       {
         "year": "2025",
         "currency": "USD",
+        "scale": 1000000,
         "values": {
           "depreciation_and_amortization": [
-            34153.0
+            {
+              "Depreciation, amortization, and other": 34153.0
+            }
           ]
         }
       },
       {
         "year": "2024",
         "currency": "USD",
+        "scale": 1000000,
         "values": {
           "depreciation_and_amortization": [
-            22287.0
+            {
+              "Depreciation, amortization, and other": 22287.0
+            }
           ]
         }
       },
       {
         "year": "2023",
         "currency": "USD",
+        "scale": 1000000,
         "values": {
           "depreciation_and_amortization": [
-            13861.0
+            {
+              "Depreciation, amortization, and other": 13861.0
+            }
           ]
         }
       }
     ],
-    "notes": "Extracted the single value for 'Depreciation, amortization, and other' from the cash flow statement's adjustments to reconcile net income. This is the standard line item for depreciation and amortization in the cash flow statement. No calculation or summation was performed.",
+    "notes": "The field 'depreciation_and_amortization' was directly mapped from the line item 'Depreciation, amortization, and other' in the cash flow statement's adjustments to reconcile net income. The values are positive as they are non-cash expenses added back to net income. The supplementary tables provide detailed breakdowns of intangible asset amortization and lease-related amortization, but the cash flow statement presents a consolidated figure for depreciation, amortization, and other non-cash items.",
     "source_file": "extracted_text/microsoft_2025.consolidated-cash-flow-statement.llm.json"
   }
 }

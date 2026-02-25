@@ -92,7 +92,10 @@ def build_prompt(
     statement_and_supplementary_tables: str,
 ) -> str:
     fields_schema = ",\n".join(
-        [f'        "{field}": number[]' for field in required_fields]
+        [
+            f'        "{field}": [{{"source_label": number}}]'
+            for field in required_fields
+        ]
     )
     prompt = (
         "You are a financial statement extraction engine.\n"
@@ -104,6 +107,7 @@ def build_prompt(
         "    {\n"
         '      "year": "string",\n'
         '      "currency": "string",\n'
+        '      "scale": number,\n'
         '      "values": {\n'
         f"{fields_schema}\n"
         "      }\n"
@@ -113,15 +117,15 @@ def build_prompt(
         "}\n\n"
         "Rules:\n"
         "1) Use every period/column available in the statement.\n"
-        "2) Return numeric array values only (no commas, no currency symbols, no percent signs).\n"
-        "3) If a value cannot be directly mapped to a field, try to map number(s) to the corresponding field (WITHOUT ADDING THEM UP IF THERE ARE MORE THAN ONE NUMBER) by taking into account the industry the company is in, and note what you did in notes field. If you cannot find a match, return an empty array.\n"
-        "4) If multiple numbers make up a field, DO NOT CALCULATE. Simply return them in an array without adding them up.\n"
+        "2) Return an array of maps for each field where each map is {source_label: number} (no commas, no currency symbols, no percent signs in numbers).\n"
+        "3) If multiple elements need to be combined to make up a field, return all of them individually in an array.\n"
+        "4) If a value(s) cannot be directly mapped to a field, try to map element(s) to the corresponding field by taking into account the industry the company is in, and note your reasoning in the notes field. If you cannot find a match, return an empty array.\n"
         "5) If there are multiple close synonyms, use best accounting match.\n"
-        "6) For parentheses negatives, return negative numbers.\n"
-        "7) For year, report the year of the period only.\n"
-        "8) For currency, report its formal 3-letter acronym.\n"
-        "9) For total_operating_cost, list all elements that should be included in standard practice for the industry the company is in. Elements that should be subtracted should be negative.\n"
-        "10) For taxes, interest_expenses, and total_operating_cost, the sign convention should be such that if an element reduces income, it should be positive, and if it increases income, it should be negative.\n"
+        "6) For year, report the year of the period only.\n"
+        "7) For currency, report its formal 3-letter acronym.\n"
+        "8) For scale, report the scale of the values in the statement. For example, if the values are in millions, the scale should be 1E6.\n"
+        "9) For total_operating_cost, list all elements that should be included in standard practice for the industry the company is in.\n"
+        "10) For taxes, interest_expenses, and total_operating_cost, the sign convention should be such that if an element REDUCES income, it should be POSITIVE, and if it INCREASES income, it should be NEGATIVE. Otherwise, generally, numbers in parentheses are negative.\n"
         "11) For marketable_securities, it has to be a liquid asset that can be easily converted to cash.\n"
         "12) Return JSON only.\n\n"
         f"company_id: {company_id}\n\n"
@@ -182,6 +186,45 @@ def to_float_list(value: Any) -> List[float]:
     return [parsed_scalar]
 
 
+def to_labeled_float_list(value: Any) -> List[Dict[str, float]]:
+    if isinstance(value, list):
+        normalized: List[Dict[str, float]] = []
+        fallback_idx = 1
+        for item in value:
+            if isinstance(item, dict):
+                for raw_key, raw_value in item.items():
+                    key = str(raw_key).strip()
+                    if not key:
+                        continue
+                    parsed = to_float_or_none(raw_value)
+                    if parsed is not None:
+                        normalized.append({key: parsed})
+                continue
+
+            # Backward compatibility if the model still emits a bare number array.
+            parsed_scalar = to_float_or_none(item)
+            if parsed_scalar is not None:
+                normalized.append({f"unlabeled_value_{fallback_idx}": parsed_scalar})
+                fallback_idx += 1
+        return normalized
+
+    if isinstance(value, dict):
+        normalized_dict_items: List[Dict[str, float]] = []
+        for raw_key, raw_value in value.items():
+            key = str(raw_key).strip()
+            if not key:
+                continue
+            parsed = to_float_or_none(raw_value)
+            if parsed is not None:
+                normalized_dict_items.append({key: parsed})
+        return normalized_dict_items
+
+    parsed_scalar = to_float_or_none(value)
+    if parsed_scalar is None:
+        return []
+    return [{"unlabeled_value_1": parsed_scalar}]
+
+
 def normalize_periods(periods: Any, required_fields: List[str]) -> List[Dict[str, Any]]:
     if not isinstance(periods, list):
         return []
@@ -192,18 +235,20 @@ def normalize_periods(periods: Any, required_fields: List[str]) -> List[Dict[str
             continue
         period_label = str(period_item.get("year", "")).strip()
         currency_label = str(period_item.get("currency", "")).strip()
+        scale_label = period_item.get("scale", 1)
         values = period_item.get("values", {})
         if not isinstance(values, dict):
             values = {}
 
-        normalized_values: Dict[str, List[float]] = {}
+        normalized_values: Dict[str, List[Dict[str, float]]] = {}
         for field in required_fields:
-            normalized_values[field] = to_float_list(values.get(field))
+            normalized_values[field] = to_labeled_float_list(values.get(field))
 
         normalized.append(
             {
                 "year": period_label,
                 "currency": currency_label,
+                "scale": scale_label,
                 "values": normalized_values,
             }
         )

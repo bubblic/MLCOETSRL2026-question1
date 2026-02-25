@@ -10,32 +10,41 @@
       {
         "year": "2024",
         "currency": "USD",
+        "scale": 1000000,
         "values": {
           "depreciation_and_amortization": [
-            7938.0
+            {
+              "source_label": 7938.0
+            }
           ]
         }
       },
       {
         "year": "2023",
         "currency": "USD",
+        "scale": 1000000,
         "values": {
           "depreciation_and_amortization": [
-            7512.0
+            {
+              "source_label": 7512.0
+            }
           ]
         }
       },
       {
         "year": "2022",
         "currency": "USD",
+        "scale": 1000000,
         "values": {
           "depreciation_and_amortization": [
-            7051.0
+            {
+              "source_label": 7051.0
+            }
           ]
         }
       }
     ],
-    "notes": "Extracted the single 'Depreciation and amortization' value from the operating activities section of the Consolidated Statements of Cash Flows for each year. No other numbers were mapped to this field as the statement provides a single, consolidated figure.",
+    "notes": "Only the 'depreciation_and_amortization' field was requested for extraction. The value was directly mapped from the 'Depreciation and amortization' line item in the operating activities section of the Consolidated Statements of Cash Flows. The supplementary tables contain additional details on operating leases and parent company cash flows, but these are not required for the requested field.",
     "source_file": "extracted_text/jpmorgan_2024.consolidated-cash-flow-statement.llm.json"
   }
 }

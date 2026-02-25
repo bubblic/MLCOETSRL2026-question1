@@ -10,35 +10,50 @@
       {
         "year": "2023",
         "currency": "USD",
+        "scale": 1000000,
         "values": {
           "depreciation_and_amortization": [
-            4904.0,
-            6984.0
+            {
+              "Depreciation and impairment of Equipment on operating leases, net": 4904.0
+            },
+            {
+              "Depreciation, amortization and impairment charges on Property, net": 6984.0
+            }
           ]
         }
       },
       {
         "year": "2022",
         "currency": "USD",
+        "scale": 1000000,
         "values": {
           "depreciation_and_amortization": [
-            4839.0,
-            6451.0
+            {
+              "Depreciation and impairment of Equipment on operating leases, net": 4839.0
+            },
+            {
+              "Depreciation, amortization and impairment charges on Property, net": 6451.0
+            }
           ]
         }
       },
       {
         "year": "2021",
         "currency": "USD",
+        "scale": 1000000,
         "values": {
           "depreciation_and_amortization": [
-            6076.0,
-            5975.0
+            {
+              "Depreciation and impairment of Equipment on operating leases, net": 6076.0
+            },
+            {
+              "Depreciation, amortization and impairment charges on Property, net": 5975.0
+            }
           ]
         }
       }
     ],
-    "notes": "The 'depreciation_and_amortization' field was populated using two line items from the cash flow statement: 'Depreciation and impairment of Equipment on operating leases, net' and 'Depreciation, amortization and impairment charges on Property, net'. Both numbers are provided for each year as separate components, per the instruction not to add them. The currency is USD based on the statement's 'In millions' notation and the company's reporting.",
+    "notes": "The 'depreciation_and_amortization' field is populated by combining two line items from the operating activities section: 'Depreciation and impairment of Equipment on operating leases, net' and 'Depreciation, amortization and impairment charges on Property, net'. This combination follows standard accounting practice for an automotive manufacturer, where both property/plant/equipment and leased assets are significant sources of depreciation and amortization. The scale is 1E6 (millions) as indicated in the statement. The supplementary tables provided details on cash paid for taxes and interest, but these are not part of the requested field.",
     "source_file": "extracted_text/2023 General Motors Annual Report .consolidated-cash-flow-statement.llm.json"
   }
 }

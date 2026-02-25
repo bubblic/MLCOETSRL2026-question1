@@ -14,57 +14,93 @@
       {
         "year": "2024",
         "currency": "EUR",
+        "scale": 1000000,
         "values": {
           "revenue": [
-            324656.0
+            {
+              "Sales revenue": 324656.0
+            }
           ],
           "total_operating_cost": [
-            -265184.0,
-            -22320.0,
-            -12754.0,
-            14974.0,
-            -20312.0
+            {
+              "Cost of sales": 265184.0
+            },
+            {
+              "Distribution expenses": 22320.0
+            },
+            {
+              "Administrative expenses": 12754.0
+            },
+            {
+              "Other operating expenses": 20312.0
+            }
           ],
           "net_income": [
-            12394.0
+            {
+              "Earnings after tax": 12394.0
+            }
           ],
           "taxes": [
-            5858.0,
-            -1447.0
+            {
+              "Current tax expense": 5858.0
+            },
+            {
+              "Deferred tax income": -1447.0
+            }
           ],
           "interest_expenses": [
-            3446.0
+            {
+              "Interest expenses": 3446.0
+            }
           ]
         }
       },
       {
         "year": "2023",
         "currency": "EUR",
+        "scale": 1000000,
         "values": {
           "revenue": [
-            322284.0
+            {
+              "Sales revenue": 322284.0
+            }
           ],
           "total_operating_cost": [
-            -261299.0,
-            -21345.0,
-            -12729.0,
-            15152.0,
-            -19534.0
+            {
+              "Cost of sales": 261299.0
+            },
+            {
+              "Distribution expenses": 21345.0
+            },
+            {
+              "Administrative expenses": 12729.0
+            },
+            {
+              "Other operating expenses": 19534.0
+            }
           ],
           "net_income": [
-            17861.0
+            {
+              "Earnings after tax": 17861.0
+            }
           ],
           "taxes": [
-            6791.0,
-            -1554.0
+            {
+              "Current tax expense": 6791.0
+            },
+            {
+              "Deferred tax income": -1554.0
+            }
           ],
           "interest_expenses": [
-            3640.0
+            {
+              "Interest expenses": 3640.0
+            }
           ]
         }
       }
     ],
-    "notes": "Extracted from the Consolidated Income Statement on Page 471. Revenue mapped from 'Sales revenue'. Total operating cost includes all items from the operating section before 'Operating result': Cost of sales, Distribution expenses, Administrative expenses, Other operating income (added as a positive component as it reduces total cost), and Other operating expenses. Net income mapped from 'Earnings after tax'. Taxes include current tax expense (positive as it reduces income) and deferred tax income (negative as it increases income). Interest expenses extracted directly from the statement. All values are in € million as per the statement. The sign convention follows the rule: items that reduce income are positive, items that increase income are negative. For total_operating_cost, the array lists the components in the order they appear: Cost of sales, Distribution expenses, Administrative expenses, Other operating income, Other operating expenses.",
+    "notes": "1. Revenue is mapped from 'Sales revenue'. 2. Total operating cost includes Cost of sales, Distribution expenses, Administrative expenses, and Other operating expenses, as these are the standard operating cost components for an automotive manufacturer. Other operating income is not included as it is a separate income line. 3. Net income is mapped from 'Earnings after tax'. 4. Taxes are broken down into Current tax expense (positive as it reduces income) and Deferred tax income (negative as it increases income), per the sign convention. 5. Interest expenses are taken directly from the line item. All values are in € million (scale 1E6).",
     "source_file": "extracted_text/volkswagen_2024.consolidated-income-statement.llm.json"
   }
 }

@@ -10,32 +10,41 @@
       {
         "year": "2024",
         "currency": "USD",
+        "scale": 1000000,
         "values": {
           "depreciation_and_amortization": [
-            23442.0
+            {
+              "source_label": 23442.0
+            }
           ]
         }
       },
       {
         "year": "2023",
         "currency": "USD",
+        "scale": 1000000,
         "values": {
           "depreciation_and_amortization": [
-            20641.0
+            {
+              "source_label": 20641.0
+            }
           ]
         }
       },
       {
         "year": "2022",
         "currency": "USD",
+        "scale": 1000000,
         "values": {
           "depreciation_and_amortization": [
-            24040.0
+            {
+              "source_label": 24040.0
+            }
           ]
         }
       }
     ],
-    "notes": "Extracted 'Depreciation and depletion (includes impairments)' line item as the value for 'depreciation_and_amortization'. The field name in the statement is a close synonym and includes impairments, which is a standard adjustment for this industry. Values are taken directly from the primary statement table. Parentheses in the source indicate negatives, but all values here are positive.",
+    "notes": "Only the 'depreciation_and_amortization' field was requested for extraction. The primary statement line 'Depreciation and depletion (includes impairments)' was mapped to this field as it is the standard accounting match for the oil and gas industry. All other cash flow statement line items were not requested and are therefore not included in the output.",
     "source_file": "extracted_text/exxon_2024.consolidated-cash-flow-statement.llm.json"
   }
 }

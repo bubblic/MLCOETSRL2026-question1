@@ -16,62 +16,116 @@
       {
         "year": "2024",
         "currency": "CNY",
+        "scale": 1000000,
         "values": {
           "cash_and_cash_equivalents": [
-            132519.0
+            {
+              "Cash and cash equivalents": 132519.0
+            }
           ],
           "marketable_securities": [
-            9568.0,
-            3345.0
+            {
+              "Financial assets at fair value through profit or loss (Current)": 9568.0
+            },
+            {
+              "Financial assets at fair value through other comprehensive income (Current)": 3345.0
+            },
+            {
+              "Term deposits (Current)": 192977.0
+            }
           ],
           "accounts_receivable": [
-            48203.0
+            {
+              "Accounts receivable": 48203.0
+            }
           ],
           "total_current_liabilities": [
-            396909.0
+            {
+              "Total current liabilities": 396909.0
+            }
           ],
           "total_debt_short_term_and_long_term": [
-            199406.0,
-            139209.0
+            {
+              "Borrowings (Non-current)": 146521.0
+            },
+            {
+              "Borrowings (Current)": 52885.0
+            },
+            {
+              "Notes payable (Non-current)": 130586.0
+            },
+            {
+              "Notes payable (Current)": 8623.0
+            }
           ],
           "total_equity": [
-            1053896.0
+            {
+              "Total equity": 1053896.0
+            }
           ],
           "total_assets": [
-            1780995.0
+            {
+              "Total assets": 1780995.0
+            }
           ]
         }
       },
       {
         "year": "2023",
         "currency": "CNY",
+        "scale": 1000000,
         "values": {
           "cash_and_cash_equivalents": [
-            172320.0
+            {
+              "Cash and cash equivalents": 172320.0
+            }
           ],
           "marketable_securities": [
-            14903.0
+            {
+              "Financial assets at fair value through profit or loss (Current)": 14903.0
+            },
+            {
+              "Term deposits (Current)": 185983.0
+            }
           ],
           "accounts_receivable": [
-            46606.0
+            {
+              "Accounts receivable": 46606.0
+            }
           ],
           "total_current_liabilities": [
-            352157.0
+            {
+              "Total current liabilities": 352157.0
+            }
           ],
           "total_debt_short_term_and_long_term": [
-            197356.0,
-            151262.0
+            {
+              "Borrowings (Non-current)": 155819.0
+            },
+            {
+              "Borrowings (Current)": 41537.0
+            },
+            {
+              "Notes payable (Non-current)": 137101.0
+            },
+            {
+              "Notes payable (Current)": 14161.0
+            }
           ],
           "total_equity": [
-            873681.0
+            {
+              "Total equity": 873681.0
+            }
           ],
           "total_assets": [
-            1577246.0
+            {
+              "Total assets": 1577246.0
+            }
           ]
         }
       }
     ],
-    "notes": "1. Currency identified as Chinese Yuan (CNY). 2. 'Marketable Securities' mapped from 'Financial assets at fair value through profit or loss' and 'Financial assets at fair value through other comprehensive income' under Current Assets, as these are liquid financial instruments. For 2023, only FVPL was present in current assets; FVOCI in current assets was '–' (zero). 3. 'Total Debt (short-term and long-term)' mapped as separate arrays for 'Borrowings' and 'Notes Payable' from both current and non-current liabilities, as per the supplementary table 'Capital Risk Management - Total Debts/Adjusted EBITDA'. 4. 'Total Equity' taken directly from the balance sheet line. 5. 'Total Current Liabilities' taken directly from the balance sheet line. 6. 'Total Assets' taken directly from the balance sheet line. 7. All values are in RMB millions, as per the statement.",
+    "notes": "1. 'Marketable Securities' includes current financial assets at FVPL, current financial assets at FVOCI, and current term deposits, as these are highly liquid and can be readily converted to cash. Non-current term deposits are excluded as they are less liquid. 2. 'Total Debt' is the sum of all Borrowings and Notes Payable (both current and non-current portions), as per the supplementary table 'Capital Risk Management - Total Debts/Adjusted EBITDA'. 3. All values are extracted directly from the primary balance sheet. 4. The scale is in millions (RMB in Millions).",
     "source_file": "extracted_text/tencent_2024.consolidated-balance-sheet.llm.json"
   }
 }

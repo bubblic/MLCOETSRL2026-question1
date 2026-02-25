@@ -16,61 +16,95 @@
       {
         "year": "2024",
         "currency": "EUR",
+        "scale": 1000000,
         "values": {
           "cash_and_cash_equivalents": [
-            40296.0
+            {
+              "Cash and cash equivalents": 40296.0
+            }
           ],
           "marketable_securities": [
-            27326.0
+            {
+              "Marketable securities and time deposits": 27326.0
+            }
           ],
           "accounts_receivable": [
-            21130.0
+            {
+              "Trade receivables": 21130.0
+            }
           ],
           "total_current_liabilities": [
-            217039.0
+            {
+              "Total current liabilities": 217039.0
+            }
           ],
           "total_debt_short_term_and_long_term": [
-            117020.0,
-            137061.0
+            {
+              "Financial liabilities (Non-current)": 137061.0
+            },
+            {
+              "Financial liabilities (Current)": 117020.0
+            }
           ],
           "total_equity": [
-            196731.0
+            {
+              "Total equity": 196731.0
+            }
           ],
           "total_assets": [
-            632905.0
+            {
+              "Total assets": 632905.0
+            }
           ]
         }
       },
       {
         "year": "2023",
         "currency": "EUR",
+        "scale": 1000000,
         "values": {
           "cash_and_cash_equivalents": [
-            43449.0
+            {
+              "Cash and cash equivalents": 43449.0
+            }
           ],
           "marketable_securities": [
-            26772.0
+            {
+              "Marketable securities and time deposits": 26772.0
+            }
           ],
           "accounts_receivable": [
-            21849.0
+            {
+              "Trade receivables": 21849.0
+            }
           ],
           "total_current_liabilities": [
-            206036.0
+            {
+              "Total current liabilities": 206036.0
+            }
           ],
           "total_debt_short_term_and_long_term": [
-            110476.0,
-            122323.0
+            {
+              "Financial liabilities (Non-current)": 122323.0
+            },
+            {
+              "Financial liabilities (Current)": 110476.0
+            }
           ],
           "total_equity": [
-            189186.0
+            {
+              "Total equity": 189186.0
+            }
           ],
           "total_assets": [
-            600649.0
+            {
+              "Total assets": 600649.0
+            }
           ]
         }
       }
     ],
-    "notes": "1) Extracted from the primary consolidated balance sheet on page 474. 2) 'Marketable securities and time deposits' (Note 22) is mapped to 'marketable_securities' as it is described as a liquid asset. 3) 'Trade receivables' is mapped to 'accounts_receivable'. 4) 'Total debt short term and long term' is represented as an array containing two numbers: first the 'Financial liabilities' under 'Current liabilities' and second the 'Financial liabilities' under 'Non-current liabilities', as per the primary statement. They are not summed per the rules. 5) All values are in € million as per the statement.",
+    "notes": "All values extracted directly from the primary consolidated balance sheet on Page 474. The 'Marketable securities and time deposits' line item is mapped to 'marketable_securities' as it is described as a liquid asset. 'Total debt short-term and long-term' is constructed by summing the 'Financial liabilities' line items from both the non-current and current sections. The 'accounts_receivable' field maps to 'Trade receivables'. All other fields map directly to single line items in the statement. The scale is in millions (€ million).",
     "source_file": "extracted_text/volkswagen_2024.consolidated-balance-sheet.llm.json"
   }
 }

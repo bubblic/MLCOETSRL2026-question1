@@ -16,89 +16,140 @@
       {
         "year": "2024",
         "currency": "EUR",
+        "scale": 1000000,
         "values": {
           "cash_and_cash_equivalents": [
-            9631.0
+            {
+              "Cash and cash equivalents": 9631.0
+            }
           ],
           "marketable_securities": [
-            3956.0
+            {
+              "Current available for sale financial assets": 3956.0
+            }
           ],
           "accounts_receivable": [
-            4730.0
+            {
+              "Trade accounts receivable": 4730.0
+            }
           ],
           "total_current_liabilities": [
-            33696.0
+            {
+              "Total current liabilities": 33696.0
+            }
           ],
           "total_debt_short_term_and_long_term": [
-            12091.0,
-            10851.0
+            {
+              "Long-term borrowings": 12091.0
+            },
+            {
+              "Short-term borrowings": 10851.0
+            }
           ],
           "total_equity": [
-            69287.0
+            {
+              "Total equity": 69287.0
+            }
           ],
           "total_assets": [
-            149190.0
+            {
+              "Total assets": 149190.0
+            }
           ]
         }
       },
       {
         "year": "2023",
         "currency": "EUR",
+        "scale": 1000000,
         "values": {
           "cash_and_cash_equivalents": [
-            7774.0
+            {
+              "Cash and cash equivalents": 7774.0
+            }
           ],
           "marketable_securities": [
-            3490.0
+            {
+              "Current available for sale financial assets": 3490.0
+            }
           ],
           "accounts_receivable": [
-            4728.0
+            {
+              "Trade accounts receivable": 4728.0
+            }
           ],
           "total_current_liabilities": [
-            33145.0
+            {
+              "Total current liabilities": 33145.0
+            }
           ],
           "total_debt_short_term_and_long_term": [
-            11227.0,
-            10680.0
+            {
+              "Long-term borrowings": 11227.0
+            },
+            {
+              "Short-term borrowings": 10680.0
+            }
           ],
           "total_equity": [
-            62701.0
+            {
+              "Total equity": 62701.0
+            }
           ],
           "total_assets": [
-            143694.0
+            {
+              "Total assets": 143694.0
+            }
           ]
         }
       },
       {
         "year": "2022",
         "currency": "EUR",
+        "scale": 1000000,
         "values": {
           "cash_and_cash_equivalents": [
-            7300.0
+            {
+              "Cash and cash equivalents": 7300.0
+            }
           ],
           "marketable_securities": [
-            3552.0
+            {
+              "Current available for sale financial assets": 3552.0
+            }
           ],
           "accounts_receivable": [
-            4258.0
+            {
+              "Trade accounts receivable": 4258.0
+            }
           ],
           "total_current_liabilities": [
-            31543.0
+            {
+              "Total current liabilities": 31543.0
+            }
           ],
           "total_debt_short_term_and_long_term": [
-            10380.0,
-            9359.0
+            {
+              "Long-term borrowings": 10380.0
+            },
+            {
+              "Short-term borrowings": 9359.0
+            }
           ],
           "total_equity": [
-            56604.0
+            {
+              "Total equity": 56604.0
+            }
           ],
           "total_assets": [
-            134646.0
+            {
+              "Total assets": 134646.0
+            }
           ]
         }
       }
     ],
-    "notes": "1) 'marketable_securities' mapped to 'Current available for sale financial assets' from Note 13/14, as these are liquid assets. 'Non-current available for sale financial assets' (Note 9) are not included as they are not current. 2) 'total_debt_short_term_and_long_term' mapped to 'Long-term borrowings' and 'Short-term borrowings' from Note 19.1, returned as separate numbers in the array per rule 4. 3) 'accounts_receivable' mapped to 'Trade accounts receivable' from the primary statement. 4) All other values mapped directly from the primary consolidated balance sheet table.",
+    "notes": "Extracted values are from the primary consolidated balance sheet. 'Marketable securities' is mapped to 'Current available for sale financial assets' from Note 13/14, as these are liquid financial assets. 'Total debt' is the sum of 'Long-term borrowings' and 'Short-term borrowings' from Note 19. All other fields map directly to primary statement line items. The scale is 1,000,000 (EUR millions) as indicated. The 'total_debt_short_term_and_long_term' field combines two separate line items, each listed in its own object in the array.",
     "source_file": "extracted_text/lvmh_dec_2024.consolidated-balance-sheet.llm.json"
   }
 }
