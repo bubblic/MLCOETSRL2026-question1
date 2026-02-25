@@ -1,6 +1,6 @@
 """Top-level orchestration for training and forecast runs."""
 
-from typing import Any, Dict
+from typing import Dict, Mapping, Optional, Sequence
 
 import numpy as np
 import tensorflow as tf
@@ -57,21 +57,72 @@ def _build_state_from_index(
     }
 
 
+def _validate_historical_data(data: Mapping[str, np.ndarray]) -> None:
+    """Validate required historical data keys."""
+    required_keys = {
+        "sales",
+        "purchases",
+        "cogs",
+        "nca",
+        "depreciation",
+        "advance_payments_purchases",
+        "accounts_receivable",
+        "accounts_payable",
+        "advance_payments_sales",
+        "cash",
+        "ims",
+        "inventory",
+        "current_liabilities",
+        "non_current_liabilities",
+        "equity",
+        "net_income",
+        "dividends",
+        "stock_buyback",
+        "opex",
+        "tax",
+        "inflation",
+        "current_lt_debt",
+        "interest_payment",
+        "ms_return",
+        "tax_onetime_payments",
+    }
+    missing = sorted(required_keys.difference(data.keys()))
+    if missing:
+        raise ValueError(
+            "historical_data is missing required keys: " + ", ".join(missing)
+        )
+
+
 def run_training_and_forecast(
     use_trained_parameters: bool = False,
     parameters_path: str = "trained_parameters.npz",
     use_inflation: bool = True,
     include_tax_anomalies: bool = True,
+    historical_data: [Mapping[str, np.ndarray]] ,
+    sales_forecast_usd: [Sequence[float]] ,
+    inflation_forecast: [Sequence[float]] ,
+    simple_policy_epochs: int = 25000,
+    structural_epochs: int = 20000,
+    monte_carlo_samples: int = 1000,
 ) -> None:
     """Run model training (optional), forecast simulation, and plotting.
 
     This function preserves the historical training/forecast flow and output
-    artifacts while centralizing orchestration in one place.
+    artifacts while centralizing orchestration in one place. Callers may
+    optionally provide preloaded historical data and forecast assumptions.
     """
+    if simple_policy_epochs < 1:
+        raise ValueError("simple_policy_epochs must be >= 1")
+    if structural_epochs < 1:
+        raise ValueError("structural_epochs must be >= 1")
+    if monte_carlo_samples < 1:
+        raise ValueError("monte_carlo_samples must be >= 1")
+
     model = TrainableFinancialModel(base_year=2018)
 
     # --- 1. LOAD HISTORICAL DATA FROM APPLE (2018-2025) ---
-    data = get_apple_historical_data()
+    data = historical_data
+    _validate_historical_data(data)
     sales_hist = data["sales"]
     purchases_hist = data["purchases"]
     cogs_hist = data["cogs"]
@@ -169,6 +220,7 @@ def run_training_and_forecast(
             historical_eff_st_debt=effective_st_debt_hist_bil[:-1],
             historical_inflation=inflation_hist[:-1],
             historical_years=train_years,
+            epochs=simple_policy_epochs,
             show_plot=False,
             loss_scale_mode="std",
         )
@@ -199,6 +251,7 @@ def run_training_and_forecast(
             historical_tax_onetime_payments=tax_onetime_payments_hist_bil[:-1],
             historical_inflation=inflation_hist[:-1],
             historical_years=train_years,
+            epochs=structural_epochs,
             loss_scale_mode="std",
         )
         model.save_parameters(parameters_path)
@@ -250,15 +303,12 @@ def run_training_and_forecast(
 
     # Forecast Drivers: Sales is the sole exogenous driver.
     # Purchases are derived inside forecast_step from the learned cost ratio.
-    n_hist = len(sales_hist)  # 8 (FY2018-FY2025)
-    n_forecast_years = 10
-    # Average linear growth per year from full historical data
-    yearly_deltas = np.diff(sales_hist_bil)
-    avg_linear_growth = np.mean(yearly_deltas)
-    sales_forecast = np.array(
-        [sales_hist_bil[-1] + avg_linear_growth * i for i in range(n_forecast_years)],
-        dtype=np.float64,
-    )
+    n_hist = len(sales_hist)  # e.g. 8 for FY2018-FY2025
+    sales_forecast_usd_array = np.asarray(sales_forecast_usd, dtype=np.float64)
+    if sales_forecast_usd_array.ndim != 1 or sales_forecast_usd_array.size == 0:
+        raise ValueError("sales_forecast_usd must be a non-empty 1D sequence")
+    sales_forecast = sales_forecast_usd_array / amount_scale
+    n_forecast_years = int(sales_forecast.size)
     # Forecast starts at FY2025 (last historical year) and continues forward
     last_hist_year = model.base_year + n_hist - 1  # FY2025
     forecast_years = np.arange(
@@ -269,14 +319,17 @@ def run_training_and_forecast(
     cum_inf_hist = np.cumprod(1 + inflation_hist)
     last_historical_cum_inf = cum_inf_hist[-1]
 
-    # Forecast inflation rate assumptions
-    inflation_forecast = np.array(
-        [0.03, 0.03, 0.03, 0.03, 0.03, 0.03, 0.03, 0.03, 0.03, 0.03],
-        dtype=np.float64,
-    )
+    inflation_forecast_array = np.asarray(inflation_forecast, dtype=np.float64)
+    if (
+        inflation_forecast_array.ndim != 1
+        or inflation_forecast_array.size != n_forecast_years
+    ):
+        raise ValueError(
+            "inflation_forecast must be a 1D sequence with the same length as sales_forecast_usd"
+        )
     if not use_inflation:
-        inflation_forecast = np.zeros_like(inflation_forecast)
-    cum_inf_forecast = last_historical_cum_inf * np.cumprod(1 + inflation_forecast)
+        inflation_forecast_array = np.zeros_like(inflation_forecast_array)
+    cum_inf_forecast = last_historical_cum_inf * np.cumprod(1 + inflation_forecast_array)
 
     # --- Execute Monte Carlo Forecast ---
     forecast_trajectories = run_monte_carlo_forecast(
@@ -285,7 +338,7 @@ def run_training_and_forecast(
         sales_forecast,
         cum_inf_forecast,
         forecast_years,
-        n_samples=1000,
+        n_samples=monte_carlo_samples,
     )
 
     # --- 6. COMPUTE ONE-STEP-AHEAD HISTORICAL FIT ---
@@ -489,13 +542,4 @@ def run_training_and_forecast(
         historical_fit=historical_fit,
         historical_fit_years=historical_fit_years,
         show_plot=False,
-    )
-
-
-if __name__ == "__main__":
-    run_training_and_forecast(
-        use_trained_parameters=False,
-        parameters_path="trained_parameters_include_tax_anomalies.npz",
-        use_inflation=True,  # Set to False to disable inflation (all rates → 0%)
-        include_tax_anomalies=True,
     )
