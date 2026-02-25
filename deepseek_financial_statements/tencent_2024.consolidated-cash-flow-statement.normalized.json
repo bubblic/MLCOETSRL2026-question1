@@ -28,7 +28,7 @@
         }
       }
     ],
-    "notes": "The 'depreciation_and_amortization' field was populated using the values from the supplementary reconciliation note 43(a). The values correspond to 'Depreciation of property, plant and equipment, investment properties and right-of-use assets' and 'Amortisation of intangible assets and land use rights' for each year, as these are the standard components of D&A. The numbers were extracted directly without summation, as per the schema requirement for an array.",
+    "notes": "The 'depreciation_and_amortization' field was populated using the 'Depreciation of property, plant and equipment, investment properties and right-of-use assets' and 'Amortisation of intangible assets and land use rights' lines from the supplementary reconciliation table (Note 43(a)). These are the two standard components that make up the total depreciation and amortization expense. They are reported as separate numbers in the array, as per the instruction not to add them up.",
     "source_file": "extracted_text/tencent_2024.consolidated-cash-flow-statement.llm.json"
   }
 }

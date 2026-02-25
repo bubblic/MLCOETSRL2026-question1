@@ -1,0 +1,101 @@
+{
+  "query": "Consolidated Balance Sheet",
+  "selected_pages": {
+    "primary_statement_pages": [
+      55,
+      246,
+      247,
+      309
+    ],
+    "supplementary_pages": [
+      55,
+      82,
+      83,
+      84,
+      85,
+      86,
+      87,
+      88,
+      89,
+      90,
+      91,
+      92,
+      93,
+      94,
+      95,
+      96,
+      97,
+      98,
+      99,
+      246,
+      247,
+      254,
+      255,
+      256,
+      257,
+      258,
+      259,
+      260,
+      261,
+      262,
+      263,
+      264,
+      265,
+      266,
+      267,
+      268,
+      269,
+      270,
+      271,
+      272,
+      273,
+      274,
+      275,
+      276,
+      277,
+      278,
+      279,
+      280,
+      281,
+      282,
+      283,
+      284,
+      285,
+      286,
+      287,
+      288,
+      289,
+      290,
+      291,
+      292,
+      293,
+      294,
+      295,
+      296,
+      297,
+      298,
+      299,
+      317,
+      318,
+      319,
+      320,
+      321
+    ]
+  },
+  "extraction": {
+    "primary_statement": {
+      "raw_response": "Based on the provided pages, the table corresponding to the **Consolidated Balance Sheet** is found on pages 246 and 247. Here is the combined data presented in a tabular format.\n\n### Consolidated Balance Sheet\n**As of March 31**\n\n| Item (in RMB millions, except per share data) | Notes | 2024 (RMB mn) | 2025 (RMB mn) | 2025 (USD mn) |\n| :--- | :--- | :---: | :---: | :---: |\n| **ASSETS** | | | | |\n| **Current assets:** | | | | |\n| Cash and cash equivalents | 2(p) | 248,125 | 145,487 | 20,049 |\n| Short-term investments | 2(q) | 262,955 | 228,826 | 31,533 |\n| Restricted cash and escrow receivables | 10 | 38,299 | 43,781 | 6,033 |\n| Equity securities and other investments | 11 | 59,949 | 53,780 | 7,411 |\n| Prepayments, receivables and other assets | 13 | 143,536 | 202,175 | 27,860 |\n| **Total current assets** | | **752,864** | **674,049** | **92,886** |\n| Equity securities and other investments | 11 | 220,942 | 356,818 | 49,171 |\n| Prepayments, receivables and other assets | 13 | 116,102 | 83,431 | 11,497 |\n| Investments accounted for using the equity method | 14 | 203,131 | 210,169 | 28,962 |\n| Property and equipment, net | 15 | 185,161 | 203,348 | 28,022 |\n| Intangible assets, net | 16 | 26,950 | 20,911 | 2,882 |\n| Goodwill | 17 | 259,679 | 255,501 | 35,209 |\n| **Total assets** | | **1,764,829** | **1,804,227** | **248,629** |\n| | | | | |\n| **LIABILITIES, MEZZANINE EQUITY AND SHAREHOLDERS’ EQUITY** | | | | |\n| **Current liabilities:** | | | | |\n| Short-term bank borrowings | 21 | 12,749 | 22,562 | 3,109 |\n| Short-term unsecured senior notes | 22 | 16,252 | — | — |\n| Income tax payable | | 9,068 | 11,638 | 1,604 |\n| Accrued expenses, accounts payable and other liabilities | 19 | 297,883 | 332,537 | 45,825 |\n| Merchant deposits | 2(ac) | 12,737 | 274 | 37 |\n| Deferred revenue and customer advances | 18 | 72,818 | 68,335 | 9,417 |\n| **Total current liabilities** | | **421,507** | **435,346** | **59,992** |\n| Deferred revenue | 18 | 4,069 | 4,536 | 625 |\n| Deferred tax liabilities | 7 | 53,012 | 48,454 | 6,677 |\n| Long-term bank borrowings | 21 | 55,686 | 49,909 | 6,878 |\n| Long-term unsecured senior notes | 22 | 86,089 | 122,398 | 16,867 |\n| Long-term convertible unsecured senior notes | 23 | — | 35,834 | 4,938 |\n| Other liabilities | 19 | 31,867 | 17,644 | 2,432 |\n| **Total liabilities** | | **652,230** | **714,121** | **98,409** |\n| Commitments and contingencies | 26, 27 | | | |\n| Mezzanine equity | | 10,728 | 11,713 | 1,613 |\n| **Shareholders’ equity:** | | | | |\n| Ordinary shares, par value US$0.000003125 per share; <br> Authorized: 32,000,000,000 shares as of March 31, 2024 and 2025; <br> Issued and outstanding: 19,469,126,956 and 18,474,235,708 shares as of March 31, 2024 and 2025, respectively | | 1 | 1 | — |\n| Capital surplus | | 397,999 | 381,379 | 52,555 |\n| Treasury shares, at cost | 2(af) | (27,684) | (36,329) | (5,006) |\n| Statutory reserves | 2(ag) | 14,733 | 15,936 | 2,196 |\n| Accumulated other comprehensive income (loss): | | | | |\n| Cumulative foreign currency translation adjustment | | 3,635 | 3,286 | 453 |\n| Unrealized (loss) gain on interest rate swaps and others | | (37) | 107 | 15 |\n| Retained earnings | | 597,897 | 645,478 | 88,949 |\n| **Total shareholders’ equity** | | **986,544** | **1,009,858** | **139,162** |\n| Non-controlling interests | | 115,327 | 68,535 | 9,445 |\n| **Total equity** | | **1,101,871** | **1,078,393** | **148,607** |\n| **Total liabilities, mezzanine equity and equity** | | **1,764,829** | **1,804,227** | **248,629** |\n\n*The accompanying notes form an integral part of these consolidated financial statements.*"
+    },
+    "supplementary": {
+      "supplementary_tables": [],
+      "chunk_responses": [
+        {
+          "raw_response": "Based on the primary statement (Consolidated Balance Sheet) and the provided pages, I have identified several supplementary tables that provide breakdowns, expansions, or schedules related to the line items from the balance sheet. The most relevant ones are the **Variable Interest Entity (VIE) financial data tables** on pages 82-86, which provide a detailed breakdown of assets, liabilities, and equity by entity type (Parent, Other subsidiaries and consolidated entities, Major VIE entities and their subsidiaries, etc.). These tables effectively disaggregate the consolidated totals from the primary balance sheet.\n\nHere are the extracted supplementary tables in a tabular format:\n\n### 1. Supplementary Table: Consolidated Balance Sheet by Entity Type (As of March 31, 2025)\nThis table breaks down the consolidated balance sheet totals into major entity groups.\n\n| Item (in RMB millions, except per share data) | Parent | Other subsidiaries and consolidated entities | Major VIE entities and their subsidiaries | Major VIE entities' primary beneficiary | Eliminations | Consolidated Total | USD mn |\n| :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: |\n| **ASSETS** | | | | | | | |\n| Cash and cash equivalents and short-term investments | 618 | 292,918 | 5,542 | 75,235 | — | 374,313 | 51,582 |\n| Equity method investments and equity securities and other investments | — | 288,039 | 26,433 | 306,295 | — | 620,767 | 85,544 |\n| Accounts receivable and contract assets (net of allowance) | — | 13,676 | 16,159 | 1,337 | — | 31,172 | 4,295 |\n| Amounts due from group companies | 15,170 | 406,817 | 48,184 | 285,523 | (755,694) | — | — |\n| Prepayments and other assets | 245 | 223,039 | 28,413 | 46,518 | — | 298,215 | 41,095 |\n| Interests in subsidiaries and VIE entities | 1,365,004 | 422,662 | — | 3,423 | (1,791,089) | — | — |\n| Property and equipment and intangible assets | — | 182,309 | 18,357 | 23,593 | — | 224,259 | 30,904 |\n| Goodwill | — | 253,475 | 2,026 | — | — | 255,501 | 35,209 |\n| **Total assets** | **1,381,037** | **2,082,935** | **145,114** | **741,924** | **(2,546,783)** | **1,804,227** | **248,629** |\n| **LIABILITIES AND EQUITY** | | | | | | | |\n| Amounts due to group companies | 184,879 | 268,040 | 85,437 | 217,338 | (755,694) | — | — |\n| Accrued and other liabilities | 186,300 | 316,759 | 39,784 | 98,407 | — | 641,250 | 88,367 |\n| Deferred revenue and customer advances | — | 52,685 | 16,669 | 3,517 | — | 72,871 | 10,042 |\n| **Total liabilities** | **371,179** | **637,484** | **141,890** | **319,262** | **(755,694)** | **714,121** | **98,409** |\n| Mezzanine equity | — | 11,713 | — | — | — | 11,713 | 1,613 |\n| **Total shareholders' equity** | **1,009,858** | **1,365,004** | **3,423** | **422,662** | **(1,791,089)** | **1,009,858** | **139,162** |\n| Non-controlling interests | — | 68,734 | (199) | — | — | 68,535 | 9,445 |\n| **Total equity** | **1,009,858** | **1,433,738** | **3,224** | **422,662** | **(1,791,089)** | **1,078,393** | **148,607** |\n| **Total liabilities, mezzanine equity and equity** | **1,381,037** | **2,082,935** | **145,114** | **741,924** | **(2,546,783)** | **1,804,227** | **248,629** |\n\n### 2. Supplementary Table: Consolidated Balance Sheet by Entity Type (As of March 31, 2024)\nThis table provides the same breakdown for the prior year.\n\n| Item (in RMB millions) | Parent | Other subsidiaries and consolidated entities | Major VIE entities and their subsidiaries | Major VIE entities' primary beneficiary | Eliminations | Consolidated Total |\n| :--- | :---: | :---: | :---: | :---: | :---: | :---: |\n| **ASSETS** | | | | | | |\n| Cash and cash equivalents and short-term investments | 1,114 | 332,430 | 21,276 | 156,260 | — | 511,080 |\n| Equity method investments and equity securities and other investments | — | 242,911 | 27,018 | 214,093 | — | 484,022 |\n| Accounts receivable and contract assets (net of allowance) | — | 14,074 | 15,608 | 1,004 | — | 30,686 |\n| Amounts due from group companies | 49,096 | 299,957 | 31,746 | 227,363 | (608,162) | — |\n| Prepayments and other assets | 527 | 198,891 | 24,104 | 43,729 | — | 267,251 |\n| Interests in subsidiaries and VIE entities | 1,180,705 | 402,275 | — | 4,983 | (1,587,963) | — |\n| Property and equipment and intangible assets | — | 186,545 | 10,053 | 15,513 | — | 212,111 |\n| Goodwill | — | 257,719 | 1,960 | — | — | 259,679 |\n| **Total assets** | **1,231,442** | **1,934,802** | **131,765** | **662,945** | **(2,196,125)** | **1,764,829** |\n| **LIABILITIES AND EQUITY** | | | | | | |\n| Amounts due to group companies | 110,867 | 242,279 | 75,643 | 179,373 | (608,162) | — |\n| Accrued and other liabilities | 134,031 | 327,402 | 36,467 | 77,443 | — | 575,343 |\n| Deferred revenue and customer advances | — | 58,166 | 14,867 | 3,854 | — | 76,887 |\n| **Total liabilities** | **244,898** | **627,847** | **126,977** | **260,670** | **(608,162)** | **652,230** |\n| Mezzanine equity | — | 10,728 | — | — | — | 10,728 |\n| **Total shareholders' equity** | **986,544** | **1,180,705** | **4,983** | **402,275** | **(1,587,963)** | **986,544** |\n| Non-controlling interests | — | 115,522 | (195) | — | — | 115,327 |\n| **Total equity** | **986,544** | **1,296,227** | **4,788** | **402,275** | **(1,587,963)** | **1,101,871** |\n| **Total liabilities, mezzanine equity and equity** | **1,231,442** | **1,934,802** | **131,765** | **662,945** | **(2,196,125)** | **1,764,829** |\n\n### 3. Supplementary Table: Financial Data of Consolidated VIE Entities (From Notes)\nThis table, found in Note 2(c) on page 257, provides a summary of the assets, liabilities, and selected financial data of the consolidated VIE entities themselves.\n\n| Item (in RMB millions) | As of / For the year ended March 31, 2024 | As of / For the year ended March 31, 2025 |\n| :--- | :---: | :---: |\n| **Balance Sheet Data** | | |\n| Cash and cash equivalents and short-term investments | 25,825 | 10,621 |\n| Equity method investments and equity securities and other investments | 35,228 | 37,117 |\n| Accounts receivable and contract assets (net of allowance) | 16,884 | 18,408 |\n| Amounts due from non-VIE subsidiary companies | 36,405 | 53,792 |\n| Property and equipment, net and intangible assets, net | 11,927 | 19,911 |\n| Other assets | 33,276 | 40,429 |\n| **Total assets** | **159,545** | **180,278** |\n| Amounts due to non-VIE subsidiary companies | 99,404 | 113,332 |\n| Accrued expenses, accounts payable and other liabilities | 45,634 | 50,521 |\n| Deferred revenue and customer advances | 15,586 | 19,126 |\n| **Total liabilities** | **160,624** | **182,979** |\n| **Income Statement Data** | | |\n| Revenue | 117,686 | 137,708 |\n| Net profit (loss) | (3,193) | (850) |\n| **Cash Flow Data** | | |\n| Net cash provided by (used in) operating activities | 12,053 | (992) |\n| Net cash used in investing activities | (11,772) | (33,847) |\n| Net cash provided by financing activities | 5,626 | 25,933 |\n\nThese tables are directly related to the primary Consolidated Balance Sheet as they provide a detailed entity-wise decomposition of the consolidated figures and specific data on the consolidated VIE entities, which are a significant component of the group's structure."
+        },
+        {
+          "raw_response": "Based on the primary statement (Consolidated Balance Sheet) and the provided pages, I have identified several line items that have supplementary disclosures. The main supplementary tables found are breakdowns and schedules for specific balance sheet accounts. Here is the extraction in a tabular format:\n\n| Primary Statement Line Item | Note Reference | Supplementary Table Description | Page | Details |\n| :--- | :--- | :--- | :--- | :--- |\n| **Restricted cash and escrow receivables** | 10 | Breakdown of restricted cash and escrow receivables. | 287 | Shows components: Buyer protection fund deposits and Other. |\n| **Equity securities and other investments** | 11 | Detailed composition and fair value hierarchy of investments. | 288-291 | Breakdown by type (equity securities, debt investments, other financial investments) and cost/impairment. Includes fair value hierarchy table (Level 1, 2, 3). |\n| **Prepayments, receivables and other assets** | 13 | Breakdown of current and non-current portions. | 292 | Lists components such as accounts receivable, inventory, prepaid expenses, etc. |\n| **Investments accounted for using the equity method** | 14 | Rollforward of carrying amount and summarized financial information of equity method investees. | 293-294 | Table showing changes in balance and summarized income statement/balance sheet data for all equity method investees. |\n| **Property and equipment, net** | 15 | Breakdown of gross carrying amount by category. | 294 | Categories: Buildings and leasehold improvements, Computer and related equipment and software, Construction in progress, etc. |\n| **Intangible assets, net** | 16 | Breakdown of gross carrying amount by category and future amortization expense. | 294-295 | Categories: User base and customer relationships, Trade names, trademarks and domain names, etc. Includes table of estimated future amortization. |\n| **Goodwill** | 17 | Movement table by reportable segment and impairment details. | 295 | Shows opening balance, additions, disposals, impairments, and closing balance for each segment. |\n| **Deferred revenue and customer advances** | 18 | Breakdown between deferred revenue and customer advances, and current vs. non-current. | 296 | |\n| **Accrued expenses, accounts payable and other liabilities** | 19 | Breakdown of current and non-current portions. | 297 | Lists components such as accrued operating costs, deposits payable, amounts due to merchants, etc. |\n| **Short-term / Long-term bank borrowings** | 21 | Details on bank loans, including interest rates and maturity schedule. | 299 | Includes future principal repayment schedule. |\n| **Supplier financing program** | 20 | Details on outstanding payment obligations under supplier financing. | 298 | Shows movement and balance sheet classification of obligations. |\n| **Treasury shares** | 2(af) | *Note: While a specific breakdown table wasn't extracted, the primary statement shows the cost of treasury shares.* | 246-247 | Value presented in the primary statement. |\n| **Statutory reserves** | 2(ag) | *Note: While a specific breakdown table wasn't extracted, the primary statement shows the amount.* | 246-247 | Value presented in the primary statement. |\n\n**Note:** Pages 283-286 and 317-321 contain detailed notes on Share-based Payment (Note 8), Earnings Per Share (Note 9), and US GAAP to IFRS reconciliations (Note 35). These are extensive textual and numerical disclosures that provide crucial context for the financial statements but are not simple supplementary \"tables\" in the sense of a breakdown of a single line item. They have therefore not been included in the table above, which focuses on direct component breakdowns of balance sheet accounts."
+        }
+      ]
+    }
+  }
+}

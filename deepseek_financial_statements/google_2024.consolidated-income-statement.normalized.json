@@ -84,7 +84,7 @@
         }
       }
     ],
-    "notes": "1. 'total_operating_cost' includes the four main operating expense line items from the primary statement: Cost of revenues, Research and development, Sales and marketing, and General and administrative. These are listed as positive numbers as they are costs to be summed. 2. 'interest_expenses' was extracted from the 'Other income (expense), net' breakdown in the supplementary tables. The value is reported as a positive number, but the original data shows it in parentheses, indicating it is an expense. It has been converted to a negative number in the output to reflect that it is a cost. 3. 'taxes' maps to 'Provision for income taxes' from the primary statement. 4. All other values (revenue, net_income) map directly from the primary statement.",
+    "notes": "1. 'total_operating_cost' includes the four main expense line items from the income statement: Cost of revenues, Research and development, Sales and marketing, and General and administrative. These are all costs that reduce operating income and are reported as positive numbers. 2. 'interest_expenses' is taken from the 'Components of Other Income (Expense), Net' supplementary table. It is a positive number as it reduces income. 3. 'taxes' is the 'Provision for income taxes' from the income statement. 4. All values are in millions of USD as per the statement. 5. The arrays contain the raw numbers without summation, as per the rules.",
     "source_file": "extracted_text/google_2024.consolidated-income-statement.llm.json"
   }
 }

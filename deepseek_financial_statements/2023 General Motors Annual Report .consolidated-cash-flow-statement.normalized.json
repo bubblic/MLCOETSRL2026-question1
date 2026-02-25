@@ -38,7 +38,7 @@
         }
       }
     ],
-    "notes": "The 'depreciation_and_amortization' field was populated using the two distinct depreciation/amortization/impairment line items from the cash flow statement: 'Depreciation and impairment of Equipment on operating leases, net' and 'Depreciation, amortization and impairment charges on Property, net'. Both are non-cash add-backs to net income in the operating activities section and are standard components of total depreciation and amortization. They are reported as separate array elements per the instruction to not add them up.",
+    "notes": "The 'depreciation_and_amortization' field was populated using two line items from the cash flow statement: 'Depreciation and impairment of Equipment on operating leases, net' and 'Depreciation, amortization and impairment charges on Property, net'. Both numbers are provided for each year as separate components, per the instruction not to add them. The currency is USD based on the statement's 'In millions' notation and the company's reporting.",
     "source_file": "extracted_text/2023 General Motors Annual Report .consolidated-cash-flow-statement.llm.json"
   }
 }

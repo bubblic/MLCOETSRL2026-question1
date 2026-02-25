@@ -35,7 +35,7 @@
         }
       }
     ],
-    "notes": "Extracted 'Depreciation and depletion (includes impairments)' line item as the best match for 'depreciation_and_amortization'. The company is in the oil & gas industry, where 'depletion' is a standard non-cash charge similar to amortization for natural resources. Impairments are included as per the note.",
+    "notes": "Extracted 'Depreciation and depletion (includes impairments)' line item as the value for 'depreciation_and_amortization'. The field name in the statement is a close synonym and includes impairments, which is a standard adjustment for this industry. Values are taken directly from the primary statement table. Parentheses in the source indicate negatives, but all values here are positive.",
     "source_file": "extracted_text/exxon_2024.consolidated-cash-flow-statement.llm.json"
   }
 }

@@ -1,0 +1,44 @@
+{
+  "schema_version": "1.0",
+  "fields": [
+    "depreciation_and_amortization"
+  ],
+  "statement": {
+    "company_id": "google_2024",
+    "statement_type": "consolidated-cash-flow-statement",
+    "periods": [
+      {
+        "year": "2022",
+        "currency": "USD",
+        "values": {
+          "depreciation_and_amortization": [
+            13475.0,
+            474.0
+          ]
+        }
+      },
+      {
+        "year": "2023",
+        "currency": "USD",
+        "values": {
+          "depreciation_and_amortization": [
+            11946.0,
+            469.0
+          ]
+        }
+      },
+      {
+        "year": "2024",
+        "currency": "USD",
+        "values": {
+          "depreciation_and_amortization": [
+            15311.0,
+            413.0
+          ]
+        }
+      }
+    ],
+    "notes": "The 'depreciation_and_amortization' field is populated using the 'Depreciation of property and equipment' line from the primary cash flow statement and the 'Amortization of lease assets' line from the supplementary table on lease costs. These are the two components that constitute total depreciation and amortization expense for the period. The values are reported as separate numbers in an array as per the instruction to not add them up.",
+    "source_file": "extracted_text/google_2024.consolidated-cash-flow-statement.llm.json"
+  }
+}

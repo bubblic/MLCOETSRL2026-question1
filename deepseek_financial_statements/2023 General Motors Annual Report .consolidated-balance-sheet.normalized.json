@@ -70,7 +70,7 @@
         }
       }
     ],
-    "notes": "1. 'Accounts and notes receivable, net' from the primary statement is mapped to 'accounts_receivable'. 2. 'Marketable debt securities' from the primary statement is mapped to 'marketable_securities'. 3. 'Total debt short-term and long-term' is represented as an array containing two numbers per period: [Automotive total debt, GM Financial total debt], as these are the two major debt segments detailed in Note 13. The values are the 'Carrying Amount' totals for each segment. 4. 'Total Equity' is taken directly from the primary statement line. 5. All values are in millions of USD as per the statement heading.",
+    "notes": "1) 'Marketable debt securities' from the primary statement was mapped to 'marketable_securities'. 2) 'Accounts and notes receivable, net' from the primary statement was mapped to 'accounts_receivable'. 3) 'Total current liabilities' taken directly from the primary statement. 4) 'Total debt short term and long term' is represented as an array containing two numbers: 'Total automotive debt' and 'Total GM Financial debt' from the supplementary Note 13 tables. These were not added together per the instruction. 5) 'Total Equity' taken directly from the primary statement. 6) 'Total Assets' taken directly from the primary statement. 7) All values are in millions of USD as per the statement heading.",
     "source_file": "extracted_text/2023 General Motors Annual Report .consolidated-balance-sheet.llm.json"
   }
 }

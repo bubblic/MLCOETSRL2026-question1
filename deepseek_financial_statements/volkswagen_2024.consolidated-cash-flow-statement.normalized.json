@@ -30,7 +30,7 @@
         }
       }
     ],
-    "notes": "The 'depreciation_and_amortization' field was populated using the three distinct line items from the primary cash flow statement that constitute total depreciation and amortization expense: 1) 'Depreciation and amortization of, and impairment losses on, intangible assets, property, plant and equipment, and investment property', 2) 'Amortization of and impairment losses on capitalized development costs', and 3) 'Depreciation of and impairment losses on lease assets'. The values are reported as separate numbers in an array per the instruction to not add them up. The supplementary table shows a consolidated 'Depreciation and amortization expense' figure, but the primary statement breakdown was used for granularity. The currency is identified as Euro (EUR).",
+    "notes": "The 'depreciation_and_amortization' field was populated using the three distinct, non-aggregated depreciation and amortization line items from the primary cash flow statement: 'Depreciation and amortization of, and impairment losses on, intangible assets, property, plant and equipment, and investment property', 'Amortization of and impairment losses on capitalized development costs', and 'Depreciation of and impairment losses on lease assets'. The numbers are reported as-is in an array, per the instruction not to add them up. The supplementary table shows a consolidated 'Depreciation and amortization expense' figure, but the primary statement's detailed breakdown was used to provide the component values.",
     "source_file": "extracted_text/volkswagen_2024.consolidated-cash-flow-statement.llm.json"
   }
 }

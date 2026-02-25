@@ -38,7 +38,7 @@
         }
       }
     ],
-    "notes": "Extracted '物业及设备的折旧及减值以及与土地使用权有关的经营租赁成本' as depreciation and '无形资产及获授权版权的摊销' as amortization. These are the two standard components of 'depreciation_and_amortization'. Values are taken from the RMB columns for each year. The USD columns were not used as per the requirement to use the primary currency from the statement.",
+    "notes": "The 'depreciation_and_amortization' field was populated by extracting the two distinct line items from the cash flow statement: 'Depreciation and impairment of property and equipment and operating lease cost related to land use rights' and 'Amortization of intangible assets and licensed copyrights'. The values are reported as separate numbers in the array for each year, as per the rule not to add them. The currency is reported as CNY (Chinese Yuan Renminbi) based on the RMB (Renminbi) denomination in the statement. The 2025 USD column was not used as the primary currency is RMB.",
     "source_file": "extracted_text/alibaba_2025.consolidated-cash-flow-statement.llm.json"
   }
 }

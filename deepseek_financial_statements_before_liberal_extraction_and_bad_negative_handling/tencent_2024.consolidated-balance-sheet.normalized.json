@@ -1,0 +1,85 @@
+{
+  "schema_version": "1.0",
+  "fields": [
+    "cash_and_cash_equivalents",
+    "marketable_securities",
+    "accounts_receivable",
+    "total_current_liabilities",
+    "total_debt_short_term_and_long_term",
+    "total_equity",
+    "total_assets"
+  ],
+  "statement": {
+    "company_id": "tencent_2024",
+    "statement_type": "consolidated-balance-sheet",
+    "periods": [
+      {
+        "year": "2024",
+        "currency": "CNY",
+        "values": {
+          "cash_and_cash_equivalents": [
+            132519.0
+          ],
+          "marketable_securities": [
+            204999.0,
+            302360.0,
+            9568.0,
+            3345.0
+          ],
+          "accounts_receivable": [
+            48203.0
+          ],
+          "total_current_liabilities": [
+            396909.0
+          ],
+          "total_debt_short_term_and_long_term": [
+            146521.0,
+            130586.0,
+            52885.0,
+            8623.0
+          ],
+          "total_equity": [
+            1053896.0
+          ],
+          "total_assets": [
+            1780995.0
+          ]
+        }
+      },
+      {
+        "year": "2023",
+        "currency": "CNY",
+        "values": {
+          "cash_and_cash_equivalents": [
+            172320.0
+          ],
+          "marketable_securities": [
+            211145.0,
+            213951.0,
+            14903.0
+          ],
+          "accounts_receivable": [
+            46606.0
+          ],
+          "total_current_liabilities": [
+            352157.0
+          ],
+          "total_debt_short_term_and_long_term": [
+            155819.0,
+            137101.0,
+            41537.0,
+            14161.0
+          ],
+          "total_equity": [
+            873681.0
+          ],
+          "total_assets": [
+            1577246.0
+          ]
+        }
+      }
+    ],
+    "notes": "Currency identified as Chinese Yuan (CNY) from 'RMB in Millions'. 'Marketable Securities' includes 'Financial assets at fair value through profit or loss' and 'Financial assets at fair value through other comprehensive income' from both current and non-current assets. For 2023, 'Financial assets at fair value through other comprehensive income' under current assets was '–' (dash), interpreted as 0, so not included in the array. 'Total Debt' includes 'Borrowings' and 'Notes Payable' from both current and non-current liabilities, as per standard classification of short-term and long-term debt. All values extracted directly from the primary statement table.",
+    "source_file": "extracted_text/tencent_2024.consolidated-balance-sheet.llm.json"
+  }
+}

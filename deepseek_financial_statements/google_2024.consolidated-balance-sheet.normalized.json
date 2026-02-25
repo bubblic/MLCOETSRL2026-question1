@@ -68,7 +68,7 @@
         }
       }
     ],
-    "notes": "All values extracted directly from the primary consolidated balance sheet. 'Total debt short-term and long-term' mapped to the 'Long-term debt' line item, as no short-term debt is listed separately. 'Marketable securities' includes only the line item explicitly named as such; non-marketable securities are a separate asset line. Values are reported in millions as per the statement. Parentheses for negatives (e.g., accumulated other comprehensive income) are handled as negative numbers in the source data but are not directly required for the requested fields.",
+    "notes": "1. All values extracted directly from the primary consolidated balance sheet. 2. 'Accounts receivable' uses the 'Accounts receivable, net' line. 3. 'Total debt short-term and long-term' uses the 'Long-term debt' line, as no short-term debt is separately listed in the provided statement. 4. 'Total equity' uses the 'Total stockholders’ equity' line. 5. The supplementary tables provide detailed breakdowns but were not used for extraction as the primary statement contained all required aggregated values.",
     "source_file": "extracted_text/google_2024.consolidated-balance-sheet.llm.json"
   }
 }

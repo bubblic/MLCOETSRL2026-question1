@@ -1,0 +1,90 @@
+{
+  "schema_version": "1.0",
+  "fields": [
+    "revenue",
+    "total_operating_cost",
+    "net_income",
+    "taxes",
+    "interest_expenses"
+  ],
+  "statement": {
+    "company_id": "microsoft_2025",
+    "statement_type": "consolidated-income-statement",
+    "periods": [
+      {
+        "year": "2025",
+        "currency": "USD",
+        "values": {
+          "revenue": [
+            281724.0
+          ],
+          "total_operating_cost": [
+            87831.0,
+            32488.0,
+            25654.0,
+            7223.0
+          ],
+          "net_income": [
+            101832.0
+          ],
+          "taxes": [
+            21795.0
+          ],
+          "interest_expenses": [
+            2385.0
+          ]
+        }
+      },
+      {
+        "year": "2024",
+        "currency": "USD",
+        "values": {
+          "revenue": [
+            245122.0
+          ],
+          "total_operating_cost": [
+            74114.0,
+            29510.0,
+            24456.0,
+            7609.0
+          ],
+          "net_income": [
+            88136.0
+          ],
+          "taxes": [
+            19651.0
+          ],
+          "interest_expenses": [
+            2935.0
+          ]
+        }
+      },
+      {
+        "year": "2023",
+        "currency": "USD",
+        "values": {
+          "revenue": [
+            211915.0
+          ],
+          "total_operating_cost": [
+            65863.0,
+            27195.0,
+            22759.0,
+            7575.0
+          ],
+          "net_income": [
+            72361.0
+          ],
+          "taxes": [
+            16950.0
+          ],
+          "interest_expenses": [
+            1968.0
+          ]
+        }
+      }
+    ],
+    "notes": "Extracted from the primary consolidated income statement and supplementary Note 3. 'Revenue' mapped from 'Total revenue'. 'Total_operating_cost' includes all operating costs and expenses: 'Total cost of revenue' (positive), 'Research and development', 'Sales and marketing', and 'General and administrative' (all positive as they are costs). 'Net_income' mapped directly. 'Taxes' mapped from 'Provision for income taxes'. 'Interest_expenses' mapped from the 'Interest expense' component within 'Other income (expense), net' in Note 3, returned as positive numbers (the expense value).",
+    "source_file": "extracted_text/microsoft_2025.consolidated-income-statement.llm.json"
+  }
+}

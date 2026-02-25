@@ -30,8 +30,8 @@
             33696.0
           ],
           "total_debt_short_term_and_long_term": [
-            10851.0,
-            12091.0
+            12091.0,
+            10851.0
           ],
           "total_equity": [
             69287.0
@@ -58,8 +58,8 @@
             33145.0
           ],
           "total_debt_short_term_and_long_term": [
-            10680.0,
-            11227.0
+            11227.0,
+            10680.0
           ],
           "total_equity": [
             62701.0
@@ -86,8 +86,8 @@
             31543.0
           ],
           "total_debt_short_term_and_long_term": [
-            9359.0,
-            10380.0
+            10380.0,
+            9359.0
           ],
           "total_equity": [
             56604.0
@@ -98,7 +98,7 @@
         }
       }
     ],
-    "notes": "1. 'marketable_securities' mapped from 'Current available for sale financial assets' line within 'Other current assets' (Note 13). 2. 'total_debt_short_term_and_long_term' includes 'Short-term borrowings' and 'Long-term borrowings' as separate array elements, per rule 4. Lease liabilities are not included as they are a separate financing obligation. 3. 'accounts_receivable' mapped from 'Trade accounts receivable'. 4. All values extracted directly from the primary consolidated balance sheet or the specified supplementary notes.",
+    "notes": "1) 'marketable_securities' mapped to 'Current available for sale financial assets' from Note 13/14, as these are liquid assets. 'Non-current available for sale financial assets' (Note 9) are not included as they are not current. 2) 'total_debt_short_term_and_long_term' mapped to 'Long-term borrowings' and 'Short-term borrowings' from Note 19.1, returned as separate numbers in the array per rule 4. 3) 'accounts_receivable' mapped to 'Trade accounts receivable' from the primary statement. 4) All other values mapped directly from the primary consolidated balance sheet table.",
     "source_file": "extracted_text/lvmh_dec_2024.consolidated-balance-sheet.llm.json"
   }
 }

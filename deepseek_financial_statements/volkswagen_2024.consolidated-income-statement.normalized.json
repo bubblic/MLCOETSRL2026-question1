@@ -29,10 +29,11 @@
             12394.0
           ],
           "taxes": [
-            4411.0
+            5858.0,
+            -1447.0
           ],
           "interest_expenses": [
-            -3446.0
+            3446.0
           ]
         }
       },
@@ -54,15 +55,16 @@
             17861.0
           ],
           "taxes": [
-            5237.0
+            6791.0,
+            -1554.0
           ],
           "interest_expenses": [
-            -3640.0
+            3640.0
           ]
         }
       }
     ],
-    "notes": "Extracted from the Consolidated Income Statement on page 471. Revenue mapped from 'Sales revenue'. Total operating cost includes all operating line items before the operating result: Cost of sales, Distribution expenses, Administrative expenses, Other operating income (added as a positive component), and Other operating expenses. Net income mapped from 'Earnings after tax'. Taxes mapped from 'Income tax income/expense' (positive number representing expense). Interest expenses taken directly from the line item. All values are in € million as per the statement. Prior-year figures for 2023 are adjusted per the note.",
+    "notes": "Extracted from the Consolidated Income Statement on Page 471. Revenue mapped from 'Sales revenue'. Total operating cost includes all items from the operating section before 'Operating result': Cost of sales, Distribution expenses, Administrative expenses, Other operating income (added as a positive component as it reduces total cost), and Other operating expenses. Net income mapped from 'Earnings after tax'. Taxes include current tax expense (positive as it reduces income) and deferred tax income (negative as it increases income). Interest expenses extracted directly from the statement. All values are in € million as per the statement. The sign convention follows the rule: items that reduce income are positive, items that increase income are negative. For total_operating_cost, the array lists the components in the order they appear: Cost of sales, Distribution expenses, Administrative expenses, Other operating income, Other operating expenses.",
     "source_file": "extracted_text/volkswagen_2024.consolidated-income-statement.llm.json"
   }
 }

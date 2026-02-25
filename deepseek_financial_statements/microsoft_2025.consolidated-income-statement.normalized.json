@@ -84,7 +84,7 @@
         }
       }
     ],
-    "notes": "Extracted from the primary consolidated income statement and supplementary Note 3. 'Revenue' mapped from 'Total revenue'. 'Total_operating_cost' includes all operating costs and expenses: 'Total cost of revenue' (positive), 'Research and development', 'Sales and marketing', and 'General and administrative' (all positive as they are costs). 'Net_income' mapped directly. 'Taxes' mapped from 'Provision for income taxes'. 'Interest_expenses' mapped from the 'Interest expense' component within 'Other income (expense), net' in Note 3, returned as positive numbers (the expense value).",
+    "notes": "Extracted from the provided Consolidated Income Statement and supplementary tables. For 'total_operating_cost', the array includes the following cost elements in order: Total cost of revenue, Research and development, Sales and marketing, and General and administrative. These are all expenses that reduce operating income and are reported as positive numbers. 'Interest expenses' was taken directly from the supplementary table for 'Other Income (Expense), Net', with the parentheses notation converted to a negative number in the source interpreted as a positive expense. 'Taxes' is the 'Provision for income taxes'. All values are in millions of USD as per the statement.",
     "source_file": "extracted_text/microsoft_2025.consolidated-income-statement.llm.json"
   }
 }

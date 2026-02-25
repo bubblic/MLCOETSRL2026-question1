@@ -81,7 +81,7 @@
         }
       }
     ],
-    "notes": "Extracted from the Consolidated Income Statements on Page 60. Revenue is 'Total net sales and revenue'. Total operating cost is broken down into its constituent line items as presented: 'Automotive and other cost of sales', 'GM Financial interest, operating and other expenses', and 'Automotive and other selling, general and administrative expense'. Net income is 'Net income (loss)'. Taxes is 'Income tax expense (benefit)'. Interest expenses is 'Automotive interest expense'. All values are in millions of USD. The supplementary tables for revenue, interest income, and equity income were reviewed but did not alter the primary statement values used for the requested fields.",
+    "notes": "Extracted from the primary Consolidated Income Statement. Revenue mapped from 'Total net sales and revenue'. Net income mapped from 'Net income (loss)'. Taxes mapped from 'Income tax expense (benefit)'. Interest expenses mapped from 'Automotive interest expense'. For total_operating_cost, mapped the three listed cost components: 'Automotive and other cost of sales', 'GM Financial interest, operating and other expenses', and 'Automotive and other selling, general and administrative expense'. These are all expenses that reduce operating income and are presented as positive numbers in the source. The supplementary tables provide detailed breakdowns but were not used for the core extraction as per the rules to avoid calculation or aggregation.",
     "source_file": "extracted_text/2023 General Motors Annual Report .consolidated-income-statement.llm.json"
   }
 }

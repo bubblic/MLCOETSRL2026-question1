@@ -16,27 +16,21 @@
         "currency": "CNY",
         "values": {
           "revenue": [
-            319168.0,
-            121374.0,
-            211956.0,
-            7759.0
+            660257.0
           ],
           "total_operating_cost": [
             -311011.0,
             -36388.0,
-            -112761.0,
-            8002.0
+            -112761.0
           ],
           "net_income": [
-            194073.0,
-            2394.0
+            196467.0
           ],
           "taxes": [
-            34903.0,
-            10115.0
+            45018.0
           ],
           "interest_expenses": [
-            12447.0
+            11981.0
           ]
         }
       },
@@ -45,32 +39,26 @@
         "currency": "CNY",
         "values": {
           "revenue": [
-            298375.0,
-            101482.0,
-            203763.0,
-            5395.0
+            609015.0
           ],
           "total_operating_cost": [
             -315906.0,
             -34211.0,
-            -103525.0,
-            4701.0
+            -103525.0
           ],
           "net_income": [
-            115216.0,
-            2832.0
+            118048.0
           ],
           "taxes": [
-            32720.0,
-            10556.0
+            43276.0
           ],
           "interest_expenses": [
-            11885.0
+            12268.0
           ]
         }
       }
     ],
-    "notes": "1. Revenue is broken down into its four reported segments: Value-added Services, Marketing Services, FinTech and Business Services, and Others. 2. Total operating cost includes Cost of revenues, Selling and marketing expenses, General and administrative expenses, and Other gains/(losses), net. 'Other gains/(losses), net' is included as a positive component (reducing total cost) as it is an operating item. 3. Net income is broken down into amounts attributable to Equity holders of the Company and Non-controlling interests. 4. Taxes are broken down into Current income tax and Deferred income tax as per the supplementary table. 5. Interest expenses are taken from the 'Interest and related expenses' line within the supplementary table for Finance costs. The 'Exchange (gains)/losses, net' component of Finance costs is excluded from interest_expenses as it is not a core interest cost. 6. Finance costs line includes interest and exchange components; only the interest portion is mapped. 7. All values are in RMB millions (CNY).",
+    "notes": "Extracted from the primary consolidated income statement. 'total_operating_cost' includes 'Cost of revenues', 'Selling and marketing expenses', and 'General and administrative expenses' as they are the primary operating expense categories. 'Other gains/(losses), net' and 'Share of profit/(loss) of associates and joint ventures, net' are not included in total_operating_cost as they are non-operating items. 'Interest expenses' is mapped from 'Finance costs'. All values are in RMB millions. Parentheses in the source indicate negatives, converted to negative numbers.",
     "source_file": "extracted_text/tencent_2024.consolidated-income-statement.llm.json"
   }
 }

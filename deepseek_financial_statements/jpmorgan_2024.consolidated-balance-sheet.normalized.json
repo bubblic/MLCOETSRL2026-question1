@@ -22,6 +22,8 @@
             445945.0
           ],
           "marketable_securities": [
+            295001.0,
+            219546.0,
             406852.0,
             274468.0
           ],
@@ -57,6 +59,8 @@
             595085.0
           ],
           "marketable_securities": [
+            276152.0,
+            200436.0,
             201704.0,
             369848.0
           ],
@@ -84,7 +88,7 @@
         }
       }
     ],
-    "notes": "1. 'cash_and_cash_equivalents' includes 'Cash and due from banks' and 'Deposits with banks' as per standard banking industry practice. 2. 'marketable_securities' includes 'Available-for-sale securities' and 'Held-to-maturity securities' as they are liquid, interest-earning securities. 3. 'accounts_receivable' maps to 'Accrued interest and accounts receivable'. 4. 'total_current_liabilities' includes all liability line items presented before 'Long-term debt' on the balance sheet: Deposits, Federal funds purchased and securities loaned or sold under repurchase agreements, Short-term borrowings, Trading liabilities, Accounts payable and other liabilities, and Beneficial interests issued by consolidated VIEs. 5. 'total_debt_short_term_and_long_term' includes 'Short-term borrowings' and 'Long-term debt'. 6. 'total_equity' is 'Total stockholders’ equity'. 7. 'total_assets' is 'Total assets'. 8. All values are extracted directly from the primary balance sheet table. Parentheses indicate negatives (e.g., allowance accounts are part of net calculations on the statement but not listed separately here as they are netted in the mapped lines like Loans).",
+    "notes": "1) 'cash_and_cash_equivalents' includes 'Cash and due from banks' and 'Deposits with banks' as these are highly liquid. 2) 'marketable_securities' includes 'Federal funds sold and securities purchased under resale agreements', 'Securities borrowed', 'Available-for-sale securities', and 'Held-to-maturity securities' as they are liquid financial instruments. 3) 'accounts_receivable' is mapped from 'Accrued interest and accounts receivable'. 4) 'total_current_liabilities' includes all liability line items listed before 'Long-term debt' in the balance sheet: 'Deposits', 'Federal funds purchased and securities loaned or sold under repurchase agreements', 'Short-term borrowings', 'Trading liabilities', 'Accounts payable and other liabilities', and 'Beneficial interests issued by consolidated VIEs'. 5) 'total_debt_short_term_and_long_term' includes 'Short-term borrowings' and 'Long-term debt'. 6) 'total_equity' is 'Total stockholders’ equity'. 7) 'total_assets' is 'Total assets'. 8) All values are taken directly from the primary balance sheet table; no calculations were performed. 9) Parentheses in the source indicate negative numbers; these have been converted to negative numeric values where applicable (e.g., allowance for loan losses is not in the extracted fields).",
     "source_file": "extracted_text/jpmorgan_2024.consolidated-balance-sheet.llm.json"
   }
 }

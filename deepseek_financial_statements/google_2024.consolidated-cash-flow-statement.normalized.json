@@ -12,8 +12,7 @@
         "currency": "USD",
         "values": {
           "depreciation_and_amortization": [
-            13475.0,
-            474.0
+            13475.0
           ]
         }
       },
@@ -22,8 +21,7 @@
         "currency": "USD",
         "values": {
           "depreciation_and_amortization": [
-            11946.0,
-            469.0
+            11946.0
           ]
         }
       },
@@ -32,13 +30,12 @@
         "currency": "USD",
         "values": {
           "depreciation_and_amortization": [
-            15311.0,
-            413.0
+            15311.0
           ]
         }
       }
     ],
-    "notes": "The 'depreciation_and_amortization' field is populated using the 'Depreciation of property and equipment' line from the primary cash flow statement and the 'Amortization of lease assets' line from the supplementary table on lease costs. These are the two components that constitute total depreciation and amortization expense for the period. The values are reported as separate numbers in an array as per the instruction to not add them up.",
+    "notes": "Extracted 'Depreciation of property and equipment' line from the operating activities section as the value for 'depreciation_and_amortization'. The supplementary tables contain lease-related depreciation details for finance leases, but these are not added to the primary figure as per rule 4. The primary statement does not have a separate 'Amortization' line; it is assumed to be included in the 'Depreciation' line or within 'Other' adjustments, but only the explicit number is mapped.",
     "source_file": "extracted_text/google_2024.consolidated-cash-flow-statement.llm.json"
   }
 }

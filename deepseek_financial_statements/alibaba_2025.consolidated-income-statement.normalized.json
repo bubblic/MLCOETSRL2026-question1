@@ -19,13 +19,12 @@
             868687.0
           ],
           "total_operating_cost": [
-            -549695.0,
-            -56744.0,
-            -103496.0,
-            -42183.0,
-            -13504.0,
-            -2714.0,
-            0.0
+            549695.0,
+            56744.0,
+            103496.0,
+            42183.0,
+            13504.0,
+            2714.0
           ],
           "net_income": [
             65573.0
@@ -46,13 +45,12 @@
             941168.0
           ],
           "total_operating_cost": [
-            -586323.0,
-            -52256.0,
-            -115141.0,
-            -41985.0,
-            -21592.0,
-            -10521.0,
-            0.0
+            586323.0,
+            52256.0,
+            115141.0,
+            41985.0,
+            21592.0,
+            10521.0
           ],
           "net_income": [
             71332.0
@@ -73,13 +71,12 @@
             996347.0
           ],
           "total_operating_cost": [
-            -598285.0,
-            -57151.0,
-            -144021.0,
-            -44239.0,
-            -6336.0,
-            -6171.0,
-            761.0
+            598285.0,
+            57151.0,
+            144021.0,
+            44239.0,
+            6336.0,
+            6171.0
           ],
           "net_income": [
             125976.0
@@ -93,7 +90,7 @@
         }
       }
     ],
-    "notes": "Extracted from the primary consolidated income statement. For 'total_operating_cost', the following line items from the statement were included as an array, in the order they appear: Operating costs, Product development expenses, Selling and marketing expenses, General and administrative expenses, Amortization and impairment of intangible assets, Impairment of goodwill, and Other net income (which is positive and thus treated as a cost reduction). This follows standard practice for a technology/e-commerce company where these are the primary operating expense categories. 'Interest and investment income, net' is not included in operating costs. Values in parentheses from the source are treated as negative numbers. The US Dollar columns were ignored as the primary reporting currency is RMB (CNY).",
+    "notes": "Extracted from the primary consolidated income statement. For 'total_operating_cost', included all line items that are subtracted from revenue to arrive at operating profit: Cost of revenue, Product development expenses, Sales and marketing expenses, General and administrative expenses, Amortization and impairment of intangible assets, and Goodwill impairment. 'Other net income' was excluded as it is an addition, not a cost. Values are in RMB millions as presented. The sign convention for costs is positive as they reduce income. The 'interest_expenses' field maps directly to the 'Interest expense' line item. The 'taxes' field maps directly to 'Income tax expense'. The 'net_income' field maps directly to 'Net income' (not the attributable to shareholders line).",
     "source_file": "extracted_text/alibaba_2025.consolidated-income-statement.llm.json"
   }
 }

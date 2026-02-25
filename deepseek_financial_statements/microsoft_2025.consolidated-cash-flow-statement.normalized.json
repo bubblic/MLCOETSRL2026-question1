@@ -35,7 +35,7 @@
         }
       }
     ],
-    "notes": "Extracted 'Depreciation, amortization, and other' line item from the operating cash flow adjustments as the value for 'depreciation_and_amortization'. The value is a single number per period, returned as an array per the schema.",
+    "notes": "Extracted the single value for 'Depreciation, amortization, and other' from the cash flow statement's adjustments to reconcile net income. This is the standard line item for depreciation and amortization in the cash flow statement. No calculation or summation was performed.",
     "source_file": "extracted_text/microsoft_2025.consolidated-cash-flow-statement.llm.json"
   }
 }

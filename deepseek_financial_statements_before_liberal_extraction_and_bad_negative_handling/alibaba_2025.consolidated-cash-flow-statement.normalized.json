@@ -1,0 +1,44 @@
+{
+  "schema_version": "1.0",
+  "fields": [
+    "depreciation_and_amortization"
+  ],
+  "statement": {
+    "company_id": "alibaba_2025",
+    "statement_type": "consolidated-cash-flow-statement",
+    "periods": [
+      {
+        "year": "2023",
+        "currency": "CNY",
+        "values": {
+          "depreciation_and_amortization": [
+            27799.0,
+            19139.0
+          ]
+        }
+      },
+      {
+        "year": "2024",
+        "currency": "CNY",
+        "values": {
+          "depreciation_and_amortization": [
+            26640.0,
+            17864.0
+          ]
+        }
+      },
+      {
+        "year": "2025",
+        "currency": "CNY",
+        "values": {
+          "depreciation_and_amortization": [
+            29260.0,
+            13199.0
+          ]
+        }
+      }
+    ],
+    "notes": "Extracted '物业及设备的折旧及减值以及与土地使用权有关的经营租赁成本' as depreciation and '无形资产及获授权版权的摊销' as amortization. These are the two standard components of 'depreciation_and_amortization'. Values are taken from the RMB columns for each year. The USD columns were not used as per the requirement to use the primary currency from the statement.",
+    "source_file": "extracted_text/alibaba_2025.consolidated-cash-flow-statement.llm.json"
+  }
+}

@@ -30,8 +30,8 @@
             217039.0
           ],
           "total_debt_short_term_and_long_term": [
-            137061.0,
-            117020.0
+            117020.0,
+            137061.0
           ],
           "total_equity": [
             196731.0
@@ -58,8 +58,8 @@
             206036.0
           ],
           "total_debt_short_term_and_long_term": [
-            122323.0,
-            110476.0
+            110476.0,
+            122323.0
           ],
           "total_equity": [
             189186.0
@@ -70,7 +70,7 @@
         }
       }
     ],
-    "notes": "1) 'Marketable securities' mapped from 'Marketable securities and time deposits'. 2) 'Accounts receivable' mapped from 'Trade receivables'. 3) 'Total debt short-term and long-term' mapped from 'Financial liabilities' under non-current and current liabilities, returned as separate numbers per rule 4. 4) All other values mapped directly from the primary consolidated balance sheet. 5) Currency is EUR as stated in the statement.",
+    "notes": "1) Extracted from the primary consolidated balance sheet on page 474. 2) 'Marketable securities and time deposits' (Note 22) is mapped to 'marketable_securities' as it is described as a liquid asset. 3) 'Trade receivables' is mapped to 'accounts_receivable'. 4) 'Total debt short term and long term' is represented as an array containing two numbers: first the 'Financial liabilities' under 'Current liabilities' and second the 'Financial liabilities' under 'Non-current liabilities', as per the primary statement. They are not summed per the rules. 5) All values are in € million as per the statement.",
     "source_file": "extracted_text/volkswagen_2024.consolidated-balance-sheet.llm.json"
   }
 }

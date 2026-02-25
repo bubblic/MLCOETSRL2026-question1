@@ -38,7 +38,7 @@
         }
       }
     ],
-    "notes": "The 'depreciation_and_amortization' field is mapped from two separate line items in the cash flow statement: 'Net increase in depreciation, amortization and provisions' and 'Depreciation of right-of-use assets'. Both are non-cash add-backs to operating profit to arrive at cash from operations. The values are reported as separate numbers in the array as per rule #4, in the order they appear in the statement. The company is in the luxury goods industry, where these are standard components of operating cash flow adjustments.",
+    "notes": "The 'depreciation_and_amortization' field was populated using two line items from the cash flow statement: 'Net increase in depreciation, amortization and provisions' and 'Depreciation of right-of-use assets'. Both are non-cash expenses added back to operating profit to arrive at cash from operations. They are returned as separate numbers in an array as per the instruction not to add them up. The 'Other adjustments and computed expenses' line was not included as it is a separate adjustment item.",
     "source_file": "extracted_text/lvmh_dec_2024.consolidated-cash-flow-statement.llm.json"
   }
 }

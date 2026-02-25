@@ -71,7 +71,7 @@
         }
       }
     ],
-    "notes": "1. 'Short-term investments' from the primary statement is mapped to 'marketable_securities'. 2. 'Short-term debt' and 'Current portion of long-term debt' are separate line items in the primary statement. For 2025, 'Short-term debt' is $0 and 'Current portion of long-term debt' is $2,999. For 2024, 'Short-term debt' is $6,693 and 'Current portion of long-term debt' is $2,249. These are provided as separate numbers in the 'total_debt_short_term_and_long_term' array, along with 'Long-term debt'. 3. 'Total stockholders’ equity' is mapped to 'total_equity'. 4. All values are extracted directly from the primary statement table. The supplementary tables provide detailed breakdowns but are not used for the core extracted values.",
+    "notes": "1. 'Short-term investments' from the primary statement is mapped to 'marketable_securities' as it is a liquid asset. 2. 'Total_debt_short_term_and_long_term' is populated with the individual components: 'Short-term debt' and 'Current portion of long-term debt' for short-term, and 'Long-term debt' for long-term. For 2024, 'Short-term debt' and 'Current portion of long-term debt' are separate line items, so both are included in the array. 3. All other values are directly mapped from the primary statement.",
     "source_file": "extracted_text/microsoft_2025.consolidated-balance-sheet.llm.json"
   }
 }

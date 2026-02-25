@@ -24,13 +24,13 @@
             262955.0
           ],
           "accounts_receivable": [
-            143536.0
+            29362.0
           ],
           "total_current_liabilities": [
             421507.0
           ],
           "total_debt_short_term_and_long_term": [
-            12987.0,
+            12030.0,
             16252.0,
             55686.0,
             86089.0
@@ -54,7 +54,7 @@
             228826.0
           ],
           "accounts_receivable": [
-            202175.0
+            30652.0
           ],
           "total_current_liabilities": [
             435346.0
@@ -74,7 +74,7 @@
         }
       }
     ],
-    "notes": "1) 'marketable_securities' mapped from 'Short-term investments'. 2) 'accounts_receivable' mapped from 'Prepayments, receivables and other assets' (current portion) as it is the most likely component containing trade receivables for an e-commerce/tech company. A more precise breakdown is not available in the provided data. 3) 'total_debt_short_term_and_long_term' includes all borrowings and notes: Short-term bank borrowings, Short-term unsecured senior notes, Long-term bank borrowings, Long-term unsecured senior notes, and Long-term convertible unsecured senior notes. Values are listed in the order: short-term bank, short-term notes, long-term bank, long-term notes, long-term convertible notes. For 2024, short-term notes are 16,252 and long-term convertible notes are 0. For 2025, short-term notes are 0 and long-term convertible notes are 35,834. 4) 'total_equity' is taken directly from the 'Total equity' line. 5) Currency is CNY (RMB) as the primary statement values are in RMB millions. USD columns are ignored per rule to use a single currency.",
+    "notes": "1) 'Short-term investments' from the primary statement is mapped to 'marketable_securities' as it is a liquid asset. 2) 'Accounts receivable' values are taken from the supplementary aging analysis table (Note 33), which provides the net figure. 3) 'Total_debt_short_term_and_long_term' includes all listed debt components: Short-term bank borrowings, Short-term unsecured senior notes, Long-term bank borrowings, Long-term unsecured senior notes, and Long-term convertible unsecured senior notes. For 2024, short-term unsecured senior notes were 16,252; for 2025, they were 0. Long-term convertible notes were 0 in 2024 and 35,834 in 2025. All values are listed as separate array elements per the rule not to add them up. 4) 'Total_equity' is taken from the 'Total equity' line in the primary statement. 5) Currency is CNY (RMB) as reported, though USD equivalents are also provided.",
     "source_file": "extracted_text/alibaba_2025.consolidated-balance-sheet.llm.json"
   }
 }

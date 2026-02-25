@@ -1,0 +1,36 @@
+{
+  "schema_version": "1.0",
+  "fields": [
+    "depreciation_and_amortization"
+  ],
+  "statement": {
+    "company_id": "volkswagen_2024",
+    "statement_type": "consolidated-cash-flow-statement",
+    "periods": [
+      {
+        "year": "2024",
+        "currency": "EUR",
+        "values": {
+          "depreciation_and_amortization": [
+            12858.0,
+            7209.0,
+            11279.0
+          ]
+        }
+      },
+      {
+        "year": "2023",
+        "currency": "EUR",
+        "values": {
+          "depreciation_and_amortization": [
+            11727.0,
+            5184.0,
+            10655.0
+          ]
+        }
+      }
+    ],
+    "notes": "The 'depreciation_and_amortization' field was populated using the three distinct line items from the primary cash flow statement that constitute total depreciation and amortization expense: 1) 'Depreciation and amortization of, and impairment losses on, intangible assets, property, plant and equipment, and investment property', 2) 'Amortization of and impairment losses on capitalized development costs', and 3) 'Depreciation of and impairment losses on lease assets'. The values are reported as separate numbers in an array per the instruction to not add them up. The supplementary table shows a consolidated 'Depreciation and amortization expense' figure, but the primary statement breakdown was used for granularity. The currency is identified as Euro (EUR).",
+    "source_file": "extracted_text/volkswagen_2024.consolidated-cash-flow-statement.llm.json"
+  }
+}

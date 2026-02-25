@@ -35,7 +35,7 @@
         }
       }
     ],
-    "notes": "Extracted 'Depreciation and amortization' values directly from the operating activities section of the Consolidated Statements of Cash Flows. The values are reported in millions of USD. Only the single, consolidated depreciation and amortization figure for each year was available and mapped.",
+    "notes": "Extracted the single 'Depreciation and amortization' value from the operating activities section of the Consolidated Statements of Cash Flows for each year. No other numbers were mapped to this field as the statement provides a single, consolidated figure.",
     "source_file": "extracted_text/jpmorgan_2024.consolidated-cash-flow-statement.llm.json"
   }
 }

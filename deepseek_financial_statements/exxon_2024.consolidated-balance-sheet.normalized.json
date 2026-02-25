@@ -21,9 +21,7 @@
             23029.0,
             158.0
           ],
-          "marketable_securities": [
-            343.0
-          ],
+          "marketable_securities": [],
           "accounts_receivable": [
             35282.0,
             8399.0
@@ -34,8 +32,7 @@
             4055.0
           ],
           "total_debt_short_term_and_long_term": [
-            4892.0,
-            63.0,
+            4955.0,
             36755.0
           ],
           "total_equity": [
@@ -55,9 +52,7 @@
             31539.0,
             29.0
           ],
-          "marketable_securities": [
-            177.0
-          ],
+          "marketable_securities": [],
           "accounts_receivable": [
             30296.0,
             7719.0
@@ -68,8 +63,7 @@
             3189.0
           ],
           "total_debt_short_term_and_long_term": [
-            4009.0,
-            75.0,
+            4090.0,
             37483.0
           ],
           "total_equity": [
@@ -82,7 +76,7 @@
         }
       }
     ],
-    "notes": "1. 'cash_and_cash_equivalents' includes 'Cash and cash equivalents' and 'Cash and cash equivalents – restricted' as per the statement. 2. 'marketable_securities' mapped from 'Equity securities carried at fair value and other investments at adjusted cost basis' within the supplementary table for Investments, Advances and Long-Term Receivables (Note 8). 3. 'accounts_receivable' mapped from the breakdown in supplementary table for Notes and Accounts Receivable (Note 6): 'Trade' and 'Other'. 4. 'total_current_liabilities' includes all listed current liabilities: 'Notes and loans payable', 'Accounts payable and accrued liabilities', and 'Income taxes payable'. 5. 'total_debt_short_term_and_long_term' includes short-term debt components from supplementary table for Notes and Loans Payable (Note 6): 'Long-term debt due within one year', 'Bank loans', and 'Commercial paper', plus 'Long-term debt' from the primary statement. 6. 'total_equity' includes 'ExxonMobil share of equity' and 'Noncontrolling interests' as per the statement. 7. 'total_assets' is taken directly from the 'Total Assets' line. 8. All values are in millions of dollars as per the statement. 9. 'Inventories' and 'Property, plant and equipment' are not part of the requested output schema.",
+    "notes": "1) 'Cash and cash equivalents' includes both unrestricted and restricted amounts as separate line items. 2) 'Marketable securities' field is empty as no line item for short-term, liquid investments was identified in the provided balance sheet; 'Investments, advances and long-term receivables' is a non-current asset. 3) 'Accounts receivable' uses the detailed breakdown from Note 6 for 'Trade' and 'Other' receivables, net of reserves. 4) 'Total current liabilities' includes the detailed components: Notes and loans payable, Accounts payable and accrued liabilities, and Income taxes payable. 5) 'Total debt short-term and long-term' includes 'Notes and loans payable' (current) and 'Long-term debt' (non-current). 6) 'Total equity' includes 'ExxonMobil share of equity' and 'Noncontrolling interests' as separate components. 7) All values are in millions of dollars as per the statement. 8) Parentheses in the source indicate negative numbers; these have been converted to negative numeric values (e.g., Accumulated other comprehensive income).",
     "source_file": "extracted_text/exxon_2024.consolidated-balance-sheet.llm.json"
   }
 }
