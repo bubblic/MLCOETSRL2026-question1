@@ -29,10 +29,7 @@
           "marketable_securities": [],
           "total_accounts_receivable": [
             {
-              "Trade, less reserves of $162 million and $170 million": 35282.0
-            },
-            {
-              "Other, less reserves of $314 million and $101 million": 8399.0
+              "Notes and accounts receivable – net": 43681.0
             }
           ],
           "total_current_liabilities": [
@@ -56,16 +53,7 @@
           ],
           "total_equity": [
             {
-              "Common stock without par value": 46238.0
-            },
-            {
-              "Earnings reinvested": 470903.0
-            },
-            {
-              "Accumulated other comprehensive income": -14619.0
-            },
-            {
-              "Common stock held in treasury": -238817.0
+              "ExxonMobil share of equity": 263705.0
             },
             {
               "Noncontrolling interests": 6901.0
@@ -73,16 +61,7 @@
           ],
           "total_assets": [
             {
-              "Total current assets": 91990.0
-            },
-            {
-              "Investments, advances and long-term receivables": 47200.0
-            },
-            {
-              "Property, plant and equipment, at cost, less accumulated depreciation and depletion": 294318.0
-            },
-            {
-              "Other assets, including intangibles – net": 19967.0
+              "Total Assets": 453475.0
             }
           ]
         }
@@ -103,10 +82,7 @@
           "marketable_securities": [],
           "total_accounts_receivable": [
             {
-              "Trade, less reserves of $170 million and $101 million": 30296.0
-            },
-            {
-              "Other, less reserves of $101 million and $101 million": 7719.0
+              "Notes and accounts receivable – net": 38015.0
             }
           ],
           "total_current_liabilities": [
@@ -130,16 +106,7 @@
           ],
           "total_equity": [
             {
-              "Common stock without par value": 17781.0
-            },
-            {
-              "Earnings reinvested": 453927.0
-            },
-            {
-              "Accumulated other comprehensive income": -11989.0
-            },
-            {
-              "Common stock held in treasury": -254917.0
+              "ExxonMobil share of equity": 204802.0
             },
             {
               "Noncontrolling interests": 7736.0
@@ -147,22 +114,13 @@
           ],
           "total_assets": [
             {
-              "Total current assets": 96609.0
-            },
-            {
-              "Investments, advances and long-term receivables": 47630.0
-            },
-            {
-              "Property, plant and equipment, at cost, less accumulated depreciation and depletion": 214940.0
-            },
-            {
-              "Other assets, including intangibles – net": 17138.0
+              "Total Assets": 376317.0
             }
           ]
         }
       }
     ],
-    "notes": "1. 'Cash and cash equivalents' includes both unrestricted and restricted amounts as per the statement. 2. 'Marketable securities' is an empty array as no line items for short-term, liquid investments (e.g., commercial paper, U.S. Treasuries) were found in the provided balance sheet or supplementary tables. Investments listed (e.g., equity securities, long-term receivables) are not considered marketable securities as they are either long-term, illiquid, or held for strategic purposes. 3. 'Total accounts receivable' is built from the supplementary Note 6 breakdown of 'Notes and accounts receivable – net'. 4. 'Total current liabilities' is built from the sum of its listed components. 5. 'Total debt' includes short-term borrowings ('Notes and loans payable') and 'Long-term debt'. 6. 'Total equity' is built from all components of equity, including noncontrolling interests. 7. 'Total assets' is built from the sum of the major asset categories, which roll up to the reported total. 8. Numbers in parentheses are treated as negative values. 9. Scale is in millions (1E6) as indicated in the statement headers.",
+    "notes": "1. 'Cash and cash equivalents' includes both unrestricted and restricted amounts as per the statement. 2. 'Marketable securities' is an empty array as no line items for short-term, liquid investments (e.g., commercial paper, U.S. Treasuries) were found in the provided balance sheet or supplementary tables. Investments listed (e.g., equity securities, long-term receivables) are not considered marketable securities as they appear to be long-term or illiquid. 3. 'Total accounts receivable' maps directly to 'Notes and accounts receivable – net'. 4. 'Total current liabilities' is the sum of the three listed line items. 5. 'Total debt' includes short-term borrowings ('Notes and loans payable') and 'Long-term debt'. 6. 'Total equity' is the sum of 'ExxonMobil share of equity' and 'Noncontrolling interests'. 7. Scale is 1,000,000 (millions) as indicated in the statement headers. 8. All numbers are extracted as presented; parentheses in the source indicate negative values but have been converted to standard negative numbers in the extraction logic. For this output, the raw label text (including parentheses for negatives) is preserved in 'source_label', but the associated number is the signed value.",
     "source_file": "extracted_text/exxon_2024.consolidated-balance-sheet.llm.json"
   }
 }

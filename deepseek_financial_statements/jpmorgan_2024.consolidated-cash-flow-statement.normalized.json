@@ -14,7 +14,7 @@
         "values": {
           "depreciation_and_amortization": [
             {
-              "Depreciation and amortization": 7938.0
+              "value": 7938.0
             }
           ]
         }
@@ -26,7 +26,7 @@
         "values": {
           "depreciation_and_amortization": [
             {
-              "Depreciation and amortization": 7512.0
+              "value": 7512.0
             }
           ]
         }
@@ -38,13 +38,13 @@
         "values": {
           "depreciation_and_amortization": [
             {
-              "Depreciation and amortization": 7051.0
+              "value": 7051.0
             }
           ]
         }
       }
     ],
-    "notes": "The 'depreciation_and_amortization' field is directly mapped from the 'Depreciation and amortization' line item in the 'Adjustments to reconcile net income to net cash provided by operating activities' section of the Consolidated Statements of Cash Flows. The supplementary tables contain detailed lease information (Note 18) and Parent Company cash flows (Note 33), but these do not provide additional breakdowns of the consolidated depreciation and amortization figure. Therefore, only the single, consolidated value from the primary statement is used for each year.",
+    "notes": "The 'depreciation_and_amortization' field was directly mapped from the 'Depreciation and amortization' line item in the 'Adjustments to reconcile net income to net cash provided by operating activities' section of the primary cash flow statement. No other supplementary elements were required to make up this field. The scale is 1E6 as values are reported in millions. The sign convention for this field is standard (positive values as presented).",
     "source_file": "extracted_text/jpmorgan_2024.consolidated-cash-flow-statement.llm.json"
   }
 }

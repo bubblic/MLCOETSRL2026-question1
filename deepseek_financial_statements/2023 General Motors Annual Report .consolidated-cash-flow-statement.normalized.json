@@ -53,7 +53,7 @@
         }
       }
     ],
-    "notes": "The 'depreciation_and_amortization' field was constructed by combining two line items from the operating activities section of the cash flow statement: 'Depreciation and impairment of Equipment on operating leases, net' and 'Depreciation, amortization and impairment charges on Property, net'. This combination aligns with standard accounting practice for calculating EBITDA and reflects the total non-cash depreciation and amortization expense added back to net income. The scale is 1E6 (millions) as indicated in the statement header. Only the field explicitly requested was extracted; other cash flow line items were omitted.",
+    "notes": "The 'depreciation_and_amortization' field is constructed from two distinct line items in the cash flow statement: 'Depreciation and impairment of Equipment on operating leases, net' and 'Depreciation, amortization and impairment charges on Property, net'. These are the only elements directly provided for this field. The supplementary tables provide details for other line items (e.g., components of changes in operating assets/liabilities, cash paid for taxes and interest) but do not contain additional elements for depreciation and amortization.",
     "source_file": "extracted_text/2023 General Motors Annual Report .consolidated-cash-flow-statement.llm.json"
   }
 }

@@ -44,7 +44,7 @@
         }
       }
     ],
-    "notes": "Only the 'depreciation_and_amortization' field was requested for extraction. The provided statement contains a single, clearly labeled line item for this field: 'Depreciation and depletion (includes impairments)'. This item is mapped directly. The scale is 1E6 (millions) as indicated in the statement header. The currency is USD, inferred from the context of the company (ExxonMobil) and the use of the dollar symbol in the statement.",
+    "notes": "Only the 'depreciation_and_amortization' field was requested for extraction. The provided cash flow statement contains a single, clearly labeled line item for this field: 'Depreciation and depletion (includes impairments)'. This item is mapped directly. The statement includes other line items (e.g., deferred taxes, working capital changes, investing/financing activities) which are not part of the requested schema for this extraction task.",
     "source_file": "extracted_text/exxon_2024.consolidated-cash-flow-statement.llm.json"
   }
 }

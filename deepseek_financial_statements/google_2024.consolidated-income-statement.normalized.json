@@ -135,7 +135,7 @@
         }
       }
     ],
-    "notes": "1. All values extracted from the primary Consolidated Statements of Income on Page 57. 2. For total_operating_cost, all listed operating expenses (Cost of revenues, Research and development, Sales and marketing, General and administrative) are included, consistent with standard practice for a technology/services company. 3. Interest expense is taken from the 'Components of Other Income (Expense), Net' table (Page 83). The sign convention is followed: the expense reduces income, so the positive number from the statement (which was shown in parentheses as negative) is used. 4. Taxes are the 'Provision for income taxes' from the primary statement. 5. The scale is millions (1E6) as indicated in the statement header. 6. Other income/expense components (e.g., interest income, gains/losses on securities) are not part of the requested fields and are therefore not mapped.",
+    "notes": "1. All values extracted from the primary Consolidated Statements of Income on page 57, except for 'interest_expenses' which were sourced from the 'Components of Other Income (Expense), Net' table on page 83. 2. 'total_operating_cost' is composed of the four main operating expense categories listed in the primary statement. 3. For 'interest_expenses', the sign convention is followed: the expense reduces income, so the positive number from the supplementary table (where it was shown in parentheses as negative) is used. 4. 'taxes' is the 'Provision for income taxes' from the primary statement. 5. 'total_revenue' is the 'Revenues' line from the primary statement. 6. 'net_income' is the 'Net income' line from the primary statement.",
     "source_file": "extracted_text/google_2024.consolidated-income-statement.llm.json"
   }
 }

@@ -53,7 +53,7 @@
         }
       }
     ],
-    "notes": "The 'depreciation_and_amortization' field is mapped from two distinct line items in the cash flow statement's adjustments section: 'Depreciation and impairment of property and equipment and operating lease cost related to land use rights' and 'Amortization of intangible assets and licensed copyrights'. These are the standard non-cash add-backs for depreciation and amortization. The USD columns were not used as the primary currency is CNY (RMB).",
+    "notes": "The 'depreciation_and_amortization' field was constructed by combining the two distinct line items from the cash flow statement: 'Depreciation and impairment of property and equipment and operating lease cost related to land use rights' and 'Amortization of intangible assets and licensed copyrights'. These are the standard non-cash add-backs for depreciation and amortization in the operating cash flow reconciliation. The USD columns were not used as the primary currency is CNY (RMB).",
     "source_file": "extracted_text/alibaba_2025.consolidated-cash-flow-statement.llm.json"
   }
 }

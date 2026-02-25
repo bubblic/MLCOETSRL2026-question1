@@ -50,9 +50,6 @@
           ],
           "total_operating_cost": [
             {
-              "Provision for credit losses": 10678.0
-            },
-            {
               "Compensation expense": 51357.0
             },
             {
@@ -69,6 +66,9 @@
             },
             {
               "Other expense": 9552.0
+            },
+            {
+              "Provision for credit losses": 10678.0
             },
             {
               "Interest expense": 101350.0
@@ -130,9 +130,6 @@
           ],
           "total_operating_cost": [
             {
-              "Provision for credit losses": 9320.0
-            },
-            {
               "Compensation expense": 46465.0
             },
             {
@@ -149,6 +146,9 @@
             },
             {
               "Other expense": 12045.0
+            },
+            {
+              "Provision for credit losses": 9320.0
             },
             {
               "Interest expense": 81321.0
@@ -210,9 +210,6 @@
           ],
           "total_operating_cost": [
             {
-              "Provision for credit losses": 6389.0
-            },
-            {
               "Compensation expense": 41636.0
             },
             {
@@ -229,6 +226,9 @@
             },
             {
               "Other expense": 6365.0
+            },
+            {
+              "Provision for credit losses": 6389.0
             },
             {
               "Interest expense": 26097.0
@@ -252,7 +252,7 @@
         }
       }
     ],
-    "notes": "The primary income statement is used for extraction. For a financial institution (JPMorgan Chase & Co.), total revenue is defined as total net revenue plus interest expense, which equals the sum of all revenue line items (noninterest revenue components and interest income). Total operating cost includes all expenses that reduce income: provision for credit losses, total noninterest expense (compensation, occupancy, technology, professional services, marketing, other), and interest expense. The sign convention for total_operating_cost, taxes, and interest_expenses follows rule 13: values that reduce income are positive. Therefore, all components of total_operating_cost are positive, as are taxes and interest_expenses. Investment securities losses are negative in the revenue section as they reduce revenue. The scale is millions (1E6) as indicated in the statement. Supplementary tables provide detailed breakdowns but do not alter the aggregated values required by the schema.",
+    "notes": "The company is a financial institution (bank). Total revenue is the sum of all revenue lines, including interest income. Total operating cost includes all operating expenses (noninterest expense), provision for credit losses, and interest expense, as these are costs of generating revenue in the banking industry. Numbers in parentheses are treated as negative. The sign convention for taxes, interest_expenses, and total_operating_cost follows rule 13: elements that reduce income are positive. The supplementary tables provide detailed breakdowns of line items (e.g., provision for credit losses, other expense) but do not change the aggregated values reported in the primary statement.",
     "source_file": "extracted_text/jpmorgan_2024.consolidated-income-statement.llm.json"
   }
 }
