@@ -1,0 +1,152 @@
+{
+  "schema_version": "1.0",
+  "fields": [
+    "cash_and_cash_equivalents",
+    "short_term_market_securities",
+    "total_accounts_receivable",
+    "total_current_liabilities",
+    "total_debt_short_term_and_long_term",
+    "total_equity",
+    "total_assets"
+  ],
+  "statement": {
+    "company_id": "jpmorgan_2024",
+    "statement_type": "consolidated-balance-sheet",
+    "periods": [
+      {
+        "year": "2024",
+        "currency": "USD",
+        "scale": 1000000,
+        "values": {
+          "cash_and_cash_equivalents": [
+            {
+              "Cash and due from banks": 23372.0
+            },
+            {
+              "Deposits with banks": 445945.0
+            }
+          ],
+          "short_term_market_securities": [
+            {
+              "Federal funds sold and securities purchased under resale agreements": 295001.0
+            },
+            {
+              "Securities borrowed": 219546.0
+            }
+          ],
+          "total_accounts_receivable": [
+            {
+              "Accrued interest and accounts receivable": 101223.0
+            }
+          ],
+          "total_current_liabilities": [
+            {
+              "Deposits": 2406032.0
+            },
+            {
+              "Federal funds purchased and securities loaned or sold under repurchase agreements": 296835.0
+            },
+            {
+              "Short-term borrowings": 52893.0
+            },
+            {
+              "Trading liabilities": 192883.0
+            },
+            {
+              "Accounts payable and other liabilities": 280672.0
+            },
+            {
+              "Beneficial interests issued by consolidated VIEs": 27323.0
+            }
+          ],
+          "total_debt_short_term_and_long_term": [
+            {
+              "Short-term borrowings": 52893.0
+            },
+            {
+              "Long-term debt": 401418.0
+            }
+          ],
+          "total_equity": [
+            {
+              "Total stockholders’ equity": 344758.0
+            }
+          ],
+          "total_assets": [
+            {
+              "Total assets(a)": 4002814.0
+            }
+          ]
+        }
+      },
+      {
+        "year": "2023",
+        "currency": "USD",
+        "scale": 1000000,
+        "values": {
+          "cash_and_cash_equivalents": [
+            {
+              "Cash and due from banks": 29066.0
+            },
+            {
+              "Deposits with banks": 595085.0
+            }
+          ],
+          "short_term_market_securities": [
+            {
+              "Federal funds sold and securities purchased under resale agreements": 276152.0
+            },
+            {
+              "Securities borrowed": 200436.0
+            }
+          ],
+          "total_accounts_receivable": [
+            {
+              "Accrued interest and accounts receivable": 107363.0
+            }
+          ],
+          "total_current_liabilities": [
+            {
+              "Deposits": 2400688.0
+            },
+            {
+              "Federal funds purchased and securities loaned or sold under repurchase agreements": 216535.0
+            },
+            {
+              "Short-term borrowings": 44712.0
+            },
+            {
+              "Trading liabilities": 180428.0
+            },
+            {
+              "Accounts payable and other liabilities": 290307.0
+            },
+            {
+              "Beneficial interests issued by consolidated VIEs": 23020.0
+            }
+          ],
+          "total_debt_short_term_and_long_term": [
+            {
+              "Short-term borrowings": 44712.0
+            },
+            {
+              "Long-term debt": 391825.0
+            }
+          ],
+          "total_equity": [
+            {
+              "Total stockholders’ equity": 327878.0
+            }
+          ],
+          "total_assets": [
+            {
+              "Total assets(a)": 3875393.0
+            }
+          ]
+        }
+      }
+    ],
+    "notes": "1. 'Cash and cash equivalents' mapped to 'Cash and due from banks' and 'Deposits with banks' as these are the most liquid assets. 2. 'Short-term market securities' mapped to 'Federal funds sold and securities purchased under resale agreements' and 'Securities borrowed' as these are short-term, liquid investments. 3. 'Total accounts receivable' mapped to 'Accrued interest and accounts receivable'. 4. 'Total current liabilities' includes all liabilities except 'Long-term debt' as the balance sheet does not explicitly separate current vs. non-current portions for all items; this is a conservative aggregation for a financial institution. 5. 'Total debt short-term and long-term' mapped to 'Short-term borrowings' and 'Long-term debt'. 6. 'Total equity' mapped to 'Total stockholders’ equity'. 7. 'Total assets' mapped to 'Total assets(a)'. 8. Scale is millions (1E6) as indicated in the statement. 9. Parentheses indicate negative numbers (e.g., Allowance for loan losses).",
+    "source_file": "extracted_text\\jpmorgan_2024.consolidated-balance-sheet.llm.json"
+  }
+}

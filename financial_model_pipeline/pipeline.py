@@ -94,13 +94,13 @@ def _validate_historical_data(data: Mapping[str, np.ndarray]) -> None:
 
 
 def run_training_and_forecast(
+    historical_data: Mapping[str, np.ndarray],
+    sales_forecast_usd: Sequence[float],
+    inflation_forecast: Sequence[float],
     use_trained_parameters: bool = False,
     parameters_path: str = "trained_parameters.npz",
     use_inflation: bool = True,
     include_tax_anomalies: bool = True,
-    historical_data: [Mapping[str, np.ndarray]] ,
-    sales_forecast_usd: [Sequence[float]] ,
-    inflation_forecast: [Sequence[float]] ,
     simple_policy_epochs: int = 25000,
     structural_epochs: int = 20000,
     monte_carlo_samples: int = 1000,
@@ -329,7 +329,9 @@ def run_training_and_forecast(
         )
     if not use_inflation:
         inflation_forecast_array = np.zeros_like(inflation_forecast_array)
-    cum_inf_forecast = last_historical_cum_inf * np.cumprod(1 + inflation_forecast_array)
+    cum_inf_forecast = last_historical_cum_inf * np.cumprod(
+        1 + inflation_forecast_array
+    )
 
     # --- Execute Monte Carlo Forecast ---
     forecast_trajectories = run_monte_carlo_forecast(

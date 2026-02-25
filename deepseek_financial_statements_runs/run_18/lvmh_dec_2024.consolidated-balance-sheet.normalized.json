@@ -1,0 +1,236 @@
+{
+  "schema_version": "1.0",
+  "fields": [
+    "cash_and_cash_equivalents",
+    "short_term_market_securities",
+    "total_accounts_receivable",
+    "total_current_liabilities",
+    "total_debt_short_term_and_long_term",
+    "total_equity",
+    "total_assets"
+  ],
+  "statement": {
+    "company_id": "lvmh_dec_2024",
+    "statement_type": "consolidated-balance-sheet",
+    "periods": [
+      {
+        "year": "2024",
+        "currency": "EUR",
+        "scale": 1000000,
+        "values": {
+          "cash_and_cash_equivalents": [
+            {
+              "Term deposits (<3 months)": 2200.0
+            },
+            {
+              "SICAV and FCP funds": 566.0
+            },
+            {
+              "Ordinary bank accounts": 6865.0
+            }
+          ],
+          "short_term_market_securities": [
+            {
+              "Current available for sale financial assets": 3956.0
+            }
+          ],
+          "total_accounts_receivable": [
+            {
+              "Trade accounts receivable, nominal amount": 4856.0
+            },
+            {
+              "Provision for impairment": -125.0
+            }
+          ],
+          "total_current_liabilities": [
+            {
+              "Short-term borrowings": 10851.0
+            },
+            {
+              "Current lease liabilities": 2972.0
+            },
+            {
+              "Trade accounts payable": 8630.0
+            },
+            {
+              "Income taxes": 1231.0
+            },
+            {
+              "Current provisions and other liabilities": 10012.0
+            }
+          ],
+          "total_debt_short_term_and_long_term": [
+            {
+              "Long-term borrowings": 12091.0
+            },
+            {
+              "Short-term borrowings": 10851.0
+            }
+          ],
+          "total_equity": [
+            {
+              "Equity, Group share": 67517.0
+            },
+            {
+              "Minority interests": 1770.0
+            }
+          ],
+          "total_assets": [
+            {
+              "Total non-current assets": 101719.0
+            },
+            {
+              "Total current assets": 47471.0
+            }
+          ]
+        }
+      },
+      {
+        "year": "2023",
+        "currency": "EUR",
+        "scale": 1000000,
+        "values": {
+          "cash_and_cash_equivalents": [
+            {
+              "Term deposits (<3 months)": 1388.0
+            },
+            {
+              "SICAV and FCP funds": 283.0
+            },
+            {
+              "Ordinary bank accounts": 6103.0
+            }
+          ],
+          "short_term_market_securities": [
+            {
+              "Current available for sale financial assets": 3490.0
+            }
+          ],
+          "total_accounts_receivable": [
+            {
+              "Trade accounts receivable, nominal amount": 4843.0
+            },
+            {
+              "Provision for impairment": -115.0
+            }
+          ],
+          "total_current_liabilities": [
+            {
+              "Short-term borrowings": 10680.0
+            },
+            {
+              "Current lease liabilities": 2728.0
+            },
+            {
+              "Trade accounts payable": 9049.0
+            },
+            {
+              "Income taxes": 1148.0
+            },
+            {
+              "Current provisions and other liabilities": 9540.0
+            }
+          ],
+          "total_debt_short_term_and_long_term": [
+            {
+              "Long-term borrowings": 11227.0
+            },
+            {
+              "Short-term borrowings": 10680.0
+            }
+          ],
+          "total_equity": [
+            {
+              "Equity, Group share": 61017.0
+            },
+            {
+              "Minority interests": 1684.0
+            }
+          ],
+          "total_assets": [
+            {
+              "Total non-current assets": 99984.0
+            },
+            {
+              "Total current assets": 43710.0
+            }
+          ]
+        }
+      },
+      {
+        "year": "2022",
+        "currency": "EUR",
+        "scale": 1000000,
+        "values": {
+          "cash_and_cash_equivalents": [
+            {
+              "Term deposits (<3 months)": 1001.0
+            },
+            {
+              "SICAV and FCP funds": 287.0
+            },
+            {
+              "Ordinary bank accounts": 6013.0
+            }
+          ],
+          "short_term_market_securities": [
+            {
+              "Current available for sale financial assets": 3552.0
+            }
+          ],
+          "total_accounts_receivable": [
+            {
+              "Trade accounts receivable, nominal amount": 4369.0
+            },
+            {
+              "Provision for impairment": -111.0
+            }
+          ],
+          "total_current_liabilities": [
+            {
+              "Short-term borrowings": 9359.0
+            },
+            {
+              "Current lease liabilities": 2632.0
+            },
+            {
+              "Trade accounts payable": 8788.0
+            },
+            {
+              "Income taxes": 1211.0
+            },
+            {
+              "Current provisions and other liabilities": 9553.0
+            }
+          ],
+          "total_debt_short_term_and_long_term": [
+            {
+              "Long-term borrowings": 10380.0
+            },
+            {
+              "Short-term borrowings": 9359.0
+            }
+          ],
+          "total_equity": [
+            {
+              "Equity, Group share": 55111.0
+            },
+            {
+              "Minority interests": 1493.0
+            }
+          ],
+          "total_assets": [
+            {
+              "Total non-current assets": 94906.0
+            },
+            {
+              "Total current assets": 39740.0
+            }
+          ]
+        }
+      }
+    ],
+    "notes": "1. 'short_term_market_securities' is mapped to 'Current available for sale financial assets' from Note 14, as these are liquid, unrestricted investments intended to be sold in the short term. 2. 'total_accounts_receivable' is mapped using the gross 'Trade accounts receivable, nominal amount' and the 'Provision for impairment' from Note 12 to arrive at the net amount reported on the balance sheet. The provision is shown as a negative number as it reduces the gross receivable. 3. 'total_current_liabilities' includes all line items listed under 'Current liabilities' in the primary statement. 4. 'total_debt_short_term_and_long_term' is the sum of 'Long-term borrowings' and 'Short-term borrowings' from the primary statement. 5. 'total_equity' is the sum of 'Equity, Group share' and 'Minority interests' from the primary statement. 6. 'total_assets' is the sum of 'Total non-current assets' and 'Total current assets' from the primary statement.",
+    "source_file": "extracted_text\\lvmh_dec_2024.consolidated-balance-sheet.llm.json"
+  }
+}

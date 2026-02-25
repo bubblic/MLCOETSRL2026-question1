@@ -1,0 +1,141 @@
+{
+  "schema_version": "1.0",
+  "fields": [
+    "total_revenue",
+    "total_operating_cost",
+    "net_income",
+    "taxes",
+    "interest_expenses"
+  ],
+  "statement": {
+    "company_id": "google_2024",
+    "statement_type": "consolidated-income-statement",
+    "periods": [
+      {
+        "year": "2022",
+        "currency": "USD",
+        "scale": 1000000,
+        "values": {
+          "total_revenue": [
+            {
+              "Revenues": 282836.0
+            }
+          ],
+          "total_operating_cost": [
+            {
+              "Cost of revenues": 126203.0
+            },
+            {
+              "Research and development": 39500.0
+            },
+            {
+              "Sales and marketing": 26567.0
+            },
+            {
+              "General and administrative": 15724.0
+            }
+          ],
+          "net_income": [
+            {
+              "Net income": 59972.0
+            }
+          ],
+          "taxes": [
+            {
+              "Provision for income taxes": 11356.0
+            }
+          ],
+          "interest_expenses": [
+            {
+              "Interest expense": 357.0
+            }
+          ]
+        }
+      },
+      {
+        "year": "2023",
+        "currency": "USD",
+        "scale": 1000000,
+        "values": {
+          "total_revenue": [
+            {
+              "Revenues": 307394.0
+            }
+          ],
+          "total_operating_cost": [
+            {
+              "Cost of revenues": 133332.0
+            },
+            {
+              "Research and development": 45427.0
+            },
+            {
+              "Sales and marketing": 27917.0
+            },
+            {
+              "General and administrative": 16425.0
+            }
+          ],
+          "net_income": [
+            {
+              "Net income": 73795.0
+            }
+          ],
+          "taxes": [
+            {
+              "Provision for income taxes": 11922.0
+            }
+          ],
+          "interest_expenses": [
+            {
+              "Interest expense": 308.0
+            }
+          ]
+        }
+      },
+      {
+        "year": "2024",
+        "currency": "USD",
+        "scale": 1000000,
+        "values": {
+          "total_revenue": [
+            {
+              "Revenues": 350018.0
+            }
+          ],
+          "total_operating_cost": [
+            {
+              "Cost of revenues": 146306.0
+            },
+            {
+              "Research and development": 49326.0
+            },
+            {
+              "Sales and marketing": 27808.0
+            },
+            {
+              "General and administrative": 14188.0
+            }
+          ],
+          "net_income": [
+            {
+              "Net income": 100118.0
+            }
+          ],
+          "taxes": [
+            {
+              "Provision for income taxes": 19697.0
+            }
+          ],
+          "interest_expenses": [
+            {
+              "Interest expense": 268.0
+            }
+          ]
+        }
+      }
+    ],
+    "notes": "1. All values extracted from the primary Consolidated Statements of Income on page 57, except for 'interest_expenses' which is sourced from the supplementary table 'Components of Other Income (Expense), Net' on page 83. 2. 'total_operating_cost' is composed of the four main operating expense categories listed under 'Costs and expenses' in the primary statement. 3. For 'interest_expenses', the sign convention per rule 13 is applied: the values are reported as positive numbers as they reduce income. The raw values from the supplementary table were in parentheses (negative), so the absolute values are used. 4. 'taxes' is mapped directly from 'Provision for income taxes' in the primary statement. 5. The scale is 1E6 as the statement is in millions. 6. All other supplementary data (e.g., segment breakdowns, revenue disaggregation, tax reconciliation) provide additional detail but do not alter the core line items required by the schema.",
+    "source_file": "extracted_text\\google_2024.consolidated-income-statement.llm.json"
+  }
+}

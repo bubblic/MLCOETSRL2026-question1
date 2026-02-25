@@ -1,0 +1,59 @@
+{
+  "schema_version": "1.0",
+  "fields": [
+    "depreciation_and_amortization"
+  ],
+  "statement": {
+    "company_id": "2023 General Motors Annual Report",
+    "statement_type": "consolidated-cash-flow-statement",
+    "periods": [
+      {
+        "year": "2023",
+        "currency": "USD",
+        "scale": 1000000,
+        "values": {
+          "depreciation_and_amortization": [
+            {
+              "Depreciation and impairment of Equipment on operating leases, net": 4904.0
+            },
+            {
+              "Depreciation, amortization and impairment charges on Property, net": 6984.0
+            }
+          ]
+        }
+      },
+      {
+        "year": "2022",
+        "currency": "USD",
+        "scale": 1000000,
+        "values": {
+          "depreciation_and_amortization": [
+            {
+              "Depreciation and impairment of Equipment on operating leases, net": 4839.0
+            },
+            {
+              "Depreciation, amortization and impairment charges on Property, net": 6451.0
+            }
+          ]
+        }
+      },
+      {
+        "year": "2021",
+        "currency": "USD",
+        "scale": 1000000,
+        "values": {
+          "depreciation_and_amortization": [
+            {
+              "Depreciation and impairment of Equipment on operating leases, net": 6076.0
+            },
+            {
+              "Depreciation, amortization and impairment charges on Property, net": 5975.0
+            }
+          ]
+        }
+      }
+    ],
+    "notes": "The schema requested only the 'depreciation_and_amortization' field. The provided cash flow statement contains two distinct line items that together constitute the total depreciation, amortization, and impairment charges for the period. These have been mapped accordingly. All other fields from the statement (e.g., net_income, cash_from_operations, etc.) were not requested in the output schema and are therefore omitted. The scale is 1E6 as values are presented 'In millions'. The currency is USD based on the context of a U.S. company's annual report.",
+    "source_file": "extracted_text\\2023 General Motors Annual Report .consolidated-cash-flow-statement.llm.json"
+  }
+}

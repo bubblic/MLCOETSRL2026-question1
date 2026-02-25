@@ -1,0 +1,50 @@
+{
+  "schema_version": "1.0",
+  "fields": [
+    "depreciation_and_amortization"
+  ],
+  "statement": {
+    "company_id": "jpmorgan_2024",
+    "statement_type": "consolidated-cash-flow-statement",
+    "periods": [
+      {
+        "year": "2024",
+        "currency": "USD",
+        "scale": 1000000,
+        "values": {
+          "depreciation_and_amortization": [
+            {
+              "value": 7938.0
+            }
+          ]
+        }
+      },
+      {
+        "year": "2023",
+        "currency": "USD",
+        "scale": 1000000,
+        "values": {
+          "depreciation_and_amortization": [
+            {
+              "value": 7512.0
+            }
+          ]
+        }
+      },
+      {
+        "year": "2022",
+        "currency": "USD",
+        "scale": 1000000,
+        "values": {
+          "depreciation_and_amortization": [
+            {
+              "value": 7051.0
+            }
+          ]
+        }
+      }
+    ],
+    "notes": "The 'depreciation_and_amortization' field was directly mapped from the single line item 'Depreciation and amortization' in the operating activities section of the Consolidated Statements of Cash Flows. No other supplementary elements were required to make up the total value for this field. The scale is 1E6 as values are reported in millions. The sign convention for this field is as reported; it is a non-cash add-back to net income in the cash flow statement.",
+    "source_file": "extracted_text\\jpmorgan_2024.consolidated-cash-flow-statement.llm.json"
+  }
+}

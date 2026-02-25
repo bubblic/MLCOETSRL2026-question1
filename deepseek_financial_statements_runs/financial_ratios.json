@@ -1,8 +1,8 @@
 {
   "schema_version": "1.0",
   "aggregation": "median_across_runs",
-  "num_runs": 5,
-  "run_values_file": "deepseek_financial_statements_runs/extraction_run_values.json",
+  "num_runs": 101,
+  "run_values_file": "deepseek_financial_statements_runs\\extraction_run_values.json",
   "companies": [
     {
       "company_id": "2023 General Motors Annual Report",

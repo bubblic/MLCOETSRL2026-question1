@@ -24,21 +24,17 @@ def main() -> None:
     )
     inflation_forecast = np.full(n_forecast_years, 0.03, dtype=np.float64)
 
-    simple_policy_epochs = 25000
-    structural_epochs = 20000
-    monte_carlo_samples = 1000
-
     run_training_and_forecast(
+        historical_data,
+        sales_forecast_usd,
+        inflation_forecast,
         use_trained_parameters=False,
         parameters_path="trained_parameters_include_tax_anomalies.npz",
         use_inflation=True,
         include_tax_anomalies=True,
-        historical_data=historical_data,
-        sales_forecast_usd=sales_forecast_usd,
-        inflation_forecast=inflation_forecast,
-        simple_policy_epochs=simple_policy_epochs,
-        structural_epochs=structural_epochs,
-        monte_carlo_samples=monte_carlo_samples,
+        simple_policy_epochs=25000,
+        structural_epochs=20000,
+        monte_carlo_samples=1000,
     )
 
 

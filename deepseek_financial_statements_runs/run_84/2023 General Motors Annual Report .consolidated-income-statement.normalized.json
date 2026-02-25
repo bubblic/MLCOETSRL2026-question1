@@ -1,0 +1,141 @@
+{
+  "schema_version": "1.0",
+  "fields": [
+    "total_revenue",
+    "total_operating_cost",
+    "net_income",
+    "taxes",
+    "interest_expenses"
+  ],
+  "statement": {
+    "company_id": "2023 General Motors Annual Report",
+    "statement_type": "consolidated-income-statement",
+    "periods": [
+      {
+        "year": "2023",
+        "currency": "USD",
+        "scale": 1000000,
+        "values": {
+          "total_revenue": [
+            {
+              "Automotive": 157658.0
+            },
+            {
+              "GM Financial": 14184.0
+            }
+          ],
+          "total_operating_cost": [
+            {
+              "Automotive and other cost of sales": 141330.0
+            },
+            {
+              "GM Financial interest, operating and other expenses": 11374.0
+            },
+            {
+              "Automotive and other selling, general and administrative expense": 9840.0
+            }
+          ],
+          "net_income": [
+            {
+              "Net income (loss)": 9840.0
+            }
+          ],
+          "taxes": [
+            {
+              "Income tax expense (benefit)": 563.0
+            }
+          ],
+          "interest_expenses": [
+            {
+              "Automotive interest expense": 911.0
+            }
+          ]
+        }
+      },
+      {
+        "year": "2022",
+        "currency": "USD",
+        "scale": 1000000,
+        "values": {
+          "total_revenue": [
+            {
+              "Automotive": 143975.0
+            },
+            {
+              "GM Financial": 12760.0
+            }
+          ],
+          "total_operating_cost": [
+            {
+              "Automotive and other cost of sales": 126892.0
+            },
+            {
+              "GM Financial interest, operating and other expenses": 8862.0
+            },
+            {
+              "Automotive and other selling, general and administrative expense": 10667.0
+            }
+          ],
+          "net_income": [
+            {
+              "Net income (loss)": 9708.0
+            }
+          ],
+          "taxes": [
+            {
+              "Income tax expense (benefit)": 1888.0
+            }
+          ],
+          "interest_expenses": [
+            {
+              "Automotive interest expense": 987.0
+            }
+          ]
+        }
+      },
+      {
+        "year": "2021",
+        "currency": "USD",
+        "scale": 1000000,
+        "values": {
+          "total_revenue": [
+            {
+              "Automotive": 113590.0
+            },
+            {
+              "GM Financial": 13414.0
+            }
+          ],
+          "total_operating_cost": [
+            {
+              "Automotive and other cost of sales": 100544.0
+            },
+            {
+              "GM Financial interest, operating and other expenses": 8582.0
+            },
+            {
+              "Automotive and other selling, general and administrative expense": 8554.0
+            }
+          ],
+          "net_income": [
+            {
+              "Net income (loss)": 9945.0
+            }
+          ],
+          "taxes": [
+            {
+              "Income tax expense (benefit)": 2771.0
+            }
+          ],
+          "interest_expenses": [
+            {
+              "Automotive interest expense": 950.0
+            }
+          ]
+        }
+      }
+    ],
+    "notes": "1. Total revenue is the sum of 'Automotive' and 'GM Financial' net sales and revenue. 2. Total operating cost is the sum of 'Automotive and other cost of sales', 'GM Financial interest, operating and other expenses', and 'Automotive and other selling, general and administrative expense', as these represent the core operational costs of generating revenue. 3. Net income is taken directly from the 'Net income (loss)' line. 4. Taxes are taken directly from the 'Income tax expense (benefit)' line. 5. Interest expenses are taken directly from the 'Automotive interest expense' line. The 'GM Financial interest, operating and other expenses' is included in total operating cost, as it is an operational cost for the financing segment. The 'Interest income and other non-operating income, net' line is not included in interest expenses as it is net income and includes other non-operating items. All values follow the sign convention: costs and expenses that reduce income are positive, and income-increasing items are negative. The supplementary tables provide detailed breakdowns but were not needed to construct the core income statement fields as the primary statement was sufficient.",
+    "source_file": "extracted_text\\2023 General Motors Annual Report .consolidated-income-statement.llm.json"
+  }
+}

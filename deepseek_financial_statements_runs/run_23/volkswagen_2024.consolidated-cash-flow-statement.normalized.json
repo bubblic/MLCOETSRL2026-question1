@@ -1,0 +1,50 @@
+{
+  "schema_version": "1.0",
+  "fields": [
+    "depreciation_and_amortization"
+  ],
+  "statement": {
+    "company_id": "volkswagen_2024",
+    "statement_type": "consolidated-cash-flow-statement",
+    "periods": [
+      {
+        "year": "2024",
+        "currency": "EUR",
+        "scale": 1000000,
+        "values": {
+          "depreciation_and_amortization": [
+            {
+              "Depreciation and amortization of, and impairment losses on, intangible assets, property, plant and equipment, and investment property¹": 12858.0
+            },
+            {
+              "Amortization of and impairment losses on capitalized development costs¹": 7209.0
+            },
+            {
+              "Depreciation of and impairment losses on lease assets¹": 11279.0
+            }
+          ]
+        }
+      },
+      {
+        "year": "2023",
+        "currency": "EUR",
+        "scale": 1000000,
+        "values": {
+          "depreciation_and_amortization": [
+            {
+              "Depreciation and amortization of, and impairment losses on, intangible assets, property, plant and equipment, and investment property¹": 11727.0
+            },
+            {
+              "Amortization of and impairment losses on capitalized development costs¹": 5184.0
+            },
+            {
+              "Depreciation of and impairment losses on lease assets¹": 10655.0
+            }
+          ]
+        }
+      }
+    ],
+    "notes": "Extracted the 'depreciation_and_amortization' field from the primary consolidated cash flow statement. The field is composed of three distinct line items as listed, which together represent the total non-cash depreciation and amortization expense for the period. The values are in millions of Euros (€ million). The 'Impairment losses on equity investments¹' line was not included as it relates specifically to equity investments, not the depreciation/amortization of the company's own assets. The supplementary table 'Cash Flow Statement by Division' provides a consolidated 'Depreciation and amortization expense³' figure (32,056 for 2024, 28,282 for 2023), which matches the sum of the three extracted components, confirming the mapping.",
+    "source_file": "extracted_text\\volkswagen_2024.consolidated-cash-flow-statement.llm.json"
+  }
+}

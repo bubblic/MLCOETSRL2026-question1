@@ -1,0 +1,112 @@
+{
+  "schema_version": "1.0",
+  "fields": [
+    "total_revenue",
+    "total_operating_cost",
+    "net_income",
+    "taxes",
+    "interest_expenses"
+  ],
+  "statement": {
+    "company_id": "tencent_2024",
+    "statement_type": "consolidated-income-statement",
+    "periods": [
+      {
+        "year": "2024",
+        "currency": "CNY",
+        "scale": 1000000,
+        "values": {
+          "total_revenue": [
+            {
+              "Value-added Services": 319168.0
+            },
+            {
+              "Marketing Services": 121374.0
+            },
+            {
+              "FinTech and Business Services": 211956.0
+            },
+            {
+              "Others": 7759.0
+            }
+          ],
+          "total_operating_cost": [
+            {
+              "Cost of revenues": 311011.0
+            },
+            {
+              "Selling and marketing expenses": 36388.0
+            },
+            {
+              "General and administrative expenses": 112761.0
+            }
+          ],
+          "net_income": [
+            {
+              "Profit for the year": 196467.0
+            }
+          ],
+          "taxes": [
+            {
+              "Income tax expense": 45018.0
+            }
+          ],
+          "interest_expenses": [
+            {
+              "Finance costs": 11981.0
+            }
+          ]
+        }
+      },
+      {
+        "year": "2023",
+        "currency": "CNY",
+        "scale": 1000000,
+        "values": {
+          "total_revenue": [
+            {
+              "Value-added Services": 298375.0
+            },
+            {
+              "Marketing Services": 101482.0
+            },
+            {
+              "FinTech and Business Services": 203763.0
+            },
+            {
+              "Others": 5395.0
+            }
+          ],
+          "total_operating_cost": [
+            {
+              "Cost of revenues": 315906.0
+            },
+            {
+              "Selling and marketing expenses": 34211.0
+            },
+            {
+              "General and administrative expenses": 103525.0
+            }
+          ],
+          "net_income": [
+            {
+              "Profit for the year": 118048.0
+            }
+          ],
+          "taxes": [
+            {
+              "Income tax expense": 43276.0
+            }
+          ],
+          "interest_expenses": [
+            {
+              "Finance costs": 12268.0
+            }
+          ]
+        }
+      }
+    ],
+    "notes": "1. All values are extracted directly from the primary consolidated income statement. Numbers in parentheses are treated as positive for cost/expense fields per rule 13. 2. 'Total operating cost' is composed of 'Cost of revenues', 'Selling and marketing expenses', and 'General and administrative expenses' as these are the primary operational costs incurred in generating income for a technology and services company. 3. 'Other gains/(losses), net' and 'Share of profit/(loss) of associates and joint ventures, net' are not included in total_operating_cost as they are non-operating in nature. 4. 'Interest income' is not included in interest_expenses as it is income, not an expense. 5. The scale is 1,000,000 (RMB'Million) as indicated in the statement.",
+    "source_file": "extracted_text\\tencent_2024.consolidated-income-statement.llm.json"
+  }
+}

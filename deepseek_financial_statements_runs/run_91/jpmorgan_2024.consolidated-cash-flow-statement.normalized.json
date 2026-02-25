@@ -1,0 +1,50 @@
+{
+  "schema_version": "1.0",
+  "fields": [
+    "depreciation_and_amortization"
+  ],
+  "statement": {
+    "company_id": "jpmorgan_2024",
+    "statement_type": "consolidated-cash-flow-statement",
+    "periods": [
+      {
+        "year": "2024",
+        "currency": "USD",
+        "scale": 1000000,
+        "values": {
+          "depreciation_and_amortization": [
+            {
+              "value": 7938.0
+            }
+          ]
+        }
+      },
+      {
+        "year": "2023",
+        "currency": "USD",
+        "scale": 1000000,
+        "values": {
+          "depreciation_and_amortization": [
+            {
+              "value": 7512.0
+            }
+          ]
+        }
+      },
+      {
+        "year": "2022",
+        "currency": "USD",
+        "scale": 1000000,
+        "values": {
+          "depreciation_and_amortization": [
+            {
+              "value": 7051.0
+            }
+          ]
+        }
+      }
+    ],
+    "notes": "The 'depreciation_and_amortization' field was directly mapped from the 'Depreciation and amortization' line item in the operating activities section of the Consolidated Statements of Cash Flows. The supplementary tables contain detailed lease information (Note 18) and Parent Company cash flows (Note 33), but these do not provide alternative or additional components for the consolidated depreciation and amortization figure. Therefore, only the single, explicit line item from the primary statement is used for each period.",
+    "source_file": "extracted_text\\jpmorgan_2024.consolidated-cash-flow-statement.llm.json"
+  }
+}

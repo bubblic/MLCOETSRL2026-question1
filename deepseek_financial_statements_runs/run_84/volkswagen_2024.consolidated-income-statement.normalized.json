@@ -1,0 +1,100 @@
+{
+  "schema_version": "1.0",
+  "fields": [
+    "total_revenue",
+    "total_operating_cost",
+    "net_income",
+    "taxes",
+    "interest_expenses"
+  ],
+  "statement": {
+    "company_id": "volkswagen_2024",
+    "statement_type": "consolidated-income-statement",
+    "periods": [
+      {
+        "year": "2024",
+        "currency": "EUR",
+        "scale": 1000000,
+        "values": {
+          "total_revenue": [
+            {
+              "Sales revenue": 324656.0
+            }
+          ],
+          "total_operating_cost": [
+            {
+              "Cost of sales": 265184.0
+            },
+            {
+              "Distribution expenses": 22320.0
+            },
+            {
+              "Administrative expenses": 12754.0
+            },
+            {
+              "Other operating expenses": 20312.0
+            }
+          ],
+          "net_income": [
+            {
+              "Earnings after tax": 12394.0
+            }
+          ],
+          "taxes": [
+            {
+              "Income tax income/expense": 4411.0
+            }
+          ],
+          "interest_expenses": [
+            {
+              "Interest expenses": 3446.0
+            }
+          ]
+        }
+      },
+      {
+        "year": "2023",
+        "currency": "EUR",
+        "scale": 1000000,
+        "values": {
+          "total_revenue": [
+            {
+              "Sales revenue": 322284.0
+            }
+          ],
+          "total_operating_cost": [
+            {
+              "Cost of sales": 261299.0
+            },
+            {
+              "Distribution expenses": 21345.0
+            },
+            {
+              "Administrative expenses": 12729.0
+            },
+            {
+              "Other operating expenses": 19534.0
+            }
+          ],
+          "net_income": [
+            {
+              "Earnings after tax": 17861.0
+            }
+          ],
+          "taxes": [
+            {
+              "Income tax income/expense": 5237.0
+            }
+          ],
+          "interest_expenses": [
+            {
+              "Interest expenses": 3640.0
+            }
+          ]
+        }
+      }
+    ],
+    "notes": "1. The primary statement provides all required fields directly. 'Sales revenue' is mapped to total_revenue. 'Cost of sales', 'Distribution expenses', 'Administrative expenses', and 'Other operating expenses' are summed to represent total_operating_cost, as they are the core operational costs of an automotive manufacturer. 'Other operating income' is not included in total_operating_cost as it is income, not a cost. 2. 'Earnings after tax' is mapped to net_income. 3. 'Income tax income/expense' is mapped to taxes. The sign convention from the statement (negative for expense) is reversed to positive in the output, as per rule 13. 4. 'Interest expenses' is mapped directly. The sign convention from the statement (negative) is reversed to positive in the output, as per rule 13. 5. Scale is 1,000,000 (millions) as indicated by '€ million'. 6. The supplementary tables provide detailed breakdowns but are not required for the requested aggregated fields.",
+    "source_file": "extracted_text\\volkswagen_2024.consolidated-income-statement.llm.json"
+  }
+}
