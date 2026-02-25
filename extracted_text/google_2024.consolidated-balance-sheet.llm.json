@@ -1,0 +1,61 @@
+{
+  "query": "Consolidated Balance Sheet",
+  "selected_pages": {
+    "primary_statement_pages": [
+      56,
+      100
+    ],
+    "supplementary_pages": [
+      56,
+      57,
+      58,
+      59,
+      60,
+      61,
+      62,
+      63,
+      64,
+      65,
+      66,
+      67,
+      68,
+      69,
+      70,
+      71,
+      72,
+      73,
+      74,
+      75,
+      76,
+      77,
+      78,
+      79,
+      80,
+      81,
+      82,
+      83,
+      84,
+      85,
+      86,
+      87,
+      88,
+      89,
+      90,
+      91,
+      92,
+      93,
+      94,
+      95,
+      96,
+      100
+    ]
+  },
+  "extraction": {
+    "primary_statement": {
+      "raw_response": "Here is the Consolidated Balance Sheet from the provided data, formatted as a table.\n\n### **Alphabet Inc.  \nConsolidated Balance Sheets  \nAs of December 31,  \n(in millions, except par value per share amounts)**\n\n| **Assets** | **2023** | **2024** |\n| :--- | ---: | ---: |\n| **Current assets:** | | |\n| Cash and cash equivalents | $ 24,048 | $ 23,466 |\n| Marketable securities | 86,868 | 72,191 |\n| **Total cash, cash equivalents, and marketable securities** | **110,916** | **95,657** |\n| Accounts receivable, net | 47,964 | 52,340 |\n| Other current assets | 12,650 | 15,714 |\n| **Total current assets** | **171,530** | **163,711** |\n| | | |\n| Non-marketable securities | 31,008 | 37,982 |\n| Deferred income taxes | 12,169 | 17,180 |\n| Property and equipment, net | 134,345 | 171,036 |\n| Operating lease assets | 14,091 | 13,588 |\n| Goodwill | 29,198 | 31,885 |\n| Other non-current assets | 10,051 | 14,874 |\n| **Total assets** | **$ 402,392** | **$ 450,256** |\n| | | |\n| **Liabilities and Stockholders’ Equity** | | |\n| **Current liabilities:** | | |\n| Accounts payable | $ 7,493 | $ 7,987 |\n| Accrued compensation and benefits | 15,140 | 15,069 |\n| Accrued expenses and other current liabilities | 46,168 | 51,228 |\n| Accrued revenue share | 8,876 | 9,802 |\n| Deferred revenue | 4,137 | 5,036 |\n| **Total current liabilities** | **81,814** | **89,122** |\n| | | |\n| Long-term debt | 11,870 | 10,883 |\n| Income taxes payable, non-current | 8,474 | 8,782 |\n| Operating lease liabilities | 12,460 | 11,691 |\n| Other long-term liabilities | 4,395 | 4,694 |\n| **Total liabilities** | **119,013** | **125,172** |\n| | | |\n| **Commitments and Contingencies** | | |\n| | | |\n| **Stockholders’ equity:** | | |\n| Preferred stock, $0.001 par value per share, 100 shares authorized; no shares issued and outstanding | 0 | 0 |\n| Class A, Class B, and Class C stock and additional paid-in capital, $0.001 par value per share | 76,534 | 84,800 |\n| Accumulated other comprehensive income (loss) | (4,402) | (4,800) |\n| Retained earnings | 211,247 | 245,084 |\n| **Total stockholders’ equity** | **283,379** | **325,084** |\n| | | |\n| **Total liabilities and stockholders’ equity** | **$ 402,392** | **$ 450,256** |\n\n*Source: Alphabet 2024 Annual Report, Page 56.*"
+    },
+    "supplementary": {
+      "raw_response": "Based on the primary statement (Consolidated Balance Sheet) and the provided pages, I have identified several line items that have supplementary disclosures in the notes. The main supplementary tables extracted relate to the breakdown of:\n1.  **Property and Equipment, Net**\n2.  **Accrued Expenses and Other Current Liabilities**\n3.  **Marketable Securities & Fair Value Measurements**\n4.  **Goodwill**\n5.  **Leases**\n6.  **Long-term Debt**\n7.  **Accounts Receivable Allowance**\n\nHere are the supplementary tables in a structured format:\n\n### 1. Property and Equipment, Net (Note 7, Page 81)\n**Breakdown of Property and Equipment:**\n| Component | As of Dec 31, 2023 ($ millions) | As of Dec 31, 2024 ($ millions) |\n| :--- | :---: | :---: |\n| Technical infrastructure | $112,504 | $139,596 |\n| Office space | 40,435 | 43,714 |\n| Corporate and other assets | 13,728 | 16,519 |\n| **Property and equipment, in service** | **166,667** | **199,829** |\n| Less: Accumulated depreciation | (67,458) | (79,390) |\n| Add: Assets not yet in service | 35,136 | 50,597 |\n| **Property and equipment, net** | **$134,345** | **$171,036** |\n\n### 2. Accrued Expenses and Other Current Liabilities (Note 7, Page 81)\n**Breakdown of Accrued Expenses and Other Current Liabilities:**\n| Component | As of Dec 31, 2023 ($ millions) | As of Dec 31, 2024 ($ millions) |\n| :--- | :---: | :---: |\n| European Commission fines | $9,525 | $6,322 |\n| Accrued purchases of property and equipment | 4,679 | 7,104 |\n| Accrued customer liabilities | 4,140 | 4,304 |\n| Current operating lease liabilities | 2,791 | 2,887 |\n| Income taxes payable, net | 2,748 | 2,905 |\n| Other accrued expenses and current liabilities | 22,285 | 27,706 |\n| **Total accrued expenses and other current liabilities** | **$46,168** | **$51,228** |\n\n### 3. Marketable Securities - Fair Value Hierarchy (Note 3, Pages 70-71)\n**Fair Value Measurements as of December 31, 2024:**\n| Hierarchy | Cost ($M) | Gross Unrealized Gains ($M) | Gross Unrealized Losses ($M) | Fair Value ($M) | Cash & Equivalents ($M) | Marketable Securities ($M) |\n| :--- | :---: | :---: | :---: | :---: | :---: | :---: |\n| **Fair value changes in OCI:** | | | | | | |\n| Time deposits (Level 2) | $2,217 | $0 | $0 | $2,217 | $2,081 | $136 |\n| Government bonds (Level 2) | 27,551 | 83 | (214) | 27,420 | 50 | 27,370 |\n| Corporate debt (Level 2) | 18,300 | 79 | (222) | 18,157 | 0 | 18,157 |\n| Mortgage/Asset-backed (Level 2) | 14,437 | 63 | (385) | 14,115 | 0 | 14,115 |\n| **Subtotal (in OCI)** | **$62,505** | **$225** | **$(821)** | **$61,909** | **$2,131** | **$59,778** |\n| **Fair value changes in Net Income:** | | | | | | |\n| Money market funds (Level 1) | - | - | - | $8,154 | $8,154 | $0 |\n| Current marketable equity (Level 1) | - | - | - | 4,708 | 0 | 4,708 |\n| Mutual funds (Level 2) | - | - | - | 105 | 0 | 105 |\n| Government bonds (Level 2) | - | - | - | 1,339 | 0 | 1,339 |\n| Corporate debt (Level 2) | - | - | - | 2,959 | 0 | 2,959 |\n| Mortgage/Asset-backed (Level 2) | - | - | - | 3,302 | 0 | 3,302 |\n| **Subtotal (in Net Income)** | **-** | **-** | **-** | **$21,341** | **$8,928** | **$12,413** |\n| **Cash** | **-** | **-** | **-** | **$12,407** | **$12,407** | **$0** |\n| **Total** | **$62,505** | **$225** | **$(821)** | **$95,657** | **$23,466** | **$72,191** |\n\n### 4. Goodwill by Segment (Note 9, Page 83)\n**Changes in the Carrying Amount of Goodwill:**\n| Segment | Balance Dec 31, 2022 ($M) | Additions ($M) | FX/Other ($M) | Balance Dec 31, 2023 ($M) | Additions ($M) | FX/Other ($M) | Balance Dec 31, 2024 ($M) |\n| :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: |\n| Google Services | $20,847 | $240 | $31 | $21,118 | $2,441 | $(38) | $23,521 |\n| Google Cloud | 7,205 | 3 | (9) | 7,199 | 295 | (4) | 7,490 |\n| Other Bets | 908 | 0 | (27) | 881 | 0 | (7) | 874 |\n| **Total** | **$28,960** | **$243** | **$(5)** | **$29,198** | **$2,736** | **$(49)** | **$31,885** |\n\n### 5. Lease Details (Note 4, Pages 77-78)\n**Components of Lease Cost:**\n| Component | Year Ended Dec 31, 2022 ($M) | Year Ended Dec 31, 2023 ($M) | Year Ended Dec 31, 2024 ($M) |\n| :--- | :---: | :---: | :---: |\n| Operating lease cost | $2,900 | $3,362 | $3,304 |\n| Finance lease cost: | | | |\n| Amortization of lease assets | 474 | 469 | 413 |\n| Interest on lease liabilities | 34 | 35 | 31 |\n| **Total finance lease cost** | **508** | **504** | **444** |\n| Variable lease cost | 838 | 1,182 | 1,425 |\n| **Total lease cost** | **$4,246** | **$5,048** | **$5,173** |\n\n**Future Lease Payments as of December 31, 2024:**\n| Year | Operating Leases ($M) | Finance Leases ($M) |\n| :--- | :---: | :---: |\n| 2025 | $3,162 | $257 |\n| 2026 | 2,824 | 208 |\n| 2027 | 2,311 | 208 |\n| 2028 | 1,838 | 197 |\n| 2029 | 1,448 | 166 |\n| Thereafter | 5,455 | 852 |\n| **Total future lease payments** | **17,038** | **1,888** |\n| Less: Imputed interest | (2,460) | (211) |\n| **Total lease liability balance** | **$14,578** | **$1,677** |\n\n### 6. Long-term Debt Maturity Schedule (Note 6, Page 80)\n**Future Principal Payments for Long-term Debt as of December 31, 2024:**\n| Year | Amount ($ millions) |\n| :--- | :---: |\n| 2025 | $1,000 |\n| 2026 | 2,000 |\n| 2027 | 1,000 |\n| 2028 | 0 |\n| 2029 | 0 |\n| Thereafter | 8,000 |\n| **Total** | **$12,000** |\n\n### 7. Accounts Receivable Allowance (Note 7, Page 81)\n**Allowance for Credit Losses:**\n| As of December 31, 2023 | As of December 31, 2024 |\n| :---: | :---: |\n| $771 million | $879 million |"
+    }
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "query": "Item 7 Management's Discussion and Analysis (MD&A), and Item 8 Financial Statements and Supplementary Data sections specifically covering \"Income Taxes\" and \"Commitments and Contingencies\".",
+  "selected_pages": [
+    23,
+    24,
+    25,
+    26,
+    27,
+    41,
+    42,
+    43,
+    45,
+    46,
+    47
+  ],
+  "extraction": {
+    "tax_onetime_amount": 10.2,
+    "tax_onetime_note": "One-time income tax charge of $10.2 billion net related to the European Commission State Aid Decision.",
+    "tax_contingency_amount": 13,
+    "tax_contingency_note": "Gross unrecognized tax benefits could decrease between approximately $5 billion and $13 billion in the next 12 months, primarily related to intercompany transfer pricing and deemed repatriation tax."
+  }
+}

@@ -1,0 +1,35 @@
+{
+  "schema_version": "1.0",
+  "fields": [
+    "depreciation_and_amortization"
+  ],
+  "statement": {
+    "company_id": "google_2024",
+    "statement_type": "consolidated-cash-flow-statement",
+    "periods": [
+      {
+        "year": "2022",
+        "currency": "USD",
+        "values": {
+          "depreciation_and_amortization": 13475.0
+        }
+      },
+      {
+        "year": "2023",
+        "currency": "USD",
+        "values": {
+          "depreciation_and_amortization": 11946.0
+        }
+      },
+      {
+        "year": "2024",
+        "currency": "USD",
+        "values": {
+          "depreciation_and_amortization": 15311.0
+        }
+      }
+    ],
+    "notes": "Extracted 'Depreciation of property and equipment' line from the operating activities adjustments. This is the standard mapping for depreciation_and_amortization in a cash flow statement. The supplementary tables include amortization of lease assets, but this is a component of finance lease cost and is not added to the main depreciation figure as it is already part of the operating cash flow adjustments via the total lease expense.",
+    "source_file": "extracted_text/google_2024.consolidated-cash-flow-statement.llm.json"
+  }
+}

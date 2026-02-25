@@ -1,0 +1,128 @@
+{
+  "schema_version": "1.0",
+  "fields": [
+    "cash_and_cash_equivalents",
+    "short_term_market_securities",
+    "total_accounts_receivable",
+    "total_current_liabilities",
+    "total_debt_short_term_and_long_term",
+    "total_equity",
+    "total_assets"
+  ],
+  "statement": {
+    "company_id": "2023 General Motors Annual Report",
+    "statement_type": "consolidated-balance-sheet",
+    "periods": [
+      {
+        "year": "2023",
+        "currency": "USD",
+        "scale": 1000000,
+        "values": {
+          "cash_and_cash_equivalents": [
+            {
+              "Cash and cash equivalents": 18853.0
+            }
+          ],
+          "short_term_market_securities": [
+            {
+              "Marketable debt securities": 7613.0
+            }
+          ],
+          "total_accounts_receivable": [
+            {
+              "Accounts and notes receivable, net": 12378.0
+            },
+            {
+              "GM Financial receivables, net": 39076.0
+            }
+          ],
+          "total_current_liabilities": [
+            {
+              "Total current liabilities": 94445.0
+            }
+          ],
+          "total_debt_short_term_and_long_term": [
+            {
+              "Short-term debt and current portion of long-term debt Automotive": 428.0
+            },
+            {
+              "Short-term debt and current portion of long-term debt GM Financial": 38540.0
+            },
+            {
+              "Long-term debt Automotive": 15985.0
+            },
+            {
+              "Long-term debt GM Financial": 66788.0
+            }
+          ],
+          "total_equity": [
+            {
+              "Total Equity": 68189.0
+            }
+          ],
+          "total_assets": [
+            {
+              "Total Assets": 273064.0
+            }
+          ]
+        }
+      },
+      {
+        "year": "2022",
+        "currency": "USD",
+        "scale": 1000000,
+        "values": {
+          "cash_and_cash_equivalents": [
+            {
+              "Cash and cash equivalents": 19153.0
+            }
+          ],
+          "short_term_market_securities": [
+            {
+              "Marketable debt securities": 12150.0
+            }
+          ],
+          "total_accounts_receivable": [
+            {
+              "Accounts and notes receivable, net": 13333.0
+            },
+            {
+              "GM Financial receivables, net": 33623.0
+            }
+          ],
+          "total_current_liabilities": [
+            {
+              "Total current liabilities": 91173.0
+            }
+          ],
+          "total_debt_short_term_and_long_term": [
+            {
+              "Short-term debt and current portion of long-term debt Automotive": 1959.0
+            },
+            {
+              "Short-term debt and current portion of long-term debt GM Financial": 36819.0
+            },
+            {
+              "Long-term debt Automotive": 15885.0
+            },
+            {
+              "Long-term debt GM Financial": 60036.0
+            }
+          ],
+          "total_equity": [
+            {
+              "Total Equity": 71927.0
+            }
+          ],
+          "total_assets": [
+            {
+              "Total Assets": 264037.0
+            }
+          ]
+        }
+      }
+    ],
+    "notes": "1. 'total_accounts_receivable' includes both trade receivables ('Accounts and notes receivable, net') and finance receivables ('GM Financial receivables, net') as both are receivables from customers. The finance receivables are a core part of GM's automotive financing business. 2. 'total_debt_short_term_and_long_term' is constructed by summing the short-term and long-term debt components for both the Automotive and GM Financial segments as presented in the balance sheet. 3. 'short_term_market_securities' is mapped directly to 'Marketable debt securities' as these are liquid, unrestricted debt investments intended to be sold in the short term. 4. Scale is 1E6 as the statement is presented 'In millions'. 5. All values are taken directly from the primary consolidated balance sheet.",
+    "source_file": "extracted_text/2023 General Motors Annual Report .consolidated-balance-sheet.llm.json"
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "query": "Consolidated Income Statement",
+  "selected_pages": [
+    3,
+    123
+  ],
+  "extraction": {
+    "raw_response": "Based on the provided pages, the **Consolidated Income Statement** is found on Page 123. Here is the data presented in a tabular format.\n\n### Consolidated Income Statement\n**For the year ended 31 December**\n*(RMB Million)*\n\n| Item | Note | 2024 | 2023 |\n| :--- | :--- | :---: | :---: |\n| **Revenues** | | | |\n| Value-added Services | | 319,168 | 298,375 |\n| Marketing Services* | | 121,374 | 101,482 |\n| FinTech and Business Services | | 211,956 | 203,763 |\n| Others | | 7,759 | 5,395 |\n| **Total Revenues** | **6** | **660,257** | **609,015** |\n| | | | |\n| Cost of revenues | 7 | (311,011) | (315,906) |\n| **Gross profit** | | **349,246** | **293,109** |\n| | | | |\n| Selling and marketing expenses | 7 | (36,388) | (34,211) |\n| General and administrative expenses | 7 | (112,761) | (103,525) |\n| Other gains/(losses), net | 8 | 8,002 | 4,701 |\n| **Operating profit** | | **208,099** | **160,074** |\n| | | | |\n| Net gains/(losses) from investments and others | 9 | 4,187 | (6,090) |\n| Interest income | 10 | 16,004 | 13,808 |\n| Finance costs | 11 | (11,981) | (12,268) |\n| Share of profit/(loss) of associates and joint ventures | | 25,176 | 5,800 |\n| **Profit before income tax** | | **241,485** | **161,324** |\n| | | | |\n| Income tax expense | 12(a) | (45,018) | (43,276) |\n| **Profit for the year** | | **196,467** | **118,048** |\n| | | | |\n| **Attributable to:** | | | |\n| Equity holders of the Company | | 194,073 | 115,216 |\n| Non-controlling interests | | 2,394 | 2,832 |\n| | | **196,467** | **118,048** |\n| | | | |\n| **Earnings per share (RMB)** | | | |\n| – basic | 13(a) | 20.938 | 12.186 |\n| – diluted | 13(b) | 20.486 | 11.887 |\n\n*Note: The Group has renamed this revenue segment from “Online Advertising” to “Marketing Services” during the year ended 31 December 2024.*"
+  }
+}

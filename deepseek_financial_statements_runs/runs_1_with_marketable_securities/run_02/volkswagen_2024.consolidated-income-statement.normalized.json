@@ -1,0 +1,130 @@
+{
+  "schema_version": "1.0",
+  "fields": [
+    "total_revenue",
+    "total_operating_cost",
+    "net_income",
+    "taxes",
+    "interest_expenses"
+  ],
+  "statement": {
+    "company_id": "volkswagen_2024",
+    "statement_type": "consolidated-income-statement",
+    "periods": [
+      {
+        "year": "2024",
+        "currency": "EUR",
+        "scale": 1000000,
+        "values": {
+          "total_revenue": [
+            {
+              "Sales revenue": 324656.0
+            }
+          ],
+          "total_operating_cost": [
+            {
+              "Cost of sales": 265184.0
+            },
+            {
+              "Distribution expenses": 22320.0
+            },
+            {
+              "Administrative expenses": 12754.0
+            },
+            {
+              "Other operating expenses": 20312.0
+            }
+          ],
+          "net_income": [
+            {
+              "Earnings after tax": 12394.0
+            }
+          ],
+          "taxes": [
+            {
+              "Current tax expense": 5858.0
+            },
+            {
+              "Deferred tax income (–)/expense (+)": -1447.0
+            }
+          ],
+          "interest_expenses": [
+            {
+              "Other interest and similar expenses": 1596.0
+            },
+            {
+              "Valuation of fair value hedges": 0.0
+            },
+            {
+              "Expenses from discounting lease liabilities": 266.0
+            },
+            {
+              "Interest result from compounding/discounting other non-current liabilities": 613.0
+            },
+            {
+              "Net interest on the net defined benefit liability": 971.0
+            }
+          ]
+        }
+      },
+      {
+        "year": "2023",
+        "currency": "EUR",
+        "scale": 1000000,
+        "values": {
+          "total_revenue": [
+            {
+              "Sales revenue": 322284.0
+            }
+          ],
+          "total_operating_cost": [
+            {
+              "Cost of sales": 261299.0
+            },
+            {
+              "Distribution expenses": 21345.0
+            },
+            {
+              "Administrative expenses": 12729.0
+            },
+            {
+              "Other operating expenses": 19534.0
+            }
+          ],
+          "net_income": [
+            {
+              "Earnings after tax": 17861.0
+            }
+          ],
+          "taxes": [
+            {
+              "Current tax expense": 6791.0
+            },
+            {
+              "Deferred tax income (–)/expense (+)": -1554.0
+            }
+          ],
+          "interest_expenses": [
+            {
+              "Other interest and similar expenses": 2050.0
+            },
+            {
+              "Valuation of fair value hedges": 3.0
+            },
+            {
+              "Expenses from discounting lease liabilities": 222.0
+            },
+            {
+              "Interest result from compounding/discounting other non-current liabilities": 351.0
+            },
+            {
+              "Net interest on the net defined benefit liability": 1014.0
+            }
+          ]
+        }
+      }
+    ],
+    "notes": "1. Total operating cost includes Cost of sales, Distribution expenses, Administrative expenses, and Other operating expenses, which are standard for a manufacturing/automotive company. Other operating income is excluded as it is a separate positive component. 2. Taxes are mapped from Note 10: Current tax expense (positive as it reduces income) and Deferred tax income/expense (negative as deferred tax income increases income). The sign convention follows rule 13. 3. Interest expenses are mapped from the detailed breakdown in Note 8, taking the absolute values of the negative items listed under Interest expenses (since they are presented as negatives in the statement but should be positive per rule 13). The line 'Valuation of fair value hedges' for 2023 is 3 (from -3 in the table). 4. All numbers are in € million (scale 1E6). 5. The primary statement shows parentheses for negative numbers; these have been handled according to rule 12 and rule 13.",
+    "source_file": "extracted_text/volkswagen_2024.consolidated-income-statement.llm.json"
+  }
+}

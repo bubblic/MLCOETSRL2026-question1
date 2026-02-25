@@ -1,0 +1,46 @@
+{
+  "schema_version": "1.0",
+  "fields": [
+    "cash_and_cash_equivalents",
+    "marketable_securities",
+    "accounts_receivable",
+    "total_current_liabilities",
+    "total_debt_short_term_and_long_term",
+    "total_equity",
+    "total_assets"
+  ],
+  "statement": {
+    "company_id": "jpmorgan_2024",
+    "statement_type": "consolidated-balance-sheet",
+    "periods": [
+      {
+        "year": "2024",
+        "currency": "USD",
+        "values": {
+          "cash_and_cash_equivalents": 469317.0,
+          "marketable_securities": 681320.0,
+          "accounts_receivable": 101223.0,
+          "total_current_liabilities": null,
+          "total_debt_short_term_and_long_term": 454311.0,
+          "total_equity": 344758.0,
+          "total_assets": 4002814.0
+        }
+      },
+      {
+        "year": "2023",
+        "currency": "USD",
+        "values": {
+          "cash_and_cash_equivalents": 624151.0,
+          "marketable_securities": 571552.0,
+          "accounts_receivable": 107363.0,
+          "total_current_liabilities": null,
+          "total_debt_short_term_and_long_term": 436537.0,
+          "total_equity": 327878.0,
+          "total_assets": 3875393.0
+        }
+      }
+    ],
+    "notes": "1. 'cash_and_cash_equivalents' is the sum of 'Cash and due from banks' and 'Deposits with banks'. 2. 'marketable_securities' is mapped to 'Investment securities, net of allowance for credit losses'. 3. 'accounts_receivable' is mapped to 'Accrued interest and accounts receivable'. 4. 'total_current_liabilities' is not directly provided; the statement does not show a clear subtotal for current liabilities. 5. 'total_debt_short_term_and_long_term' is the sum of 'Short-term borrowings' and 'Long-term debt'. 6. 'total_equity' and 'total_assets' are taken directly from the statement.",
+    "source_file": "extracted_text_total_operating_cost_marketable_securities\\jpmorgan_2024.consolidated-balance-sheet.llm.json"
+  }
+}

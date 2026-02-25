@@ -1,0 +1,104 @@
+{
+  "schema_version": "1.0",
+  "fields": [
+    "cash_and_cash_equivalents",
+    "marketable_securities",
+    "accounts_receivable",
+    "total_current_liabilities",
+    "total_debt_short_term_and_long_term",
+    "total_equity",
+    "total_assets"
+  ],
+  "statement": {
+    "company_id": "lvmh_dec_2024",
+    "statement_type": "consolidated-balance-sheet",
+    "periods": [
+      {
+        "year": "2024",
+        "currency": "EUR",
+        "values": {
+          "cash_and_cash_equivalents": [
+            9631.0
+          ],
+          "marketable_securities": [
+            3956.0
+          ],
+          "accounts_receivable": [
+            4730.0
+          ],
+          "total_current_liabilities": [
+            33696.0
+          ],
+          "total_debt_short_term_and_long_term": [
+            10851.0,
+            12091.0
+          ],
+          "total_equity": [
+            69287.0
+          ],
+          "total_assets": [
+            149190.0
+          ]
+        }
+      },
+      {
+        "year": "2023",
+        "currency": "EUR",
+        "values": {
+          "cash_and_cash_equivalents": [
+            7774.0
+          ],
+          "marketable_securities": [
+            3490.0
+          ],
+          "accounts_receivable": [
+            4728.0
+          ],
+          "total_current_liabilities": [
+            33145.0
+          ],
+          "total_debt_short_term_and_long_term": [
+            10680.0,
+            11227.0
+          ],
+          "total_equity": [
+            62701.0
+          ],
+          "total_assets": [
+            143694.0
+          ]
+        }
+      },
+      {
+        "year": "2022",
+        "currency": "EUR",
+        "values": {
+          "cash_and_cash_equivalents": [
+            7300.0
+          ],
+          "marketable_securities": [
+            3552.0
+          ],
+          "accounts_receivable": [
+            4258.0
+          ],
+          "total_current_liabilities": [
+            31543.0
+          ],
+          "total_debt_short_term_and_long_term": [
+            9359.0,
+            10380.0
+          ],
+          "total_equity": [
+            56604.0
+          ],
+          "total_assets": [
+            134646.0
+          ]
+        }
+      }
+    ],
+    "notes": "1. 'marketable_securities' mapped from 'Current available for sale financial assets' line within 'Other current assets' (Note 13). 2. 'total_debt_short_term_and_long_term' includes 'Short-term borrowings' and 'Long-term borrowings' as separate array elements, per rule 4. Lease liabilities are not included as they are a separate financing obligation. 3. 'accounts_receivable' mapped from 'Trade accounts receivable'. 4. All values extracted directly from the primary consolidated balance sheet or the specified supplementary notes.",
+    "source_file": "extracted_text/lvmh_dec_2024.consolidated-balance-sheet.llm.json"
+  }
+}

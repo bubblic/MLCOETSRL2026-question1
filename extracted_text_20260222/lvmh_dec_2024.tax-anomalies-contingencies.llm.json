@@ -1,0 +1,29 @@
+{
+  "query": "Item 7 Management's Discussion and Analysis (MD&A), and Item 8 Financial Statements and Supplementary Data sections specifically covering \"Income Taxes\" and \"Commitments and Contingencies\".",
+  "selected_pages": [
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18,
+    19,
+    20,
+    65,
+    66,
+    67
+  ],
+  "extraction": {
+    "tax_onetime_amount": null,
+    "tax_onetime_note": null,
+    "tax_contingency_amount": null,
+    "tax_contingency_note": null
+  }
+}

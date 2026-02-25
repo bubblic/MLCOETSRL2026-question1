@@ -1,0 +1,61 @@
+{
+  "query": "Consolidated Balance Sheet",
+  "selected_pages": {
+    "primary_statement_pages": [
+      56
+    ],
+    "supplementary_pages": [
+      49,
+      54,
+      56,
+      57,
+      58,
+      59,
+      60,
+      61,
+      62,
+      63,
+      64,
+      65,
+      66,
+      67,
+      68,
+      69,
+      70,
+      71,
+      72,
+      73,
+      74,
+      75,
+      76,
+      77,
+      78,
+      79,
+      80,
+      81,
+      82,
+      83,
+      84,
+      85,
+      86,
+      87,
+      88,
+      89,
+      90,
+      91,
+      92,
+      93,
+      94,
+      95,
+      96
+    ]
+  },
+  "extraction": {
+    "primary_statement": {
+      "raw_response": "**Consolidated Balance Sheets**  \n*(in millions, except par value per share amounts)*\n\n| Description | 2023 | 2024 |\n|-------------|------|------|\n| **Assets** | | |\n| Current assets: | | |\n| Cash and cash equivalents | 24,048 | 23,466 |\n| Marketable securities | 86,868 | 72,191 |\n| Total cash, cash equivalents, and marketable securities | 110,916 | 95,657 |\n| Accounts receivable, net | 47,964 | 52,340 |\n| Other current assets | 12,650 | 15,714 |\n| **Total current assets** | **171,530** | **163,711** |\n| Non-marketable securities | 31,008 | 37,982 |\n| Deferred income taxes | 12,169 | 17,180 |\n| Property and equipment, net | 134,345 | 171,036 |\n| Operating lease assets | 14,091 | 13,588 |\n| Goodwill | 29,198 | 31,885 |\n| Other non-current assets | 10,051 | 14,874 |\n| **Total assets** | **402,392** | **450,256** |\n| **Liabilities and Stockholders’ Equity** | | |\n| Current liabilities: | | |\n| Accounts payable | 7,493 | 7,987 |\n| Accrued compensation and benefits | 15,140 | 15,069 |\n| Accrued expenses and other current liabilities | 46,168 | 51,228 |\n| Accrued revenue share | 8,876 | 9,802 |\n| Deferred revenue | 4,137 | 5,036 |\n| **Total current liabilities** | **81,814** | **89,122** |\n| Long-term debt | 11,870 | 10,883 |\n| Income taxes payable, non-current | 8,474 | 8,782 |\n| Operating lease liabilities | 12,460 | 11,691 |\n| Other long-term liabilities | 4,395 | 4,694 |\n| **Total liabilities** | **119,013** | **125,172** |\n| Commitments and Contingencies (Note 10) | | |\n| Stockholders’ equity: | | |\n| Preferred stock, $0.001 par value per share, 100 shares authorized; no shares issued and outstanding | 0 | 0 |\n| Class A, Class B, and Class C stock and additional paid-in capital, $0.001 par value per share: 300,000 shares authorized (Class A 180,000, Class B 60,000, Class C 60,000); 12,460 (Class A 5,899, Class B 870, Class C 5,691) and 12,211 (Class A 5,835, Class B 861, Class C 5,515) shares issued and outstanding | 76,534 | 84,800 |\n| Accumulated other comprehensive income (loss) | (4,402) | (4,800) |\n| Retained earnings | 211,247 | 245,084 |\n| **Total stockholders’ equity** | **283,379** | **325,084** |\n| **Total liabilities and stockholders’ equity** | **402,392** | **450,256** |"
+    },
+    "supplementary": {
+      "raw_response": "Based on the primary statement (Consolidated Balance Sheet) and the provided pages, here are the supplementary tables directly related to the inferred line items.\n\n| Supplementary Table Title | Related Balance Sheet Line Item(s) | Extracted Supplementary Table |\n| :--- | :--- | :--- |\n| **Note 3: Fair Value of Marketable Securities (Recurring Basis)** | Cash and cash equivalents, Marketable securities | **As of December 31, 2023** <br> Hierarchy: Level 2 <br> - Time deposits: Fair Value $2,628 <br> - Government bonds: Fair Value $37,660 <br> - Corporate debt securities: Fair Value $21,932 <br> - Mortgage/Asset-backed: Fair Value $16,697 <br><br> **As of December 31, 2024** <br> Hierarchy: Level 2 <br> - Time deposits: Fair Value $2,217 <br> - Government bonds: Fair Value $27,420 <br> - Corporate debt securities: Fair Value $18,157 <br> - Mortgage/Asset-backed: Fair Value $14,115 <br> *(Source: Pages 70-71)* |\n| **Note 4: Components of Lease Cost** | Operating lease assets, Operating lease liabilities | **Year Ended December 31,** <br> - 2022: Operating lease cost $2,900; Finance lease cost $508; Variable lease cost $838; **Total** $4,246 <br> - 2023: Operating lease cost $3,362; Finance lease cost $504; Variable lease cost $1,182; **Total** $5,048 <br> - 2024: Operating lease cost $3,304; Finance lease cost $444; Variable lease cost $1,425; **Total** $5,173 <br> *(Source: Page 77)* |\n| **Note 4: Future Lease Payments** | Operating lease liabilities | **As of December 31, 2024** <br> - 2025: $3,162 <br> - 2026: $2,824 <br> - 2027: $2,311 <br> - 2028: $1,838 <br> - 2029: $1,448 <br> - Thereafter: $5,455 <br> **Total future lease payments:** $17,038 <br> **Less imputed interest:** ($2,460) <br> **Total lease liability:** $14,578 <br> *(Source: Page 78)* |\n| **Note 5: Unconsolidated VIEs - Funding Commitments** | Non-marketable securities | **Future Funding Commitments:** <br> - As of December 31, 2023: $1.7 billion <br> - As of December 31, 2024: $1.5 billion <br> *(Source: Page 72)* |\n| **Note 6: Long-Term Debt Maturity** | Long-term debt | **Future Principal Payments as of Dec 31, 2024:** <br> - 2025: $1,000 <br> - 2026: $2,000 <br> - 2027: $1,000 <br> - 2028: $0 <br> - 2029: $0 <br> - Thereafter: $8,000 <br> **Total:** $12,000 <br> *(Source: Page 73)* |\n| **Note 7: Property and Equipment, Net Breakdown** | Property and equipment, net | **As of December 31, 2023** <br> - Technical infrastructure: $112,504 <br> - Office space: $40,435 <br> - Corporate and other assets: $13,728 <br> - **Property & equipment, in service:** $166,667 <br> - Less: Accumulated depreciation: ($67,458) <br> - Add: Assets not yet in service: $35,136 <br> **Total, net:** $134,345 <br><br> **As of December 31, 2024** <br> - Technical infrastructure: $139,596 <br> - Office space: $43,714 <br> - Corporate and other assets: $16,519 <br> - **Property & equipment, in service:** $199,829 <br> - Less: Accumulated depreciation: ($79,390) <br> - Add: Assets not yet in service: $50,597 <br> **Total, net:** $171,036 <br> *(Source: Page 74)* |\n| **Note 7: Accrued Expenses and Other Current Liabilities Breakdown** | Accrued expenses and other current liabilities | **As of December 31, 2023** <br> - European Commission fines: $9,525 <br> - Accrued purchases of property and equipment: $4,679 <br> - Accrued customer liabilities: $4,140 <br> - Current operating lease liabilities: $2,791 <br> - Income taxes payable, net: $2,748 <br> - Other: $22,285 <br> **Total:** $46,168 <br><br> **As of December 31, 2024** <br> - European Commission fines: $6,322 <br> - Accrued purchases of property and equipment: $7,104 <br> - Accrued customer liabilities: $4,304 <br> - Current operating lease liabilities: $2,887 <br> - Income taxes payable, net: $2,905 <br> - Other: $27,706 <br> **Total:** $51,228 <br> *(Source: Page 74)* |\n| **Note 9: Goodwill Rollforward** | Goodwill | **Year Ended December 31, 2024 (in millions)** <br> **Google Services:** <br> - Beginning Balance: $21,118 <br> - Additions: $2,441 <br> - FX/Other: ($38) <br> - **Ending Balance:** $23,521 <br> **Google Cloud:** <br> - Beginning Balance: $7,199 <br> - Additions: $295 <br> - FX/Other: ($4) <br> - **Ending Balance:** $7,490 <br> **Other Bets:** <br> - Beginning Balance: $881 <br> - Additions: $0 <br> - FX/Other: ($7) <br> - **Ending Balance:** $874 <br> **Total Goodwill:** $31,885 <br> *(Source: Page 76)* |\n| **Note 10: Commitments - Content Licensing** | Commitments and Contingencies (Note 10) | **As of December 31, 2024:** <br> Future fixed/minimum guaranteed commitments for content licensing agreements: **$8.8 billion** <br> *(Source: Page 76)* |"
+    }
+  }
+}

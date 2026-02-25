@@ -1,0 +1,59 @@
+{
+  "query": "Consolidated Cash Flow Statement",
+  "selected_pages": {
+    "primary_statement_pages": [
+      126,
+      127,
+      477,
+      569,
+      570,
+      571,
+      670,
+      671,
+      672
+    ],
+    "supplementary_pages": [
+      126,
+      127,
+      128,
+      129,
+      476,
+      477,
+      478,
+      479,
+      480,
+      481,
+      482,
+      483,
+      484,
+      485,
+      486,
+      487,
+      488,
+      489,
+      490,
+      491,
+      492,
+      493,
+      494,
+      495,
+      496,
+      497,
+      498,
+      499,
+      569,
+      570,
+      571,
+      671,
+      672
+    ]
+  },
+  "extraction": {
+    "primary_statement": {
+      "raw_response": "The Consolidated Cash Flow Statement for the Volkswagen Group is found on page 477 of the provided data. The table presents cash flows for the period January 1 to December 31, 2024, compared with the prior year (2023), in € million.\n\n| Line item | 2024 (€ million) | 2023 (€ million) |\n| :--- | :--- | :--- |\n| **Cash and cash equivalents at beginning of period** | 43,522 | 29,738 |\n| Earnings before tax | 16,806 | 23,099 |\n| Income taxes paid | –6,187 | –7,716 |\n| Depreciation and amortization of, and impairment losses on, intangible assets, property, plant and equipment, and investment property¹ | 12,858 | 11,727 |\n| Amortization of and impairment losses on capitalized development costs¹ | 7,209 | 5,184 |\n| Impairment losses on equity investments¹ | 710 | 717 |\n| Depreciation of and impairment losses on lease assets¹ | 11,279 | 10,655 |\n| Gain/loss on disposal of non-current assets and equity investments | 110 | 208 |\n| Share of the result of equity-accounted investments | 2,362 | 271 |\n| Other non-cash expense/income | 903 | 3,953 |\n| Change in inventories | –2,695 | –2,071 |\n| Change in receivables (excluding financial services) | –2,083 | –4,361 |\n| Change in liabilities (excluding financial liabilities) | 52 | 5,272 |\n| Change in provisions | 4,247 | 715 |\n| Change in lease assets | –19,358 | –14,964 |\n| Change in financial services receivables | –9,061 | –13,332 |\n| **Cash flows from operating activities** | **17,151** | **19,356** |\n| Investments in intangible assets (excluding development costs), property, plant and equipment, and investment property | –17,202 | –14,653 |\n| Additions to capitalized development costs | –10,244 | –11,142 |\n| Acquisition of subsidiaries | –284 | –675 |\n| Acquisition of other equity investments | –2,152 | –2,041 |\n| Disposal of subsidiaries | –148 | –63 |\n| Disposal of other equity investments | 231 | 41 |\n| Proceeds from disposal of intangible assets, property, plant and equipment, and investment property | 947 | 501 |\n| Change in investments in securities and time deposits | –203 | 11,273 |\n| Change in loans | –2,517 | –3,054 |\n| **Cash flows from investing activities** | **–31,573** | **–19,812** |\n| Capital contributions/capital redemptions | –1,144 | 1,003 |\n| Dividends paid | –5,779 | –11,732 |\n| Capital transactions with non-controlling interest shareholders | – | –8 |\n| Proceeds from issuance of bonds | 38,420 | 37,740 |\n| Repayments of bonds | –32,617 | –32,582 |\n| Proceeds from issuance of unlisted notes | 13,122 | 15,790 |\n| Repayments of unlisted notes | –8,341 | –8,981 |\n| Changes in other financial liabilities | 8,813 | 15,967 |\n| Repayments of lease liabilities | –1,334 | –1,190 |\n| **Cash flows from financing activities** | **11,140** | **16,008** |\n| Effect of exchange rate changes on cash and cash equivalents | 55 | –1,764 |\n| Change of loss allowance within cash and cash equivalents | 1 | –2 |\n| **Net change in cash and cash equivalents** | **–3,226** | **13,785** |\n| **Cash and cash equivalents at end of period** | **40,296** | **43,522** |\n| Securities and time deposits and loans | 44,662 | 41,858 |\n| **Gross liquidity** | **84,959** | **85,380** |\n| Total third-party borrowings | –254,081 | –232,813 |\n| **Net liquidity** | **–169,122** | **–147,433** |\n\n**Notes:**  \n¹ Net of impairment reversals.  \n² Prior-year figures adjusted (see disclosures on IAS 8 in the “Prior-year corrections in accordance with IAS 8” section)."
+    },
+    "supplementary": {
+      "raw_response": "Based on the provided pages and the primary Consolidated Cash Flow Statement, the following supplementary tables were found. They provide breakdowns of cash flow items by division and business area, offering expansions directly related to the primary statement's line items.\n\n### **Supplementary Table 1: Cash Flow Statement by Division (Page 127)**\nThis table breaks down the consolidated cash flow into the **Automotive Division** and the **Financial Services Division**.\n\n| Line item | Volkswagen Group 2024 (€ million) | Volkswagen Group 2023² (€ million) | Automotive Division¹ 2024 (€ million) | Automotive Division¹ 2023² (€ million) | Financial Services Division 2024 (€ million) | Financial Services Division 2023² (€ million) |\n| :--- | :---: | :---: | :---: | :---: | :---: | :---: |\n| **Cash and cash equivalents at beginning of period** | **43,522** | **29,738** | **28,704** | **23,042** | **14,819** | **6,695** |\n| Earnings before tax | 16,806 | 23,099 | 13,811 | 19,332 | 2,994 | 3,767 |\n| Income taxes paid | –6,187 | –7,716 | –4,959 | –6,328 | –1,228 | –1,389 |\n| Depreciation and amortization expense³ | 32,056 | 28,282 | 20,854 | 17,729 | 11,201 | 10,552 |\n| Change in pension provisions | –19 | 262 | –25 | 251 | 6 | 11 |\n| Share of the result of equity-accounted investments | 2,362 | 271 | 2,135 | 244 | 227 | 27 |\n| Other non-cash income/expense and reclassifications⁴ | 1,013 | 4,161 | 1,138 | 4,474 | –125 | –313 |\n| **Gross cash flow** | **46,030** | **48,358** | **32,956** | **35,702** | **13,074** | **12,656** |\n| Change in working capital | –28,879 | –29,002 | 28 | 2,150 | –28,907 | –31,152 |\n| *Change in inventories* | *–2,695* | *–2,071* | *–1,460* | *–651* | *–1,235* | *–1,419* |\n| *Change in receivables* | *–2,083* | *–4,361* | *–1,665* | *–1,250* | *–418* | *–3,111* |\n| *Change in liabilities* | *52* | *5,272* | *–770* | *3,179* | *823* | *2,094* |\n| *Change in other provisions* | *4,266* | *453* | *4,168* | *323* | *98* | *131* |\n| *Change in lease assets (excluding depreciation)* | *–19,358* | *–14,964* | *–68* | *558* | *–19,291* | *–15,522* |\n| *Change in financial services receivables* | *–9,061* | *–13,332* | *–177* | *–8* | *–8,883* | *–13,324* |\n| **Cash flows from operating activities** | **17,151** | **19,356** | **32,983** | **37,851** | **–15,832** | **–18,495** |\n| Cash flows from investing activities attributable to operating activities | –28,853 | –28,031 | –27,971 | –27,153 | –883 | –878 |\n| *of which: investments in property, plant and equipment, investment property and intangible assets, excluding capitalized development costs (capex)* | *–17,202* | *–14,653* | *–16,949* | *–14,371* | *–253* | *–282* |\n| *capitalized development costs* | *–10,244* | *–11,142* | *–10,244* | *–11,142* | *–* | *–* |\n| *acquisition and disposal of equity investments* | *–2,354* | *–2,738* | *–1,682* | *–2,115* | *–672* | *–622* |\n| **Net cash flow⁵** | **–11,702** | **–8,675** | **5,013** | **10,698** | **–16,715** | **–19,373** |\n| Change in investments in securities and time deposits, as well as in loans | –2,720 | 8,219 | –4,406 | 9,512 | 1,686 | –1,293 |\n| **Cash flows from investing activities** | **–31,573** | **–19,812** | **–32,376** | **–17,641** | **804** | **–2,171** |\n| **Cash flows from financing activities** | **11,140** | **16,008** | **–5,340** | **–12,927** | **16,479** | **28,934** |\n| *of which: capital transactions with non-controlling interests* | *–* | *–8* | *–* | *–8* | *–* | *–* |\n| *capital contributions/capital redemptions* | *–1,144* | *1,003* | *–1,844* | *–2,919* | *699* | *3,922* |\n| Effect of exchange rate changes on cash and cash equivalents | 55 | –1,765 | 127 | –1,620 | –73 | –145 |\n| Change of loss allowance within cash and cash equivalents | 1 | –2 | 2 | –2 | –1 | 0 |\n| **Net change in cash and cash equivalents** | **–3,226** | **13,785** | **–4,603** | **5,661** | **1,377** | **8,124** |\n| **Cash and cash equivalents at Dec. 31⁶** | **40,296** | **43,522** | **24,100** | **28,704** | **16,196** | **14,819** |\n| Securities and time deposits, as well as loans | 44,662 | 41,858 | 25,175 | 20,994 | 19,487 | 20,864 |\n| **Gross liquidity** | **84,959** | **85,380** | **49,276** | **49,698** | **35,683** | **35,683** |\n| Total third-party borrowings | –254,081 | –232,813 | –13,210 | –9,409 | –240,871 | –223,404 |\n| **Net liquidity at Dec. 31⁷** | **–169,122** | **–147,433** | **36,066** | **40,289** | **–205,188** | **–187,722** |\n\n**Notes:**\n¹ Including allocation of consolidation adjustments between the Automotive and Financial Services divisions.\n² Prior-year figures adjusted (see disclosures on IAS 8).\n³ Net of impairment reversals.\n⁴ These relate mainly to the fair value measurement of financial instruments and the reclassification of gains/losses on disposal of non-current assets and equity investments to investing activities.\n⁵ Net cash flow: cash flows from operating activities, net of cash flows from investing activities attributable to operating activities (investing activities excluding change in investments in securities, time deposits and loans).\n⁶ Cash and cash equivalents comprise cash at banks, checks, cash-in-hand and call deposits.\n⁷ The total of cash, cash equivalents, securities and time deposits, as well as loans to affiliates and joint ventures net of third-party borrowings (non-current and current financial liabilities).\n\n### **Supplementary Table 2: Financial Position by Business Area (Page 129)**\nThis table provides a breakdown of key cash flow components within the **Passenger Cars, Commercial Vehicles, and Power Engineering** business areas.\n\n| € million | 2024 | 2023¹ |\n| :--- | :---: | :---: |\n| **Passenger Cars** | | |\n| Gross cash flow | 26,969 | 30,015 |\n| Change in working capital | 68 | 2,920 |\n| Cash flows from operating activities | 27,037 | 32,935 |\n| Cash flows from investing activities attributable to operating activities | –24,852 | –25,223 |\n| Net cash flow | 2,185 | 7,712 |\n| **Commercial Vehicles** | | |\n| Gross cash flow | 5,504 | 5,214 |\n| Change in working capital | –59 | –682 |\n| Cash flows from operating activities | 5,445 | 4,532 |\n| Cash flows from investing activities attributable to operating activities | –2,945 | –1,800 |\n| Net cash flow | 2,500 | 2,732 |\n| **Power Engineering** | | |\n| Gross cash flow | 483 | 472 |\n| Change in working capital | 19 | –88 |\n| Cash flows from operating activities | 501 | 384 |\n| Cash flows from investing activities attributable to operating activities | –173 | –130 |\n| Net cash flow | 328 | 254 |\n\n**Note:**\n¹ Prior-year figures adjusted (see disclosures on IAS 8)."
+    }
+  }
+}

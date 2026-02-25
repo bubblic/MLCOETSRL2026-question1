@@ -1,0 +1,134 @@
+{
+  "schema_version": "1.0",
+  "fields": [
+    "cash_and_cash_equivalents",
+    "marketable_securities",
+    "total_accounts_receivable",
+    "total_current_liabilities",
+    "total_debt_short_term_and_long_term",
+    "total_equity",
+    "total_assets"
+  ],
+  "statement": {
+    "company_id": "volkswagen_2024",
+    "statement_type": "consolidated-balance-sheet",
+    "periods": [
+      {
+        "year": "2024",
+        "currency": "EUR",
+        "scale": 1000000,
+        "values": {
+          "cash_and_cash_equivalents": [
+            {
+              "Cash and cash equivalents": 40296.0
+            }
+          ],
+          "marketable_securities": [
+            {
+              "Marketable securities and time deposits": 27326.0
+            }
+          ],
+          "total_accounts_receivable": [
+            {
+              "Trade receivables": 21130.0
+            },
+            {
+              "Financial services receivables (Current)": 68855.0
+            }
+          ],
+          "total_current_liabilities": [
+            {
+              "Financial liabilities (Current)": 117020.0
+            },
+            {
+              "Trade payables": 29772.0
+            },
+            {
+              "Other liabilities (Current)": 70247.0
+            },
+            {
+              "Liabilities associated with assets held for sale": 0.0
+            }
+          ],
+          "total_debt_short_term_and_long_term": [
+            {
+              "Financial liabilities (Non-current)": 137061.0
+            },
+            {
+              "Financial liabilities (Current)": 117020.0
+            }
+          ],
+          "total_equity": [
+            {
+              "Total equity": 196731.0
+            }
+          ],
+          "total_assets": [
+            {
+              "Total assets": 632905.0
+            }
+          ]
+        }
+      },
+      {
+        "year": "2023",
+        "currency": "EUR",
+        "scale": 1000000,
+        "values": {
+          "cash_and_cash_equivalents": [
+            {
+              "Cash and cash equivalents": 43449.0
+            }
+          ],
+          "marketable_securities": [
+            {
+              "Marketable securities and time deposits": 26772.0
+            }
+          ],
+          "total_accounts_receivable": [
+            {
+              "Trade receivables": 21849.0
+            },
+            {
+              "Financial services receivables (Current)": 66381.0
+            }
+          ],
+          "total_current_liabilities": [
+            {
+              "Financial liabilities (Current)": 110476.0
+            },
+            {
+              "Trade payables": 30901.0
+            },
+            {
+              "Other liabilities (Current)": 64628.0
+            },
+            {
+              "Liabilities associated with assets held for sale": 31.0
+            }
+          ],
+          "total_debt_short_term_and_long_term": [
+            {
+              "Financial liabilities (Non-current)": 122323.0
+            },
+            {
+              "Financial liabilities (Current)": 110476.0
+            }
+          ],
+          "total_equity": [
+            {
+              "Total equity": 189186.0
+            }
+          ],
+          "total_assets": [
+            {
+              "Total assets": 600649.0
+            }
+          ]
+        }
+      }
+    ],
+    "notes": "1. The primary balance sheet lists 'Financial services receivables' separately under current and non-current assets. For 'total_accounts_receivable', only the current portion (€68,855 for 2024, €66,381 for 2023) is included, as it is considered part of operating receivables. The non-current portion is excluded as it is a long-term financial asset. 2. 'Total current liabilities' is the sum of all line items under the 'Current liabilities' section. For 2024, 'Liabilities associated with assets held for sale' is shown as '–' in the source, interpreted as 0. 3. 'Total debt' is the sum of 'Financial liabilities' from both non-current and current sections, representing all interest-bearing borrowings. 4. 'Marketable securities' is mapped directly from 'Marketable securities and time deposits' (Note 22), which aligns with the definition of liquid, short-term investments. 5. Scale is 1,000,000 (millions) as indicated by '(€ million)' in the statement header. 6. All values are extracted directly from the primary consolidated balance sheet table on Page 474.",
+    "source_file": "extracted_text/volkswagen_2024.consolidated-balance-sheet.llm.json"
+  }
+}

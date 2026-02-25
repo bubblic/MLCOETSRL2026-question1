@@ -1,0 +1,162 @@
+{
+  "schema_version": "1.0",
+  "fields": [
+    "cash_and_cash_equivalents",
+    "marketable_securities",
+    "total_accounts_receivable",
+    "total_current_liabilities",
+    "total_debt_short_term_and_long_term",
+    "total_equity",
+    "total_assets"
+  ],
+  "statement": {
+    "company_id": "exxon_2024",
+    "statement_type": "consolidated-balance-sheet",
+    "periods": [
+      {
+        "year": "2024",
+        "currency": "USD",
+        "scale": 1000000,
+        "values": {
+          "cash_and_cash_equivalents": [
+            {
+              "Cash and cash equivalents": 23029.0
+            },
+            {
+              "Cash and cash equivalents – restricted": 158.0
+            }
+          ],
+          "marketable_securities": [],
+          "total_accounts_receivable": [
+            {
+              "Trade, less reserves of $162 million and $170 million": 35282.0
+            },
+            {
+              "Other, less reserves of $314 million and $101 million": 8399.0
+            }
+          ],
+          "total_current_liabilities": [
+            {
+              "Notes and loans payable": 4955.0
+            },
+            {
+              "Accounts payable and accrued liabilities": 61297.0
+            },
+            {
+              "Income taxes payable": 4055.0
+            }
+          ],
+          "total_debt_short_term_and_long_term": [
+            {
+              "Long-term debt due within one year": 4892.0
+            },
+            {
+              "Bank loans": 63.0
+            },
+            {
+              "Commercial paper": 0.0
+            },
+            {
+              "Long-term debt": 36755.0
+            }
+          ],
+          "total_equity": [
+            {
+              "Common stock without par value": 46238.0
+            },
+            {
+              "Earnings reinvested": 470903.0
+            },
+            {
+              "Accumulated other comprehensive income": -14619.0
+            },
+            {
+              "Common stock held in treasury": -238817.0
+            },
+            {
+              "Noncontrolling interests": 6901.0
+            }
+          ],
+          "total_assets": [
+            {
+              "Total Assets": 453475.0
+            }
+          ]
+        }
+      },
+      {
+        "year": "2023",
+        "currency": "USD",
+        "scale": 1000000,
+        "values": {
+          "cash_and_cash_equivalents": [
+            {
+              "Cash and cash equivalents": 31539.0
+            },
+            {
+              "Cash and cash equivalents – restricted": 29.0
+            }
+          ],
+          "marketable_securities": [],
+          "total_accounts_receivable": [
+            {
+              "Trade, less reserves of $162 million and $170 million": 30296.0
+            },
+            {
+              "Other, less reserves of $314 million and $101 million": 7719.0
+            }
+          ],
+          "total_current_liabilities": [
+            {
+              "Notes and loans payable": 4090.0
+            },
+            {
+              "Accounts payable and accrued liabilities": 58037.0
+            },
+            {
+              "Income taxes payable": 3189.0
+            }
+          ],
+          "total_debt_short_term_and_long_term": [
+            {
+              "Long-term debt due within one year": 4009.0
+            },
+            {
+              "Bank loans": 6.0
+            },
+            {
+              "Commercial paper": 75.0
+            },
+            {
+              "Long-term debt": 37483.0
+            }
+          ],
+          "total_equity": [
+            {
+              "Common stock without par value": 17781.0
+            },
+            {
+              "Earnings reinvested": 453927.0
+            },
+            {
+              "Accumulated other comprehensive income": -11989.0
+            },
+            {
+              "Common stock held in treasury": -254917.0
+            },
+            {
+              "Noncontrolling interests": 7736.0
+            }
+          ],
+          "total_assets": [
+            {
+              "Total Assets": 376317.0
+            }
+          ]
+        }
+      }
+    ],
+    "notes": "1. 'Cash and cash equivalents' includes both unrestricted and restricted amounts as per the primary statement.\n2. 'Total accounts receivable' is constructed from the supplementary Note 6 breakdown of 'Notes and accounts receivable – net'.\n3. 'Total current liabilities' is constructed from the sum of its listed components in the primary statement.\n4. 'Total debt short-term and long-term' includes short-term debt components from supplementary Note 6 ('Notes and loans payable' breakdown: Bank loans, Commercial paper, Long-term debt due within one year) plus the 'Long-term debt' line from the primary statement.\n5. 'Total equity' is constructed from all components listed under the EQUITY section, including noncontrolling interests.\n6. 'Marketable securities' is an empty array as no line items for liquid, unrestricted investments intended for near-term sale (e.g., trading securities, short-term investments) were identified in the provided balance sheet or supplementary tables. The 'Investments, advances and long-term receivables' line (Note 8) appears to consist of long-term equity method investments, equity securities at fair value (which may be strategic), and long-term receivables, which do not meet the typical definition of marketable securities.",
+    "source_file": "extracted_text/exxon_2024.consolidated-balance-sheet.llm.json"
+  }
+}

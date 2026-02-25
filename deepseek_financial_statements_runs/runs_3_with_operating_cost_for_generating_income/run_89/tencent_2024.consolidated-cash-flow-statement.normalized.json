@@ -1,0 +1,44 @@
+{
+  "schema_version": "1.0",
+  "fields": [
+    "depreciation_and_amortization"
+  ],
+  "statement": {
+    "company_id": "tencent_2024",
+    "statement_type": "consolidated-cash-flow-statement",
+    "periods": [
+      {
+        "year": "2024",
+        "currency": "CNY",
+        "scale": 1000000,
+        "values": {
+          "depreciation_and_amortization": [
+            {
+              "Depreciation of property, plant and equipment, investment properties and right-of-use assets": 27332.0
+            },
+            {
+              "Amortisation of intangible assets and land use rights": 28881.0
+            }
+          ]
+        }
+      },
+      {
+        "year": "2023",
+        "currency": "CNY",
+        "scale": 1000000,
+        "values": {
+          "depreciation_and_amortization": [
+            {
+              "Depreciation of property, plant and equipment, investment properties and right-of-use assets": 26305.0
+            },
+            {
+              "Amortisation of intangible assets and land use rights": 32703.0
+            }
+          ]
+        }
+      }
+    ],
+    "notes": "The 'depreciation_and_amortization' field is populated using the two distinct line items from the supplementary reconciliation table (Note 43(a)): 'Depreciation of property, plant and equipment, investment properties and right-of-use assets' and 'Amortisation of intangible assets and land use rights'. These are the standard components that sum to the total depreciation and amortization expense added back to reconcile net profit to operating cash flow. All other requested fields (e.g., total_operating_cost, taxes, interest_expenses, short_term_market_securities) could not be directly mapped from the provided cash flow statement and supplementary notes. The cash flow statement does not contain a detailed income statement breakdown for total operating costs. The 'Income tax paid' line is a cash outflow, not the income statement tax expense. Interest expenses are not separately listed in a format matching the required sign convention. Details on short-term marketable securities are not provided in the extracted sections.",
+    "source_file": "extracted_text\\tencent_2024.consolidated-cash-flow-statement.llm.json"
+  }
+}

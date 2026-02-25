@@ -1,0 +1,38 @@
+{
+  "schema_version": "1.0",
+  "fields": [
+    "depreciation_and_amortization"
+  ],
+  "statement": {
+    "company_id": "microsoft_2025",
+    "statement_type": "consolidated-cash-flow-statement",
+    "periods": [
+      {
+        "year": "2025",
+        "currency": "USD",
+        "scale": 1000000,
+        "values": {
+          "depreciation_and_amortization": []
+        }
+      },
+      {
+        "year": "2024",
+        "currency": "USD",
+        "scale": 1000000,
+        "values": {
+          "depreciation_and_amortization": []
+        }
+      },
+      {
+        "year": "2023",
+        "currency": "USD",
+        "scale": 1000000,
+        "values": {
+          "depreciation_and_amortization": []
+        }
+      }
+    ],
+    "notes": "The only field requested and directly mappable from the provided cash flow statement is 'depreciation_and_amortization'. This is represented by the single line item 'Depreciation, amortization, and other' in the 'Adjustments to reconcile net income to net cash from operations' section for each period. All other fields in the requested schema were not present in the provided data, so their arrays are empty as per the rules.",
+    "source_file": "extracted_text\\microsoft_2025.consolidated-cash-flow-statement.llm.json"
+  }
+}

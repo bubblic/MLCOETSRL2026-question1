@@ -1,0 +1,32 @@
+{
+  "schema_version": "1.0",
+  "fields": [
+    "depreciation_and_amortization"
+  ],
+  "statement": {
+    "company_id": "alibaba_2025",
+    "statement_type": "consolidated-cash-flow-statement",
+    "periods": [
+      {
+        "period": "2023",
+        "values": {
+          "depreciation_and_amortization": 46938.0
+        }
+      },
+      {
+        "period": "2024",
+        "values": {
+          "depreciation_and_amortization": 44504.0
+        }
+      },
+      {
+        "period": "2025",
+        "values": {
+          "depreciation_and_amortization": 42459.0
+        }
+      }
+    ],
+    "notes": "The 'depreciation_and_amortization' field is calculated by summing the line items 'Depreciation and impairment of property and equipment and operating lease cost related to land use rights' and 'Amortization of intangible assets and licensed copyrights' from the operating activities section. This is a standard consolidation for the cash flow statement. Values are taken from the RMB million columns.",
+    "source_file": "extracted_text\\alibaba_2025.consolidated-cash-flow-statement.llm.json"
+  }
+}

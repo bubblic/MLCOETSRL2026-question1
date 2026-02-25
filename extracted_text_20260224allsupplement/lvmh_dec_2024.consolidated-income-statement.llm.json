@@ -1,0 +1,67 @@
+{
+  "query": "Consolidated Income Statement",
+  "selected_pages": {
+    "primary_statement_pages": [
+      23
+    ],
+    "supplementary_pages": [
+      6,
+      7,
+      8,
+      9,
+      10,
+      23,
+      24,
+      25,
+      26,
+      27,
+      28,
+      29,
+      30,
+      31,
+      32,
+      33,
+      34,
+      35,
+      36,
+      37,
+      38,
+      39,
+      40,
+      41,
+      42,
+      43,
+      44,
+      45,
+      46,
+      47,
+      48,
+      49,
+      50,
+      51,
+      52,
+      53,
+      54,
+      55,
+      56,
+      57,
+      58,
+      59,
+      60,
+      61,
+      62,
+      63,
+      64,
+      65,
+      66
+    ]
+  },
+  "extraction": {
+    "primary_statement": {
+      "raw_response": "Here is the Consolidated Income Statement in tabular form:\n\n**CONSOLIDATED INCOME STATEMENT**\n*(EUR millions, except for earnings per share)*\n\n| Notes | 2024     | 2023     | 2022     |\n| :---- | :------- | :------- | :------- |\n| **Revenue**                                                                 | 24       | 84,683   | 86,153   | 79,184   |\n| Cost of sales                                                               |          | (27,918) | (26,876) | (24,988) |\n| **Gross margin**                                                             |          | 56,765   | 59,277   | 54,196   |\n| Marketing and selling expenses                                               |          | (31,002) | (30,768) | (28,151) |\n| General and administrative expenses                                          |          | (6,220)  | (5,714)  | (5,027)  |\n| Income/(Loss) from joint ventures and associates                             | 8        | 28       | 7        | 37       |\n| **Profit from recurring operations**                                         | 24       | 19,571   | 22,802   | 21,055   |\n| Other operating income and expenses                                          | 25       | (664)    | (242)    | (54)     |\n| **Operating profit**                                                         |          | 18,907   | 22,560   | 21,001   |\n| Cost of net financial debt                                                   |          | (442)    | (367)    | (17)     |\n| Interest on lease liabilities                                                |          | (510)    | (393)    | (254)    |\n| Other financial income and expenses                                          |          | 160      | (175)    | (617)    |\n| **Net financial income/(expense)**                                           | 26       | (792)    | (935)    | (888)    |\n| **Income taxes**                                                             | 27       | (5,157)  | (5,673)  | (5,362)  |\n| **Net profit before minority interests**                                     |          | 12,958   | 15,952   | 14,751   |\n| Minority interests                                                           | 18       | (408)    | (778)    | (667)    |\n| **Net profit, Group share**                                                  |          | **12,550** | **15,174** | **14,084** |\n| *Basic Group share of net earnings per share (EUR)*                          | 28       | 25.13    | 30.34    | 28.05    |\n| *Number of shares on which the calculation is based*                         |          | 499,412,515 | 500,056,586 | 502,120,694 |\n| *Diluted Group share of net earnings per share (EUR)*                        | 28       | 25.12    | 30.33    | 28.03    |\n| *Number of shares on which the calculation is based*                         |          | 499,681,046 | 500,304,316 | 502,480,100 |"
+    },
+    "supplementary": {
+      "raw_response": "Based on the primary Consolidated Income Statement and the provided pages, here are the supplementary tables that break down key line items. These tables are extracted from the notes to the financial statements and the business review sections.\n\n### 1. Revenue by Business Group (Note 24)\n*(EUR millions)*\n\n| Business Group | 2024 | 2023 | 2022 |\n|----------------|------|------|------|\n| Wines and Spirits | 5,862 | 6,602 | 7,099 |\n| Fashion and Leather Goods | 41,060 | 42,169 | 38,648 |\n| Perfumes and Cosmetics | 8,418 | 8,271 | 7,722 |\n| Watches and Jewelry | 10,577 | 10,902 | 10,581 |\n| Selective Retailing | 18,262 | 17,885 | 14,852 |\n| Other activities and eliminations | 504 | 324 | 281 |\n| **Total Revenue** | **84,683** | **86,153** | **79,184** |\n\n---\n\n### 2. Revenue by Geographic Region of Delivery (Note 24)\n*(EUR millions)*\n\n| Geographic Region | 2024 | 2023 | 2022 |\n|-------------------|------|------|------|\n| France | 7,009 | 6,830 | 6,071 |\n| Europe (excl. France) | 14,538 | 14,145 | 12,717 |\n| United States | 21,554 | 21,764 | 21,542 |\n| Japan | 7,475 | 6,314 | 5,436 |\n| Asia (excl. Japan) | 23,246 | 26,577 | 23,785 |\n| Other markets | 10,861 | 10,523 | 9,632 |\n| **Total Revenue** | **84,683** | **86,153** | **79,184** |\n\n---\n\n### 3. Profit from Recurring Operations by Business Group (Note 24)\n*(EUR millions)*\n\n| Business Group | 2024 | 2023 | 2022 |\n|----------------|------|------|------|\n| Wines and Spirits | 1,356 | 2,109 | 2,155 |\n| Fashion and Leather Goods | 15,230 | 16,836 | 15,709 |\n| Perfumes and Cosmetics | 671 | 713 | 660 |\n| Watches and Jewelry | 1,546 | 2,162 | 2,017 |\n| Selective Retailing | 1,385 | 1,391 | 788 |\n| Other activities and eliminations | (617) | (409) | (274) |\n| **Total Profit from Recurring Operations** | **19,571** | **22,802** | **21,055** |\n\n---\n\n### 4. Other Operating Income and Expenses (Note 25)\n*(EUR millions)*\n\n| Item | 2024 | 2023 | 2022 |\n|------|------|------|------|\n| Net gains/(losses) on disposals | (199) | (102) | (210) |\n| Restructuring costs | (70) | (9) | 3 |\n| Remeasurement of shares acquired prior to their initial consolidation | 1 | 2 | 232 |\n| Transaction costs relating to the acquisition of consolidated companies | (10) | (14) | (25) |\n| Impairment or amortization of brands, trade names, goodwill and other fixed assets | (422) | (105) | (50) |\n| Other items, net | 35 | (14) | (3) |\n| **Total Other Operating Income and Expenses** | **(664)** | **(242)** | **(54)** |\n\n---\n\n### 5. Net Financial Income/(Expense) Breakdown (Note 26)\n*(EUR millions)*\n\n| Item | 2024 | 2023 | 2022 |\n|------|------|------|------|\n| Borrowing costs | (676) | (580) | (128) |\n| Income from cash, cash equivalents and current available for sale financial assets | 231 | 212 | 113 |\n| Fair value adjustment of borrowings and interest rate hedges | 2 | 1 | (2) |\n| **Cost of net financial debt** | **(442)** | **(367)** | **(17)** |\n| Interest on lease liabilities | (510) | (393) | (254) |\n| Dividends received from non-current available for sale financial assets | 9 | 5 | 8 |\n| Cost of foreign exchange derivatives | (282) | (399) | (358) |\n| Fair value adjustment of available for sale financial assets | 481 | 263 | (225) |\n| Other items, net | (48) | (43) | (42) |\n| **Other financial income and expenses** | **160** | **(175)** | **(618)** |\n| **Net Financial Income/(Expense)** | **(792)** | **(935)** | **(888)** |\n\n---\n\n### 6. Income Taxes Breakdown (Note 27)\n*(EUR millions)*\n\n| Item | 2024 | 2023 | 2022 |\n|------|------|------|------|\n| Current income taxes for the fiscal year | (5,416) | (6,059) | (5,877) |\n| Current income taxes relating to previous fiscal years | - | 8 | (18) |\n| **Current income taxes** | **(5,416)** | **(6,051)** | **(5,896)** |\n| Change in deferred income taxes | 259 | 378 | 534 |\n| Impact of changes in tax rates on deferred income taxes | - | - | - |\n| **Deferred income taxes** | **259** | **378** | **534** |\n| **Total Tax Expense** | **(5,157)** | **(5,673)** | **(5,362)** |\n\n*Note: The effective tax rate was 28.5% in 2024 (26.2% in 2023 and 26.7% in 2022).*"
+    }
+  }
+}

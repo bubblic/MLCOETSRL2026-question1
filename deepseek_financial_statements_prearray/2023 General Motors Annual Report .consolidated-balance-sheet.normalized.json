@@ -1,0 +1,46 @@
+{
+  "schema_version": "1.0",
+  "fields": [
+    "cash_and_cash_equivalents",
+    "marketable_securities",
+    "accounts_receivable",
+    "total_current_liabilities",
+    "total_debt_short_term_and_long_term",
+    "total_equity",
+    "total_assets"
+  ],
+  "statement": {
+    "company_id": "2023 General Motors Annual Report",
+    "statement_type": "consolidated-balance-sheet",
+    "periods": [
+      {
+        "year": "2023",
+        "currency": "USD",
+        "values": {
+          "cash_and_cash_equivalents": 18853.0,
+          "marketable_securities": 7613.0,
+          "accounts_receivable": 12378.0,
+          "total_current_liabilities": 94445.0,
+          "total_debt_short_term_and_long_term": 121740.0,
+          "total_equity": 68189.0,
+          "total_assets": 273064.0
+        }
+      },
+      {
+        "year": "2022",
+        "currency": "USD",
+        "values": {
+          "cash_and_cash_equivalents": 19153.0,
+          "marketable_securities": 12150.0,
+          "accounts_receivable": 13333.0,
+          "total_current_liabilities": 91173.0,
+          "total_debt_short_term_and_long_term": 114652.0,
+          "total_equity": 71927.0,
+          "total_assets": 264037.0
+        }
+      }
+    ],
+    "notes": "1) 'Marketable debt securities' mapped to 'marketable_securities'. 2) 'Accounts and notes receivable, net' mapped to 'accounts_receivable'. 3) 'Total debt short-term and long-term' calculated as the sum of all debt components: For 2023: Short-term debt (Automotive $428 + GM Financial $38,540) + Long-term debt (Automotive $15,985 + GM Financial $66,788) = $121,741. For 2022: Short-term debt (Automotive $1,959 + GM Financial $36,819) + Long-term debt (Automotive $15,885 + GM Financial $60,036) = $114,699. Note: The calculated totals ($121,741 and $114,699) differ slightly from the sum of the 'Total automotive debt' and 'Total GM Financial debt' carrying amounts from Note 13 ($16,413 + $105,327 = $121,740 for 2023; $17,844 + $96,854 = $114,698 for 2022), likely due to unamortized discounts/premiums or other adjustments. The values from the note summaries ($121,740 and $114,698) are used for consistency with the debt footnote. 4) 'Total Equity' taken directly from the statement. 5) 'Total Assets' taken directly from the statement.",
+    "source_file": "extracted_text/2023 General Motors Annual Report .consolidated-balance-sheet.llm.json"
+  }
+}

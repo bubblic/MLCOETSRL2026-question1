@@ -1,0 +1,87 @@
+{
+  "schema_version": "1.0",
+  "fields": [
+    "revenue",
+    "total_operating_cost",
+    "net_income",
+    "taxes",
+    "interest_expenses"
+  ],
+  "statement": {
+    "company_id": "2023 General Motors Annual Report",
+    "statement_type": "consolidated-income-statement",
+    "periods": [
+      {
+        "year": "2023",
+        "currency": "USD",
+        "values": {
+          "revenue": [
+            171842.0
+          ],
+          "total_operating_cost": [
+            141330.0,
+            11374.0,
+            9840.0
+          ],
+          "net_income": [
+            9840.0
+          ],
+          "taxes": [
+            563.0
+          ],
+          "interest_expenses": [
+            911.0
+          ]
+        }
+      },
+      {
+        "year": "2022",
+        "currency": "USD",
+        "values": {
+          "revenue": [
+            156735.0
+          ],
+          "total_operating_cost": [
+            126892.0,
+            8862.0,
+            10667.0
+          ],
+          "net_income": [
+            9708.0
+          ],
+          "taxes": [
+            1888.0
+          ],
+          "interest_expenses": [
+            987.0
+          ]
+        }
+      },
+      {
+        "year": "2021",
+        "currency": "USD",
+        "values": {
+          "revenue": [
+            127004.0
+          ],
+          "total_operating_cost": [
+            100544.0,
+            8582.0,
+            8554.0
+          ],
+          "net_income": [
+            9945.0
+          ],
+          "taxes": [
+            2771.0
+          ],
+          "interest_expenses": [
+            950.0
+          ]
+        }
+      }
+    ],
+    "notes": "Extracted from the Consolidated Income Statements on Page 60. Revenue is 'Total net sales and revenue'. Total operating cost is broken down into its constituent line items as presented: 'Automotive and other cost of sales', 'GM Financial interest, operating and other expenses', and 'Automotive and other selling, general and administrative expense'. Net income is 'Net income (loss)'. Taxes is 'Income tax expense (benefit)'. Interest expenses is 'Automotive interest expense'. All values are in millions of USD. The supplementary tables for revenue, interest income, and equity income were reviewed but did not alter the primary statement values used for the requested fields.",
+    "source_file": "extracted_text/2023 General Motors Annual Report .consolidated-income-statement.llm.json"
+  }
+}

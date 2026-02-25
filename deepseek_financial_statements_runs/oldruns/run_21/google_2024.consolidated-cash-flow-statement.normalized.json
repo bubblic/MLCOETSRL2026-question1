@@ -1,0 +1,50 @@
+{
+  "schema_version": "1.0",
+  "fields": [
+    "depreciation_and_amortization"
+  ],
+  "statement": {
+    "company_id": "google_2024",
+    "statement_type": "consolidated-cash-flow-statement",
+    "periods": [
+      {
+        "year": "2022",
+        "currency": "USD",
+        "scale": 1000000,
+        "values": {
+          "depreciation_and_amortization": [
+            {
+              "Depreciation of property and equipment": 13475.0
+            }
+          ]
+        }
+      },
+      {
+        "year": "2023",
+        "currency": "USD",
+        "scale": 1000000,
+        "values": {
+          "depreciation_and_amortization": [
+            {
+              "Depreciation of property and equipment": 11946.0
+            }
+          ]
+        }
+      },
+      {
+        "year": "2024",
+        "currency": "USD",
+        "scale": 1000000,
+        "values": {
+          "depreciation_and_amortization": [
+            {
+              "Depreciation of property and equipment": 15311.0
+            }
+          ]
+        }
+      }
+    ],
+    "notes": "The primary cash flow statement provides a single line item for 'Depreciation of property and equipment' under the adjustments to reconcile net income. This is the standard label for the depreciation component of depreciation and amortization for this company. No separate amortization line item is presented in the cash flow statement, which is common for technology companies where amortization of intangibles may be less significant or combined. The supplementary tables provide details on lease accounting but do not break out amortization separately for the cash flow statement. Therefore, only the provided depreciation value is mapped.",
+    "source_file": "extracted_text/google_2024.consolidated-cash-flow-statement.llm.json"
+  }
+}

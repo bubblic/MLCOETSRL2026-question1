@@ -1,0 +1,150 @@
+{
+  "schema_version": "1.0",
+  "fields": [
+    "total_revenue",
+    "total_operating_cost",
+    "net_income",
+    "taxes",
+    "interest_expenses"
+  ],
+  "statement": {
+    "company_id": "lvmh_dec_2024",
+    "statement_type": "consolidated-income-statement",
+    "periods": [
+      {
+        "year": "2024",
+        "currency": "EUR",
+        "scale": 1000000,
+        "values": {
+          "total_revenue": [
+            {
+              "Revenue": 84683.0
+            }
+          ],
+          "total_operating_cost": [
+            {
+              "Cost of sales": 27918.0
+            },
+            {
+              "Marketing and selling expenses": 31002.0
+            },
+            {
+              "General and administrative expenses": 6220.0
+            },
+            {
+              "Other operating income and expenses": 664.0
+            }
+          ],
+          "net_income": [
+            {
+              "Net profit, Group share": 12550.0
+            }
+          ],
+          "taxes": [
+            {
+              "Income taxes": 5157.0
+            }
+          ],
+          "interest_expenses": [
+            {
+              "Cost of net financial debt": 442.0
+            },
+            {
+              "Interest on lease liabilities": 510.0
+            }
+          ]
+        }
+      },
+      {
+        "year": "2023",
+        "currency": "EUR",
+        "scale": 1000000,
+        "values": {
+          "total_revenue": [
+            {
+              "Revenue": 86153.0
+            }
+          ],
+          "total_operating_cost": [
+            {
+              "Cost of sales": 26876.0
+            },
+            {
+              "Marketing and selling expenses": 30768.0
+            },
+            {
+              "General and administrative expenses": 5714.0
+            },
+            {
+              "Other operating income and expenses": 242.0
+            }
+          ],
+          "net_income": [
+            {
+              "Net profit, Group share": 15174.0
+            }
+          ],
+          "taxes": [
+            {
+              "Income taxes": 5673.0
+            }
+          ],
+          "interest_expenses": [
+            {
+              "Cost of net financial debt": 367.0
+            },
+            {
+              "Interest on lease liabilities": 393.0
+            }
+          ]
+        }
+      },
+      {
+        "year": "2022",
+        "currency": "EUR",
+        "scale": 1000000,
+        "values": {
+          "total_revenue": [
+            {
+              "Revenue": 79184.0
+            }
+          ],
+          "total_operating_cost": [
+            {
+              "Cost of sales": 24988.0
+            },
+            {
+              "Marketing and selling expenses": 28151.0
+            },
+            {
+              "General and administrative expenses": 5027.0
+            },
+            {
+              "Other operating income and expenses": 54.0
+            }
+          ],
+          "net_income": [
+            {
+              "Net profit, Group share": 14084.0
+            }
+          ],
+          "taxes": [
+            {
+              "Income taxes": 5362.0
+            }
+          ],
+          "interest_expenses": [
+            {
+              "Cost of net financial debt": 17.0
+            },
+            {
+              "Interest on lease liabilities": 254.0
+            }
+          ]
+        }
+      }
+    ],
+    "notes": "1. 'total_revenue' is mapped directly from the 'Revenue' line. 2. 'total_operating_cost' includes all operating expenses that are part of arriving at Operating Profit. This includes Cost of sales, Marketing and selling expenses, General and administrative expenses, and Other operating income and expenses (which is a net expense). The sign convention for these cost elements is positive as they reduce income. 3. 'net_income' is mapped from 'Net profit, Group share'. 4. 'taxes' is mapped from 'Income taxes'. 5. 'interest_expenses' includes 'Cost of net financial debt' and 'Interest on lease liabilities' as these are the core interest-bearing financing costs. 'Other financial income and expenses' is excluded as it contains non-interest items like dividends, FX, and fair value adjustments. The sign convention for interest expenses is positive as they reduce income. 6. The supplementary tables provide detailed breakdowns but the primary statement values are used for the requested fields. 7. All numbers are in EUR millions (scale 1E6).",
+    "source_file": "extracted_text/lvmh_dec_2024.consolidated-income-statement.llm.json"
+  }
+}

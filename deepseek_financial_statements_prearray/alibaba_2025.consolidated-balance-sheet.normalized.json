@@ -1,0 +1,46 @@
+{
+  "schema_version": "1.0",
+  "fields": [
+    "cash_and_cash_equivalents",
+    "marketable_securities",
+    "accounts_receivable",
+    "total_current_liabilities",
+    "total_debt_short_term_and_long_term",
+    "total_equity",
+    "total_assets"
+  ],
+  "statement": {
+    "company_id": "alibaba_2025",
+    "statement_type": "consolidated-balance-sheet",
+    "periods": [
+      {
+        "year": "2024",
+        "currency": "CNY",
+        "values": {
+          "cash_and_cash_equivalents": 248125.0,
+          "marketable_securities": 262955.0,
+          "accounts_receivable": null,
+          "total_current_liabilities": 421507.0,
+          "total_debt_short_term_and_long_term": 170776.0,
+          "total_equity": 1101871.0,
+          "total_assets": 1764829.0
+        }
+      },
+      {
+        "year": "2025",
+        "currency": "CNY",
+        "values": {
+          "cash_and_cash_equivalents": 145487.0,
+          "marketable_securities": 228826.0,
+          "accounts_receivable": null,
+          "total_current_liabilities": 435346.0,
+          "total_debt_short_term_and_long_term": 231703.0,
+          "total_equity": 1078393.0,
+          "total_assets": 1804227.0
+        }
+      }
+    ],
+    "notes": "Currency identified as Chinese Yuan (CNY) from 'RMB millions' in statement. 'Short-term investments' mapped to 'marketable_securities'. 'Accounts_receivable' not found as a distinct line item; it is combined within 'Prepayments, receivables and other assets' and supplementary tables show it net of allowance, but a specific consolidated figure is not provided in the primary statement, so set to null. Total debt calculated as sum of short-term bank borrowings, short-term unsecured senior notes, long-term bank borrowings, long-term unsecured senior notes, and long-term convertible unsecured senior notes. For 2024: 12,749 + 16,252 + 55,686 + 86,089 + 0 = 170,776. For 2025: 22,562 + 0 + 49,909 + 122,398 + 35,834 = 231,703. Total equity taken from 'Total equity' line, which includes shareholders' equity and non-controlling interests.",
+    "source_file": "extracted_text/alibaba_2025.consolidated-balance-sheet.llm.json"
+  }
+}

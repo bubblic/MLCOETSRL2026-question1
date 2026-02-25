@@ -1,0 +1,144 @@
+{
+  "schema_version": "1.0",
+  "fields": [
+    "cash_and_cash_equivalents",
+    "short_term_market_securities",
+    "total_accounts_receivable",
+    "total_current_liabilities",
+    "total_debt_short_term_and_long_term",
+    "total_equity",
+    "total_assets"
+  ],
+  "statement": {
+    "company_id": "exxon_2024",
+    "statement_type": "consolidated-balance-sheet",
+    "periods": [
+      {
+        "year": "2024",
+        "currency": "USD",
+        "scale": 1000000,
+        "values": {
+          "cash_and_cash_equivalents": [
+            {
+              "Cash and cash equivalents": 23029.0
+            },
+            {
+              "Cash and cash equivalents – restricted": 158.0
+            }
+          ],
+          "short_term_market_securities": [],
+          "total_accounts_receivable": [
+            {
+              "Notes and accounts receivable – net": 43681.0
+            }
+          ],
+          "total_current_liabilities": [
+            {
+              "Notes and loans payable": 4955.0
+            },
+            {
+              "Accounts payable and accrued liabilities": 61297.0
+            },
+            {
+              "Income taxes payable": 4055.0
+            }
+          ],
+          "total_debt_short_term_and_long_term": [
+            {
+              "Notes and loans payable": 4955.0
+            },
+            {
+              "Long-term debt": 36755.0
+            }
+          ],
+          "total_equity": [
+            {
+              "Common stock without par value": 46238.0
+            },
+            {
+              "Earnings reinvested": 470903.0
+            },
+            {
+              "Accumulated other comprehensive income": -14619.0
+            },
+            {
+              "Common stock held in treasury": -238817.0
+            },
+            {
+              "Noncontrolling interests": 6901.0
+            }
+          ],
+          "total_assets": [
+            {
+              "Total Assets": 453475.0
+            }
+          ]
+        }
+      },
+      {
+        "year": "2023",
+        "currency": "USD",
+        "scale": 1000000,
+        "values": {
+          "cash_and_cash_equivalents": [
+            {
+              "Cash and cash equivalents": 31539.0
+            },
+            {
+              "Cash and cash equivalents – restricted": 29.0
+            }
+          ],
+          "short_term_market_securities": [],
+          "total_accounts_receivable": [
+            {
+              "Notes and accounts receivable – net": 38015.0
+            }
+          ],
+          "total_current_liabilities": [
+            {
+              "Notes and loans payable": 4090.0
+            },
+            {
+              "Accounts payable and accrued liabilities": 58037.0
+            },
+            {
+              "Income taxes payable": 3189.0
+            }
+          ],
+          "total_debt_short_term_and_long_term": [
+            {
+              "Notes and loans payable": 4090.0
+            },
+            {
+              "Long-term debt": 37483.0
+            }
+          ],
+          "total_equity": [
+            {
+              "Common stock without par value": 17781.0
+            },
+            {
+              "Earnings reinvested": 453927.0
+            },
+            {
+              "Accumulated other comprehensive income": -11989.0
+            },
+            {
+              "Common stock held in treasury": -254917.0
+            },
+            {
+              "Noncontrolling interests": 7736.0
+            }
+          ],
+          "total_assets": [
+            {
+              "Total Assets": 376317.0
+            }
+          ]
+        }
+      }
+    ],
+    "notes": "1. 'Cash and cash equivalents' includes both unrestricted and restricted amounts as per the primary statement.\n2. 'Total accounts receivable' is taken directly from the primary statement line 'Notes and accounts receivable – net'.\n3. 'Total current liabilities' is the sum of the three listed components: Notes and loans payable, Accounts payable and accrued liabilities, and Income taxes payable.\n4. 'Total debt short-term and long-term' is the sum of 'Notes and loans payable' (current) and 'Long-term debt' (non-current).\n5. 'Total equity' is built from its five constituent components: Common stock, Earnings reinvested, Accumulated other comprehensive income (negative), Treasury stock (negative), and Noncontrolling interests.\n6. No line items were identified for 'short_term_market_securities'. The supplementary tables show 'Equity securities carried at fair value and other investments' under Note 8, but these are classified within 'Investments, advances and long-term receivables', which is a non-current asset. Therefore, no short-term marketable securities are reported in current assets.",
+    "source_file": "extracted_text\\exxon_2024.consolidated-balance-sheet.llm.json"
+  }
+}

@@ -1,0 +1,38 @@
+{
+  "schema_version": "1.0",
+  "fields": [
+    "depreciation_and_amortization"
+  ],
+  "statement": {
+    "company_id": "jpmorgan_2024",
+    "statement_type": "consolidated-cash-flow-statement",
+    "periods": [
+      {
+        "year": "2024",
+        "currency": "USD",
+        "scale": 1000000,
+        "values": {
+          "depreciation_and_amortization": []
+        }
+      },
+      {
+        "year": "2023",
+        "currency": "USD",
+        "scale": 1000000,
+        "values": {
+          "depreciation_and_amortization": []
+        }
+      },
+      {
+        "year": "2022",
+        "currency": "USD",
+        "scale": 1000000,
+        "values": {
+          "depreciation_and_amortization": []
+        }
+      }
+    ],
+    "notes": "The schema requested only the 'depreciation_and_amortization' field. This value is directly provided as a single line item in the 'Adjustments to reconcile net income...' section of the Consolidated Statements of Cash Flows for each year. The supplementary tables contain additional details on operating leases and parent company cash flows, but these are not required to construct the requested field. The scale is 1E6 as the statement is in millions. All other fields from the original schema (e.g., total_operating_cost, taxes, interest_expenses, short_term_market_securities) were not requested for extraction in this specific task.",
+    "source_file": "extracted_text\\jpmorgan_2024.consolidated-cash-flow-statement.llm.json"
+  }
+}

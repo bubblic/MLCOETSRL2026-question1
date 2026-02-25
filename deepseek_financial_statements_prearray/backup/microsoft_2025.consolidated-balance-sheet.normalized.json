@@ -1,0 +1,46 @@
+{
+  "schema_version": "1.0",
+  "fields": [
+    "cash_and_cash_equivalents",
+    "marketable_securities",
+    "accounts_receivable",
+    "total_current_liabilities",
+    "total_debt_short_term_and_long_term",
+    "total_equity",
+    "total_assets"
+  ],
+  "statement": {
+    "company_id": "microsoft_2025",
+    "statement_type": "consolidated-balance-sheet",
+    "periods": [
+      {
+        "year": "2025",
+        "currency": "USD",
+        "values": {
+          "cash_and_cash_equivalents": 30242.0,
+          "marketable_securities": 64323.0,
+          "accounts_receivable": 69905.0,
+          "total_current_liabilities": 141218.0,
+          "total_debt_short_term_and_long_term": 43151.0,
+          "total_equity": 343479.0,
+          "total_assets": 619003.0
+        }
+      },
+      {
+        "year": "2024",
+        "currency": "USD",
+        "values": {
+          "cash_and_cash_equivalents": 18315.0,
+          "marketable_securities": 57228.0,
+          "accounts_receivable": 56924.0,
+          "total_current_liabilities": 125286.0,
+          "total_debt_short_term_and_long_term": 44937.0,
+          "total_equity": 268477.0,
+          "total_assets": 512163.0
+        }
+      }
+    ],
+    "notes": "1. 'Short-term investments' from the primary statement is mapped to 'marketable_securities'. 2. 'Total debt short-term and long-term' is calculated as the sum of 'Short-term debt' and 'Long-term debt' from the primary statement. The supplementary table for Long-term Debt provides a 'Total debt' figure which matches this sum (e.g., $43,151 for 2025 = $0 Short-term debt + $40,152 Long-term debt + $2,999 Current portion of long-term debt). The 'Current portion of long-term debt' is included in the short-term debt component for this total. 3. 'Total equity' is taken directly from 'Total stockholders’ equity'. 4. All values are in millions of USD as indicated in the statement header.",
+    "source_file": "extracted_text_total_operating_cost_marketable_securities\\microsoft_2025.consolidated-balance-sheet.llm.json"
+  }
+}

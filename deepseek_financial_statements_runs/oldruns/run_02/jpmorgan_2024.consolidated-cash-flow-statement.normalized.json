@@ -1,0 +1,50 @@
+{
+  "schema_version": "1.0",
+  "fields": [
+    "depreciation_and_amortization"
+  ],
+  "statement": {
+    "company_id": "jpmorgan_2024",
+    "statement_type": "consolidated-cash-flow-statement",
+    "periods": [
+      {
+        "year": "2024",
+        "currency": "USD",
+        "scale": 1000000,
+        "values": {
+          "depreciation_and_amortization": [
+            {
+              "Depreciation and amortization": 7938.0
+            }
+          ]
+        }
+      },
+      {
+        "year": "2023",
+        "currency": "USD",
+        "scale": 1000000,
+        "values": {
+          "depreciation_and_amortization": [
+            {
+              "Depreciation and amortization": 7512.0
+            }
+          ]
+        }
+      },
+      {
+        "year": "2022",
+        "currency": "USD",
+        "scale": 1000000,
+        "values": {
+          "depreciation_and_amortization": [
+            {
+              "Depreciation and amortization": 7051.0
+            }
+          ]
+        }
+      }
+    ],
+    "notes": "The primary cash flow statement provides a single line item for 'Depreciation and amortization' under the operating activities section. No supplementary tables provided additional breakdowns or components for this field. Therefore, the array contains a single map for each period with the value directly from the statement.",
+    "source_file": "extracted_text/jpmorgan_2024.consolidated-cash-flow-statement.llm.json"
+  }
+}

@@ -1,0 +1,40 @@
+{
+  "schema_version": "1.0",
+  "fields": [
+    "revenue",
+    "total_operating_cost",
+    "net_income",
+    "taxes",
+    "interest_expenses"
+  ],
+  "statement": {
+    "company_id": "tencent_2024",
+    "statement_type": "consolidated-income-statement",
+    "periods": [
+      {
+        "year": "2024",
+        "currency": "RMB",
+        "values": {
+          "revenue": 660257.0,
+          "total_operating_cost": 424206.0,
+          "net_income": 196467.0,
+          "taxes": 45018.0,
+          "interest_expenses": 11981.0
+        }
+      },
+      {
+        "year": "2023",
+        "currency": "RMB",
+        "values": {
+          "revenue": 609015.0,
+          "total_operating_cost": 411516.0,
+          "net_income": 118048.0,
+          "taxes": 43276.0,
+          "interest_expenses": 12268.0
+        }
+      }
+    ],
+    "notes": "1. 'Total Revenues' mapped to 'revenue'. 2. 'Total expenses by nature' from supplementary Note 7 mapped to 'total_operating_cost' as it represents the sum of operating expenses by nature (transaction costs, employee benefits, content costs, amortisation, depreciation, bandwidth, promotion, auditor fees). 3. 'Profit for the year' mapped to 'net_income'. 4. 'Income tax expense' mapped to 'taxes'. 5. 'Finance costs' from the primary statement mapped to 'interest_expenses'. This includes 'Interest and related expenses' and 'Exchange (gains)/losses, net' as per supplementary Note 11.",
+    "source_file": "extracted_text_total_operating_cost_marketable_securities\\tencent_2024.consolidated-income-statement.llm.json"
+  }
+}

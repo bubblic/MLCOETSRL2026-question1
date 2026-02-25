@@ -1,0 +1,26 @@
+{
+  "schema_version": "1.0",
+  "fields": [
+    "depreciation_and_amortization"
+  ],
+  "statement": {
+    "company_id": "tencent_2024",
+    "statement_type": "consolidated-cash-flow-statement",
+    "periods": [
+      {
+        "period": "2024",
+        "values": {
+          "depreciation_and_amortization": null
+        }
+      },
+      {
+        "period": "2023",
+        "values": {
+          "depreciation_and_amortization": null
+        }
+      }
+    ],
+    "notes": "The provided consolidated statement of cash flows does not contain an explicit line item for 'depreciation and amortization'. In a cash flow statement prepared using the indirect method, this is typically listed as an add-back to profit in the operating activities section. However, this statement appears to present operating cash flows using the direct method (starting with 'Cash generated from operations'), and the detailed reconciliation from profit including depreciation and amortization is not included in the provided text. Therefore, the value cannot be extracted and is set to null.",
+    "source_file": "extracted_text/tencent_2024.consolidated-cash-flow-statement.llm.json"
+  }
+}

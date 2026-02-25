@@ -1,0 +1,51 @@
+{
+  "schema_version": "1.0",
+  "fields": [
+    "revenue",
+    "total_operating_cost",
+    "net_income",
+    "taxes",
+    "interest_expenses"
+  ],
+  "statement": {
+    "company_id": "google_2024",
+    "statement_type": "consolidated-income-statement",
+    "periods": [
+      {
+        "year": "2022",
+        "currency": "USD",
+        "values": {
+          "revenue": 282836.0,
+          "total_operating_cost": 207994.0,
+          "net_income": 59972.0,
+          "taxes": 11356.0,
+          "interest_expenses": 357.0
+        }
+      },
+      {
+        "year": "2023",
+        "currency": "USD",
+        "values": {
+          "revenue": 307394.0,
+          "total_operating_cost": 223101.0,
+          "net_income": 73795.0,
+          "taxes": 11922.0,
+          "interest_expenses": 308.0
+        }
+      },
+      {
+        "year": "2024",
+        "currency": "USD",
+        "values": {
+          "revenue": 350018.0,
+          "total_operating_cost": 237628.0,
+          "net_income": 100118.0,
+          "taxes": 19697.0,
+          "interest_expenses": 268.0
+        }
+      }
+    ],
+    "notes": "Currency inferred as USD from context. 'Total costs and expenses' mapped to 'total_operating_cost'. 'Provision for income taxes' mapped to 'taxes'. 'Interest expense' component from supplementary 'Other Income (Expense), Net Breakdown' mapped to 'interest_expenses'.",
+    "source_file": "extracted_text/google_2024.consolidated-income-statement.llm.json"
+  }
+}

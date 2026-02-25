@@ -1,0 +1,144 @@
+{
+  "schema_version": "1.0",
+  "fields": [
+    "cash_and_cash_equivalents",
+    "short_term_market_securities",
+    "total_accounts_receivable",
+    "total_current_liabilities",
+    "total_debt_short_term_and_long_term",
+    "total_equity",
+    "total_assets"
+  ],
+  "statement": {
+    "company_id": "exxon_2024",
+    "statement_type": "consolidated-balance-sheet",
+    "periods": [
+      {
+        "year": "2024",
+        "currency": "USD",
+        "scale": 1000000,
+        "values": {
+          "cash_and_cash_equivalents": [
+            {
+              "Cash and cash equivalents": 23029.0
+            },
+            {
+              "Cash and cash equivalents – restricted": 158.0
+            }
+          ],
+          "short_term_market_securities": [],
+          "total_accounts_receivable": [
+            {
+              "Notes and accounts receivable – net": 43681.0
+            }
+          ],
+          "total_current_liabilities": [
+            {
+              "Notes and loans payable": 4955.0
+            },
+            {
+              "Accounts payable and accrued liabilities": 61297.0
+            },
+            {
+              "Income taxes payable": 4055.0
+            }
+          ],
+          "total_debt_short_term_and_long_term": [
+            {
+              "Notes and loans payable": 4955.0
+            },
+            {
+              "Long-term debt": 36755.0
+            }
+          ],
+          "total_equity": [
+            {
+              "Common stock without par value": 46238.0
+            },
+            {
+              "Earnings reinvested": 470903.0
+            },
+            {
+              "Accumulated other comprehensive income": -14619.0
+            },
+            {
+              "Common stock held in treasury": -238817.0
+            },
+            {
+              "Noncontrolling interests": 6901.0
+            }
+          ],
+          "total_assets": [
+            {
+              "Total Assets": 453475.0
+            }
+          ]
+        }
+      },
+      {
+        "year": "2023",
+        "currency": "USD",
+        "scale": 1000000,
+        "values": {
+          "cash_and_cash_equivalents": [
+            {
+              "Cash and cash equivalents": 31539.0
+            },
+            {
+              "Cash and cash equivalents – restricted": 29.0
+            }
+          ],
+          "short_term_market_securities": [],
+          "total_accounts_receivable": [
+            {
+              "Notes and accounts receivable – net": 38015.0
+            }
+          ],
+          "total_current_liabilities": [
+            {
+              "Notes and loans payable": 4090.0
+            },
+            {
+              "Accounts payable and accrued liabilities": 58037.0
+            },
+            {
+              "Income taxes payable": 3189.0
+            }
+          ],
+          "total_debt_short_term_and_long_term": [
+            {
+              "Notes and loans payable": 4090.0
+            },
+            {
+              "Long-term debt": 37483.0
+            }
+          ],
+          "total_equity": [
+            {
+              "Common stock without par value": 17781.0
+            },
+            {
+              "Earnings reinvested": 453927.0
+            },
+            {
+              "Accumulated other comprehensive income": -11989.0
+            },
+            {
+              "Common stock held in treasury": -254917.0
+            },
+            {
+              "Noncontrolling interests": 7736.0
+            }
+          ],
+          "total_assets": [
+            {
+              "Total Assets": 376317.0
+            }
+          ]
+        }
+      }
+    ],
+    "notes": "1. The 'short_term_market_securities' field is empty as no line items for marketable securities, short-term investments, or similar liquid securities were found in the provided balance sheet or supplementary notes. The 'Investments, advances and long-term receivables' line (Note 8) appears to be long-term in nature and includes equity method investments, equity securities at fair value, and long-term receivables, which do not meet the criteria for short-term, liquid market securities intended for sale in the short term.\n2. The 'total_current_liabilities' field is composed of the three line items explicitly listed under 'Current liabilities' in the primary statement.\n3. The 'total_debt_short_term_and_long_term' field is composed of 'Notes and loans payable' (current) and 'Long-term debt' (non-current).\n4. The 'total_equity' field is composed of all elements that sum to the 'Total Equity' line, as detailed in the equity section of the balance sheet.\n5. Numbers in parentheses in the source are treated as negative values (e.g., Accumulated other comprehensive income, Common stock held in treasury).\n6. Scale is 1,000,000 (millions) as indicated in the statement headers.",
+    "source_file": "extracted_text\\exxon_2024.consolidated-balance-sheet.llm.json"
+  }
+}

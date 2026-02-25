@@ -1,0 +1,90 @@
+{
+  "schema_version": "1.0",
+  "fields": [
+    "cash_and_cash_equivalents",
+    "marketable_securities",
+    "accounts_receivable",
+    "total_current_liabilities",
+    "total_debt_short_term_and_long_term",
+    "total_equity",
+    "total_assets"
+  ],
+  "statement": {
+    "company_id": "jpmorgan_2024",
+    "statement_type": "consolidated-balance-sheet",
+    "periods": [
+      {
+        "year": "2024",
+        "currency": "USD",
+        "values": {
+          "cash_and_cash_equivalents": [
+            23372.0,
+            445945.0
+          ],
+          "marketable_securities": [
+            406852.0,
+            274468.0
+          ],
+          "accounts_receivable": [
+            101223.0
+          ],
+          "total_current_liabilities": [
+            2406032.0,
+            296835.0,
+            52893.0,
+            192883.0,
+            280672.0,
+            27323.0
+          ],
+          "total_debt_short_term_and_long_term": [
+            52893.0,
+            401418.0
+          ],
+          "total_equity": [
+            344758.0
+          ],
+          "total_assets": [
+            4002814.0
+          ]
+        }
+      },
+      {
+        "year": "2023",
+        "currency": "USD",
+        "values": {
+          "cash_and_cash_equivalents": [
+            29066.0,
+            595085.0
+          ],
+          "marketable_securities": [
+            201704.0,
+            369848.0
+          ],
+          "accounts_receivable": [
+            107363.0
+          ],
+          "total_current_liabilities": [
+            2400688.0,
+            216535.0,
+            44712.0,
+            180428.0,
+            290307.0,
+            23020.0
+          ],
+          "total_debt_short_term_and_long_term": [
+            44712.0,
+            391825.0
+          ],
+          "total_equity": [
+            327878.0
+          ],
+          "total_assets": [
+            3875393.0
+          ]
+        }
+      }
+    ],
+    "notes": "1. 'cash_and_cash_equivalents' includes 'Cash and due from banks' and 'Deposits with banks' as per standard banking industry practice. 2. 'marketable_securities' includes 'Available-for-sale securities' and 'Held-to-maturity securities' as they are liquid, interest-earning securities. 3. 'accounts_receivable' maps to 'Accrued interest and accounts receivable'. 4. 'total_current_liabilities' includes all liability line items presented before 'Long-term debt' on the balance sheet: Deposits, Federal funds purchased and securities loaned or sold under repurchase agreements, Short-term borrowings, Trading liabilities, Accounts payable and other liabilities, and Beneficial interests issued by consolidated VIEs. 5. 'total_debt_short_term_and_long_term' includes 'Short-term borrowings' and 'Long-term debt'. 6. 'total_equity' is 'Total stockholders’ equity'. 7. 'total_assets' is 'Total assets'. 8. All values are extracted directly from the primary balance sheet table. Parentheses indicate negatives (e.g., allowance accounts are part of net calculations on the statement but not listed separately here as they are netted in the mapped lines like Loans).",
+    "source_file": "extracted_text/jpmorgan_2024.consolidated-balance-sheet.llm.json"
+  }
+}

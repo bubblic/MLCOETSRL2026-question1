@@ -1,0 +1,159 @@
+{
+  "schema_version": "1.0",
+  "fields": [
+    "total_revenue",
+    "total_operating_cost",
+    "net_income",
+    "taxes",
+    "interest_expenses"
+  ],
+  "statement": {
+    "company_id": "alibaba_2025",
+    "statement_type": "consolidated-income-statement",
+    "periods": [
+      {
+        "year": "2023",
+        "currency": "CNY",
+        "scale": 1000000,
+        "values": {
+          "total_revenue": [
+            {
+              "Revenue": 868687.0
+            }
+          ],
+          "total_operating_cost": [
+            {
+              "Cost of revenue": 549695.0
+            },
+            {
+              "Product development expenses": 56744.0
+            },
+            {
+              "Sales and marketing expenses": 103496.0
+            },
+            {
+              "General and administrative expenses": 42183.0
+            },
+            {
+              "Amortization and impairment of intangible assets": 13504.0
+            },
+            {
+              "Goodwill impairment": 2714.0
+            }
+          ],
+          "net_income": [
+            {
+              "Net income": 65573.0
+            }
+          ],
+          "taxes": [
+            {
+              "Income tax expense": 15549.0
+            }
+          ],
+          "interest_expenses": [
+            {
+              "Interest expense": 5918.0
+            }
+          ]
+        }
+      },
+      {
+        "year": "2024",
+        "currency": "CNY",
+        "scale": 1000000,
+        "values": {
+          "total_revenue": [
+            {
+              "Revenue": 941168.0
+            }
+          ],
+          "total_operating_cost": [
+            {
+              "Cost of revenue": 586323.0
+            },
+            {
+              "Product development expenses": 52256.0
+            },
+            {
+              "Sales and marketing expenses": 115141.0
+            },
+            {
+              "General and administrative expenses": 41985.0
+            },
+            {
+              "Amortization and impairment of intangible assets": 21592.0
+            },
+            {
+              "Goodwill impairment": 10521.0
+            }
+          ],
+          "net_income": [
+            {
+              "Net income": 71332.0
+            }
+          ],
+          "taxes": [
+            {
+              "Income tax expense": 22529.0
+            }
+          ],
+          "interest_expenses": [
+            {
+              "Interest expense": 7947.0
+            }
+          ]
+        }
+      },
+      {
+        "year": "2025",
+        "currency": "CNY",
+        "scale": 1000000,
+        "values": {
+          "total_revenue": [
+            {
+              "Revenue": 996347.0
+            }
+          ],
+          "total_operating_cost": [
+            {
+              "Cost of revenue": 598285.0
+            },
+            {
+              "Product development expenses": 57151.0
+            },
+            {
+              "Sales and marketing expenses": 144021.0
+            },
+            {
+              "General and administrative expenses": 44239.0
+            },
+            {
+              "Amortization and impairment of intangible assets": 6336.0
+            },
+            {
+              "Goodwill impairment": 6171.0
+            }
+          ],
+          "net_income": [
+            {
+              "Net income": 125976.0
+            }
+          ],
+          "taxes": [
+            {
+              "Income tax expense": 35445.0
+            }
+          ],
+          "interest_expenses": [
+            {
+              "Interest expense": 9596.0
+            }
+          ]
+        }
+      }
+    ],
+    "notes": "1. All values are extracted from the primary consolidated income statement. Numbers in parentheses are treated as positive for cost/expense fields per rule 13. 2. 'Other net income' (RMB 761 million for 2025) is not included in total_operating_cost as it is an addition to operating profit, not a cost. 3. 'Interest and investment income, net' and 'Other net income (expenses)' are not mapped to the requested fields as they are non-operating items. 4. 'Share of results of equity method investees' is a separate line item below income tax and is not included in net income or operating costs. 5. The supplementary tables provide detailed breakdowns (e.g., revenue by segment, share-based compensation by function, tax components) but are not required for the core income statement fields as per the schema. 6. The USD columns are not used as the primary reporting currency is CNY (RMB).",
+    "source_file": "extracted_text\\alibaba_2025.consolidated-income-statement.llm.json"
+  }
+}

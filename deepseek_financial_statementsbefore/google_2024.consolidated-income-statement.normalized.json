@@ -1,0 +1,48 @@
+{
+  "schema_version": "1.0",
+  "fields": [
+    "revenue",
+    "operating_expenses",
+    "net_income",
+    "taxes",
+    "interest_expenses"
+  ],
+  "statement": {
+    "company_id": "google_2024",
+    "statement_type": "consolidated-income-statement",
+    "periods": [
+      {
+        "period": "2022",
+        "values": {
+          "revenue": 282836.0,
+          "operating_expenses": 207994.0,
+          "net_income": 59972.0,
+          "taxes": 11356.0,
+          "interest_expenses": null
+        }
+      },
+      {
+        "period": "2023",
+        "values": {
+          "revenue": 307394.0,
+          "operating_expenses": 223101.0,
+          "net_income": 73795.0,
+          "taxes": 11922.0,
+          "interest_expenses": null
+        }
+      },
+      {
+        "period": "2024",
+        "values": {
+          "revenue": 350018.0,
+          "operating_expenses": 237628.0,
+          "net_income": 100118.0,
+          "taxes": 19697.0,
+          "interest_expenses": null
+        }
+      }
+    ],
+    "notes": "Operating expenses mapped to 'Total costs and expenses'. No separate line item for interest expense found in the statement; it is likely included in 'Other income (expense), net' but cannot be separated. Taxes mapped to 'Provision for income taxes'.",
+    "source_file": "extracted_text/google_2024.consolidated-income-statement.llm.json"
+  }
+}

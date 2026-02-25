@@ -1,0 +1,159 @@
+{
+  "schema_version": "1.0",
+  "fields": [
+    "total_revenue",
+    "total_operating_cost",
+    "net_income",
+    "taxes",
+    "interest_expenses"
+  ],
+  "statement": {
+    "company_id": "microsoft_2025",
+    "statement_type": "consolidated-income-statement",
+    "periods": [
+      {
+        "year": "2025",
+        "currency": "USD",
+        "scale": 1000000,
+        "values": {
+          "total_revenue": [
+            {
+              "Product": 63946.0
+            },
+            {
+              "Service and other": 217778.0
+            }
+          ],
+          "total_operating_cost": [
+            {
+              "Product": 13501.0
+            },
+            {
+              "Service and other": 74330.0
+            },
+            {
+              "Research and development": 32488.0
+            },
+            {
+              "Sales and marketing": 25654.0
+            },
+            {
+              "General and administrative": 7223.0
+            }
+          ],
+          "net_income": [
+            {
+              "Net income": 101832.0
+            }
+          ],
+          "taxes": [
+            {
+              "Provision for income taxes": 21795.0
+            }
+          ],
+          "interest_expenses": [
+            {
+              "Interest expense": 2385.0
+            }
+          ]
+        }
+      },
+      {
+        "year": "2024",
+        "currency": "USD",
+        "scale": 1000000,
+        "values": {
+          "total_revenue": [
+            {
+              "Product": 64773.0
+            },
+            {
+              "Service and other": 180349.0
+            }
+          ],
+          "total_operating_cost": [
+            {
+              "Product": 15272.0
+            },
+            {
+              "Service and other": 58842.0
+            },
+            {
+              "Research and development": 29510.0
+            },
+            {
+              "Sales and marketing": 24456.0
+            },
+            {
+              "General and administrative": 7609.0
+            }
+          ],
+          "net_income": [
+            {
+              "Net income": 88136.0
+            }
+          ],
+          "taxes": [
+            {
+              "Provision for income taxes": 19651.0
+            }
+          ],
+          "interest_expenses": [
+            {
+              "Interest expense": 2935.0
+            }
+          ]
+        }
+      },
+      {
+        "year": "2023",
+        "currency": "USD",
+        "scale": 1000000,
+        "values": {
+          "total_revenue": [
+            {
+              "Product": 64699.0
+            },
+            {
+              "Service and other": 147216.0
+            }
+          ],
+          "total_operating_cost": [
+            {
+              "Product": 17804.0
+            },
+            {
+              "Service and other": 48059.0
+            },
+            {
+              "Research and development": 27195.0
+            },
+            {
+              "Sales and marketing": 22759.0
+            },
+            {
+              "General and administrative": 7575.0
+            }
+          ],
+          "net_income": [
+            {
+              "Net income": 72361.0
+            }
+          ],
+          "taxes": [
+            {
+              "Provision for income taxes": 16950.0
+            }
+          ],
+          "interest_expenses": [
+            {
+              "Interest expense": 1968.0
+            }
+          ]
+        }
+      }
+    ],
+    "notes": "1. Total revenue is the sum of 'Product' and 'Service and other' lines. 2. Total operating cost is the sum of 'Total cost of revenue' (broken into its components) and the three operating expense lines: 'Research and development', 'Sales and marketing', and 'General and administrative'. These are all costs incurred in generating income and are standard for a technology company. 3. 'Other income (expense), net' contains multiple components (interest income, investment gains/losses, derivatives, FX, etc.). Only the 'Interest expense' component is mapped to the 'interest_expenses' field, as it is the direct cost of borrowing. The other components are non-operating and are not part of the requested fields. 4. The sign convention for taxes, interest_expenses, and total_operating_cost follows rule 13: values that reduce income are reported as positive numbers. All extracted values are positive as they represent costs. 5. The scale is 1E6 (millions) as indicated in the statement header.",
+    "source_file": "extracted_text\\microsoft_2025.consolidated-income-statement.llm.json"
+  }
+}
