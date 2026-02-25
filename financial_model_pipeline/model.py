@@ -1,5 +1,6 @@
 """Trainable financial model definition and training logic."""
 
+import os
 import numpy as np
 import tensorflow as tf
 import tensorflow_probability as tfp
