@@ -3,7 +3,7 @@
   "fields": [
     "cash_and_cash_equivalents",
     "marketable_securities",
-    "accounts_receivable",
+    "total_accounts_receivable",
     "total_current_liabilities",
     "total_debt_short_term_and_long_term",
     "total_equity",
@@ -34,7 +34,7 @@
               "Term deposits (Current)": 192977.0
             }
           ],
-          "accounts_receivable": [
+          "total_accounts_receivable": [
             {
               "Accounts receivable": 48203.0
             }
@@ -88,7 +88,7 @@
               "Term deposits (Current)": 185983.0
             }
           ],
-          "accounts_receivable": [
+          "total_accounts_receivable": [
             {
               "Accounts receivable": 46606.0
             }
@@ -125,7 +125,7 @@
         }
       }
     ],
-    "notes": "1. 'Marketable Securities' includes current financial assets at FVPL, current financial assets at FVOCI, and current term deposits, as these are highly liquid and can be readily converted to cash. Non-current term deposits are excluded as they are less liquid. 2. 'Total Debt' is the sum of all Borrowings and Notes Payable (both current and non-current portions), as per the supplementary table 'Capital Risk Management - Total Debts/Adjusted EBITDA'. 3. All values are extracted directly from the primary balance sheet. 4. The scale is in millions (RMB in Millions).",
+    "notes": "1. 'Marketable securities' includes current financial assets at FVPL, current financial assets at FVOCI, and current term deposits, as these are liquid assets readily convertible to cash. For 2023, current FVOCI was zero ('–'). 2. 'Total debt' is the sum of all borrowings and notes payable (both current and non-current portions). 3. 'Total accounts receivable' is the net carrying amount after loss allowance. 4. All values are extracted directly from the primary consolidated statement of financial position. 5. Scale is 1,000,000 (RMB in Millions).",
     "source_file": "extracted_text/tencent_2024.consolidated-balance-sheet.llm.json"
   }
 }

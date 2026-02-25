@@ -53,7 +53,7 @@
         }
       }
     ],
-    "notes": "The 'depreciation_and_amortization' field is populated by combining two line items from the operating activities section: 'Depreciation and impairment of Equipment on operating leases, net' and 'Depreciation, amortization and impairment charges on Property, net'. This combination follows standard accounting practice for an automotive manufacturer, where both property/plant/equipment and leased assets are significant sources of depreciation and amortization. The scale is 1E6 (millions) as indicated in the statement. The supplementary tables provided details on cash paid for taxes and interest, but these are not part of the requested field.",
+    "notes": "Extracted depreciation and amortization values from the 'Cash flows from operating activities' section. The field includes two distinct line items: 'Depreciation and impairment of Equipment on operating leases, net' and 'Depreciation, amortization and impairment charges on Property, net'. Both are non-cash add-backs to net income and are standard components of depreciation and amortization for an automotive manufacturer with financing operations. The values are reported in millions (scale: 1E6).",
     "source_file": "extracted_text/2023 General Motors Annual Report .consolidated-cash-flow-statement.llm.json"
   }
 }

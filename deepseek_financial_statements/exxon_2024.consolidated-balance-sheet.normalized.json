@@ -3,7 +3,7 @@
   "fields": [
     "cash_and_cash_equivalents",
     "marketable_securities",
-    "accounts_receivable",
+    "total_accounts_receivable",
     "total_current_liabilities",
     "total_debt_short_term_and_long_term",
     "total_equity",
@@ -27,7 +27,7 @@
             }
           ],
           "marketable_securities": [],
-          "accounts_receivable": [
+          "total_accounts_receivable": [
             {
               "Notes and accounts receivable – net": 43681.0
             }
@@ -71,7 +71,7 @@
             }
           ],
           "marketable_securities": [],
-          "accounts_receivable": [
+          "total_accounts_receivable": [
             {
               "Notes and accounts receivable – net": 38015.0
             }
@@ -102,7 +102,7 @@
         }
       }
     ],
-    "notes": "1) 'Cash and cash equivalents' includes both unrestricted and restricted amounts as per the primary statement. 2) 'Marketable securities' field is empty as no line item for short-term, liquid investments (e.g., marketable securities, short-term investments) was identified in the provided balance sheet. 'Investments, advances and long-term receivables' (Note 8) is a non-current asset and includes equity method investments and long-term receivables, which are not considered readily marketable. 3) 'Total debt short-term and long-term' combines 'Notes and loans payable' (current) and 'Long-term debt' (non-current). 4) All values are in millions of dollars (scale: 1E6). 5) The sign convention for parentheses in the source (e.g., Accumulated other comprehensive income) indicates a negative value, but this is handled within the equity calculation. Extracted numbers are the raw, positive figures from the statement.",
+    "notes": "1. 'Cash and cash equivalents' includes both unrestricted and restricted amounts as per the primary statement.\n2. 'Marketable securities' field is empty as no specific line items for short-term, liquid investments (e.g., trading securities, available-for-sale securities) were identified in the provided balance sheet or supplementary tables. Investments listed (e.g., equity securities, long-term receivables) are non-current.\n3. 'Total accounts receivable' maps directly to 'Notes and accounts receivable – net'.\n4. 'Total current liabilities' maps directly to the aggregated line.\n5. 'Total debt short-term and long-term' combines 'Notes and loans payable' (current) and 'Long-term debt' (non-current).\n6. 'Total equity' and 'Total assets' map directly to the aggregated lines.\n7. All values are extracted as positive numbers; parentheses in the source (e.g., for Accumulated other comprehensive income) indicate negative equity components but are already netted within the 'Total Equity' figure provided.",
     "source_file": "extracted_text/exxon_2024.consolidated-balance-sheet.llm.json"
   }
 }

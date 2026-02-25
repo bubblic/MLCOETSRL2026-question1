@@ -3,7 +3,7 @@
   "fields": [
     "cash_and_cash_equivalents",
     "marketable_securities",
-    "accounts_receivable",
+    "total_accounts_receivable",
     "total_current_liabilities",
     "total_debt_short_term_and_long_term",
     "total_equity",
@@ -20,7 +20,13 @@
         "values": {
           "cash_and_cash_equivalents": [
             {
-              "Cash and cash equivalents": 9631.0
+              "Term deposits (<3 months)": 2200.0
+            },
+            {
+              "SICAV and FCP funds": 566.0
+            },
+            {
+              "Ordinary bank accounts": 6865.0
             }
           ],
           "marketable_securities": [
@@ -28,14 +34,29 @@
               "Current available for sale financial assets": 3956.0
             }
           ],
-          "accounts_receivable": [
+          "total_accounts_receivable": [
             {
-              "Trade accounts receivable": 4730.0
+              "Trade accounts receivable, nominal amount": 4856.0
+            },
+            {
+              "Provision for impairment": -125.0
             }
           ],
           "total_current_liabilities": [
             {
-              "Total current liabilities": 33696.0
+              "Short-term borrowings": 10851.0
+            },
+            {
+              "Current lease liabilities": 2972.0
+            },
+            {
+              "Trade accounts payable": 8630.0
+            },
+            {
+              "Income taxes": 1231.0
+            },
+            {
+              "Current provisions and other liabilities": 10012.0
             }
           ],
           "total_debt_short_term_and_long_term": [
@@ -48,7 +69,10 @@
           ],
           "total_equity": [
             {
-              "Total equity": 69287.0
+              "Equity, Group share": 67517.0
+            },
+            {
+              "Minority interests": 1770.0
             }
           ],
           "total_assets": [
@@ -65,7 +89,13 @@
         "values": {
           "cash_and_cash_equivalents": [
             {
-              "Cash and cash equivalents": 7774.0
+              "Term deposits (<3 months)": 1388.0
+            },
+            {
+              "SICAV and FCP funds": 283.0
+            },
+            {
+              "Ordinary bank accounts": 6103.0
             }
           ],
           "marketable_securities": [
@@ -73,14 +103,29 @@
               "Current available for sale financial assets": 3490.0
             }
           ],
-          "accounts_receivable": [
+          "total_accounts_receivable": [
             {
-              "Trade accounts receivable": 4728.0
+              "Trade accounts receivable, nominal amount": 4843.0
+            },
+            {
+              "Provision for impairment": -115.0
             }
           ],
           "total_current_liabilities": [
             {
-              "Total current liabilities": 33145.0
+              "Short-term borrowings": 10680.0
+            },
+            {
+              "Current lease liabilities": 2728.0
+            },
+            {
+              "Trade accounts payable": 9049.0
+            },
+            {
+              "Income taxes": 1148.0
+            },
+            {
+              "Current provisions and other liabilities": 9540.0
             }
           ],
           "total_debt_short_term_and_long_term": [
@@ -93,7 +138,10 @@
           ],
           "total_equity": [
             {
-              "Total equity": 62701.0
+              "Equity, Group share": 61017.0
+            },
+            {
+              "Minority interests": 1684.0
             }
           ],
           "total_assets": [
@@ -110,7 +158,13 @@
         "values": {
           "cash_and_cash_equivalents": [
             {
-              "Cash and cash equivalents": 7300.0
+              "Term deposits (<3 months)": 1001.0
+            },
+            {
+              "SICAV and FCP funds": 287.0
+            },
+            {
+              "Ordinary bank accounts": 6013.0
             }
           ],
           "marketable_securities": [
@@ -118,14 +172,29 @@
               "Current available for sale financial assets": 3552.0
             }
           ],
-          "accounts_receivable": [
+          "total_accounts_receivable": [
             {
-              "Trade accounts receivable": 4258.0
+              "Trade accounts receivable, nominal amount": 4369.0
+            },
+            {
+              "Provision for impairment": -111.0
             }
           ],
           "total_current_liabilities": [
             {
-              "Total current liabilities": 31543.0
+              "Short-term borrowings": 9360.0
+            },
+            {
+              "Current lease liabilities": 2632.0
+            },
+            {
+              "Trade accounts payable": 8788.0
+            },
+            {
+              "Income taxes": 1211.0
+            },
+            {
+              "Current provisions and other liabilities": 9553.0
             }
           ],
           "total_debt_short_term_and_long_term": [
@@ -133,12 +202,15 @@
               "Long-term borrowings": 10380.0
             },
             {
-              "Short-term borrowings": 9359.0
+              "Short-term borrowings": 9360.0
             }
           ],
           "total_equity": [
             {
-              "Total equity": 56604.0
+              "Equity, Group share": 55111.0
+            },
+            {
+              "Minority interests": 1493.0
             }
           ],
           "total_assets": [
@@ -149,7 +221,7 @@
         }
       }
     ],
-    "notes": "Extracted values are from the primary consolidated balance sheet. 'Marketable securities' is mapped to 'Current available for sale financial assets' from Note 13/14, as these are liquid financial assets. 'Total debt' is the sum of 'Long-term borrowings' and 'Short-term borrowings' from Note 19. All other fields map directly to primary statement line items. The scale is 1,000,000 (EUR millions) as indicated. The 'total_debt_short_term_and_long_term' field combines two separate line items, each listed in its own object in the array.",
+    "notes": "1. 'marketable_securities' is mapped to 'Current available for sale financial assets' from Note 14, as these are liquid, current financial assets easily convertible to cash, distinct from cash equivalents. 2. 'total_accounts_receivable' is mapped using the gross nominal amount and the provision for impairment from Note 12, as the net amount is already on the balance sheet. The provision is shown as a negative number as it reduces the asset. 3. 'total_current_liabilities' includes all line items listed under 'Current liabilities' in the primary statement. 4. 'total_debt_short_term_and_long_term' includes 'Long-term borrowings' and 'Short-term borrowings' from the primary statement/Note 19. 5. 'total_equity' includes 'Equity, Group share' and 'Minority interests' from the primary statement. 6. All values are sourced from the primary balance sheet or the detailed supplementary notes, maintaining the scale of millions (EUR).",
     "source_file": "extracted_text/lvmh_dec_2024.consolidated-balance-sheet.llm.json"
   }
 }

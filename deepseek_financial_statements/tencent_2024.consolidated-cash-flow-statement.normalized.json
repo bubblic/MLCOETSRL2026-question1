@@ -38,7 +38,7 @@
         }
       }
     ],
-    "notes": "The 'depreciation_and_amortization' field is populated using the two distinct line items from the reconciliation of net profit to cash generated from operations (Note 43(a)). These are the standard components for this field in a cash flow statement reconciliation. The primary cash flow statement does not list this figure directly, but it is a standard adjustment to reconcile profit to operating cash flow. The values are positive as they are non-cash expenses added back to profit.",
+    "notes": "The 'depreciation_and_amortization' field was populated using the explicit line items from the supplementary reconciliation table (Note 43(a)). The values are reported as positive numbers as they are non-cash expenses added back to profit to arrive at cash from operations. The primary cash flow statement does not list these items directly, so the supplementary reconciliation was used. The scale is 1E6 (millions) as indicated by 'RMB' Million'. The currency is CNY (Chinese Yuan Renminbi).",
     "source_file": "extracted_text/tencent_2024.consolidated-cash-flow-statement.llm.json"
   }
 }

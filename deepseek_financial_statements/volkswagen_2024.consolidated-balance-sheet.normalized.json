@@ -3,7 +3,7 @@
   "fields": [
     "cash_and_cash_equivalents",
     "marketable_securities",
-    "accounts_receivable",
+    "total_accounts_receivable",
     "total_current_liabilities",
     "total_debt_short_term_and_long_term",
     "total_equity",
@@ -28,7 +28,7 @@
               "Marketable securities and time deposits": 27326.0
             }
           ],
-          "accounts_receivable": [
+          "total_accounts_receivable": [
             {
               "Trade receivables": 21130.0
             }
@@ -73,7 +73,7 @@
               "Marketable securities and time deposits": 26772.0
             }
           ],
-          "accounts_receivable": [
+          "total_accounts_receivable": [
             {
               "Trade receivables": 21849.0
             }
@@ -104,7 +104,7 @@
         }
       }
     ],
-    "notes": "All values extracted directly from the primary consolidated balance sheet on Page 474. The 'Marketable securities and time deposits' line item is mapped to 'marketable_securities' as it is described as a liquid asset. 'Total debt short-term and long-term' is constructed by summing the 'Financial liabilities' line items from both the non-current and current sections. The 'accounts_receivable' field maps to 'Trade receivables'. All other fields map directly to single line items in the statement. The scale is in millions (€ million).",
+    "notes": "All values extracted directly from the primary consolidated balance sheet table. 'Marketable securities' is mapped from 'Marketable securities and time deposits'. 'Total accounts receivable' is mapped from 'Trade receivables'. 'Total debt short-term and long-term' is the sum of 'Financial liabilities' from both the non-current and current sections. All other fields map directly to single line items. The scale is in millions (€ million).",
     "source_file": "extracted_text/volkswagen_2024.consolidated-balance-sheet.llm.json"
   }
 }

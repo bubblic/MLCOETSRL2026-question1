@@ -44,7 +44,7 @@
         }
       }
     ],
-    "notes": "The primary statement provides a single line item 'Depreciation of property and equipment' under adjustments to reconcile net income. This is mapped directly to 'depreciation_and_amortization'. The supplementary tables contain detailed lease information, but the depreciation expense for finance leases is not separately broken out in the cash flow statement; it is likely included within the main 'Depreciation of property and equipment' line. Therefore, only the explicitly stated value from the primary statement is used.",
+    "notes": "Only the 'Depreciation of property and equipment' line item from the primary cash flow statement was directly mapped to the 'depreciation_and_amortization' field. The supplementary tables contain detailed lease information and a schedule for valuation accounts, but these do not provide additional depreciation or amortization figures that are not already captured in the primary statement's single line item. The 'Other' line in operating activities could contain some amortization of intangibles, but it is not itemized, so it is not included.",
     "source_file": "extracted_text/google_2024.consolidated-cash-flow-statement.llm.json"
   }
 }

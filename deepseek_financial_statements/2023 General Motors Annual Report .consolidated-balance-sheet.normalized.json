@@ -3,7 +3,7 @@
   "fields": [
     "cash_and_cash_equivalents",
     "marketable_securities",
-    "accounts_receivable",
+    "total_accounts_receivable",
     "total_current_liabilities",
     "total_debt_short_term_and_long_term",
     "total_equity",
@@ -28,7 +28,7 @@
               "Marketable debt securities": 7613.0
             }
           ],
-          "accounts_receivable": [
+          "total_accounts_receivable": [
             {
               "Accounts and notes receivable, net": 12378.0
             },
@@ -82,7 +82,7 @@
               "Marketable debt securities": 12150.0
             }
           ],
-          "accounts_receivable": [
+          "total_accounts_receivable": [
             {
               "Accounts and notes receivable, net": 13333.0
             },
@@ -122,7 +122,7 @@
         }
       }
     ],
-    "notes": "The company is in the automotive manufacturing and financing industry. For 'accounts_receivable', the field includes both trade receivables ('Accounts and notes receivable, net') and the current portion of finance receivables ('GM Financial receivables, net'), as both represent amounts due from customers. For 'total_debt_short_term_and_long_term', all components of debt (Automotive and GM Financial, both short-term and long-term) are listed individually as per the statement. The scale is 1E6 (millions) as indicated in the statement header. The 'marketable_securities' field maps directly to 'Marketable debt securities', which are liquid assets. All values are extracted directly from the primary balance sheet table.",
+    "notes": "1. 'total_accounts_receivable' includes both trade receivables ('Accounts and notes receivable, net') and the current portion of finance receivables ('GM Financial receivables, net') as both represent amounts due from customers. 2. 'total_debt_short_term_and_long_term' is the sum of all short-term and long-term debt components for both Automotive and GM Financial segments, as detailed in the primary statement and Note 13. 3. 'marketable_securities' is mapped directly to the 'Marketable debt securities' line item, which is a current, liquid asset. 4. The scale is 1E6 (millions) as stated in the primary statement. 5. All values are extracted directly from the primary statement, with debt components aggregated from their detailed breakdowns.",
     "source_file": "extracted_text/2023 General Motors Annual Report .consolidated-balance-sheet.llm.json"
   }
 }

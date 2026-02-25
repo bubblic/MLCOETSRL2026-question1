@@ -27,7 +27,7 @@ STATEMENT_CONFIGS: Dict[str, Dict[str, Any]] = {
         "fields": [
             "cash_and_cash_equivalents",
             "marketable_securities",
-            "accounts_receivable",
+            "total_accounts_receivable",
             "total_current_liabilities",
             "total_debt_short_term_and_long_term",
             "total_equity",
@@ -117,7 +117,7 @@ def build_prompt(
         "}\n\n"
         "Rules:\n"
         "1) Use every period/column available in the statement.\n"
-        "2) Return an array of maps for each field where each map is {source_label: number} (no commas, no currency symbols, no percent signs in numbers).\n"
+        "2) Return an array of maps for each field where each map is {source_label: number} where source_label is the direct copy of the label from the statement and the number is the value of the element (no commas, no currency symbols, no percent signs in numbers).\n"
         "3) If multiple elements need to be combined to make up a field, return all of them individually in an array.\n"
         "4) If a value(s) cannot be directly mapped to a field, try to map element(s) to the corresponding field by taking into account the industry the company is in, and note your reasoning in the notes field. If you cannot find a match, return an empty array.\n"
         "5) If there are multiple close synonyms, use best accounting match.\n"
@@ -125,9 +125,10 @@ def build_prompt(
         "7) For currency, report its formal 3-letter acronym.\n"
         "8) For scale, report the scale of the values in the statement. For example, if the values are in millions, the scale should be 1E6.\n"
         "9) For total_operating_cost, list all elements that should be included in standard practice for the industry the company is in.\n"
-        "10) For taxes, interest_expenses, and total_operating_cost, the sign convention should be such that if an element REDUCES income, it should be POSITIVE, and if it INCREASES income, it should be NEGATIVE. Otherwise, generally, numbers in parentheses are negative.\n"
-        "11) For marketable_securities, it has to be a liquid asset that can be easily converted to cash.\n"
-        "12) Return JSON only.\n\n"
+        "10) For taxes, it is the tax assessed on the income. If a tax belongs to the cost of revenue, it should be part of total_operating_cost.\n"
+        "11) For taxes, interest_expenses, and total_operating_cost, the sign convention should be such that if an element REDUCES income, it should be POSITIVE, and if it INCREASES income, it should be NEGATIVE. Otherwise, generally, numbers in parentheses are negative.\n"
+        "12) For marketable_securities, it includes all current liquid assets (excluding cash and cash equivalents) that can be easily converted to cash.\n"
+        "13) Return JSON only.\n\n"
         f"company_id: {company_id}\n\n"
         "statement and supplementary tables:\n"
         f"{statement_and_supplementary_tables}\n"

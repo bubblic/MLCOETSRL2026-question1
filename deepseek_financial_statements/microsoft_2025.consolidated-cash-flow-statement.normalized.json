@@ -14,7 +14,7 @@
         "values": {
           "depreciation_and_amortization": [
             {
-              "Depreciation, amortization, and other": 34153.0
+              "source_label": 34153.0
             }
           ]
         }
@@ -26,7 +26,7 @@
         "values": {
           "depreciation_and_amortization": [
             {
-              "Depreciation, amortization, and other": 22287.0
+              "source_label": 22287.0
             }
           ]
         }
@@ -38,13 +38,13 @@
         "values": {
           "depreciation_and_amortization": [
             {
-              "Depreciation, amortization, and other": 13861.0
+              "source_label": 13861.0
             }
           ]
         }
       }
     ],
-    "notes": "The field 'depreciation_and_amortization' was directly mapped from the line item 'Depreciation, amortization, and other' in the cash flow statement's adjustments to reconcile net income. The values are positive as they are non-cash expenses added back to net income. The supplementary tables provide detailed breakdowns of intangible asset amortization and lease-related amortization, but the cash flow statement presents a consolidated figure for depreciation, amortization, and other non-cash items.",
+    "notes": "Extracted the single line item 'Depreciation, amortization, and other' from the cash flow statement's adjustments to reconcile net income to net cash from operations. This is the standard mapping for the depreciation_and_amortization field. No other fields were requested for extraction in this specific task.",
     "source_file": "extracted_text/microsoft_2025.consolidated-cash-flow-statement.llm.json"
   }
 }

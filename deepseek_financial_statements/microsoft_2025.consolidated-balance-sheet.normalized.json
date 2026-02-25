@@ -3,7 +3,7 @@
   "fields": [
     "cash_and_cash_equivalents",
     "marketable_securities",
-    "accounts_receivable",
+    "total_accounts_receivable",
     "total_current_liabilities",
     "total_debt_short_term_and_long_term",
     "total_equity",
@@ -28,7 +28,7 @@
               "Short-term investments": 64323.0
             }
           ],
-          "accounts_receivable": [
+          "total_accounts_receivable": [
             {
               "Accounts receivable, net": 69905.0
             }
@@ -76,7 +76,7 @@
               "Short-term investments": 57228.0
             }
           ],
-          "accounts_receivable": [
+          "total_accounts_receivable": [
             {
               "Accounts receivable, net": 56924.0
             }
@@ -110,7 +110,7 @@
         }
       }
     ],
-    "notes": "Extracted values are from the primary consolidated balance sheet. 'Short-term investments' is mapped to 'marketable_securities' as it represents liquid, interest-bearing securities. 'Total debt' is the sum of short-term debt, current portion of long-term debt, and long-term debt. All other mappings are direct from the statement labels. The supplementary tables provide detailed breakdowns but were not used for the core extraction as the primary statement contains the required aggregated figures.",
+    "notes": "All values extracted directly from the primary Consolidated Balance Sheet. 'Short-term investments' is mapped to 'marketable_securities' as it represents current liquid assets (excluding cash and cash equivalents) that can be easily converted to cash. 'Total debt' is the sum of short-term debt, current portion of long-term debt, and long-term debt. The supplementary tables provide detailed breakdowns but were not needed for the requested normalized fields.",
     "source_file": "extracted_text/microsoft_2025.consolidated-balance-sheet.llm.json"
   }
 }

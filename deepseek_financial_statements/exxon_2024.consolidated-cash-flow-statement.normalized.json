@@ -14,7 +14,7 @@
         "values": {
           "depreciation_and_amortization": [
             {
-              "source_label": 23442.0
+              "Depreciation and depletion (includes impairments)": 23442.0
             }
           ]
         }
@@ -26,7 +26,7 @@
         "values": {
           "depreciation_and_amortization": [
             {
-              "source_label": 20641.0
+              "Depreciation and depletion (includes impairments)": 20641.0
             }
           ]
         }
@@ -38,13 +38,13 @@
         "values": {
           "depreciation_and_amortization": [
             {
-              "source_label": 24040.0
+              "Depreciation and depletion (includes impairments)": 24040.0
             }
           ]
         }
       }
     ],
-    "notes": "Only the 'depreciation_and_amortization' field was requested for extraction. The primary statement line 'Depreciation and depletion (includes impairments)' was mapped to this field as it is the standard accounting match for the oil and gas industry. All other cash flow statement line items were not requested and are therefore not included in the output.",
+    "notes": "Only the 'depreciation_and_amortization' field was requested for extraction. The value was directly mapped from the line item 'Depreciation and depletion (includes impairments)' in the primary statement. All other cash flow statement line items were not requested and are therefore not included in the output.",
     "source_file": "extracted_text/exxon_2024.consolidated-cash-flow-statement.llm.json"
   }
 }

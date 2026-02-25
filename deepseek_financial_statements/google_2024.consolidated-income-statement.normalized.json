@@ -18,25 +18,7 @@
         "values": {
           "revenue": [
             {
-              "Google Search & other": 162450.0
-            },
-            {
-              "YouTube ads": 29243.0
-            },
-            {
-              "Google Network": 32780.0
-            },
-            {
-              "Google subscriptions, platforms, and devices": 29055.0
-            },
-            {
-              "Google Cloud": 26280.0
-            },
-            {
-              "Other Bets": 1068.0
-            },
-            {
-              "Hedging gains (losses)": 1960.0
+              "Revenues": 282836.0
             }
           ],
           "total_operating_cost": [
@@ -77,25 +59,7 @@
         "values": {
           "revenue": [
             {
-              "Google Search & other": 175033.0
-            },
-            {
-              "YouTube ads": 31510.0
-            },
-            {
-              "Google Network": 31312.0
-            },
-            {
-              "Google subscriptions, platforms, and devices": 34688.0
-            },
-            {
-              "Google Cloud": 33088.0
-            },
-            {
-              "Other Bets": 1527.0
-            },
-            {
-              "Hedging gains (losses)": 236.0
+              "Revenues": 307394.0
             }
           ],
           "total_operating_cost": [
@@ -136,25 +100,7 @@
         "values": {
           "revenue": [
             {
-              "Google Search & other": 198084.0
-            },
-            {
-              "YouTube ads": 36147.0
-            },
-            {
-              "Google Network": 30359.0
-            },
-            {
-              "Google subscriptions, platforms, and devices": 40340.0
-            },
-            {
-              "Google Cloud": 43229.0
-            },
-            {
-              "Other Bets": 1648.0
-            },
-            {
-              "Hedging gains (losses)": 211.0
+              "Revenues": 350018.0
             }
           ],
           "total_operating_cost": [
@@ -189,7 +135,7 @@
         }
       }
     ],
-    "notes": "1. All values extracted from the primary consolidated income statement and supplementary tables. 2. Revenue is disaggregated into its components as provided in the supplementary table 'Disaggregated Revenues by Type'. 3. Total operating cost is composed of the four main operating expense categories listed in the primary statement: Cost of revenues, Research and development, Sales and marketing, and General and administrative. These are standard for a technology/services company like Alphabet. 4. Taxes are mapped from 'Provision for income taxes'. 5. Interest expenses are mapped from the 'Interest expense' component within 'Other income (expense), net'. The value is positive as it reduces income. 6. The 'Hedging gains (losses)' component of revenue is included as presented; it is a component of total revenue. 7. Scale is 1E6 (millions) as indicated in the statement. 8. All numbers are presented without commas or currency symbols as per the rules.",
+    "notes": "1. All values extracted from the primary Consolidated Statements of Income on page 57 and the supplementary table 'Components of Other Income (Expense), Net' on page 83. 2. For total_operating_cost, the four main operating expense categories (Cost of revenues, Research and development, Sales and marketing, General and administrative) are listed individually as they sum to 'Total costs and expenses'. This is standard for a technology/services company like Alphabet. 3. For taxes, 'Provision for income taxes' is used. 4. For interest_expenses, the value is taken from the 'Interest expense' line within 'Other income (expense), net'. The sign convention is followed: these expenses reduce income, so the positive numbers from the statement (which were shown in parentheses) are reported as positive numbers. 5. The scale is 1,000,000 (millions) as indicated in the statement. 6. All other supplementary data (e.g., segment breakdowns, revenue disaggregation, tax details) provide supporting detail but are not required for the core income statement fields requested.",
     "source_file": "extracted_text/google_2024.consolidated-income-statement.llm.json"
   }
 }

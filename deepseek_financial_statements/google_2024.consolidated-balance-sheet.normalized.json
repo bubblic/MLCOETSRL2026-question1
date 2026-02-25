@@ -3,7 +3,7 @@
   "fields": [
     "cash_and_cash_equivalents",
     "marketable_securities",
-    "accounts_receivable",
+    "total_accounts_receivable",
     "total_current_liabilities",
     "total_debt_short_term_and_long_term",
     "total_equity",
@@ -28,7 +28,7 @@
               "Marketable securities": 86868.0
             }
           ],
-          "accounts_receivable": [
+          "total_accounts_receivable": [
             {
               "Accounts receivable, net": 47964.0
             }
@@ -70,7 +70,7 @@
               "Marketable securities": 72191.0
             }
           ],
-          "accounts_receivable": [
+          "total_accounts_receivable": [
             {
               "Accounts receivable, net": 52340.0
             }
@@ -98,7 +98,7 @@
         }
       }
     ],
-    "notes": "1. All values are taken directly from the primary consolidated balance sheet. 2. The 'total_debt_short_term_and_long_term' field maps only to the explicit 'Long-term debt' line item, as no short-term debt is separately identified in the provided statement. The supplementary table shows total future principal payments of $12,000M for 2024, which is greater than the $10,883M long-term debt balance, suggesting the inclusion of current maturities. However, the current portion is not explicitly broken out in the primary statement, so only the long-term debt line is used. 3. 'Marketable securities' is a distinct, liquid asset line item. 4. 'Accounts receivable' is net of an allowance, as shown in the supplementary table. 5. Scale is in millions (1E6) as indicated in the statement header.",
+    "notes": "1. All values are extracted directly from the primary consolidated balance sheet. 2. The 'total_debt_short_term_and_long_term' field maps to 'Long-term debt' from the statement, as no short-term debt is listed separately. The supplementary table shows a total principal of $12,000M for 2024, which is greater than the $10,883M balance sheet value; the difference is likely unamortized discount/premium. The balance sheet value is used. 3. 'Marketable securities' includes all current liquid securities as per the primary statement. The supplementary table provides a detailed fair value breakdown. 4. 'Total accounts receivable' is net of an allowance for credit losses ($771M for 2023, $879M for 2024 per supplementary). 5. Scale is 1E6 (millions) as indicated in the statement header.",
     "source_file": "extracted_text/google_2024.consolidated-balance-sheet.llm.json"
   }
 }

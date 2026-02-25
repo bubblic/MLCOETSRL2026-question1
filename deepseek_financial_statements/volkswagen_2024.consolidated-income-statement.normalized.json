@@ -42,10 +42,7 @@
           ],
           "taxes": [
             {
-              "Current tax expense": 5858.0
-            },
-            {
-              "Deferred tax income": -1447.0
+              "Income tax income/expense": 4411.0
             }
           ],
           "interest_expenses": [
@@ -86,10 +83,7 @@
           ],
           "taxes": [
             {
-              "Current tax expense": 6791.0
-            },
-            {
-              "Deferred tax income": -1554.0
+              "Income tax income/expense": 5237.0
             }
           ],
           "interest_expenses": [
@@ -100,7 +94,7 @@
         }
       }
     ],
-    "notes": "1. Revenue is mapped from 'Sales revenue'. 2. Total operating cost includes Cost of sales, Distribution expenses, Administrative expenses, and Other operating expenses, as these are the standard operating cost components for an automotive manufacturer. Other operating income is not included as it is a separate income line. 3. Net income is mapped from 'Earnings after tax'. 4. Taxes are broken down into Current tax expense (positive as it reduces income) and Deferred tax income (negative as it increases income), per the sign convention. 5. Interest expenses are taken directly from the line item. All values are in € million (scale 1E6).",
+    "notes": "Extracted from the Consolidated Income Statement on Page 471. All values are in € million (scale: 1E6). For 'total_operating_cost', standard practice for an automotive manufacturer includes Cost of sales, Distribution expenses, Administrative expenses, and Other operating expenses. 'Other operating income' is not included in total_operating_cost as it is a separate income line that contributes to the Operating result. 'Taxes' is mapped to the 'Income tax income/expense' line. 'Interest expenses' is taken directly from the statement. All numbers are reported as positive per the sign convention where items that reduce income are positive. The 'Other operating expenses' line item includes all sub-components from Note 6.",
     "source_file": "extracted_text/volkswagen_2024.consolidated-income-statement.llm.json"
   }
 }

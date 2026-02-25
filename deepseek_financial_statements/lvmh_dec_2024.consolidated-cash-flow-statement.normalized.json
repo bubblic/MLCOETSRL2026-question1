@@ -14,10 +14,10 @@
         "values": {
           "depreciation_and_amortization": [
             {
-              "source_label": 4568.0
+              "Net increase in depreciation, amortization and provisions": 4568.0
             },
             {
-              "source_label": 3228.0
+              "Depreciation of right-of-use assets": 3228.0
             }
           ]
         }
@@ -29,10 +29,10 @@
         "values": {
           "depreciation_and_amortization": [
             {
-              "source_label": 4146.0
+              "Net increase in depreciation, amortization and provisions": 4146.0
             },
             {
-              "source_label": 3031.0
+              "Depreciation of right-of-use assets": 3031.0
             }
           ]
         }
@@ -44,16 +44,16 @@
         "values": {
           "depreciation_and_amortization": [
             {
-              "source_label": 3219.0
+              "Net increase in depreciation, amortization and provisions": 3219.0
             },
             {
-              "source_label": 3007.0
+              "Depreciation of right-of-use assets": 3007.0
             }
           ]
         }
       }
     ],
-    "notes": "The 'depreciation_and_amortization' field is populated using two line items from the cash flow statement: 'Net increase in depreciation, amortization and provisions' and 'Depreciation of right-of-use assets'. These are the standard components for this field under IFRS. The 'Other adjustments and computed expenses' line was not included as it is not a direct depreciation or amortization charge. The scale is 1E6 (millions) as indicated. Only the 'depreciation_and_amortization' field was requested for extraction.",
+    "notes": "The 'depreciation_and_amortization' field has been mapped by combining two line items from the primary statement: 'Net increase in depreciation, amortization and provisions' and 'Depreciation of right-of-use assets'. This combination is standard under IFRS 16 for total depreciation and amortization expense. The 'Other adjustments and computed expenses' line was not included as it is a separate, non-cash adjustment that may include items other than depreciation and amortization. The scale is 1E6 (millions) as indicated by the statement's unit (EUR millions).",
     "source_file": "extracted_text/lvmh_dec_2024.consolidated-cash-flow-statement.llm.json"
   }
 }

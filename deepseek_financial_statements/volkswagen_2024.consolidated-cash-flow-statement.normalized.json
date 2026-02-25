@@ -44,7 +44,7 @@
         }
       }
     ],
-    "notes": "Extracted depreciation and amortization values from the primary consolidated cash flow statement. The field 'depreciation_and_amortization' is composed of three distinct line items as presented in the statement, which are standard for an automotive manufacturer: 1) Depreciation/amortization/impairment on PP&E, intangibles, and investment property, 2) Amortization/impairment on capitalized development costs (R&D), and 3) Depreciation/impairment on lease assets (right-of-use assets). All values are reported in millions of Euros (scale 1E6). The 2023 figures are prior-year adjusted as noted in the statement.",
+    "notes": "The 'depreciation_and_amortization' field is constructed by combining three distinct line items from the primary cash flow statement, as they collectively represent the total non-cash depreciation and amortization expense for the period. The values are reported in millions of Euros (scale: 1E6). The supplementary tables provide divisional and business area breakdowns but do not alter the consolidated totals used here.",
     "source_file": "extracted_text/volkswagen_2024.consolidated-cash-flow-statement.llm.json"
   }
 }
