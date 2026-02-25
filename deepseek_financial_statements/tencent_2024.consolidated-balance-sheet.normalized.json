@@ -21,17 +21,20 @@
           "cash_and_cash_equivalents": [
             {
               "Cash and cash equivalents": 132519.0
+            },
+            {
+              "Bank balances and cash": 89183.0
+            },
+            {
+              "Term deposits and highly liquid investments (within three months)": 43336.0
             }
           ],
           "marketable_securities": [
             {
-              "Financial assets at fair value through profit or loss (Current)": 9568.0
+              "Financial assets at fair value through profit or loss (Current assets)": 9568.0
             },
             {
-              "Financial assets at fair value through other comprehensive income (Current)": 3345.0
-            },
-            {
-              "Term deposits (Current)": 192977.0
+              "Financial assets at fair value through other comprehensive income (Current assets)": 3345.0
             }
           ],
           "total_accounts_receivable": [
@@ -41,21 +44,45 @@
           ],
           "total_current_liabilities": [
             {
-              "Total current liabilities": 396909.0
+              "Accounts payable": 118712.0
+            },
+            {
+              "Other payables and accruals": 84032.0
+            },
+            {
+              "Borrowings (Current liabilities)": 52885.0
+            },
+            {
+              "Notes payable (Current liabilities)": 8623.0
+            },
+            {
+              "Current income tax liabilities": 16586.0
+            },
+            {
+              "Other tax liabilities": 4038.0
+            },
+            {
+              "Other financial liabilities (Current liabilities)": 6336.0
+            },
+            {
+              "Lease liabilities (Current liabilities)": 5600.0
+            },
+            {
+              "Deferred revenue (Current liabilities)": 100097.0
             }
           ],
           "total_debt_short_term_and_long_term": [
             {
-              "Borrowings (Non-current)": 146521.0
+              "Borrowings (Non-current liabilities)": 146521.0
             },
             {
-              "Borrowings (Current)": 52885.0
+              "Borrowings (Current liabilities)": 52885.0
             },
             {
-              "Notes payable (Non-current)": 130586.0
+              "Notes payable (Non-current liabilities)": 130586.0
             },
             {
-              "Notes payable (Current)": 8623.0
+              "Notes payable (Current liabilities)": 8623.0
             }
           ],
           "total_equity": [
@@ -78,14 +105,20 @@
           "cash_and_cash_equivalents": [
             {
               "Cash and cash equivalents": 172320.0
+            },
+            {
+              "Bank balances and cash": 127241.0
+            },
+            {
+              "Term deposits and highly liquid investments (within three months)": 45079.0
             }
           ],
           "marketable_securities": [
             {
-              "Financial assets at fair value through profit or loss (Current)": 14903.0
+              "Financial assets at fair value through profit or loss (Current assets)": 14903.0
             },
             {
-              "Term deposits (Current)": 185983.0
+              "Financial assets at fair value through other comprehensive income (Current assets)": 0.0
             }
           ],
           "total_accounts_receivable": [
@@ -95,21 +128,45 @@
           ],
           "total_current_liabilities": [
             {
-              "Total current liabilities": 352157.0
+              "Accounts payable": 100948.0
+            },
+            {
+              "Other payables and accruals": 76595.0
+            },
+            {
+              "Borrowings (Current liabilities)": 41537.0
+            },
+            {
+              "Notes payable (Current liabilities)": 14161.0
+            },
+            {
+              "Current income tax liabilities": 17664.0
+            },
+            {
+              "Other tax liabilities": 4372.0
+            },
+            {
+              "Other financial liabilities (Current liabilities)": 4558.0
+            },
+            {
+              "Lease liabilities (Current liabilities)": 6154.0
+            },
+            {
+              "Deferred revenue (Current liabilities)": 86168.0
             }
           ],
           "total_debt_short_term_and_long_term": [
             {
-              "Borrowings (Non-current)": 155819.0
+              "Borrowings (Non-current liabilities)": 155819.0
             },
             {
-              "Borrowings (Current)": 41537.0
+              "Borrowings (Current liabilities)": 41537.0
             },
             {
-              "Notes payable (Non-current)": 137101.0
+              "Notes payable (Non-current liabilities)": 137101.0
             },
             {
-              "Notes payable (Current)": 14161.0
+              "Notes payable (Current liabilities)": 14161.0
             }
           ],
           "total_equity": [
@@ -125,7 +182,7 @@
         }
       }
     ],
-    "notes": "1. 'Marketable securities' includes current financial assets at FVPL, current financial assets at FVOCI, and current term deposits, as these are highly liquid assets readily convertible to cash. Non-current term deposits and non-current financial assets are excluded as they are not considered current. For 2023, current FVOCI was zero ('–').\n2. 'Total debt' is defined as the sum of all borrowings and notes payable (both current and non-current portions). This aligns with the 'Total debts' line in the supplementary table (Note 4.2).\n3. All values are extracted directly from the primary consolidated statement of financial position. The scale is in millions (RMB).",
+    "notes": "1. 'Cash and cash equivalents' is mapped from the primary statement line item and its detailed composition from Note 32. The detailed components are included in the array.\n2. 'Marketable securities' is mapped from the current portion of 'Financial assets at fair value through profit or loss' and 'Financial assets at fair value through other comprehensive income', as these represent liquid, unrestricted investments intended for trading or near-term sale. The non-current portions are considered long-term investments and are not included.\n3. 'Total accounts receivable' is mapped directly from the primary statement line item.\n4. 'Total current liabilities' is the sum of all items listed under 'Current liabilities' in the primary statement.\n5. 'Total debt short-term and long-term' is the sum of all 'Borrowings' and 'Notes payable' from both current and non-current liabilities, as per standard debt definition.\n6. 'Total equity' and 'Total assets' are mapped directly from the primary statement totals.\n7. The scale is 1,000,000 (RMB in Millions) as indicated in the statement header.\n8. Currency is CNY (Chinese Yuan Renminbi).\n9. For 2023, 'Financial assets at fair value through other comprehensive income (Current assets)' is reported as '–' in the primary statement, which is interpreted as 0.",
     "source_file": "extracted_text/tencent_2024.consolidated-balance-sheet.llm.json"
   }
 }

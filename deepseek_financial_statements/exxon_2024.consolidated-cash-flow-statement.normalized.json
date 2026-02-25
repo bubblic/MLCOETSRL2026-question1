@@ -44,7 +44,7 @@
         }
       }
     ],
-    "notes": "Only the 'depreciation_and_amortization' field was requested for extraction. The value was directly mapped from the 'Depreciation and depletion (includes impairments)' line item in the Cash Flows from Operating Activities section. The statement provides values for 2024, 2023, and 2022 in millions of US dollars.",
+    "notes": "Only the 'depreciation_and_amortization' field was requested for extraction. The provided line item 'Depreciation and depletion (includes impairments)' from the operating activities section is mapped to this field. The statement is for an oil and gas (energy) company, where 'depletion' is the industry-specific term analogous to amortization for natural resources. All other fields from the cash flow statement (e.g., net income, changes in working capital, investing/financing activities) were not requested and are therefore not included in the output.",
     "source_file": "extracted_text/exxon_2024.consolidated-cash-flow-statement.llm.json"
   }
 }

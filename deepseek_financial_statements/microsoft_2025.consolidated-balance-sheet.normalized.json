@@ -35,7 +35,25 @@
           ],
           "total_current_liabilities": [
             {
-              "Total current liabilities": 141218.0
+              "Accounts payable": 27724.0
+            },
+            {
+              "Short-term debt": 0.0
+            },
+            {
+              "Current portion of long-term debt": 2999.0
+            },
+            {
+              "Accrued compensation": 13709.0
+            },
+            {
+              "Short-term income taxes": 7211.0
+            },
+            {
+              "Short-term unearned revenue": 64555.0
+            },
+            {
+              "Other current liabilities": 25020.0
             }
           ],
           "total_debt_short_term_and_long_term": [
@@ -51,12 +69,36 @@
           ],
           "total_equity": [
             {
-              "Total stockholders’ equity": 343479.0
+              "Common stock and paid-in capital": 109095.0
+            },
+            {
+              "Retained earnings": 237731.0
+            },
+            {
+              "Accumulated other comprehensive loss": -3347.0
             }
           ],
           "total_assets": [
             {
-              "Total assets": 619003.0
+              "Total current assets": 191131.0
+            },
+            {
+              "Property and equipment, net": 204966.0
+            },
+            {
+              "Operating lease right-of-use assets": 24823.0
+            },
+            {
+              "Equity and other investments": 15405.0
+            },
+            {
+              "Goodwill": 119509.0
+            },
+            {
+              "Intangible assets, net": 22604.0
+            },
+            {
+              "Other long-term assets": 40565.0
             }
           ]
         }
@@ -83,7 +125,25 @@
           ],
           "total_current_liabilities": [
             {
-              "Total current liabilities": 125286.0
+              "Accounts payable": 21996.0
+            },
+            {
+              "Short-term debt": 6693.0
+            },
+            {
+              "Current portion of long-term debt": 2249.0
+            },
+            {
+              "Accrued compensation": 12564.0
+            },
+            {
+              "Short-term income taxes": 5017.0
+            },
+            {
+              "Short-term unearned revenue": 57582.0
+            },
+            {
+              "Other current liabilities": 19185.0
             }
           ],
           "total_debt_short_term_and_long_term": [
@@ -99,18 +159,42 @@
           ],
           "total_equity": [
             {
-              "Total stockholders’ equity": 268477.0
+              "Common stock and paid-in capital": 100923.0
+            },
+            {
+              "Retained earnings": 173144.0
+            },
+            {
+              "Accumulated other comprehensive loss": -5590.0
             }
           ],
           "total_assets": [
             {
-              "Total assets": 512163.0
+              "Total current assets": 159734.0
+            },
+            {
+              "Property and equipment, net": 135591.0
+            },
+            {
+              "Operating lease right-of-use assets": 18961.0
+            },
+            {
+              "Equity and other investments": 14600.0
+            },
+            {
+              "Goodwill": 119220.0
+            },
+            {
+              "Intangible assets, net": 27597.0
+            },
+            {
+              "Other long-term assets": 36460.0
             }
           ]
         }
       }
     ],
-    "notes": "1. All values extracted directly from the primary Consolidated Balance Sheet. 2. 'Short-term investments' is mapped to 'marketable_securities' as it represents current liquid assets easily convertible to cash, excluding cash and cash equivalents. 3. 'Total debt' is the sum of 'Short-term debt', 'Current portion of long-term debt', and 'Long-term debt'. 4. The supplementary tables provide detailed breakdowns but are not required for the requested normalized fields.",
+    "notes": "1. 'Short-term investments' from the primary statement is mapped to 'marketable_securities' as it represents liquid, unrestricted debt investments intended to be sold in the near term, consistent with the supplementary investment table details. 2. 'Total current liabilities' is the sum of all listed current liability line items. 3. 'Total debt_short_term_and_long_term' is the sum of short-term debt, current portion of long-term debt, and long-term debt. 4. 'Total equity' is the sum of the three listed stockholders' equity components. 5. 'Total assets' is the sum of all listed asset line items, which matches the reported total assets. 6. The supplementary tables provide detailed breakdowns but are not required for the aggregated values requested in the schema.",
     "source_file": "extracted_text/microsoft_2025.consolidated-balance-sheet.llm.json"
   }
 }

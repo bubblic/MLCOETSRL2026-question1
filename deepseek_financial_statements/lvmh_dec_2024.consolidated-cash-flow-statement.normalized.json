@@ -53,7 +53,7 @@
         }
       }
     ],
-    "notes": "The schema requested only one field: 'depreciation_and_amortization'. This field has been populated using the two relevant line items from the cash flow statement: 'Net increase in depreciation, amortization and provisions' and 'Depreciation of right-of-use assets'. These are the standard components for this field in a cash flow statement under the indirect method. The 'Other adjustments and computed expenses' line was not included as it is not a standard component of depreciation and amortization. All other fields from the provided schema were omitted as they were not present in the request.",
+    "notes": "The 'depreciation_and_amortization' field is constructed from two line items in the cash flow statement: 'Net increase in depreciation, amortization and provisions' and 'Depreciation of right-of-use assets'. These are the only items directly related to depreciation and amortization in the provided cash flow statement. The 'Other adjustments and computed expenses' line is excluded as it is not specifically identified as depreciation or amortization and may include other non-cash items. The scale is 1E6 (millions) as indicated by '(EUR millions)' in the statement header.",
     "source_file": "extracted_text/lvmh_dec_2024.consolidated-cash-flow-statement.llm.json"
   }
 }

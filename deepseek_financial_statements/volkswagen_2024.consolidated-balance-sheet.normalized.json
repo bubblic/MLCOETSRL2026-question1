@@ -31,11 +31,26 @@
           "total_accounts_receivable": [
             {
               "Trade receivables": 21130.0
+            },
+            {
+              "Financial services receivables (Current)": 68855.0
+            },
+            {
+              "Other receivables (Current)": 10217.0
             }
           ],
           "total_current_liabilities": [
             {
-              "Total current liabilities": 217039.0
+              "Financial liabilities (Current)": 117020.0
+            },
+            {
+              "Trade payables": 29772.0
+            },
+            {
+              "Other liabilities (Current)": 70247.0
+            },
+            {
+              "Liabilities associated with assets held for sale": 0.0
             }
           ],
           "total_debt_short_term_and_long_term": [
@@ -76,11 +91,26 @@
           "total_accounts_receivable": [
             {
               "Trade receivables": 21849.0
+            },
+            {
+              "Financial services receivables (Current)": 66381.0
+            },
+            {
+              "Other receivables (Current)": 8799.0
             }
           ],
           "total_current_liabilities": [
             {
-              "Total current liabilities": 206036.0
+              "Financial liabilities (Current)": 110476.0
+            },
+            {
+              "Trade payables": 30901.0
+            },
+            {
+              "Other liabilities (Current)": 64628.0
+            },
+            {
+              "Liabilities associated with assets held for sale": 31.0
             }
           ],
           "total_debt_short_term_and_long_term": [
@@ -104,7 +134,7 @@
         }
       }
     ],
-    "notes": "All values extracted directly from the primary consolidated balance sheet table. 'Marketable securities and time deposits' is mapped to 'marketable_securities' as it represents current liquid assets excluding cash. 'Total debt' is the sum of 'Financial liabilities' from both non-current and current sections. 'Total accounts receivable' is mapped from 'Trade receivables' as the primary component; other receivables (e.g., other financial assets, other receivables) are not included as they are not considered trade-related. The scale is 1,000,000 (millions) as indicated by '(€ million)'.",
+    "notes": "1. For 'total_accounts_receivable', the field includes Trade receivables, Financial services receivables (current portion), and Other receivables (current portion) as these are the core components of receivables expected to be collected within the operating cycle. The non-current portion of Financial services receivables is excluded as it is a long-term asset. 2. For 'total_current_liabilities', the field includes all items listed under 'Current liabilities' in the primary statement. The value for 'Liabilities associated with assets held for sale' is 0 for 2024 and 31 for 2023, as shown. 3. For 'total_debt_short_term_and_long_term', the field is the sum of Financial liabilities under both Non-current and Current liabilities, representing total financial debt. 4. All values are sourced directly from the primary consolidated balance sheet table. The scale is in millions (€ million).",
     "source_file": "extracted_text/volkswagen_2024.consolidated-balance-sheet.llm.json"
   }
 }

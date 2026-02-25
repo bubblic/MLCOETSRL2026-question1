@@ -26,9 +26,6 @@
           "marketable_securities": [
             {
               "Short-term investments": 262955.0
-            },
-            {
-              "Equity securities and other investments": 59949.0
             }
           ],
           "total_accounts_receivable": [
@@ -38,7 +35,22 @@
           ],
           "total_current_liabilities": [
             {
-              "Total current liabilities": 421507.0
+              "Short-term bank borrowings": 12749.0
+            },
+            {
+              "Short-term unsecured senior notes": 16252.0
+            },
+            {
+              "Income tax payable": 9068.0
+            },
+            {
+              "Accrued expenses, accounts payable and other liabilities": 297883.0
+            },
+            {
+              "Merchant deposits": 12737.0
+            },
+            {
+              "Deferred revenue and customer advances": 72818.0
             }
           ],
           "total_debt_short_term_and_long_term": [
@@ -80,9 +92,6 @@
           "marketable_securities": [
             {
               "Short-term investments": 228826.0
-            },
-            {
-              "Equity securities and other investments": 53780.0
             }
           ],
           "total_accounts_receivable": [
@@ -92,7 +101,19 @@
           ],
           "total_current_liabilities": [
             {
-              "Total current liabilities": 435346.0
+              "Short-term bank borrowings": 22562.0
+            },
+            {
+              "Income tax payable": 11638.0
+            },
+            {
+              "Accrued expenses, accounts payable and other liabilities": 332537.0
+            },
+            {
+              "Merchant deposits": 274.0
+            },
+            {
+              "Deferred revenue and customer advances": 68335.0
             }
           ],
           "total_debt_short_term_and_long_term": [
@@ -122,7 +143,7 @@
         }
       }
     ],
-    "notes": "1. 'marketable_securities' includes 'Short-term investments' and the current portion of 'Equity securities and other investments' as per the balance sheet classification. The non-current portion of 'Equity securities and other investments' is excluded. 2. 'total_accounts_receivable' is sourced from the supplementary aging analysis table (Note 33). 3. 'total_debt_short_term_and_long_term' includes all short-term and long-term borrowings and notes. For 2025, 'Short-term unsecured senior notes' is zero and not included. 4. 'total_equity' is the line item 'Total equity' which includes shareholders' equity and non-controlling interests. 5. All values are in RMB millions (scale 1E6).",
+    "notes": "1. 'total_accounts_receivable' is mapped from the supplementary table 'Accounts Receivable Aging Analysis' (Note 33). The primary statement line 'Prepayments, receivables and other assets' is a combined figure; the supplementary table provides the specific accounts receivable component. 2. 'total_current_liabilities' includes all line items listed under 'Current liabilities:' in the primary statement. For 2025, 'Short-term unsecured senior notes' is zero and is omitted. 3. 'total_debt_short_term_and_long_term' includes all borrowings and notes (short-term and long-term) as listed. It excludes other liabilities like deferred revenue and accounts payable. 4. 'total_equity' is taken directly from the 'Total equity' line, which includes shareholders' equity and non-controlling interests. 5. 'marketable_securities' is mapped to 'Short-term investments' from the primary statement, as these are typically liquid investments intended for the near term. 'Equity securities and other investments' under current assets is not included as it may contain less liquid or strategic holdings. 6. Scale is 1,000,000 (millions) as indicated in the statement header. Currency is Chinese Yuan (CNY/RMB).",
     "source_file": "extracted_text/alibaba_2025.consolidated-balance-sheet.llm.json"
   }
 }

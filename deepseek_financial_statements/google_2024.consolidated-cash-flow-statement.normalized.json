@@ -44,7 +44,7 @@
         }
       }
     ],
-    "notes": "Only the 'Depreciation of property and equipment' line item was directly mapped to 'depreciation_and_amortization'. The supplementary tables contain detailed lease information and a schedule for valuation accounts, but these do not provide additional depreciation or amortization figures beyond what is in the primary cash flow statement. The 'Other' line in operating activities could contain some amortization, but it is not itemized, so it is not included to avoid redundancy or incorrect aggregation.",
+    "notes": "Only the 'Depreciation of property and equipment' line item was directly mapped to the 'depreciation_and_amortization' field. The supplementary tables contain detailed lease information, but the primary cash flow statement does not break out amortization of intangible assets or lease-related amortization separately. Therefore, only the explicit depreciation figure is included. The 'Other' line in operating adjustments could contain some amortization, but its composition is unspecified, so it is not included to maintain accuracy.",
     "source_file": "extracted_text/google_2024.consolidated-cash-flow-statement.llm.json"
   }
 }

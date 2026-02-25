@@ -106,7 +106,7 @@
         }
       }
     ],
-    "notes": "1. Total revenue is composed of the four reported revenue segments. 2. Total operating cost includes cost of revenues, selling & marketing, and general & administrative expenses, which are the primary operating expenses for a technology and services company. Items like 'Other gains/(losses), net' and 'Share of profit/(loss) of associates' are non-operating and are not included. 3. Finance costs are mapped to interest_expenses. The sign convention is followed: all cost/expense items are positive as they reduce income. 4. The scale is in millions (RMB'Million).",
+    "notes": "The primary income statement provides all required fields directly. For total_operating_cost, the standard components for a technology/internet company are included: Cost of revenues, Selling and marketing expenses, and General and administrative expenses. 'Other gains/(losses), net' is not included in total_operating_cost as it is a non-operating item. 'Finance costs' is mapped to interest_expenses. All numbers are in RMB millions (scale 1E6). Values in parentheses from the source are treated as positive numbers for cost/expense fields per rule 13.",
     "source_file": "extracted_text/tencent_2024.consolidated-income-statement.llm.json"
   }
 }

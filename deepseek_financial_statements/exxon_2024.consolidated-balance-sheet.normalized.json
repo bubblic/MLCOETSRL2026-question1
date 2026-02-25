@@ -26,11 +26,7 @@
               "Cash and cash equivalents – restricted": 158.0
             }
           ],
-          "marketable_securities": [
-            {
-              "Equity securities carried at fair value and other investments at adjusted cost basis": 343.0
-            }
-          ],
+          "marketable_securities": [],
           "total_accounts_receivable": [
             {
               "Trade, less reserves of $162 million and $170 million": 35282.0
@@ -60,7 +56,16 @@
           ],
           "total_equity": [
             {
-              "ExxonMobil share of equity": 263705.0
+              "Common stock without par value": 46238.0
+            },
+            {
+              "Earnings reinvested": 470903.0
+            },
+            {
+              "Accumulated other comprehensive income": -14619.0
+            },
+            {
+              "Common stock held in treasury": -238817.0
             },
             {
               "Noncontrolling interests": 6901.0
@@ -86,11 +91,7 @@
               "Cash and cash equivalents – restricted": 29.0
             }
           ],
-          "marketable_securities": [
-            {
-              "Equity securities carried at fair value and other investments at adjusted cost basis": 177.0
-            }
-          ],
+          "marketable_securities": [],
           "total_accounts_receivable": [
             {
               "Trade, less reserves of $162 million and $170 million": 30296.0
@@ -120,7 +121,16 @@
           ],
           "total_equity": [
             {
-              "ExxonMobil share of equity": 204802.0
+              "Common stock without par value": 17781.0
+            },
+            {
+              "Earnings reinvested": 453927.0
+            },
+            {
+              "Accumulated other comprehensive income": -11989.0
+            },
+            {
+              "Common stock held in treasury": -254917.0
             },
             {
               "Noncontrolling interests": 7736.0
@@ -134,7 +144,7 @@
         }
       }
     ],
-    "notes": "1. 'Cash and cash equivalents' includes both unrestricted and restricted amounts as per the primary statement.\n2. 'Marketable securities' is mapped from the 'Equity securities carried at fair value and other investments at adjusted cost basis' line in Note 8, as it represents current liquid assets (excluding cash) that can be easily converted to cash. Other items in Note 8 (equity method investments, advances, long-term receivables) are non-current and not considered marketable securities.\n3. 'Total accounts receivable' is mapped from the detailed breakdown in Note 6, which sums to the 'Notes and accounts receivable – net' line on the primary statement.\n4. 'Total current liabilities' includes all items listed under 'Current liabilities' on the primary statement.\n5. 'Total debt short-term and long-term' includes 'Notes and loans payable' (current) and 'Long-term debt' (non-current).\n6. 'Total equity' includes 'ExxonMobil share of equity' and 'Noncontrolling interests' as per the primary statement.\n7. All values are in millions of dollars (scale: 1E6).",
+    "notes": "1. 'Cash and cash equivalents' includes both unrestricted and restricted cash as per the balance sheet. 2. 'Marketable securities' is an empty array as no line items for short-term, liquid investments (e.g., commercial paper, U.S. Treasuries) were identified in the balance sheet or supplementary notes. The 'Investments, advances and long-term receivables' line appears to be long-term in nature. 3. 'Total accounts receivable' is composed of the detailed 'Trade' and 'Other' receivables from Note 6. 4. 'Total current liabilities' includes all items listed under the 'Current liabilities' section. 5. 'Total debt short-term and long-term' includes 'Notes and loans payable' (current) and 'Long-term debt' (non-current). 6. 'Total equity' is the sum of all equity components, including noncontrolling interests. The 'ExxonMobil share of equity' line is not used directly to avoid double-counting its components. 7. Scale is 1,000,000 (millions) as indicated in the statement headers. 8. Numbers in parentheses are treated as negative values.",
     "source_file": "extracted_text/exxon_2024.consolidated-balance-sheet.llm.json"
   }
 }

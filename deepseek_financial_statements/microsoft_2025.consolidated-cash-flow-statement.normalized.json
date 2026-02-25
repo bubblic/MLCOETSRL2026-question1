@@ -12,7 +12,11 @@
         "currency": "USD",
         "scale": 1000000,
         "values": {
-          "depreciation_and_amortization": []
+          "depreciation_and_amortization": [
+            {
+              "Depreciation, amortization, and other": 34153.0
+            }
+          ]
         }
       },
       {
@@ -20,7 +24,11 @@
         "currency": "USD",
         "scale": 1000000,
         "values": {
-          "depreciation_and_amortization": []
+          "depreciation_and_amortization": [
+            {
+              "Depreciation, amortization, and other": 22287.0
+            }
+          ]
         }
       },
       {
@@ -28,11 +36,15 @@
         "currency": "USD",
         "scale": 1000000,
         "values": {
-          "depreciation_and_amortization": []
+          "depreciation_and_amortization": [
+            {
+              "Depreciation, amortization, and other": 13861.0
+            }
+          ]
         }
       }
     ],
-    "notes": "The only field requested for extraction from the provided schema was 'depreciation_and_amortization'. This value is directly provided in the primary cash flow statement under the line item 'Depreciation, amortization, and other' for each period. All other data in the statement and supplementary tables are not required for this specific extraction request.",
+    "notes": "The field 'depreciation_and_amortization' is directly mapped from the single line item 'Depreciation, amortization, and other' in the cash flow statement's 'Adjustments to reconcile net income to net cash from operations' section. No combination of elements is required.",
     "source_file": "extracted_text/microsoft_2025.consolidated-cash-flow-statement.llm.json"
   }
 }

@@ -28,19 +28,7 @@
           ],
           "marketable_securities": [
             {
-              "Federal funds sold and securities purchased under resale agreements": 295001.0
-            },
-            {
-              "Securities borrowed": 219546.0
-            },
-            {
-              "Trading assets": 637784.0
-            },
-            {
               "Available-for-sale securities": 406852.0
-            },
-            {
-              "Held-to-maturity securities": 274468.0
             }
           ],
           "total_accounts_receivable": [
@@ -103,19 +91,7 @@
           ],
           "marketable_securities": [
             {
-              "Federal funds sold and securities purchased under resale agreements": 276152.0
-            },
-            {
-              "Securities borrowed": 200436.0
-            },
-            {
-              "Trading assets": 540607.0
-            },
-            {
               "Available-for-sale securities": 201704.0
-            },
-            {
-              "Held-to-maturity securities": 369848.0
             }
           ],
           "total_accounts_receivable": [
@@ -164,7 +140,7 @@
         }
       }
     ],
-    "notes": "The balance sheet is for a financial institution (JPMorgan Chase & Co.). The mapping follows standard banking industry practice: 1) 'Cash and cash equivalents' includes 'Cash and due from banks' and 'Deposits with banks'. 2) 'Marketable securities' includes all liquid, interest-earning assets that are not cash or loans: Federal funds sold and securities purchased under resale agreements, Securities borrowed, Trading assets, Available-for-sale securities, and Held-to-maturity securities. 3) 'Total accounts receivable' is mapped to 'Accrued interest and accounts receivable'. 4) 'Total current liabilities' includes all liabilities except long-term debt, as the statement does not explicitly separate current vs. non-current portions for all items. It includes Deposits, Federal funds purchased and securities loaned or sold under repurchase agreements, Short-term borrowings, Trading liabilities, Accounts payable and other liabilities, and Beneficial interests issued by consolidated VIEs. 5) 'Total debt short-term and long-term' includes Short-term borrowings and Long-term debt. 6) 'Total equity' is 'Total stockholders’ equity'. 7) 'Total assets' is 'Total assets(a)'. All values are taken directly from the primary statement table. The scale is millions (1E6) as indicated in the statement header.",
+    "notes": "1. For cash_and_cash_equivalents: Combined 'Cash and due from banks' and 'Deposits with banks' as they are the most liquid assets. 'Federal funds sold and securities purchased under resale agreements' and 'Securities borrowed' are excluded as they are more akin to short-term investments/collateralized financing, not unrestricted cash. 2. For marketable_securities: Mapped 'Available-for-sale securities' as they are liquid, unrestricted debt investments intended to be held for liquidity or sold. 'Held-to-maturity securities' are excluded as they are not intended for sale. 'Trading assets' are excluded as they are held for trading purposes, not as near-term liquid investments. 3. For total_current_liabilities: Included all liability line items except 'Long-term debt' as the statement does not provide a clear current/non-current breakdown. This is a conservative approach for a financial institution where many liabilities (like deposits) are payable on demand or short-term. 4. For total_debt_short_term_and_long_term: Combined 'Short-term borrowings' and 'Long-term debt'. 'Federal funds purchased...' and 'Trading liabilities' are excluded as they are not considered core debt financing. 5. All numbers are taken directly from the primary consolidated balance sheet table. Parentheses indicate negative values (e.g., Allowance for loan losses), but these are netted within their respective line items (e.g., Loans, net).",
     "source_file": "extracted_text/jpmorgan_2024.consolidated-balance-sheet.llm.json"
   }
 }

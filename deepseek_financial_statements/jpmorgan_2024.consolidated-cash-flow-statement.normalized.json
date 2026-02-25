@@ -14,7 +14,7 @@
         "values": {
           "depreciation_and_amortization": [
             {
-              "value": 7938.0
+              "Depreciation and amortization": 7938.0
             }
           ]
         }
@@ -26,7 +26,7 @@
         "values": {
           "depreciation_and_amortization": [
             {
-              "value": 7512.0
+              "Depreciation and amortization": 7512.0
             }
           ]
         }
@@ -38,13 +38,13 @@
         "values": {
           "depreciation_and_amortization": [
             {
-              "value": 7051.0
+              "Depreciation and amortization": 7051.0
             }
           ]
         }
       }
     ],
-    "notes": "Extracted the 'Depreciation and amortization' line item directly from the Consolidated Statements of Cash Flows. The supplementary tables provide additional detail on operating lease components (e.g., right-of-use asset amortization) which are part of the consolidated depreciation and amortization figure, but are not listed separately in the primary cash flow statement. Therefore, only the single, consolidated value is mapped for each period.",
+    "notes": "The primary cash flow statement provides a single line item for 'Depreciation and amortization' under the operating activities section. No supplementary tables contained additional elements that needed to be combined to make up this field. The values are extracted directly from the statement. The scale is in millions (1E6) as indicated by '(in millions)' in the statement header.",
     "source_file": "extracted_text/jpmorgan_2024.consolidated-cash-flow-statement.llm.json"
   }
 }

@@ -38,7 +38,16 @@
           ],
           "total_current_liabilities": [
             {
-              "Total current liabilities": 94445.0
+              "Accounts payable (principally trade)": 28114.0
+            },
+            {
+              "Short-term debt and current portion of long-term debt Automotive": 428.0
+            },
+            {
+              "Short-term debt and current portion of long-term debt GM Financial": 38540.0
+            },
+            {
+              "Accrued liabilities": 27364.0
             }
           ],
           "total_debt_short_term_and_long_term": [
@@ -92,7 +101,16 @@
           ],
           "total_current_liabilities": [
             {
-              "Total current liabilities": 91173.0
+              "Accounts payable (principally trade)": 27486.0
+            },
+            {
+              "Short-term debt and current portion of long-term debt Automotive": 1959.0
+            },
+            {
+              "Short-term debt and current portion of long-term debt GM Financial": 36819.0
+            },
+            {
+              "Accrued liabilities": 24910.0
             }
           ],
           "total_debt_short_term_and_long_term": [
@@ -122,7 +140,7 @@
         }
       }
     ],
-    "notes": "1. 'total_accounts_receivable' includes both 'Accounts and notes receivable, net' and the current portion of 'GM Financial receivables, net' as they are both receivables held by the consolidated entity. The non-current portion of GM Financial receivables is excluded as it is a non-current asset.\n2. 'total_debt_short_term_and_long_term' is constructed by summing the short-term and long-term debt components for both Automotive and GM Financial segments as presented in the balance sheet. The supplementary tables provide more detail but the totals align with the primary statement line items.\n3. 'marketable_securities' maps directly to 'Marketable debt securities' on the balance sheet.\n4. Scale is 1,000,000 (millions) as stated in the statement heading.\n5. All values are extracted directly from the primary consolidated balance sheet table. Parentheses in the source indicate negative numbers, but all extracted values here are positive magnitudes as they represent asset or liability balances.",
+    "notes": "1. 'Marketable debt securities' is mapped to 'marketable_securities' as it represents liquid, unrestricted debt investments intended to be sold in the near term. 2. 'Accounts and notes receivable, net' and 'GM Financial receivables, net' (current portion) are combined to form 'total_accounts_receivable'. 3. 'Total current liabilities' is built from its explicit subcomponents. 4. 'Total debt_short_term_and_long_term' is built from the sum of short-term and long-term debt for both Automotive and GM Financial segments. 5. 'Total Equity' is taken directly from the statement line. 6. Scale is 1E6 as values are presented 'In millions'. 7. The supplementary tables provide detailed breakdowns but do not alter the totals used for the required fields.",
     "source_file": "extracted_text/2023 General Motors Annual Report .consolidated-balance-sheet.llm.json"
   }
 }
