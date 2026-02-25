@@ -14,6 +14,7 @@ def main() -> None:
     """Run training and forecasting with explicit runtime configuration."""
     historical_data = get_apple_historical_data()
     sales_hist = historical_data["sales"]
+    inflation_hist = historical_data["inflation"]
 
     n_forecast_years = 10
     yearly_deltas = np.diff(sales_hist)
@@ -23,7 +24,11 @@ def main() -> None:
         dtype=np.float64,
     )
     inflation_forecast = np.full(n_forecast_years, 0.03, dtype=np.float64)
+    inflation_forecast[0] = inflation_hist[
+        -1
+    ]  # This is because the last year of the historical data is the start of the forecasted years.
 
+    # Model is trained on historical data up to the second-to-last year, and actually the last year of the historical data is the start of the forecasted years. This is so that we can use the last historical year data for testing the model's forecasting ability.
     run_training_and_forecast(
         historical_data,
         sales_forecast_usd,

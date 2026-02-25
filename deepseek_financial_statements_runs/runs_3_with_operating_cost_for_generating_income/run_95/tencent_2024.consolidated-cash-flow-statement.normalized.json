@@ -1,0 +1,30 @@
+{
+  "schema_version": "1.0",
+  "fields": [
+    "depreciation_and_amortization"
+  ],
+  "statement": {
+    "company_id": "tencent_2024",
+    "statement_type": "consolidated-cash-flow-statement",
+    "periods": [
+      {
+        "year": "2024",
+        "currency": "CNY",
+        "scale": 1000000,
+        "values": {
+          "depreciation_and_amortization": []
+        }
+      },
+      {
+        "year": "2023",
+        "currency": "CNY",
+        "scale": 1000000,
+        "values": {
+          "depreciation_and_amortization": []
+        }
+      }
+    ],
+    "notes": "The 'depreciation_and_amortization' field is constructed from the two explicit line items in the supplementary reconciliation table (Note 43(a)). These are the standard components for this field in a cash flow statement reconciliation. The values for each year are: 2024: 27,332 + 28,881 = 56,213; 2023: 26,305 + 32,703 = 59,008. The primary cash flow statement does not list these items directly; they are part of the reconciliation to 'Cash generated from operations'.",
+    "source_file": "extracted_text\\tencent_2024.consolidated-cash-flow-statement.llm.json"
+  }
+}

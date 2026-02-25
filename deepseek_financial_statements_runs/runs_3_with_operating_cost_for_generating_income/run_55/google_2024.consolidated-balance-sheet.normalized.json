@@ -1,0 +1,104 @@
+{
+  "schema_version": "1.0",
+  "fields": [
+    "cash_and_cash_equivalents",
+    "short_term_market_securities",
+    "total_accounts_receivable",
+    "total_current_liabilities",
+    "total_debt_short_term_and_long_term",
+    "total_equity",
+    "total_assets"
+  ],
+  "statement": {
+    "company_id": "google_2024",
+    "statement_type": "consolidated-balance-sheet",
+    "periods": [
+      {
+        "year": "2023",
+        "currency": "USD",
+        "scale": 1000000,
+        "values": {
+          "cash_and_cash_equivalents": [
+            {
+              "Cash and cash equivalents": 24048.0
+            }
+          ],
+          "short_term_market_securities": [
+            {
+              "Marketable securities": 86868.0
+            }
+          ],
+          "total_accounts_receivable": [
+            {
+              "Accounts receivable, net": 47964.0
+            }
+          ],
+          "total_current_liabilities": [
+            {
+              "Total current liabilities": 81814.0
+            }
+          ],
+          "total_debt_short_term_and_long_term": [
+            {
+              "Long-term debt": 11870.0
+            }
+          ],
+          "total_equity": [
+            {
+              "Total stockholders’ equity": 283379.0
+            }
+          ],
+          "total_assets": [
+            {
+              "Total assets": 402392.0
+            }
+          ]
+        }
+      },
+      {
+        "year": "2024",
+        "currency": "USD",
+        "scale": 1000000,
+        "values": {
+          "cash_and_cash_equivalents": [
+            {
+              "Cash and cash equivalents": 23466.0
+            }
+          ],
+          "short_term_market_securities": [
+            {
+              "Marketable securities": 72191.0
+            }
+          ],
+          "total_accounts_receivable": [
+            {
+              "Accounts receivable, net": 52340.0
+            }
+          ],
+          "total_current_liabilities": [
+            {
+              "Total current liabilities": 89122.0
+            }
+          ],
+          "total_debt_short_term_and_long_term": [
+            {
+              "Long-term debt": 10883.0
+            }
+          ],
+          "total_equity": [
+            {
+              "Total stockholders’ equity": 325084.0
+            }
+          ],
+          "total_assets": [
+            {
+              "Total assets": 450256.0
+            }
+          ]
+        }
+      }
+    ],
+    "notes": "1. The balance sheet shows 'Marketable securities' as a single line item. The supplementary table provides a detailed breakdown by type (e.g., government bonds, corporate debt) and valuation hierarchy, but the total value matches the primary statement line. Therefore, the single line item is used for 'short_term_market_securities'. 2. 'Total debt short-term and long-term' is mapped from the 'Long-term debt' line item. The statement does not show any separate short-term debt component in current liabilities, so only long-term debt is included. 3. 'Total accounts receivable' is mapped from 'Accounts receivable, net'. The supplementary note shows an allowance for credit losses, which is already netted in the reported figure. 4. All other fields are mapped directly from clearly labeled line items in the primary statement.",
+    "source_file": "extracted_text\\google_2024.consolidated-balance-sheet.llm.json"
+  }
+}

@@ -1,0 +1,50 @@
+{
+  "schema_version": "1.0",
+  "fields": [
+    "depreciation_and_amortization"
+  ],
+  "statement": {
+    "company_id": "google_2024",
+    "statement_type": "consolidated-cash-flow-statement",
+    "periods": [
+      {
+        "year": "2022",
+        "currency": "USD",
+        "scale": 1000000,
+        "values": {
+          "depreciation_and_amortization": [
+            {
+              "Depreciation of property and equipment": 13475.0
+            }
+          ]
+        }
+      },
+      {
+        "year": "2023",
+        "currency": "USD",
+        "scale": 1000000,
+        "values": {
+          "depreciation_and_amortization": [
+            {
+              "Depreciation of property and equipment": 11946.0
+            }
+          ]
+        }
+      },
+      {
+        "year": "2024",
+        "currency": "USD",
+        "scale": 1000000,
+        "values": {
+          "depreciation_and_amortization": [
+            {
+              "Depreciation of property and equipment": 15311.0
+            }
+          ]
+        }
+      }
+    ],
+    "notes": "Only the 'Depreciation of property and equipment' line item was directly available in the cash flow statement. The statement does not list a separate 'Amortization' line. In the technology industry, amortization of intangible assets is common, but it may be included within the 'Depreciation' line, combined with other items in 'Other', or not broken out in the cash flow statement. Since no explicit amortization value is provided, only the explicit depreciation value is mapped.",
+    "source_file": "extracted_text\\google_2024.consolidated-cash-flow-statement.llm.json"
+  }
+}

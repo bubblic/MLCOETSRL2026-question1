@@ -1,0 +1,59 @@
+{
+  "schema_version": "1.0",
+  "fields": [
+    "depreciation_and_amortization"
+  ],
+  "statement": {
+    "company_id": "2023 General Motors Annual Report",
+    "statement_type": "consolidated-cash-flow-statement",
+    "periods": [
+      {
+        "year": "2023",
+        "currency": "USD",
+        "scale": 1000000,
+        "values": {
+          "depreciation_and_amortization": [
+            {
+              "Depreciation and impairment of Equipment on operating leases, net": 4904.0
+            },
+            {
+              "Depreciation, amortization and impairment charges on Property, net": 6984.0
+            }
+          ]
+        }
+      },
+      {
+        "year": "2022",
+        "currency": "USD",
+        "scale": 1000000,
+        "values": {
+          "depreciation_and_amortization": [
+            {
+              "Depreciation and impairment of Equipment on operating leases, net": 4839.0
+            },
+            {
+              "Depreciation, amortization and impairment charges on Property, net": 6451.0
+            }
+          ]
+        }
+      },
+      {
+        "year": "2021",
+        "currency": "USD",
+        "scale": 1000000,
+        "values": {
+          "depreciation_and_amortization": [
+            {
+              "Depreciation and impairment of Equipment on operating leases, net": 6076.0
+            },
+            {
+              "Depreciation, amortization and impairment charges on Property, net": 5975.0
+            }
+          ]
+        }
+      }
+    ],
+    "notes": "The 'depreciation_and_amortization' field is composed of two distinct line items from the cash flow statement: 'Depreciation and impairment of Equipment on operating leases, net' and 'Depreciation, amortization and impairment charges on Property, net'. These are the only fields that could be directly and unambiguously mapped from the provided cash flow statement. Other fields like total_operating_cost, taxes, interest_expenses, and short_term_market_securities could not be directly mapped as they are not presented as distinct, additive components in the provided statement or supplementary tables. The supplementary tables provide cash paid for taxes and interest, but these are cash flow figures, not the expense accruals that would be required for the requested fields. The 'Available-for-sale marketable securities' line items relate to investing activities and do not meet the definition of 'short_term_market_securities' as a balance sheet component for this extraction.",
+    "source_file": "extracted_text\\2023 General Motors Annual Report .consolidated-cash-flow-statement.llm.json"
+  }
+}

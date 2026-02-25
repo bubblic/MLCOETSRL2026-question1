@@ -1,0 +1,59 @@
+{
+  "schema_version": "1.0",
+  "fields": [
+    "depreciation_and_amortization"
+  ],
+  "statement": {
+    "company_id": "alibaba_2025",
+    "statement_type": "consolidated-cash-flow-statement",
+    "periods": [
+      {
+        "year": "2023",
+        "currency": "CNY",
+        "scale": 1000000,
+        "values": {
+          "depreciation_and_amortization": [
+            {
+              "Depreciation and impairment of property and equipment and operating lease cost related to land use rights": 27799.0
+            },
+            {
+              "Amortization of intangible assets and licensed copyrights": 19139.0
+            }
+          ]
+        }
+      },
+      {
+        "year": "2024",
+        "currency": "CNY",
+        "scale": 1000000,
+        "values": {
+          "depreciation_and_amortization": [
+            {
+              "Depreciation and impairment of property and equipment and operating lease cost related to land use rights": 26640.0
+            },
+            {
+              "Amortization of intangible assets and licensed copyrights": 17864.0
+            }
+          ]
+        }
+      },
+      {
+        "year": "2025",
+        "currency": "CNY",
+        "scale": 1000000,
+        "values": {
+          "depreciation_and_amortization": [
+            {
+              "Depreciation and impairment of property and equipment and operating lease cost related to land use rights": 29260.0
+            },
+            {
+              "Amortization of intangible assets and licensed copyrights": 13199.0
+            }
+          ]
+        }
+      }
+    ],
+    "notes": "The 'depreciation_and_amortization' field is constructed by combining the two explicit line items from the cash flow statement: 'Depreciation and impairment of property and equipment and operating lease cost related to land use rights' and 'Amortization of intangible assets and licensed copyrights'. These are the standard non-cash add-backs for depreciation and amortization. The USD columns were not used as the primary currency is CNY (RMB).",
+    "source_file": "extracted_text\\alibaba_2025.consolidated-cash-flow-statement.llm.json"
+  }
+}

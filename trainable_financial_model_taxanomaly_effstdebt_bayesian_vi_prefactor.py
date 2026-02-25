@@ -2709,13 +2709,13 @@ def run_training_and_forecast(
         last_hist_year, last_hist_year + n_forecast_years, dtype=np.float64
     )
 
-    # Continue forecast inflation compounding from the historical baseline
-    cum_inf_hist = np.cumprod(1 + inflation_hist)
+    # Continue inflation compounding from the historical baseline up to second-to-last year because the last year is the start of the forecasted years
+    cum_inf_hist = np.cumprod(1 + inflation_hist[:-1])
     last_historical_cum_inf = cum_inf_hist[-1]
 
-    # Forecast inflation rate assumptions
+    # Forecast inflation rate assumptions, with the first year actually being the last historical inflation rate
     inflation_forecast = np.array(
-        [0.03, 0.03, 0.03, 0.03, 0.03, 0.03, 0.03, 0.03, 0.03, 0.03],
+        [inflation_hist[-1], 0.03, 0.03, 0.03, 0.03, 0.03, 0.03, 0.03, 0.03, 0.03],
         dtype=np.float64,
     )
     if not use_inflation:

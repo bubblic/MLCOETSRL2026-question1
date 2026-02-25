@@ -1,0 +1,50 @@
+{
+  "schema_version": "1.0",
+  "fields": [
+    "depreciation_and_amortization"
+  ],
+  "statement": {
+    "company_id": "exxon_2024",
+    "statement_type": "consolidated-cash-flow-statement",
+    "periods": [
+      {
+        "year": "2024",
+        "currency": "USD",
+        "scale": 1000000,
+        "values": {
+          "depreciation_and_amortization": [
+            {
+              "Depreciation and depletion (includes impairments)": 23442.0
+            }
+          ]
+        }
+      },
+      {
+        "year": "2023",
+        "currency": "USD",
+        "scale": 1000000,
+        "values": {
+          "depreciation_and_amortization": [
+            {
+              "Depreciation and depletion (includes impairments)": 20641.0
+            }
+          ]
+        }
+      },
+      {
+        "year": "2022",
+        "currency": "USD",
+        "scale": 1000000,
+        "values": {
+          "depreciation_and_amortization": [
+            {
+              "Depreciation and depletion (includes impairments)": 24040.0
+            }
+          ]
+        }
+      }
+    ],
+    "notes": "Only the 'depreciation_and_amortization' field was requested for extraction. The provided statement contains a single, clear line item for this field: 'Depreciation and depletion (includes impairments)'. All other line items from the cash flow statement and supplementary tables were not mapped as they correspond to other financial statement fields not included in the requested output schema.",
+    "source_file": "extracted_text/exxon_2024.consolidated-cash-flow-statement.llm.json"
+  }
+}

@@ -1,0 +1,177 @@
+{
+  "schema_version": "1.0",
+  "fields": [
+    "total_revenue",
+    "total_operating_cost",
+    "net_income",
+    "taxes",
+    "interest_expenses"
+  ],
+  "statement": {
+    "company_id": "exxon_2024",
+    "statement_type": "consolidated-income-statement",
+    "periods": [
+      {
+        "year": "2024",
+        "currency": "USD",
+        "scale": 1000000,
+        "values": {
+          "total_revenue": [
+            {
+              "Sales and other operating revenue": 339247.0
+            },
+            {
+              "Income from equity affiliates": 6194.0
+            },
+            {
+              "Other income": 4144.0
+            }
+          ],
+          "total_operating_cost": [
+            {
+              "Crude oil and product purchases": 199454.0
+            },
+            {
+              "Production and manufacturing expenses": 39609.0
+            },
+            {
+              "Selling, general and administrative expenses": 9976.0
+            },
+            {
+              "Depreciation and depletion (includes impairments)": 23442.0
+            },
+            {
+              "Exploration expenses, including dry holes": 826.0
+            },
+            {
+              "Non-service pension and postretirement benefit expense": 121.0
+            }
+          ],
+          "net_income": [
+            {
+              "Net income (loss) attributable to ExxonMobil": 33680.0
+            }
+          ],
+          "taxes": [
+            {
+              "Income tax expense (benefit)": 13810.0
+            }
+          ],
+          "interest_expenses": [
+            {
+              "Interest expense": 996.0
+            }
+          ]
+        }
+      },
+      {
+        "year": "2023",
+        "currency": "USD",
+        "scale": 1000000,
+        "values": {
+          "total_revenue": [
+            {
+              "Sales and other operating revenue": 334697.0
+            },
+            {
+              "Income from equity affiliates": 6385.0
+            },
+            {
+              "Other income": 3500.0
+            }
+          ],
+          "total_operating_cost": [
+            {
+              "Crude oil and product purchases": 193029.0
+            },
+            {
+              "Production and manufacturing expenses": 36885.0
+            },
+            {
+              "Selling, general and administrative expenses": 9919.0
+            },
+            {
+              "Depreciation and depletion (includes impairments)": 20641.0
+            },
+            {
+              "Exploration expenses, including dry holes": 751.0
+            },
+            {
+              "Non-service pension and postretirement benefit expense": 714.0
+            }
+          ],
+          "net_income": [
+            {
+              "Net income (loss) attributable to ExxonMobil": 36010.0
+            }
+          ],
+          "taxes": [
+            {
+              "Income tax expense (benefit)": 15429.0
+            }
+          ],
+          "interest_expenses": [
+            {
+              "Interest expense": 849.0
+            }
+          ]
+        }
+      },
+      {
+        "year": "2022",
+        "currency": "USD",
+        "scale": 1000000,
+        "values": {
+          "total_revenue": [
+            {
+              "Sales and other operating revenue": 398675.0
+            },
+            {
+              "Income from equity affiliates": 11463.0
+            },
+            {
+              "Other income": 3542.0
+            }
+          ],
+          "total_operating_cost": [
+            {
+              "Crude oil and product purchases": 228959.0
+            },
+            {
+              "Production and manufacturing expenses": 42609.0
+            },
+            {
+              "Selling, general and administrative expenses": 10095.0
+            },
+            {
+              "Depreciation and depletion (includes impairments)": 24040.0
+            },
+            {
+              "Exploration expenses, including dry holes": 1025.0
+            },
+            {
+              "Non-service pension and postretirement benefit expense": 482.0
+            }
+          ],
+          "net_income": [
+            {
+              "Net income (loss) attributable to ExxonMobil": 55740.0
+            }
+          ],
+          "taxes": [
+            {
+              "Income tax expense (benefit)": 20176.0
+            }
+          ],
+          "interest_expenses": [
+            {
+              "Interest expense": 798.0
+            }
+          ]
+        }
+      }
+    ],
+    "notes": "1. The 'Total revenues and other income' line from the statement is broken down into its three constituent parts as per the schema requirement for an array of source elements. 2. 'Total operating cost' is constructed from all line items under 'Costs and other deductions' except for 'Interest expense' and 'Other taxes and duties'. 'Interest expense' is mapped separately. 'Other taxes and duties' is excluded from total_operating_cost as it is considered a non-income tax (e.g., property, severance, excise duties) and is part of the cost structure before arriving at 'Income before income taxes'. 3. 'Taxes' maps directly to 'Income tax expense (benefit)'. 4. The supplementary tables provide detailed breakdowns (e.g., for Other income, Depreciation, Taxes) but do not alter the primary income statement line item totals used for extraction. 5. The sign convention for taxes, interest_expenses, and total_operating_cost follows Rule 13: values that reduce income are reported as positive numbers, which is consistent with their presentation in the source statement.",
+    "source_file": "extracted_text\\exxon_2024.consolidated-income-statement.llm.json"
+  }
+}

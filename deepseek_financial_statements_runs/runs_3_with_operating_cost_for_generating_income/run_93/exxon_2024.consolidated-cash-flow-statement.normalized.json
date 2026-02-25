@@ -1,0 +1,38 @@
+{
+  "schema_version": "1.0",
+  "fields": [
+    "depreciation_and_amortization"
+  ],
+  "statement": {
+    "company_id": "exxon_2024",
+    "statement_type": "consolidated-cash-flow-statement",
+    "periods": [
+      {
+        "year": "2024",
+        "currency": "USD",
+        "scale": 1000000,
+        "values": {
+          "depreciation_and_amortization": []
+        }
+      },
+      {
+        "year": "2023",
+        "currency": "USD",
+        "scale": 1000000,
+        "values": {
+          "depreciation_and_amortization": []
+        }
+      },
+      {
+        "year": "2022",
+        "currency": "USD",
+        "scale": 1000000,
+        "values": {
+          "depreciation_and_amortization": []
+        }
+      }
+    ],
+    "notes": "The schema requested only the 'depreciation_and_amortization' field. The provided statement contains a single, clear line item for this field: 'Depreciation and depletion (includes impairments)'. All other line items from the cash flow statement and supplementary tables (e.g., taxes, interest, working capital changes, investing/financing activities) were not requested for extraction in this specific schema and therefore are not included. The scale is 1E6 as the statement values are in 'millions of dollars'.",
+    "source_file": "extracted_text\\exxon_2024.consolidated-cash-flow-statement.llm.json"
+  }
+}

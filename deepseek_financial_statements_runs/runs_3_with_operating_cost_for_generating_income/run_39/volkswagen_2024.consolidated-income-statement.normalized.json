@@ -1,0 +1,130 @@
+{
+  "schema_version": "1.0",
+  "fields": [
+    "total_revenue",
+    "total_operating_cost",
+    "net_income",
+    "taxes",
+    "interest_expenses"
+  ],
+  "statement": {
+    "company_id": "volkswagen_2024",
+    "statement_type": "consolidated-income-statement",
+    "periods": [
+      {
+        "year": "2024",
+        "currency": "EUR",
+        "scale": 1000000,
+        "values": {
+          "total_revenue": [
+            {
+              "Sales revenue": 324656.0
+            }
+          ],
+          "total_operating_cost": [
+            {
+              "Cost of sales": 265184.0
+            },
+            {
+              "Distribution expenses": 22320.0
+            },
+            {
+              "Administrative expenses": 12754.0
+            },
+            {
+              "Other operating expenses": 20312.0
+            }
+          ],
+          "net_income": [
+            {
+              "Earnings after tax": 12394.0
+            }
+          ],
+          "taxes": [
+            {
+              "Current tax expense": 5858.0
+            },
+            {
+              "Deferred tax income (–)/expense (+)": -1447.0
+            }
+          ],
+          "interest_expenses": [
+            {
+              "Other interest and similar expenses": 1596.0
+            },
+            {
+              "Valuation of fair value hedges": 0.0
+            },
+            {
+              "Expenses from discounting lease liabilities": 266.0
+            },
+            {
+              "Interest result from compounding/discounting other non-current liabilities": 613.0
+            },
+            {
+              "Net interest on the net defined benefit liability": 971.0
+            }
+          ]
+        }
+      },
+      {
+        "year": "2023",
+        "currency": "EUR",
+        "scale": 1000000,
+        "values": {
+          "total_revenue": [
+            {
+              "Sales revenue": 322284.0
+            }
+          ],
+          "total_operating_cost": [
+            {
+              "Cost of sales": 261299.0
+            },
+            {
+              "Distribution expenses": 21345.0
+            },
+            {
+              "Administrative expenses": 12729.0
+            },
+            {
+              "Other operating expenses": 19534.0
+            }
+          ],
+          "net_income": [
+            {
+              "Earnings after tax": 17861.0
+            }
+          ],
+          "taxes": [
+            {
+              "Current tax expense": 6791.0
+            },
+            {
+              "Deferred tax income (–)/expense (+)": -1554.0
+            }
+          ],
+          "interest_expenses": [
+            {
+              "Other interest and similar expenses": 2050.0
+            },
+            {
+              "Valuation of fair value hedges": 3.0
+            },
+            {
+              "Expenses from discounting lease liabilities": 222.0
+            },
+            {
+              "Interest result from compounding/discounting other non-current liabilities": 351.0
+            },
+            {
+              "Net interest on the net defined benefit liability": 1014.0
+            }
+          ]
+        }
+      }
+    ],
+    "notes": "1. 'total_revenue' is mapped from 'Sales revenue'. 2. 'total_operating_cost' includes Cost of sales, Distribution expenses, Administrative expenses, and Other operating expenses. 'Other operating income' is not included as it is a separate income line, not a cost. 3. 'net_income' is mapped from 'Earnings after tax'. 4. 'taxes' includes the components from Note 10: Current tax expense (positive as it reduces income) and Deferred tax income/expense (negative for 2024 and 2023 as it is an income, increasing net income). The sign convention follows rule 13. 5. 'interest_expenses' includes all components from the 'Interest expenses' breakdown in Note 8. The values are reported as positive numbers as they are expenses that reduce income, per rule 13. The total 'Interest expenses' line in the primary statement is -3,446 for 2024 and -3,640 for 2023, which matches the sum of the provided components. 6. Scale is 1E6 (millions) as indicated by '€ million'. 7. The 'Financial result' line is not directly mapped as its components are allocated to 'interest_expenses' and the remaining part ('Other financial result') is not a standard field in the schema. 8. 'Share of the result of equity-accounted investments' is not mapped as it is not a standard field in the schema.",
+    "source_file": "extracted_text\\volkswagen_2024.consolidated-income-statement.llm.json"
+  }
+}

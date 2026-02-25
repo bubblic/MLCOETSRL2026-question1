@@ -1,0 +1,19 @@
+{
+  "schema_version": "1.0",
+  "fields": [
+    "cash_and_cash_equivalents",
+    "short_term_market_securities",
+    "total_accounts_receivable",
+    "total_current_liabilities",
+    "total_debt_short_term_and_long_term",
+    "total_equity",
+    "total_assets"
+  ],
+  "statement": {
+    "company_id": "jpmorgan_2024",
+    "statement_type": "consolidated-balance-sheet",
+    "periods": [],
+    "notes": "",
+    "source_file": "extracted_text\\jpmorgan_2024.consolidated-balance-sheet.llm.json"
+  }
+}

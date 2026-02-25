@@ -1,0 +1,38 @@
+{
+  "schema_version": "1.0",
+  "fields": [
+    "depreciation_and_amortization"
+  ],
+  "statement": {
+    "company_id": "jpmorgan_2024",
+    "statement_type": "consolidated-cash-flow-statement",
+    "periods": [
+      {
+        "year": "2024",
+        "currency": "USD",
+        "scale": 1000000,
+        "values": {
+          "depreciation_and_amortization": []
+        }
+      },
+      {
+        "year": "2023",
+        "currency": "USD",
+        "scale": 1000000,
+        "values": {
+          "depreciation_and_amortization": []
+        }
+      },
+      {
+        "year": "2022",
+        "currency": "USD",
+        "scale": 1000000,
+        "values": {
+          "depreciation_and_amortization": []
+        }
+      }
+    ],
+    "notes": "The primary cash flow statement provides a single line item for 'Depreciation and amortization' under the operating activities section. The supplementary tables provide details on operating leases (Note 18) which include components like 'Net rental expense' and 'Cash paid for amounts included in lease liabilities'. However, these lease-related amounts are not additive components of the reported 'Depreciation and amortization' figure in the cash flow statement; they represent separate cash and expense flows related to operating leases. Therefore, only the explicitly labeled 'Depreciation and amortization' line is mapped.",
+    "source_file": "extracted_text\\jpmorgan_2024.consolidated-cash-flow-statement.llm.json"
+  }
+}
