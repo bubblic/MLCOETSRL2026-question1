@@ -634,8 +634,6 @@ def run_monte_carlo_forecast(
     # Use simulated dividend outputs directly because the model applies
     # Lintner smoothing with prior-year NI and prior-year dividends.
     mean_dividends_prev = np.mean(dividends_trajectories, axis=0)
-    mean_cre = np.cumsum(mean_net_income_formula - mean_dividends_prev)
-
     income_statement_rows = [
         ("Revenue (Sales_t)", mean_sales),
         ("COGS", mean_cogs),
@@ -653,7 +651,6 @@ def run_monte_carlo_forecast(
             f"alpha={dividend_adjustment_speed:.2f})",
             mean_dividends_prev,
         ),
-        ("CRE (cumulated retained earnings = NI - dividends paid)", mean_cre),
     ]
     print_markdown_table(
         "FORECAST INCOME STATEMENT — Mean across Monte Carlo samples (USD)",
