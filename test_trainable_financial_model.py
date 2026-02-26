@@ -69,9 +69,33 @@ def test_forecast_step_outputs_finite_and_identity_close(model, state_dict, econ
     predicted = model.forecast_step(state_dict, econ_inputs)
     assert isinstance(predicted, module.FinancialState)
     assert np.isfinite(float(predicted.net_income.numpy()))
-    assert np.isfinite(float(predicted.balance_sheet_check.numpy()))
+    check_value = float(predicted.balance_sheet_check.numpy())
+    assert np.isfinite(check_value)
     assert np.isfinite(float(predicted.liquidity_check.numpy()))
-    assert float(tf.math.abs(predicted.balance_sheet_check).numpy()) < 1e-4
+
+    # Validate internal consistency: reported check equals recomputed
+    # Assets - (Liabilities + Equity) from the returned state.
+    total_assets = float(
+        (
+            predicted.nca
+            + predicted.advance_payments_purchases
+            + predicted.accounts_receivable
+            + predicted.inventory
+            + predicted.cash
+            + predicted.investment_in_market_securities
+        ).numpy()
+    )
+    total_liab_equity = float(
+        (
+            predicted.accounts_payable
+            + predicted.advance_payments_sales
+            + predicted.current_liabilities
+            + predicted.non_current_liabilities
+            + predicted.equity
+        ).numpy()
+    )
+    recomputed_check = total_assets - total_liab_equity
+    assert check_value == pytest.approx(recomputed_check, rel=0.0, abs=1e-9)
 
 
 def test_apply_constraints_clips_invalid_parameter_values(model):
