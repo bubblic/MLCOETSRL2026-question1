@@ -645,12 +645,7 @@ def run_monte_carlo_forecast(
         ("EBT = EBIT - Interest + ST Returns", mean_ebt),
         (f"Income Taxes = EBT * %EffTax ({eff_tax:.2%})", mean_income_taxes_formula),
         ("Net Income = EBT - Income Taxes", mean_net_income_formula),
-        (
-            "Dividends (model output, "
-            f"Lintner smoothed: payout={payout_ratio:.2%}, "
-            f"alpha={dividend_adjustment_speed:.2f})",
-            mean_dividends_prev,
-        ),
+        ("Dividends", mean_dividends_prev),
     ]
     print_markdown_table(
         "FORECAST INCOME STATEMENT — Mean across Monte Carlo samples (USD)",
