@@ -4,6 +4,8 @@ This module runs forward simulations from an initial balance-sheet state and
 returns per-year trajectory arrays for each forecasted metric.
 """
 
+from __future__ import annotations
+
 from typing import Any, Dict, List, Mapping
 
 import numpy as np
