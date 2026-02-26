@@ -154,7 +154,9 @@ def run_monte_carlo_forecast(
 
     _summarize_trajectories("Net Income", trajectories["net_income"], amount_scale)
     _summarize_trajectories("Total Assets", trajectories["total_assets"], amount_scale)
-    _summarize_trajectories("Assets: Non-current Assets", trajectories["nca"], amount_scale)
+    _summarize_trajectories(
+        "Assets: Non-current Assets", trajectories["nca"], amount_scale
+    )
     _summarize_trajectories(
         "Assets: Advance Payments (Purchases)",
         trajectories["advance_payments_purchases"],
@@ -163,7 +165,9 @@ def run_monte_carlo_forecast(
     _summarize_trajectories(
         "Assets: Accounts Receivable", trajectories["accounts_receivable"], amount_scale
     )
-    _summarize_trajectories("Assets: Inventory", trajectories["inventory"], amount_scale)
+    _summarize_trajectories(
+        "Assets: Inventory", trajectories["inventory"], amount_scale
+    )
     _summarize_trajectories("Assets: Cash", trajectories["cash"], amount_scale)
     _summarize_trajectories(
         "Assets: Investment in Market Securities",
@@ -179,7 +183,9 @@ def run_monte_carlo_forecast(
         amount_scale,
     )
     _summarize_trajectories("Equity", trajectories["equity"], amount_scale)
-    _summarize_trajectories("Accounts Payable", trajectories["accounts_payable"], amount_scale)
+    _summarize_trajectories(
+        "Accounts Payable", trajectories["accounts_payable"], amount_scale
+    )
     _summarize_trajectories(
         "Advance Payments (Sales)", trajectories["advance_payments_sales"], amount_scale
     )
@@ -286,7 +292,9 @@ def run_monte_carlo_forecast(
     if max_abs_check < 1.0:
         print("  PASS: Balance sheet identity holds (mismatch < $1).")
     elif max_abs_check < 1000.0:
-        print("  PASS: Balance sheet identity holds within rounding (mismatch < $1,000).")
+        print(
+            "  PASS: Balance sheet identity holds within rounding (mismatch < $1,000)."
+        )
     else:
         print("  WARNING: Balance sheet mismatch detected!")
         for idx in range(n_years):
@@ -312,6 +320,8 @@ def run_monte_carlo_forecast(
     print(f"    Mean absolute mismatch: ${mean_abs_check_all:,.2f}")
 
     return trajectories
+
+
 """Monte Carlo forecast execution helpers."""
 
 import numpy as np
@@ -618,9 +628,12 @@ def run_monte_carlo_forecast(
     mean_ebt = mean_ebit - mean_interest + mean_ms_return
     eff_tax = float(model.income_tax_pct.numpy())
     payout_ratio = float(model.dividend_payout_ratio_pct.numpy())
+    dividend_adjustment_speed = float(model.dividend_adjustment_speed.numpy())
     mean_income_taxes_formula = mean_ebt * eff_tax
     mean_net_income_formula = mean_ebt - mean_income_taxes_formula
-    mean_next_year_dividends = mean_net_income_formula * payout_ratio
+    # Use simulated dividend outputs directly because the model applies
+    # Lintner smoothing with prior-year NI and prior-year dividends.
+    mean_dividends_prev = np.mean(dividends_trajectories, axis=0)
     mean_cre = np.cumsum(mean_net_income_formula)
 
     income_statement_rows = [
@@ -634,7 +647,12 @@ def run_monte_carlo_forecast(
         ("EBT = EBIT - Interest + ST Returns", mean_ebt),
         (f"Income Taxes = EBT * %EffTax ({eff_tax:.2%})", mean_income_taxes_formula),
         ("Net Income = EBT - Income Taxes", mean_net_income_formula),
-        (f"Next-Year Dividends = Net Income * %Payout ({payout_ratio:.2%})", mean_next_year_dividends),
+        (
+            "Dividends (model output, "
+            f"Lintner smoothed: payout={payout_ratio:.2%}, "
+            f"alpha={dividend_adjustment_speed:.2f})",
+            mean_dividends_prev,
+        ),
         ("CRE (cumulated retained earnings, forecast cumulative)", mean_cre),
     ]
     print_markdown_table(
@@ -647,13 +665,13 @@ def run_monte_carlo_forecast(
     # --- Cash Budget (5 modules, requested decomposition) ---
     mean_equity_financing = np.mean(equity_financing_trajectories, axis=0)
     mean_new_lt_loan = np.mean(new_lt_loan_trajectories, axis=0)
-    mean_dividends_prev = np.mean(dividends_trajectories, axis=0)
     mean_stock_buyback = np.mean(stock_buyback_trajectories, axis=0)
 
     # CapEx formula in the model: asset_maintain * depreciation + sales_t * asset_growth
-    mean_capex = float(model.asset_maintain.numpy()) * mean_depr + float(
-        model.asset_growth.numpy()
-    ) * mean_sales
+    mean_capex = (
+        float(model.asset_maintain.numpy()) * mean_depr
+        + float(model.asset_growth.numpy()) * mean_sales
+    )
 
     prev_eff_st = np.concatenate(
         ([float(initial_state["effective_st_debt"].numpy())], mean_eff_st[:-1])
@@ -666,7 +684,9 @@ def run_monte_carlo_forecast(
     )
     mean_st_principal = prev_eff_st
     mean_lt_principal = prev_curr_lt
-    mean_st_interest = float(model.avg_short_term_interest_pct.numpy()) * mean_st_principal
+    mean_st_interest = (
+        float(model.avg_short_term_interest_pct.numpy()) * mean_st_principal
+    )
     mean_lt_interest = float(model.avg_long_term_interest_pct.numpy()) * (
         prev_ncl + prev_curr_lt
     )
