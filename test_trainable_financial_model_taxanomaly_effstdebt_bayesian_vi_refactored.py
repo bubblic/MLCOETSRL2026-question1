@@ -112,7 +112,9 @@ def mock_forecast_state():
         "effective_st_debt": tf.constant(0.12, dtype=tf.float64),
         "current_lt_debt": tf.constant(0.10, dtype=tf.float64),
         "non_current_liabilities": tf.constant(0.28, dtype=tf.float64),
-        "equity": tf.constant(0.58, dtype=tf.float64),
+        # Keep prior balance sheet exactly closed:
+        # Assets (1.45) = Liabilities (0.76) + Equity (0.69).
+        "equity": tf.constant(0.69, dtype=tf.float64),
         "net_income": tf.constant(0.08, dtype=tf.float64),
         "dividends": tf.constant(0.013, dtype=tf.float64),
     }
@@ -171,7 +173,9 @@ def test_save_load_parameters(model, tmp_path):
     model.save_parameters(str(save_path))
 
     # Change parameter after save to verify that load performs a true restore.
-    model.asset_growth.assign(original_asset_growth + 0.5)
+    model.asset_growth.assign(
+        tf.constant(original_asset_growth + 0.5, dtype=tf.float64)
+    )
     assert float(model.asset_growth.numpy()) != pytest.approx(original_asset_growth)
 
     model.load_parameters(str(save_path))
