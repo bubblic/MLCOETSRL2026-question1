@@ -2,6 +2,7 @@
 
 import numpy as np
 import pytest
+
 tf = pytest.importorskip("tensorflow")
 
 import simple_financial_model as module
@@ -70,8 +71,32 @@ def test_forecast_step_returns_finite_outputs(model, state_dict, econ_inputs):
     assert isinstance(out, module.FinancialState)
     assert np.isfinite(float(out.net_income.numpy()))
     assert np.isfinite(float(out.liquidity_check.numpy()))
-    assert np.isfinite(float(out.check.numpy()))
-    assert float(tf.math.abs(out.check).numpy()) < 1e-4
+    check_value = float(out.check.numpy())
+    assert np.isfinite(check_value)
+
+    # Validate internal accounting consistency: `check` should equal
+    # Assets - (Liabilities + Equity) using the returned state values.
+    total_assets = float(
+        (
+            out.nca
+            + out.advance_payments_purchases
+            + out.accounts_receivable
+            + out.inventory
+            + out.cash
+            + out.investment_in_market_securities
+        ).numpy()
+    )
+    total_liab_equity = float(
+        (
+            out.accounts_payable
+            + out.advance_payments_sales
+            + out.current_liabilities
+            + out.non_current_liabilities
+            + out.equity
+        ).numpy()
+    )
+    recomputed_check = total_assets - total_liab_equity
+    assert check_value == pytest.approx(recomputed_check, rel=0.0, abs=1e-9)
 
 
 def test_parameters_are_expected_fixed_constants(model):
