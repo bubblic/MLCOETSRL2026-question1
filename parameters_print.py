@@ -1,4 +1,4 @@
-path = "trained_parameters_include_tax_anomalies.npz"
+path = "trained_parameters_dont_include_tax_anomalies.npz"
 import os
 import numpy as np
 from historical_data import get_apple_historical_data

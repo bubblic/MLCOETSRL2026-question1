@@ -289,33 +289,6 @@ def get_apple_historical_data():
         ],
         dtype=np.float64,
     )
-    # current_liabilities = np.array(
-    #     [
-    #         55012000000,
-    #         53960000000,
-    #         56453000000,
-    #         63106000000,
-    #         81955000000,
-    #         74636000000,
-    #         99183000000,
-    #         86716000000,
-    #     ],
-    #     dtype=np.float64,
-    # )
-    # st_debt = None  # As many companies don't directly report short-term debt, we try not to use this data for training and have the model learn it by itself.
-    # st_debt = np.array(
-    #     [
-    #         45291000000,
-    #         43700000000,
-    #         47680000000,
-    #         53493000000,
-    #         70827000000,
-    #         64814000000,
-    #         88271000000,
-    #         74366000000,
-    #     ],
-    #     dtype=np.float64,
-    # )
     current_lt_debt = np.array(
         [8784e6, 10260e6, 8773e6, 9613e6, 11128e6, 9822e6, 10912e6, 12350e6],
         dtype=np.float64,

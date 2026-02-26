@@ -48,7 +48,6 @@ ADDITIONAL_FORECAST_KEYS = [
     "opex",
     "tax",
     "stock_buyback",
-    "st_debt",
 ]
 
 ELEMENT_KEYS = BALANCE_SHEET_KEYS + ADDITIONAL_FORECAST_KEYS
@@ -149,7 +148,6 @@ class AzureReasoningBalanceSheetForecaster:
                         "opex": "float",
                         "tax": "float",
                         "stock_buyback": "float",
-                        "st_debt": "float",
                     }
                 ]
             },
@@ -299,7 +297,6 @@ def load_historical_balance_sheet() -> Dict[str, np.ndarray]:
         "opex": data["opex"],
         "tax": data["tax"],
         "stock_buyback": data["stock_buyback"],
-        "st_debt": data["st_debt"],
     }
     mapped["years"] = data["years"]
     return mapped
@@ -347,7 +344,6 @@ def plot_forecast_elements(
         "opex": "Operating Expenses",
         "tax": "Tax",
         "stock_buyback": "Stock Buyback",
-        "st_debt": "Short-Term Debt",
     }
 
     fig, axs = plt.subplots(nrows, ncols, figsize=(7 * ncols, 4.5 * nrows))

@@ -327,6 +327,21 @@ def run_monte_carlo_forecast(
 ):
     print(f"\n--- Running Monte Carlo Forecast ({n_samples} samples) ---")
 
+    def print_markdown_table(title, year_labels, rows, scale):
+        print(f"\n{title}")
+        header = "| Line Item | " + " | ".join(year_labels) + " |"
+        separator = "| --- | " + " | ".join(["---:"] * len(year_labels)) + " |"
+        print(header)
+        print(separator)
+
+        for label, data in rows:
+            if data is None:
+                print(f"| **{label}** | " + " | ".join([""] * len(year_labels)) + " |")
+                continue
+
+            values = [f"${float(v) * scale:,.0f}" for v in np.asarray(data)]
+            print(f"| {label} | " + " | ".join(values) + " |")
+
     # Store trajectories
     # Shape: [Samples, Years]
     ni_trajectories = []
@@ -553,8 +568,6 @@ def run_monte_carlo_forecast(
     mean_curr_lt = np.mean(current_lt_debt_trajectories, axis=0)
     mean_ncl = np.mean(non_current_liabilities_trajectories, axis=0)
     mean_equity = np.mean(equity_trajectories, axis=0)
-    mean_ni = np.mean(ni_trajectories, axis=0)
-
     mean_total_liabilities = mean_ap + mean_aps + mean_eff_st + mean_curr_lt + mean_ncl
     mean_total_liab_equity = mean_total_liabilities + mean_equity
     mean_check = mean_total_assets - mean_total_liab_equity
@@ -563,54 +576,170 @@ def run_monte_carlo_forecast(
     year_labels = [f"FY{int(forecast_years[t])}" for t in range(n_years)]
 
     # Row definitions: (label, data_array)
-    rows = [
+    balance_sheet_rows = [
         ("ASSETS", None),
-        ("  Non-Current Assets", mean_nca),
-        ("  Adv Payments (Purch)", mean_adv_pp),
-        ("  Accounts Receivable", mean_ar),
-        ("  Inventory", mean_inv),
-        ("  Cash", mean_cash),
-        ("  Invest in Mkt Sec", mean_ims),
+        ("Non-Current Assets", mean_nca),
+        ("Advance Payments (Purchases)", mean_adv_pp),
+        ("Accounts Receivable", mean_ar),
+        ("Inventory", mean_inv),
+        ("Cash", mean_cash),
+        ("Investment in Market Securities", mean_ims),
         ("TOTAL ASSETS", mean_total_assets),
         ("", None),
         ("LIABILITIES", None),
-        ("  Accounts Payable", mean_ap),
-        ("  Adv Payments (Sales)", mean_aps),
-        ("  Effective ST Debt", mean_eff_st),
-        ("  Current LT Debt", mean_curr_lt),
-        ("  Non-Current Liabilities", mean_ncl),
+        ("Accounts Payable", mean_ap),
+        ("Advance Payments (Sales)", mean_aps),
+        ("Effective ST Debt", mean_eff_st),
+        ("Current LT Debt", mean_curr_lt),
+        ("Non-Current Liabilities", mean_ncl),
         ("TOTAL LIABILITIES", mean_total_liabilities),
         ("", None),
-        ("EQUITY", mean_equity),
+        ("EQUITY", None),
+        ("Equity", mean_equity),
         ("", None),
         ("TOTAL LIAB + EQUITY", mean_total_liab_equity),
-        ("", None),
-        ("INCOME STATEMENT", None),
-        ("  Net Income", mean_ni),
-        ("", None),
         ("CHECK: Assets-(L+E)", mean_check),
     ]
-
-    col_width = 14
-    label_width = 26
-    header = f"{'':>{label_width}}" + "".join(
-        f"{yl:>{col_width}}" for yl in year_labels
+    print_markdown_table(
+        "FORECAST BALANCE SHEET — Mean across Monte Carlo samples (USD)",
+        year_labels,
+        balance_sheet_rows,
+        scale,
     )
 
-    print("\n" + "=" * len(header))
-    print("FORECAST BALANCE SHEET — Mean across Monte Carlo samples (USD)")
-    print("=" * len(header))
-    print(header)
-    print("-" * len(header))
+    # --- Income Statement (requested formula view) ---
+    mean_sales = np.asarray(sales_forecast, dtype=np.float64)
+    mean_depr = np.mean(depreciation_trajectories, axis=0)
+    mean_cogs = np.mean(cogs_trajectories, axis=0)
+    mean_opex = np.mean(opex_trajectories, axis=0)
+    mean_interest = np.mean(interest_payment_trajectories, axis=0)
+    mean_ms_return = np.mean(ms_return_trajectories, axis=0)
+    mean_ebit = mean_sales - mean_cogs - mean_opex - mean_depr
+    mean_ebt = mean_ebit - mean_interest + mean_ms_return
+    eff_tax = float(model.income_tax_pct.numpy())
+    payout_ratio = float(model.dividend_payout_ratio_pct.numpy())
+    mean_income_taxes_formula = mean_ebt * eff_tax
+    mean_net_income_formula = mean_ebt - mean_income_taxes_formula
+    mean_next_year_dividends = mean_net_income_formula * payout_ratio
+    mean_cre = np.cumsum(mean_net_income_formula)
 
-    for label, data in rows:
-        if data is None:
-            print(f"{label:>{label_width}}")
-        else:
-            vals_str = "".join(f"{v * scale:>{col_width},.0f}" for v in data)
-            print(f"{label:>{label_width}}{vals_str}")
+    income_statement_rows = [
+        ("Revenue (Sales_t)", mean_sales),
+        ("COGS", mean_cogs),
+        ("OpEx", mean_opex),
+        ("Depreciation & Amortization", mean_depr),
+        ("EBIT = Revenue - COGS - OpEx - Depreciation", mean_ebit),
+        ("Interest Payments", mean_interest),
+        ("ST Investment Returns", mean_ms_return),
+        ("EBT = EBIT - Interest + ST Returns", mean_ebt),
+        (f"Income Taxes = EBT * %EffTax ({eff_tax:.2%})", mean_income_taxes_formula),
+        ("Net Income = EBT - Income Taxes", mean_net_income_formula),
+        (f"Next-Year Dividends = Net Income * %Payout ({payout_ratio:.2%})", mean_next_year_dividends),
+        ("CRE (cumulated retained earnings, forecast cumulative)", mean_cre),
+    ]
+    print_markdown_table(
+        "FORECAST INCOME STATEMENT — Mean across Monte Carlo samples (USD)",
+        year_labels,
+        income_statement_rows,
+        scale,
+    )
 
-    print("-" * len(header))
+    # --- Cash Budget (5 modules, requested decomposition) ---
+    mean_equity_financing = np.mean(equity_financing_trajectories, axis=0)
+    mean_new_lt_loan = np.mean(new_lt_loan_trajectories, axis=0)
+    mean_dividends_prev = np.mean(dividends_trajectories, axis=0)
+    mean_stock_buyback = np.mean(stock_buyback_trajectories, axis=0)
+
+    # CapEx formula in the model: asset_maintain * depreciation + sales_t * asset_growth
+    mean_capex = float(model.asset_maintain.numpy()) * mean_depr + float(
+        model.asset_growth.numpy()
+    ) * mean_sales
+
+    prev_eff_st = np.concatenate(
+        ([float(initial_state["effective_st_debt"].numpy())], mean_eff_st[:-1])
+    )
+    prev_curr_lt = np.concatenate(
+        ([float(initial_state["current_lt_debt"].numpy())], mean_curr_lt[:-1])
+    )
+    prev_ncl = np.concatenate(
+        ([float(initial_state["non_current_liabilities"].numpy())], mean_ncl[:-1])
+    )
+    mean_st_principal = prev_eff_st
+    mean_lt_principal = prev_curr_lt
+    mean_st_interest = float(model.avg_short_term_interest_pct.numpy()) * mean_st_principal
+    mean_lt_interest = float(model.avg_long_term_interest_pct.numpy()) * (
+        prev_ncl + prev_curr_lt
+    )
+
+    operating_inflows = mean_sales
+    operating_outflows = mean_cogs + mean_opex + mean_income_taxes_formula
+    operating_ncb = operating_inflows - operating_outflows
+
+    investing_inflows = np.zeros_like(mean_sales)
+    investing_outflows = mean_capex
+    investing_ncb = investing_inflows - investing_outflows
+
+    financing_inflows = mean_eff_st + mean_new_lt_loan
+    financing_outflows = (
+        mean_st_principal + mean_st_interest + mean_lt_principal + mean_lt_interest
+    )
+    financing_ncb = financing_inflows - financing_outflows
+
+    owners_inflows = mean_equity_financing
+    owners_outflows = mean_dividends_prev + mean_stock_buyback
+    owners_ncb = owners_inflows - owners_outflows
+
+    discretionary_inflows = mean_ms_return
+    discretionary_outflows = np.zeros_like(mean_sales)
+    discretionary_ncb = discretionary_inflows - discretionary_outflows
+
+    cash_budget_rows = [
+        ("MODULE 1: Operating Activities", None),
+        ("Inflows from Sales", operating_inflows),
+        ("Total Inflows (Operating)", operating_inflows),
+        ("Payments for Purchases (COGS)", mean_cogs),
+        ("Operational Expenses (OpEx)", mean_opex),
+        ("Income Tax", mean_income_taxes_formula),
+        ("Total Outflows (Operating)", operating_outflows),
+        ("Operating Net Cash Balance", operating_ncb),
+        ("", None),
+        ("MODULE 2: Investing Activities", None),
+        ("Total Inflows (Investing)", investing_inflows),
+        ("Investment in Fixed Assets (CapEx)", investing_outflows),
+        ("Total Outflows (Investing)", investing_outflows),
+        ("Investing Net Cash Balance", investing_ncb),
+        ("", None),
+        ("MODULE 3: External Financing", None),
+        ("ST Loan", mean_eff_st),
+        ("LT Loan", mean_new_lt_loan),
+        ("Total Inflows (Financing)", financing_inflows),
+        ("ST Principal Payment", mean_st_principal),
+        ("ST Interest", mean_st_interest),
+        ("LT Principal Payment", mean_lt_principal),
+        ("LT Interest", mean_lt_interest),
+        ("Total Outflows (Financing)", financing_outflows),
+        ("Financing Net Cash Balance", financing_ncb),
+        ("", None),
+        ("MODULE 4: Transactions with Owners", None),
+        ("Invested Equity (Equity Financing)", owners_inflows),
+        ("Total Inflows (Owners)", owners_inflows),
+        ("Dividends from Last Year", mean_dividends_prev),
+        ("Stock Buyback", mean_stock_buyback),
+        ("Total Outflows (Owners)", owners_outflows),
+        ("Owners' Transaction Net Cash Balance", owners_ncb),
+        ("", None),
+        ("MODULE 5: Discretionary Transactions", None),
+        ("Return from ST Investments", discretionary_inflows),
+        ("Total Inflows (Discretionary)", discretionary_inflows),
+        ("Total Outflows (Discretionary)", discretionary_outflows),
+        ("Discretionary Transaction Net Cash Balance", discretionary_ncb),
+    ]
+    print_markdown_table(
+        "FORECAST CASH BUDGET — Mean across Monte Carlo samples (USD)",
+        year_labels,
+        cash_budget_rows,
+        scale,
+    )
 
     # --- Balance Sheet Identity Check ---
     max_abs_check = np.max(np.abs(mean_check * scale))
