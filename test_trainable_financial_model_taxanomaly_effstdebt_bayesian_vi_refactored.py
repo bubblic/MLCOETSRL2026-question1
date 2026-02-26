@@ -7,6 +7,10 @@ This suite focuses on:
 - Bijector-implied economic bounds.
 - Short-horizon training execution stability.
 - Monte Carlo trajectory finite-value stability.
+
+
+Run the script by:
+python -m pytest -q test_trainable_financial_model_taxanomaly_effstdebt_bayesian_vi_refactored.py
 """
 
 import numpy as np

@@ -2,6 +2,10 @@
 
 These tests are intentionally mock-heavy and file-light to validate logic and
 control flow without invoking real LLM calls or PDF extraction engines.
+
+
+Run the script by:
+python -m pytest -q test_llm_extract_tax_anomalies_from_pdf.py
 """
 
 import argparse
@@ -56,7 +60,10 @@ def test_parse_parameters_non_object_raises():
 
 
 def test_resolve_endpoint_prefers_override():
-    assert module.resolve_endpoint(" https://override.example ") == "https://override.example"
+    assert (
+        module.resolve_endpoint(" https://override.example ")
+        == "https://override.example"
+    )
 
 
 def test_resolve_endpoint_reads_env(monkeypatch):
@@ -123,7 +130,9 @@ def test_run_pipeline_writes_expected_output_file(tmp_path, sample_pages, monkey
     output_dir = tmp_path / "extracted_text"
 
     mock_client = Mock()
-    monkeypatch.setitem(module.EXTRACTORS, "pdfplumber", Mock(return_value=sample_pages))
+    monkeypatch.setitem(
+        module.EXTRACTORS, "pdfplumber", Mock(return_value=sample_pages)
+    )
     monkeypatch.setattr(module, "AzureLLMClient", Mock(return_value=mock_client))
     monkeypatch.setattr(module, "select_pages_with_llm", Mock(return_value=[5, 6]))
     monkeypatch.setattr(
@@ -167,8 +176,12 @@ def test_main_with_single_input_file_invokes_run_pipeline(
     valid_args.input_file = str(input_pdf)
 
     monkeypatch.setattr(module, "parse_args", Mock(return_value=valid_args))
-    monkeypatch.setattr(module, "parse_parameters", Mock(return_value={"temperature": 0}))
-    monkeypatch.setattr(module, "resolve_endpoint", Mock(return_value="https://endpoint"))
+    monkeypatch.setattr(
+        module, "parse_parameters", Mock(return_value={"temperature": 0})
+    )
+    monkeypatch.setattr(
+        module, "resolve_endpoint", Mock(return_value="https://endpoint")
+    )
     mocked_run_pipeline = Mock()
     monkeypatch.setattr(module, "run_pipeline", mocked_run_pipeline)
 
@@ -184,7 +197,9 @@ def test_main_raises_when_no_pdfs_found(monkeypatch, valid_args):
     valid_args.input_file = None
     monkeypatch.setattr(module, "parse_args", Mock(return_value=valid_args))
     monkeypatch.setattr(module, "parse_parameters", Mock(return_value={}))
-    monkeypatch.setattr(module, "resolve_endpoint", Mock(return_value="https://endpoint"))
+    monkeypatch.setattr(
+        module, "resolve_endpoint", Mock(return_value="https://endpoint")
+    )
     monkeypatch.setattr(Path, "glob", Mock(return_value=[]))
 
     with pytest.raises(FileNotFoundError, match="No PDF files found"):

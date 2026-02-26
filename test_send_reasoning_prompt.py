@@ -1,4 +1,9 @@
-"""Tests for send_reasoning_prompt.py."""
+"""Tests for send_reasoning_prompt.py.
+
+
+Run the script by:
+python -m pytest -q test_send_reasoning_prompt.py
+"""
 
 import argparse
 

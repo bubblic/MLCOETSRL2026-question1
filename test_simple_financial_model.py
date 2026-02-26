@@ -1,4 +1,9 @@
-"""Tests for simple_financial_model.py."""
+"""Tests for simple_financial_model.py.
+
+
+Run the script by:
+python -m pytest -q test_simple_financial_model.py
+"""
 
 import numpy as np
 import pytest

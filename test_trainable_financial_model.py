@@ -1,7 +1,14 @@
-"""Tests for trainable_financial_model.py."""
+"""Tests for trainable_financial_model.py.
+
+
+
+Run the script by:
+python -m pytest -q test_trainable_financial_model.py
+"""
 
 import numpy as np
 import pytest
+
 tf = pytest.importorskip("tensorflow")
 
 import trainable_financial_model as module
@@ -65,7 +72,9 @@ def test_financial_state_from_dict_filters_unknown_keys():
     assert not hasattr(state, "unexpected")
 
 
-def test_forecast_step_outputs_finite_and_identity_close(model, state_dict, econ_inputs):
+def test_forecast_step_outputs_finite_and_identity_close(
+    model, state_dict, econ_inputs
+):
     predicted = model.forecast_step(state_dict, econ_inputs)
     assert isinstance(predicted, module.FinancialState)
     assert np.isfinite(float(predicted.net_income.numpy()))

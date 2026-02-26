@@ -2,6 +2,10 @@
 
 The suite is mock-heavy to keep tests fast and deterministic while validating
 control flow, argument handling, and JSON output shaping.
+
+
+Run the script by:
+python -m pytest -q test_llm_extract_financial_statement_from_pdf.py
 """
 
 import argparse
@@ -74,7 +78,10 @@ def test_parse_parameters_non_object_raises():
 
 
 def test_resolve_endpoint_prefers_override():
-    assert module.resolve_endpoint(" https://override.example ") == "https://override.example"
+    assert (
+        module.resolve_endpoint(" https://override.example ")
+        == "https://override.example"
+    )
 
 
 def test_resolve_endpoint_reads_env(monkeypatch):
@@ -103,7 +110,9 @@ def test_extract_table_with_llm_uses_raw_response_json_if_available(
     mock_client, sample_pages, monkeypatch
 ):
     mock_client.ask_json.return_value = {"raw_response": '{"parsed": true}'}
-    monkeypatch.setattr(module, "extract_json_from_text", Mock(return_value={"parsed": True}))
+    monkeypatch.setattr(
+        module, "extract_json_from_text", Mock(return_value={"parsed": True})
+    )
 
     extracted = module.extract_table_with_llm(
         client=mock_client,
@@ -161,9 +170,13 @@ def test_run_pipeline_writes_expected_json_output(
     input_pdf.write_bytes(b"%PDF-1.4")
     output_dir = tmp_path / "out"
 
-    monkeypatch.setitem(module.EXTRACTORS, "pdfplumber", Mock(return_value=sample_pages))
+    monkeypatch.setitem(
+        module.EXTRACTORS, "pdfplumber", Mock(return_value=sample_pages)
+    )
     monkeypatch.setattr(module, "AzureLLMClient", Mock(return_value=Mock()))
-    monkeypatch.setattr(module, "select_pages_with_llm", Mock(side_effect=[[1, 2], [10, 11]]))
+    monkeypatch.setattr(
+        module, "select_pages_with_llm", Mock(side_effect=[[1, 2], [10, 11]])
+    )
     monkeypatch.setattr(
         module,
         "extract_table_with_llm",
@@ -203,8 +216,12 @@ def test_main_runs_pipeline_for_single_input_file(monkeypatch, tmp_path, valid_a
     valid_args.max_workers = 1
 
     monkeypatch.setattr(module, "parse_args", Mock(return_value=valid_args))
-    monkeypatch.setattr(module, "parse_parameters", Mock(return_value={"temperature": 0}))
-    monkeypatch.setattr(module, "resolve_endpoint", Mock(return_value="https://endpoint"))
+    monkeypatch.setattr(
+        module, "parse_parameters", Mock(return_value={"temperature": 0})
+    )
+    monkeypatch.setattr(
+        module, "resolve_endpoint", Mock(return_value="https://endpoint")
+    )
     mocked_run_pipeline = Mock()
     monkeypatch.setattr(module, "run_pipeline", mocked_run_pipeline)
 
@@ -222,7 +239,9 @@ def test_main_raises_when_no_pdf_files(monkeypatch, valid_args):
 
     monkeypatch.setattr(module, "parse_args", Mock(return_value=valid_args))
     monkeypatch.setattr(module, "parse_parameters", Mock(return_value={}))
-    monkeypatch.setattr(module, "resolve_endpoint", Mock(return_value="https://endpoint"))
+    monkeypatch.setattr(
+        module, "resolve_endpoint", Mock(return_value="https://endpoint")
+    )
     monkeypatch.setattr(Path, "glob", Mock(return_value=[]))
 
     with pytest.raises(FileNotFoundError, match="No PDF files found"):

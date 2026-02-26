@@ -2,6 +2,10 @@
 
 These tests are intentionally mock-heavy so they validate control flow and
 argument handling without triggering real extraction workloads or network I/O.
+
+
+Run the script by:
+python -m pytest -q test_llm_extract_json_from_financial_statements.py
 """
 
 import argparse
@@ -125,7 +129,9 @@ def test_run_ratio_pipeline_median_calls_aggregation(monkeypatch, valid_args, tm
         Mock(side_effect=lambda root, rel: Path(root) / rel),
     )
     mocked_compute = Mock()
-    monkeypatch.setattr(statement_cli, "compute_ratios_from_median_runs", mocked_compute)
+    monkeypatch.setattr(
+        statement_cli, "compute_ratios_from_median_runs", mocked_compute
+    )
 
     statement_cli.run_ratio_pipeline(valid_args)
 
@@ -133,7 +139,10 @@ def test_run_ratio_pipeline_median_calls_aggregation(monkeypatch, valid_args, tm
     kwargs = mocked_compute.call_args.kwargs
     assert kwargs["run_dirs"] == run_dirs
     assert kwargs["ratios_output_file"] == runs_root / valid_args.ratios_output_file
-    assert kwargs["run_values_output_file"] == runs_root / valid_args.run_values_output_file
+    assert (
+        kwargs["run_values_output_file"]
+        == runs_root / valid_args.run_values_output_file
+    )
     assert kwargs["plots_dir"] == runs_root / valid_args.plots_dir
     assert kwargs["plot_distributions"] is False
 
