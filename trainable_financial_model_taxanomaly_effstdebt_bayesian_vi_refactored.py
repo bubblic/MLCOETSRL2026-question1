@@ -34,7 +34,7 @@ def main() -> None:
         sales_forecast_usd,
         inflation_forecast,
         use_trained_parameters=False,
-        parameters_path="trained_parameters_include_tax_anomalies.npz",
+        parameters_path="new_trained_parameters.npz",
         use_inflation=True,
         include_tax_anomalies=True,
         simple_policy_epochs=25000,
