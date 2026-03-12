@@ -13,7 +13,6 @@ Software Engineering Principles Applied:
 """
 
 import tensorflow as tf
-import numpy as np
 from dataclasses import dataclass, asdict
 from typing import Dict, List, Optional, Union, Any
 
@@ -394,7 +393,7 @@ class TrainableFinancialModel(tf.Module):
         )
 
     def train_simple_policies(
-        self, historical_data: Dict[str, np.ndarray], learning_rate=0.0001, epochs=5000
+        self, historical_data: Dict[str, tf.Tensor], learning_rate=0.0001, epochs=5000
     ):
         """Train policy parameters using historical data alignment."""
         data = {
@@ -519,7 +518,7 @@ class TrainableFinancialModel(tf.Module):
                 print(f"Epoch {i}: Policy Loss = {total_loss.numpy():.4e}")
 
     def train_structural_parameters(
-        self, historical_data: Dict[str, np.ndarray], learning_rate=0.0001, epochs=5000
+        self, historical_data: Dict[str, tf.Tensor], learning_rate=0.0001, epochs=5000
     ):
         """Train structural parameters using state transition gradients."""
         data = {
@@ -640,7 +639,7 @@ def run_training_and_forecast():
     model = TrainableFinancialModel()
 
     # Organized Historical Data (Apple 2022-2025)
-    sales = np.array(
+    sales = tf.constant(
         [
             2.65595e11,
             2.60174e11,
@@ -650,9 +649,10 @@ def run_training_and_forecast():
             3.83285e11,
             3.91035e11,
             4.16161e11,
-        ]
+        ],
+        dtype=tf.float64,
     )
-    inv_raw = np.array(
+    inv_raw = tf.constant(
         [
             4855000000,
             3956000000,
@@ -663,9 +663,10 @@ def run_training_and_forecast():
             6331000000,
             7286000000,
             5718000000,
-        ]
+        ],
+        dtype=tf.float64,
     )
-    cogs_raw = np.array(
+    cogs_raw = tf.constant(
         [
             1.52853e11,
             1.49235e11,
@@ -675,7 +676,8 @@ def run_training_and_forecast():
             2.02618e11,
             1.98907e11,
             2.09262e11,
-        ]
+        ],
+        dtype=tf.float64,
     )
     purchases = cogs_raw + inv_raw[1:] - inv_raw[:-1]
 
@@ -683,10 +685,11 @@ def run_training_and_forecast():
         "sales": sales,
         "purchases": purchases,
         "inventory": inv_raw[1:],
-        "depr": np.array(
-            [10903e6, 12547e6, 11056e6, 11284e6, 11104e6, 11519e6, 11445e6, 11698e6]
+        "depr": tf.constant(
+            [10903e6, 12547e6, 11056e6, 11284e6, 11104e6, 11519e6, 11445e6, 11698e6],
+            dtype=tf.float64,
         ),
-        "nca": np.array(
+        "nca": tf.constant(
             [
                 2.34386e11,
                 1.75697e11,
@@ -696,30 +699,38 @@ def run_training_and_forecast():
                 2.09017e11,
                 2.11993e11,
                 2.11284e11,
-            ]
+            ],
+            dtype=tf.float64,
         ),
-        "advance_payments_purchases": np.array(
-            [12087e6, 12352e6, 11264e6, 14111e6, 21223e6, 14695e6, 14287e6, 14585e6]
+        "advance_payments_purchases": tf.constant(
+            [12087e6, 12352e6, 11264e6, 14111e6, 21223e6, 14695e6, 14287e6, 14585e6],
+            dtype=tf.float64,
         ),
-        "accounts_receivable": np.array(
-            [48995e6, 45804e6, 37445e6, 51506e6, 60932e6, 60985e6, 66243e6, 72957e6]
+        "accounts_receivable": tf.constant(
+            [48995e6, 45804e6, 37445e6, 51506e6, 60932e6, 60985e6, 66243e6, 72957e6],
+            dtype=tf.float64,
         ),
-        "cash": np.array(
-            [25913e6, 48844e6, 38016e6, 34940e6, 23646e6, 29965e6, 29943e6, 35934e6]
+        "cash": tf.constant(
+            [25913e6, 48844e6, 38016e6, 34940e6, 23646e6, 29965e6, 29943e6, 35934e6],
+            dtype=tf.float64,
         ),
-        "investment_in_market_securities": np.array(
-            [40388e6, 51713e6, 52927e6, 27699e6, 24658e6, 31590e6, 35228e6, 18763e6]
+        "investment_in_market_securities": tf.constant(
+            [40388e6, 51713e6, 52927e6, 27699e6, 24658e6, 31590e6, 35228e6, 18763e6],
+            dtype=tf.float64,
         ),
-        "accounts_payable": np.array(
-            [55888e6, 46236e6, 42296e6, 54763e6, 64115e6, 62611e6, 68960e6, 69860e6]
+        "accounts_payable": tf.constant(
+            [55888e6, 46236e6, 42296e6, 54763e6, 64115e6, 62611e6, 68960e6, 69860e6],
+            dtype=tf.float64,
         ),
-        "advance_payments_sales": np.array(
-            [5966e6, 5522e6, 6643e6, 7612e6, 7912e6, 8061e6, 8249e6, 9055e6]
+        "advance_payments_sales": tf.constant(
+            [5966e6, 5522e6, 6643e6, 7612e6, 7912e6, 8061e6, 8249e6, 9055e6],
+            dtype=tf.float64,
         ),
-        "current_liabilities": np.array(
-            [55012e6, 53960e6, 56453e6, 63106e6, 81955e6, 74636e6, 99183e6, 86716e6]
+        "current_liabilities": tf.constant(
+            [55012e6, 53960e6, 56453e6, 63106e6, 81955e6, 74636e6, 99183e6, 86716e6],
+            dtype=tf.float64,
         ),
-        "non_current_liabilities": np.array(
+        "non_current_liabilities": tf.constant(
             [
                 1.41712e11,
                 1.4231e11,
@@ -729,27 +740,36 @@ def run_training_and_forecast():
                 1.45129e11,
                 1.31638e11,
                 1.19877e11,
-            ]
+            ],
+            dtype=tf.float64,
         ),
-        "equity": np.array(
-            [1.07147e11, 90488e6, 65339e6, 63090e6, 50672e6, 62146e6, 56950e6, 73733e6]
+        "equity": tf.constant(
+            [1.07147e11, 90488e6, 65339e6, 63090e6, 50672e6, 62146e6, 56950e6, 73733e6],
+            dtype=tf.float64,
         ),
-        "net_income": np.array(
-            [59531e6, 55256e6, 57411e6, 94680e6, 99803e6, 96995e6, 93736e6, 112010e6]
+        "net_income": tf.constant(
+            [59531e6, 55256e6, 57411e6, 94680e6, 99803e6, 96995e6, 93736e6, 112010e6],
+            dtype=tf.float64,
         ),
-        "dividends": np.array(
-            [13712e6, 14119e6, 14081e6, 14467e6, 14841e6, 15025e6, 15234e6, 15421e6]
+        "dividends": tf.constant(
+            [13712e6, 14119e6, 14081e6, 14467e6, 14841e6, 15025e6, 15234e6, 15421e6],
+            dtype=tf.float64,
         ),
-        "stock_buyback": np.array(
-            [72738e6, 66897e6, 72358e6, 85971e6, 89402e6, 77550e6, 94949e6, 90711e6]
+        "stock_buyback": tf.constant(
+            [72738e6, 66897e6, 72358e6, 85971e6, 89402e6, 77550e6, 94949e6, 90711e6],
+            dtype=tf.float64,
         ),
-        "opex": np.array(
-            [30941e6, 34462e6, 38668e6, 43887e6, 51345e6, 54847e6, 57467e6, 62151e6]
+        "opex": tf.constant(
+            [30941e6, 34462e6, 38668e6, 43887e6, 51345e6, 54847e6, 57467e6, 62151e6],
+            dtype=tf.float64,
         ),
-        "tax": np.array(
-            [13372e6, 10481e6, 9680e6, 14527e6, 19300e6, 16741e6, 29749e6, 20719e6]
+        "tax": tf.constant(
+            [13372e6, 10481e6, 9680e6, 14527e6, 19300e6, 16741e6, 29749e6, 20719e6],
+            dtype=tf.float64,
         ),
-        "inflation": np.array([0.024, 0.018, 0.012, 0.047, 0.08, 0.041, 0.029, 0.027]),
+        "inflation": tf.constant(
+            [0.024, 0.018, 0.012, 0.047, 0.08, 0.041, 0.029, 0.027], dtype=tf.float64
+        ),
     }
 
     # Training (using all data except last for backtesting)
@@ -817,7 +837,7 @@ def run_training_and_forecast():
         purchases_t=historical_data["purchases"][-1],
         sales_t_plus_1=historical_data["sales"][-1] * s_growth,
         purchases_t_plus_1=historical_data["purchases"][-1] * p_growth,
-        cum_inflation=np.prod(1 + historical_data["inflation"]),
+        cum_inflation=tf.reduce_prod(1 + historical_data["inflation"]),
     )
 
     forecast_2025 = model.forecast_step(initial_state, inputs_2025)

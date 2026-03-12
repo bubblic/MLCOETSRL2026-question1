@@ -8,7 +8,6 @@ from datetime import datetime
 from typing import Any, Dict, Optional
 
 import matplotlib.pyplot as plt
-import numpy as np
 import tensorflow as tf
 import tensorflow_probability as tfp
 
@@ -19,10 +18,10 @@ tfd = tfp.distributions
 
 def plot_opex_fit_with_aleatoric_noise(
     model: Any,
-    historical_years: np.ndarray,
-    historical_sales_bil: np.ndarray,
-    historical_opex_bil: np.ndarray,
-    historical_inflation: Optional[np.ndarray],
+    historical_years: tf.Tensor,
+    historical_sales_bil: tf.Tensor,
+    historical_opex_bil: tf.Tensor,
+    historical_inflation: Optional[tf.Tensor],
     n_samples: int = 2000,
     lower_q: float = 5.0,
     upper_q: float = 95.0,
@@ -31,8 +30,8 @@ def plot_opex_fit_with_aleatoric_noise(
 ) -> None:
     """Plot historical OpEx against model fit with predictive uncertainty."""
     if historical_inflation is None:
-        historical_inflation = np.zeros_like(historical_sales_bil)
-    cum_inf = np.cumprod(1 + historical_inflation)
+        historical_inflation = tf.zeros_like(historical_sales_bil)
+    cum_inf = tf.math.cumprod(1 + historical_inflation)
 
     mean_var_opex = model.q_var_opex_loc.numpy()
     mean_base_opex = model.q_base_opex_loc.numpy()
@@ -50,11 +49,11 @@ def plot_opex_fit_with_aleatoric_noise(
         var_var = float(model.q_var_opex_scale.numpy()) ** 2
         var_base = float(model.q_base_opex_scale.numpy()) ** 2
         var_noise = float(sigma_opex) ** 2
-        cum_inf_np = np.asarray(cum_inf, dtype=np.float64)
+        cum_inf_tf = tf.cast(cum_inf, dtype=tf.float64)
         # Use centered sales for variance calculation
-        sales_np = np.asarray(historical_sales_bil_centered, dtype=np.float64)
-        std_opex_bil = np.sqrt(
-            (cum_inf_np**2) * var_base + (sales_np**2) * var_var + var_noise
+        sales_tf = tf.cast(historical_sales_bil_centered, dtype=tf.float64)
+        std_opex_bil = tf.sqrt(
+            (cum_inf_tf**2) * var_base + (sales_tf**2) * var_var + var_noise
         )
         z_low = float(tfd.Normal(0.0, 1.0).quantile(lower_q / 100.0))
         z_up = float(tfd.Normal(0.0, 1.0).quantile(upper_q / 100.0))
@@ -82,10 +81,9 @@ def plot_opex_fit_with_aleatoric_noise(
             dtype=tf.float64,
         )
         opex_samples_bil = (base_samples * cum_inf_t) + (var_samples * sales) + noise
-        opex_samples_bil = opex_samples_bil.numpy()
 
-        lower_opex_bil = np.percentile(opex_samples_bil, lower_q, axis=0)
-        upper_opex_bil = np.percentile(opex_samples_bil, upper_q, axis=0)
+        lower_opex_bil = tfp.stats.percentile(opex_samples_bil, lower_q, axis=0)
+        upper_opex_bil = tfp.stats.percentile(opex_samples_bil, upper_q, axis=0)
 
     amount_scale = model.amount_scale
     mean_opex_usd = mean_opex_bil * amount_scale
@@ -144,19 +142,19 @@ def plot_opex_fit_with_aleatoric_noise(
 
     # --- OpEx vs Sales (separate figure) ---
     # Add x-axis padding to visualize extrapolation beyond training range
-    x_min = float(np.min(sales_hist_usd))
-    x_max = float(np.max(sales_hist_usd))
+    x_min = float(tf.reduce_min(sales_hist_usd))
+    x_max = float(tf.reduce_max(sales_hist_usd))
     x_span = x_max - x_min if x_max > x_min else max(abs(x_max), 1.0)
     x_pad = 0.5 * x_span
     x_left = x_min - x_pad
     x_right = x_max + x_pad
 
     # Extend the regression lines to the padded range
-    sales_grid_usd = np.linspace(x_left, x_right, 200)
+    sales_grid_usd = tf.linspace(x_left, x_right, 200)
     sales_grid_bil = sales_grid_usd / amount_scale
     # Center the sales grid using the offset
     sales_grid_bil_centered = sales_grid_bil - sales_offset
-    cum_inf_mean = float(np.mean(cum_inf))
+    cum_inf_mean = float(tf.reduce_mean(cum_inf))
     mean_opex_grid_bil = (mean_base_opex * cum_inf_mean) + (
         mean_var_opex * sales_grid_bil_centered
     )
@@ -167,7 +165,7 @@ def plot_opex_fit_with_aleatoric_noise(
         var_base = float(model.q_base_opex_scale.numpy()) ** 2
         var_noise = float(sigma_opex) ** 2
         # Use centered sales for variance calculation
-        std_opex_grid_bil = np.sqrt(
+        std_opex_grid_bil = tf.sqrt(
             (cum_inf_mean**2) * var_base
             + (sales_grid_bil_centered**2) * var_var
             + var_noise
@@ -188,9 +186,7 @@ def plot_opex_fit_with_aleatoric_noise(
             tf.convert_to_tensor(sales_grid_bil_centered, dtype=tf.float64), (1, -1)
         )
         cum_inf_grid_t = tf.reshape(
-            tf.convert_to_tensor(
-                np.full_like(sales_grid_bil, cum_inf_mean), dtype=tf.float64
-            ),
+            tf.fill(sales_grid_bil.shape, tf.constant(cum_inf_mean, dtype=tf.float64)),
             (1, -1),
         )
         noise_grid = tf.random.normal(
@@ -202,9 +198,8 @@ def plot_opex_fit_with_aleatoric_noise(
         opex_samples_grid_bil = (
             (base_samples * cum_inf_grid_t) + (var_samples * sales_grid_t) + noise_grid
         )
-        opex_samples_grid_bil = opex_samples_grid_bil.numpy()
-        lower_opex_grid_bil = np.percentile(opex_samples_grid_bil, lower_q, axis=0)
-        upper_opex_grid_bil = np.percentile(opex_samples_grid_bil, upper_q, axis=0)
+        lower_opex_grid_bil = tfp.stats.percentile(opex_samples_grid_bil, lower_q, axis=0)
+        upper_opex_grid_bil = tfp.stats.percentile(opex_samples_grid_bil, upper_q, axis=0)
     lower_opex_grid_usd = lower_opex_grid_bil * amount_scale
     upper_opex_grid_usd = upper_opex_grid_bil * amount_scale
 
@@ -268,15 +263,15 @@ def plot_opex_fit_with_aleatoric_noise(
 
 
 def plot_historical_and_forecast(
-    historical_years: np.ndarray,
-    forecast_years: np.ndarray,
-    historical_data: Dict[str, np.ndarray],
-    forecast_trajectories: Dict[str, np.ndarray],
+    historical_years: tf.Tensor,
+    forecast_years: tf.Tensor,
+    historical_data: Dict[str, tf.Tensor],
+    forecast_trajectories: Dict[str, tf.Tensor],
     amount_scale: float,
-    sales_hist_usd: Optional[np.ndarray] = None,
-    sales_forecast_usd: Optional[np.ndarray] = None,
-    historical_fit: Optional[Dict[str, np.ndarray]] = None,
-    historical_fit_years: Optional[np.ndarray] = None,
+    sales_hist_usd: Optional[tf.Tensor] = None,
+    sales_forecast_usd: Optional[tf.Tensor] = None,
+    historical_fit: Optional[Dict[str, tf.Tensor]] = None,
+    historical_fit_years: Optional[tf.Tensor] = None,
     show_plot: bool = False,
 ) -> None:
     """
@@ -303,9 +298,9 @@ def plot_historical_and_forecast(
     for name in elements:
         trajs = forecast_trajectories[name]
         forecast_stats[name] = {
-            "mean": np.mean(trajs, axis=0) * amount_scale,
-            "lower": np.percentile(trajs, 2.5, axis=0) * amount_scale,
-            "upper": np.percentile(trajs, 97.5, axis=0) * amount_scale,
+            "mean": tf.reduce_mean(trajs, axis=0) * amount_scale,
+            "lower": tfp.stats.percentile(trajs, 2.5, axis=0) * amount_scale,
+            "upper": tfp.stats.percentile(trajs, 97.5, axis=0) * amount_scale,
         }
 
     # Layout: add 1 for sales if provided

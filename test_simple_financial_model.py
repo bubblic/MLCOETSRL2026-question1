@@ -5,7 +5,6 @@ Run the script by:
 python -m pytest -q test_simple_financial_model.py
 """
 
-import numpy as np
 import pytest
 
 tf = pytest.importorskip("tensorflow")
@@ -74,10 +73,10 @@ def test_financial_state_from_dict_maps_legacy_fields():
 def test_forecast_step_returns_finite_outputs(model, state_dict, econ_inputs):
     out = model.forecast_step(state_dict, econ_inputs)
     assert isinstance(out, module.FinancialState)
-    assert np.isfinite(float(out.net_income.numpy()))
-    assert np.isfinite(float(out.liquidity_check.numpy()))
+    assert tf.math.is_finite(out.net_income)
+    assert tf.math.is_finite(out.liquidity_check)
     check_value = float(out.check.numpy())
-    assert np.isfinite(check_value)
+    assert tf.math.is_finite(out.check)
 
     # Validate internal accounting consistency: `check` should equal
     # Assets - (Liabilities + Equity) using the returned state values.

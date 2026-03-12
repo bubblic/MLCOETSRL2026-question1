@@ -2,7 +2,6 @@
 
 from typing import Dict, Mapping, Optional, Sequence
 
-import numpy as np
 import tensorflow as tf
 
 from historical_data import get_apple_historical_data
@@ -19,20 +18,20 @@ def _as_float64_constant(value: float) -> tf.Tensor:
 
 def _build_state_from_index(
     index: int,
-    nca: np.ndarray,
-    advance_payments_purchases: np.ndarray,
-    accounts_receivable: np.ndarray,
-    inventory: np.ndarray,
-    cash: np.ndarray,
-    investment_in_market_securities: np.ndarray,
-    accounts_payable: np.ndarray,
-    advance_payments_sales: np.ndarray,
-    effective_st_debt: np.ndarray,
-    current_lt_debt: np.ndarray,
-    non_current_liabilities: np.ndarray,
-    equity: np.ndarray,
-    net_income: np.ndarray,
-    dividends: np.ndarray,
+    nca: tf.Tensor,
+    advance_payments_purchases: tf.Tensor,
+    accounts_receivable: tf.Tensor,
+    inventory: tf.Tensor,
+    cash: tf.Tensor,
+    investment_in_market_securities: tf.Tensor,
+    accounts_payable: tf.Tensor,
+    advance_payments_sales: tf.Tensor,
+    effective_st_debt: tf.Tensor,
+    current_lt_debt: tf.Tensor,
+    non_current_liabilities: tf.Tensor,
+    equity: tf.Tensor,
+    net_income: tf.Tensor,
+    dividends: tf.Tensor,
 ) -> Dict[str, tf.Tensor]:
     """Build model state dictionary for a specific historical index."""
     return {
@@ -57,7 +56,7 @@ def _build_state_from_index(
     }
 
 
-def _validate_historical_data(data: Mapping[str, np.ndarray]) -> None:
+def _validate_historical_data(data: Mapping[str, tf.Tensor]) -> None:
     """Validate required historical data keys."""
     required_keys = {
         "sales",
@@ -94,7 +93,7 @@ def _validate_historical_data(data: Mapping[str, np.ndarray]) -> None:
 
 
 def run_training_and_forecast(
-    historical_data: Mapping[str, np.ndarray],
+    historical_data: Mapping[str, tf.Tensor],
     sales_forecast_usd: Sequence[float],
     inflation_forecast: Sequence[float],
     use_trained_parameters: bool = False,
@@ -146,9 +145,9 @@ def run_training_and_forecast(
     tax_onetime_payments_hist = (
         data["tax_onetime_payments"]
         if include_tax_anomalies
-        else np.zeros(len(sales_hist))
+        else tf.zeros(len(sales_hist), dtype=tf.float64)
     )
-    inflation_hist = data["inflation"] if use_inflation else np.zeros(len(sales_hist))
+    inflation_hist = data["inflation"] if use_inflation else tf.zeros(len(sales_hist), dtype=tf.float64)
     current_lt_debt_hist = data["current_lt_debt"]
     effective_st_debt_hist = (
         current_liabilities_hist
@@ -195,8 +194,8 @@ def run_training_and_forecast(
         # We feed in the historical arrays from 2018-2024, and leave 2025 for forecast testing.
         # Historical years: FY2018..FY2024 (training), FY2025 held out for testing
         n_train = len(sales_hist_bil[:-1])
-        train_years = np.arange(
-            model.base_year, model.base_year + n_train, dtype=np.float64
+        train_years = tf.cast(
+            tf.range(model.base_year, model.base_year + n_train), dtype=tf.float64
         )
         model.train_simple_policies(
             sales_hist_bil[:-1],
@@ -257,7 +256,7 @@ def run_training_and_forecast(
         model.save_parameters(parameters_path)
 
     # --- 4. PLOT OPEX FIT (Mean + Aleatoric Sigma) ---
-    historical_years = np.arange(1, len(opex_hist_bil) + 1)
+    historical_years = tf.cast(tf.range(1, len(opex_hist_bil) + 1), dtype=tf.float64)
 
     # Posterior prediction by Gaussian Confidence Interval
     plot_opex_fit_with_aleatoric_noise(
@@ -304,33 +303,33 @@ def run_training_and_forecast(
     # Forecast Drivers: Sales is the sole exogenous driver.
     # Purchases are derived inside forecast_step from the learned cost ratio.
     n_hist = len(sales_hist)  # e.g. 8 for FY2018-FY2025
-    sales_forecast_usd_array = np.asarray(sales_forecast_usd, dtype=np.float64)
-    if sales_forecast_usd_array.ndim != 1 or sales_forecast_usd_array.size == 0:
+    sales_forecast_usd_tensor = tf.constant(sales_forecast_usd, dtype=tf.float64)
+    if sales_forecast_usd_tensor.ndim != 1 or tf.size(sales_forecast_usd_tensor) == 0:
         raise ValueError("sales_forecast_usd must be a non-empty 1D sequence")
-    sales_forecast = sales_forecast_usd_array / amount_scale
-    n_forecast_years = int(sales_forecast.size)
+    sales_forecast = sales_forecast_usd_tensor / amount_scale
+    n_forecast_years = int(tf.size(sales_forecast))
     # Forecast starts at FY2025 (last historical year) and continues forward
     last_hist_year = model.base_year + n_hist - 1  # FY2025
-    forecast_years = np.arange(
-        last_hist_year, last_hist_year + n_forecast_years, dtype=np.float64
+    forecast_years = tf.cast(
+        tf.range(last_hist_year, last_hist_year + n_forecast_years), dtype=tf.float64
     )
 
     # Continue inflation compounding from the historical baseline. The last year is the start of the forecasted years
-    cum_inf_hist = np.cumprod(1 + inflation_hist)
+    cum_inf_hist = tf.math.cumprod(1 + inflation_hist)
     last_historical_cum_inf = cum_inf_hist[-2]
 
-    inflation_forecast_array = np.asarray(inflation_forecast, dtype=np.float64)
+    inflation_forecast_tensor = tf.constant(inflation_forecast, dtype=tf.float64)
     if (
-        inflation_forecast_array.ndim != 1
-        or inflation_forecast_array.size != n_forecast_years
+        inflation_forecast_tensor.ndim != 1
+        or tf.size(inflation_forecast_tensor) != n_forecast_years
     ):
         raise ValueError(
             "inflation_forecast must be a 1D sequence with the same length as sales_forecast_usd"
         )
     if not use_inflation:
-        inflation_forecast_array = np.zeros_like(inflation_forecast_array)
-    cum_inf_forecast = last_historical_cum_inf * np.cumprod(
-        1 + inflation_forecast_array
+        inflation_forecast_tensor = tf.zeros_like(inflation_forecast_tensor)
+    cum_inf_forecast = last_historical_cum_inf * tf.math.cumprod(
+        1 + inflation_forecast_tensor
     )
 
     # --- Execute Monte Carlo Forecast ---
@@ -483,18 +482,21 @@ def run_training_and_forecast(
 
         historical_fit_years.append(model.base_year + t + 1)
 
-    # Convert to numpy arrays
+    # Convert to TensorFlow tensors
     for k in historical_fit:
-        historical_fit[k] = np.array(historical_fit[k])
-    historical_fit_years = np.array(historical_fit_years)
+        historical_fit[k] = tf.constant(historical_fit[k], dtype=tf.float64)
+    historical_fit_years = tf.constant(historical_fit_years, dtype=tf.float64)
 
     # --- 7. PLOT ALL ELEMENTS: HISTORICAL + FIT + FORECAST ---
-    historical_years = np.arange(model.base_year, model.base_year + n_hist_points)
+    historical_years = tf.cast(
+        tf.range(model.base_year, model.base_year + n_hist_points), dtype=tf.float64
+    )
 
     n_forecast_steps = len(sales_forecast)
     forecast_year_start = model.base_year + n_hist_points - 1  # FY2025
-    plot_forecast_years = np.arange(
-        forecast_year_start, forecast_year_start + n_forecast_steps
+    plot_forecast_years = tf.cast(
+        tf.range(forecast_year_start, forecast_year_start + n_forecast_steps),
+        dtype=tf.float64,
     )
 
     # Build historical data dict (in USD, not scaled)

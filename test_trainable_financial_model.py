@@ -6,7 +6,6 @@ Run the script by:
 python -m pytest -q test_trainable_financial_model.py
 """
 
-import numpy as np
 import pytest
 
 tf = pytest.importorskip("tensorflow")
@@ -16,7 +15,6 @@ import trainable_financial_model as module
 
 @pytest.fixture
 def model():
-    np.random.seed(1)
     tf.random.set_seed(1)
     return module.TrainableFinancialModel()
 
@@ -77,10 +75,10 @@ def test_forecast_step_outputs_finite_and_identity_close(
 ):
     predicted = model.forecast_step(state_dict, econ_inputs)
     assert isinstance(predicted, module.FinancialState)
-    assert np.isfinite(float(predicted.net_income.numpy()))
+    assert tf.math.is_finite(predicted.net_income)
     check_value = float(predicted.balance_sheet_check.numpy())
-    assert np.isfinite(check_value)
-    assert np.isfinite(float(predicted.liquidity_check.numpy()))
+    assert tf.math.is_finite(predicted.balance_sheet_check)
+    assert tf.math.is_finite(predicted.liquidity_check)
 
     # Validate internal consistency: reported check equals recomputed
     # Assets - (Liabilities + Equity) from the returned state.
@@ -126,59 +124,59 @@ def test_apply_constraints_clips_invalid_parameter_values(model):
 def test_train_simple_policies_executes_short_run(model):
     # Keep tiny synthetic data for speed and deterministic behavior.
     n = 5
-    sales = np.linspace(1.0, 1.2, n, dtype=np.float64)
-    purchases = np.linspace(0.6, 0.7, n, dtype=np.float64)
+    sales = tf.linspace(tf.constant(1.0, dtype=tf.float64), tf.constant(1.2, dtype=tf.float64), n)
+    purchases = tf.linspace(tf.constant(0.6, dtype=tf.float64), tf.constant(0.7, dtype=tf.float64), n)
     historical_data = {
         "sales": sales,
         "purchases": purchases,
-        "inventory": np.linspace(0.03, 0.04, n, dtype=np.float64),
-        "depr": np.linspace(0.04, 0.05, n, dtype=np.float64),
-        "nca": np.linspace(0.9, 1.0, n, dtype=np.float64),
-        "advance_payments_purchases": np.linspace(0.04, 0.05, n, dtype=np.float64),
-        "accounts_receivable": np.linspace(0.15, 0.18, n, dtype=np.float64),
-        "cash": np.linspace(0.1, 0.12, n, dtype=np.float64),
-        "investment_in_market_securities": np.linspace(0.1, 0.11, n, dtype=np.float64),
-        "accounts_payable": np.linspace(0.22, 0.26, n, dtype=np.float64),
-        "advance_payments_sales": np.linspace(0.02, 0.03, n, dtype=np.float64),
-        "current_liabilities": np.linspace(0.16, 0.19, n, dtype=np.float64),
-        "non_current_liabilities": np.linspace(0.3, 0.34, n, dtype=np.float64),
-        "equity": np.linspace(0.65, 0.7, n, dtype=np.float64),
-        "net_income": np.linspace(0.07, 0.09, n, dtype=np.float64),
-        "dividends": np.linspace(0.01, 0.013, n, dtype=np.float64),
-        "stock_buyback": np.linspace(0.01, 0.014, n, dtype=np.float64),
-        "opex": np.linspace(0.17, 0.2, n, dtype=np.float64),
-        "tax": np.linspace(0.01, 0.015, n, dtype=np.float64),
-        "inflation": np.zeros(n, dtype=np.float64),
+        "inventory": tf.linspace(tf.constant(0.03, dtype=tf.float64), tf.constant(0.04, dtype=tf.float64), n),
+        "depr": tf.linspace(tf.constant(0.04, dtype=tf.float64), tf.constant(0.05, dtype=tf.float64), n),
+        "nca": tf.linspace(tf.constant(0.9, dtype=tf.float64), tf.constant(1.0, dtype=tf.float64), n),
+        "advance_payments_purchases": tf.linspace(tf.constant(0.04, dtype=tf.float64), tf.constant(0.05, dtype=tf.float64), n),
+        "accounts_receivable": tf.linspace(tf.constant(0.15, dtype=tf.float64), tf.constant(0.18, dtype=tf.float64), n),
+        "cash": tf.linspace(tf.constant(0.1, dtype=tf.float64), tf.constant(0.12, dtype=tf.float64), n),
+        "investment_in_market_securities": tf.linspace(tf.constant(0.1, dtype=tf.float64), tf.constant(0.11, dtype=tf.float64), n),
+        "accounts_payable": tf.linspace(tf.constant(0.22, dtype=tf.float64), tf.constant(0.26, dtype=tf.float64), n),
+        "advance_payments_sales": tf.linspace(tf.constant(0.02, dtype=tf.float64), tf.constant(0.03, dtype=tf.float64), n),
+        "current_liabilities": tf.linspace(tf.constant(0.16, dtype=tf.float64), tf.constant(0.19, dtype=tf.float64), n),
+        "non_current_liabilities": tf.linspace(tf.constant(0.3, dtype=tf.float64), tf.constant(0.34, dtype=tf.float64), n),
+        "equity": tf.linspace(tf.constant(0.65, dtype=tf.float64), tf.constant(0.7, dtype=tf.float64), n),
+        "net_income": tf.linspace(tf.constant(0.07, dtype=tf.float64), tf.constant(0.09, dtype=tf.float64), n),
+        "dividends": tf.linspace(tf.constant(0.01, dtype=tf.float64), tf.constant(0.013, dtype=tf.float64), n),
+        "stock_buyback": tf.linspace(tf.constant(0.01, dtype=tf.float64), tf.constant(0.014, dtype=tf.float64), n),
+        "opex": tf.linspace(tf.constant(0.17, dtype=tf.float64), tf.constant(0.2, dtype=tf.float64), n),
+        "tax": tf.linspace(tf.constant(0.01, dtype=tf.float64), tf.constant(0.015, dtype=tf.float64), n),
+        "inflation": tf.zeros(n, dtype=tf.float64),
     }
     model.train_simple_policies(historical_data, epochs=1)
-    assert np.isfinite(float(model.asset_growth.numpy()))
+    assert tf.math.is_finite(model.asset_growth)
 
 
 def test_train_structural_parameters_executes_short_run(model):
     n = 5
-    sales = np.linspace(1.0, 1.2, n, dtype=np.float64)
-    purchases = np.linspace(0.6, 0.7, n, dtype=np.float64)
+    sales = tf.linspace(tf.constant(1.0, dtype=tf.float64), tf.constant(1.2, dtype=tf.float64), n)
+    purchases = tf.linspace(tf.constant(0.6, dtype=tf.float64), tf.constant(0.7, dtype=tf.float64), n)
     historical_data = {
         "sales": sales,
         "purchases": purchases,
-        "inventory": np.linspace(0.03, 0.04, n, dtype=np.float64),
-        "depr": np.linspace(0.04, 0.05, n, dtype=np.float64),
-        "nca": np.linspace(0.9, 1.0, n, dtype=np.float64),
-        "advance_payments_purchases": np.linspace(0.04, 0.05, n, dtype=np.float64),
-        "accounts_receivable": np.linspace(0.15, 0.18, n, dtype=np.float64),
-        "cash": np.linspace(0.1, 0.12, n, dtype=np.float64),
-        "investment_in_market_securities": np.linspace(0.1, 0.11, n, dtype=np.float64),
-        "accounts_payable": np.linspace(0.22, 0.26, n, dtype=np.float64),
-        "advance_payments_sales": np.linspace(0.02, 0.03, n, dtype=np.float64),
-        "current_liabilities": np.linspace(0.16, 0.19, n, dtype=np.float64),
-        "non_current_liabilities": np.linspace(0.3, 0.34, n, dtype=np.float64),
-        "equity": np.linspace(0.65, 0.7, n, dtype=np.float64),
-        "net_income": np.linspace(0.07, 0.09, n, dtype=np.float64),
-        "dividends": np.linspace(0.01, 0.013, n, dtype=np.float64),
-        "stock_buyback": np.linspace(0.01, 0.014, n, dtype=np.float64),
-        "opex": np.linspace(0.17, 0.2, n, dtype=np.float64),
-        "tax": np.linspace(0.01, 0.015, n, dtype=np.float64),
-        "inflation": np.zeros(n, dtype=np.float64),
+        "inventory": tf.linspace(tf.constant(0.03, dtype=tf.float64), tf.constant(0.04, dtype=tf.float64), n),
+        "depr": tf.linspace(tf.constant(0.04, dtype=tf.float64), tf.constant(0.05, dtype=tf.float64), n),
+        "nca": tf.linspace(tf.constant(0.9, dtype=tf.float64), tf.constant(1.0, dtype=tf.float64), n),
+        "advance_payments_purchases": tf.linspace(tf.constant(0.04, dtype=tf.float64), tf.constant(0.05, dtype=tf.float64), n),
+        "accounts_receivable": tf.linspace(tf.constant(0.15, dtype=tf.float64), tf.constant(0.18, dtype=tf.float64), n),
+        "cash": tf.linspace(tf.constant(0.1, dtype=tf.float64), tf.constant(0.12, dtype=tf.float64), n),
+        "investment_in_market_securities": tf.linspace(tf.constant(0.1, dtype=tf.float64), tf.constant(0.11, dtype=tf.float64), n),
+        "accounts_payable": tf.linspace(tf.constant(0.22, dtype=tf.float64), tf.constant(0.26, dtype=tf.float64), n),
+        "advance_payments_sales": tf.linspace(tf.constant(0.02, dtype=tf.float64), tf.constant(0.03, dtype=tf.float64), n),
+        "current_liabilities": tf.linspace(tf.constant(0.16, dtype=tf.float64), tf.constant(0.19, dtype=tf.float64), n),
+        "non_current_liabilities": tf.linspace(tf.constant(0.3, dtype=tf.float64), tf.constant(0.34, dtype=tf.float64), n),
+        "equity": tf.linspace(tf.constant(0.65, dtype=tf.float64), tf.constant(0.7, dtype=tf.float64), n),
+        "net_income": tf.linspace(tf.constant(0.07, dtype=tf.float64), tf.constant(0.09, dtype=tf.float64), n),
+        "dividends": tf.linspace(tf.constant(0.01, dtype=tf.float64), tf.constant(0.013, dtype=tf.float64), n),
+        "stock_buyback": tf.linspace(tf.constant(0.01, dtype=tf.float64), tf.constant(0.014, dtype=tf.float64), n),
+        "opex": tf.linspace(tf.constant(0.17, dtype=tf.float64), tf.constant(0.2, dtype=tf.float64), n),
+        "tax": tf.linspace(tf.constant(0.01, dtype=tf.float64), tf.constant(0.015, dtype=tf.float64), n),
+        "inflation": tf.zeros(n, dtype=tf.float64),
     }
     model.train_structural_parameters(historical_data, epochs=1)
-    assert np.isfinite(float(model.avg_maturity_years.numpy()))
+    assert tf.math.is_finite(model.avg_maturity_years)

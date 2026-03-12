@@ -8,8 +8,8 @@ from __future__ import annotations
 
 from typing import Any, Dict, List, Mapping
 
-import numpy as np
 import tensorflow as tf
+import tensorflow_probability as tfp
 
 TrajectoryStore = Dict[str, List[List[float]]]
 StateDict = Dict[str, Any]
@@ -86,26 +86,26 @@ def _append_sample(store: TrajectoryStore, sample: Dict[str, List[float]]) -> No
         store[key].append(values)
 
 
-def _to_numpy_trajectories(store: TrajectoryStore) -> Dict[str, np.ndarray]:
-    """Convert trajectory lists to numpy arrays."""
-    return {key: np.array(values) for key, values in store.items()}
+def _to_tf_trajectories(store: TrajectoryStore) -> Dict[str, tf.Tensor]:
+    """Convert trajectory lists to TensorFlow tensors."""
+    return {key: tf.constant(values, dtype=tf.float64) for key, values in store.items()}
 
 
 def _summarize_trajectories(
-    name: str, trajectories: np.ndarray, amount_scale: float
+    name: str, trajectories: tf.Tensor, amount_scale: float
 ) -> None:
     """Print mean and 95% interval summary for one metric."""
-    mean_vals = np.mean(trajectories, axis=0)
-    lower_bound = np.percentile(trajectories, 2.5, axis=0)
-    upper_bound = np.percentile(trajectories, 97.5, axis=0)
+    mean_vals = tf.reduce_mean(trajectories, axis=0)
+    lower_bound = tfp.stats.percentile(trajectories, 2.5, axis=0)
+    upper_bound = tfp.stats.percentile(trajectories, 97.5, axis=0)
 
     print(f"\n{name}")
     print(f"{'Year':<5} | {'Mean':<15} | {'2.5% CI':<15} | {'97.5% CI':<15}")
     print("-" * 60)
     for idx in range(len(mean_vals)):
-        mean_usd = mean_vals[idx] * amount_scale
-        lower_usd = lower_bound[idx] * amount_scale
-        upper_usd = upper_bound[idx] * amount_scale
+        mean_usd = float(mean_vals[idx]) * amount_scale
+        lower_usd = float(lower_bound[idx]) * amount_scale
+        upper_usd = float(upper_bound[idx]) * amount_scale
         print(
             f"{idx + 1:<5} | {mean_usd:<15.2e} | {lower_usd:<15.2e} | {upper_usd:<15.2e}"
         )
@@ -114,11 +114,11 @@ def _summarize_trajectories(
 def run_monte_carlo_forecast(
     model: Any,
     initial_state: StateDict,
-    sales_forecast: np.ndarray,
-    cum_inf_forecast: np.ndarray,
-    forecast_years: np.ndarray,
+    sales_forecast: tf.Tensor,
+    cum_inf_forecast: tf.Tensor,
+    forecast_years: tf.Tensor,
     n_samples: int = 1000,
-) -> Dict[str, np.ndarray]:
+) -> Dict[str, tf.Tensor]:
     """Run Monte Carlo trajectories for all forecast years.
 
     The model structure and equations are unchanged; this function only
@@ -151,7 +151,7 @@ def run_monte_carlo_forecast(
 
         _append_sample(store, sample_store)
 
-    trajectories = _to_numpy_trajectories(store)
+    trajectories = _to_tf_trajectories(store)
     amount_scale = model.amount_scale
 
     _summarize_trajectories("Net Income", trajectories["net_income"], amount_scale)
@@ -217,46 +217,46 @@ def run_monte_carlo_forecast(
 
     n_years = trajectories["total_assets"].shape[1]
     scale = amount_scale
-    mean_total_assets = np.mean(trajectories["total_assets"], axis=0)
+    mean_total_assets = tf.reduce_mean(trajectories["total_assets"], axis=0)
     mean_total_liabilities = (
-        np.mean(trajectories["accounts_payable"], axis=0)
-        + np.mean(trajectories["advance_payments_sales"], axis=0)
-        + np.mean(trajectories["effective_st_debt"], axis=0)
-        + np.mean(trajectories["current_lt_debt"], axis=0)
-        + np.mean(trajectories["non_current_liabilities"], axis=0)
+        tf.reduce_mean(trajectories["accounts_payable"], axis=0)
+        + tf.reduce_mean(trajectories["advance_payments_sales"], axis=0)
+        + tf.reduce_mean(trajectories["effective_st_debt"], axis=0)
+        + tf.reduce_mean(trajectories["current_lt_debt"], axis=0)
+        + tf.reduce_mean(trajectories["non_current_liabilities"], axis=0)
     )
-    mean_equity = np.mean(trajectories["equity"], axis=0)
+    mean_equity = tf.reduce_mean(trajectories["equity"], axis=0)
     mean_total_liab_equity = mean_total_liabilities + mean_equity
     mean_check = mean_total_assets - mean_total_liab_equity
     year_labels = [f"FY{int(forecast_years[idx])}" for idx in range(n_years)]
 
     rows = [
         ("ASSETS", None),
-        ("  Non-Current Assets", np.mean(trajectories["nca"], axis=0)),
+        ("  Non-Current Assets", tf.reduce_mean(trajectories["nca"], axis=0)),
         (
             "  Adv Payments (Purch)",
-            np.mean(trajectories["advance_payments_purchases"], axis=0),
+            tf.reduce_mean(trajectories["advance_payments_purchases"], axis=0),
         ),
-        ("  Accounts Receivable", np.mean(trajectories["accounts_receivable"], axis=0)),
-        ("  Inventory", np.mean(trajectories["inventory"], axis=0)),
-        ("  Cash", np.mean(trajectories["cash"], axis=0)),
+        ("  Accounts Receivable", tf.reduce_mean(trajectories["accounts_receivable"], axis=0)),
+        ("  Inventory", tf.reduce_mean(trajectories["inventory"], axis=0)),
+        ("  Cash", tf.reduce_mean(trajectories["cash"], axis=0)),
         (
             "  Invest in Mkt Sec",
-            np.mean(trajectories["investment_in_market_securities"], axis=0),
+            tf.reduce_mean(trajectories["investment_in_market_securities"], axis=0),
         ),
         ("TOTAL ASSETS", mean_total_assets),
         ("", None),
         ("LIABILITIES", None),
-        ("  Accounts Payable", np.mean(trajectories["accounts_payable"], axis=0)),
+        ("  Accounts Payable", tf.reduce_mean(trajectories["accounts_payable"], axis=0)),
         (
             "  Adv Payments (Sales)",
-            np.mean(trajectories["advance_payments_sales"], axis=0),
+            tf.reduce_mean(trajectories["advance_payments_sales"], axis=0),
         ),
-        ("  Effective ST Debt", np.mean(trajectories["effective_st_debt"], axis=0)),
-        ("  Current LT Debt", np.mean(trajectories["current_lt_debt"], axis=0)),
+        ("  Effective ST Debt", tf.reduce_mean(trajectories["effective_st_debt"], axis=0)),
+        ("  Current LT Debt", tf.reduce_mean(trajectories["current_lt_debt"], axis=0)),
         (
             "  Non-Current Liabilities",
-            np.mean(trajectories["non_current_liabilities"], axis=0),
+            tf.reduce_mean(trajectories["non_current_liabilities"], axis=0),
         ),
         ("TOTAL LIABILITIES", mean_total_liabilities),
         ("", None),
@@ -265,7 +265,7 @@ def run_monte_carlo_forecast(
         ("TOTAL LIAB + EQUITY", mean_total_liab_equity),
         ("", None),
         ("INCOME STATEMENT", None),
-        ("  Net Income", np.mean(trajectories["net_income"], axis=0)),
+        ("  Net Income", tf.reduce_mean(trajectories["net_income"], axis=0)),
         ("", None),
         ("CHECK: Assets-(L+E)", mean_check),
     ]
@@ -284,11 +284,11 @@ def run_monte_carlo_forecast(
         if data is None:
             print(f"{label:>{label_width}}")
             continue
-        values_str = "".join(f"{value * scale:>{col_width},.0f}" for value in data)
+        values_str = "".join(f"{float(value) * scale:>{col_width},.0f}" for value in data)
         print(f"{label:>{label_width}}{values_str}")
     print("-" * len(header))
 
-    max_abs_check = np.max(np.abs(mean_check * scale))
+    max_abs_check = float(tf.reduce_max(tf.abs(mean_check * scale)))
     print(f"\nBalance Sheet Identity Check (Assets = Liabilities + Equity):")
     print(f"  Max absolute mismatch across years (mean): ${max_abs_check:,.2f}")
     if max_abs_check < 1.0:
@@ -300,7 +300,7 @@ def run_monte_carlo_forecast(
     else:
         print("  WARNING: Balance sheet mismatch detected!")
         for idx in range(n_years):
-            check_value = mean_check[idx] * scale
+            check_value = float(mean_check[idx]) * scale
             if abs(check_value) >= 1000.0:
                 print(
                     f"    {year_labels[idx]}: Assets - (Liab+Eq) = ${check_value:,.2f}"
@@ -315,8 +315,8 @@ def run_monte_carlo_forecast(
         + trajectories["equity"]
     )
     check_all = trajectories["total_assets"] - total_liab_equity_all
-    max_abs_check_all = np.max(np.abs(check_all)) * scale
-    mean_abs_check_all = np.mean(np.abs(check_all)) * scale
+    max_abs_check_all = float(tf.reduce_max(tf.abs(check_all))) * scale
+    mean_abs_check_all = float(tf.reduce_mean(tf.abs(check_all))) * scale
     print(f"\n  Per-sample check (across all {n_samples} samples x {n_years} years):")
     print(f"    Max absolute mismatch:  ${max_abs_check_all:,.2f}")
     print(f"    Mean absolute mismatch: ${mean_abs_check_all:,.2f}")
@@ -325,8 +325,6 @@ def run_monte_carlo_forecast(
 
 
 """Monte Carlo forecast execution helpers."""
-
-import numpy as np
 
 
 def run_monte_carlo_forecast(
@@ -351,7 +349,7 @@ def run_monte_carlo_forecast(
                 print(f"| **{label}** | " + " | ".join([""] * len(year_labels)) + " |")
                 continue
 
-            values = [f"${float(v) * scale:,.0f}" for v in np.asarray(data)]
+            values = [f"${float(v) * scale:,.0f}" for v in tf.cast(data, tf.float64)]
             print(f"| {label} | " + " | ".join(values) + " |")
 
     # Store trajectories
@@ -487,47 +485,47 @@ def run_monte_carlo_forecast(
         equity_financing_trajectories.append(sample_ef)
         liq_deficit_st_trajectories.append(sample_liq_deficit_st)
 
-    ni_trajectories = np.array(ni_trajectories)
-    equity_trajectories = np.array(equity_trajectories)
-    assets_trajectories = np.array(assets_trajectories)
-    nca_trajectories = np.array(nca_trajectories)
-    adv_pay_purch_trajectories = np.array(adv_pay_purch_trajectories)
-    ar_trajectories = np.array(ar_trajectories)
-    inv_trajectories = np.array(inv_trajectories)
-    cash_trajectories = np.array(cash_trajectories)
-    ims_trajectories = np.array(ims_trajectories)
-    effective_st_debt_trajectories = np.array(effective_st_debt_trajectories)
-    non_current_liabilities_trajectories = np.array(
-        non_current_liabilities_trajectories
+    ni_trajectories = tf.constant(ni_trajectories, dtype=tf.float64)
+    equity_trajectories = tf.constant(equity_trajectories, dtype=tf.float64)
+    assets_trajectories = tf.constant(assets_trajectories, dtype=tf.float64)
+    nca_trajectories = tf.constant(nca_trajectories, dtype=tf.float64)
+    adv_pay_purch_trajectories = tf.constant(adv_pay_purch_trajectories, dtype=tf.float64)
+    ar_trajectories = tf.constant(ar_trajectories, dtype=tf.float64)
+    inv_trajectories = tf.constant(inv_trajectories, dtype=tf.float64)
+    cash_trajectories = tf.constant(cash_trajectories, dtype=tf.float64)
+    ims_trajectories = tf.constant(ims_trajectories, dtype=tf.float64)
+    effective_st_debt_trajectories = tf.constant(effective_st_debt_trajectories, dtype=tf.float64)
+    non_current_liabilities_trajectories = tf.constant(
+        non_current_liabilities_trajectories, dtype=tf.float64
     )
-    ap_trajectories = np.array(ap_trajectories)
-    aps_trajectories = np.array(aps_trajectories)
-    depreciation_trajectories = np.array(depreciation_trajectories)
-    cogs_trajectories = np.array(cogs_trajectories)
-    opex_trajectories = np.array(opex_trajectories)
-    tax_trajectories = np.array(tax_trajectories)
-    ms_return_trajectories = np.array(ms_return_trajectories)
-    interest_payment_trajectories = np.array(interest_payment_trajectories)
-    dividends_trajectories = np.array(dividends_trajectories)
-    stock_buyback_trajectories = np.array(stock_buyback_trajectories)
-    current_lt_debt_trajectories = np.array(current_lt_debt_trajectories)
-    new_lt_loan_trajectories = np.array(new_lt_loan_trajectories)
-    equity_financing_trajectories = np.array(equity_financing_trajectories)
-    liq_deficit_st_trajectories = np.array(liq_deficit_st_trajectories)
+    ap_trajectories = tf.constant(ap_trajectories, dtype=tf.float64)
+    aps_trajectories = tf.constant(aps_trajectories, dtype=tf.float64)
+    depreciation_trajectories = tf.constant(depreciation_trajectories, dtype=tf.float64)
+    cogs_trajectories = tf.constant(cogs_trajectories, dtype=tf.float64)
+    opex_trajectories = tf.constant(opex_trajectories, dtype=tf.float64)
+    tax_trajectories = tf.constant(tax_trajectories, dtype=tf.float64)
+    ms_return_trajectories = tf.constant(ms_return_trajectories, dtype=tf.float64)
+    interest_payment_trajectories = tf.constant(interest_payment_trajectories, dtype=tf.float64)
+    dividends_trajectories = tf.constant(dividends_trajectories, dtype=tf.float64)
+    stock_buyback_trajectories = tf.constant(stock_buyback_trajectories, dtype=tf.float64)
+    current_lt_debt_trajectories = tf.constant(current_lt_debt_trajectories, dtype=tf.float64)
+    new_lt_loan_trajectories = tf.constant(new_lt_loan_trajectories, dtype=tf.float64)
+    equity_financing_trajectories = tf.constant(equity_financing_trajectories, dtype=tf.float64)
+    liq_deficit_st_trajectories = tf.constant(liq_deficit_st_trajectories, dtype=tf.float64)
 
     # Calculate Statistics
     def summarize_trajectories(name, trajectories):
-        mean_vals = np.mean(trajectories, axis=0)
-        lower_bound = np.percentile(trajectories, 2.5, axis=0)
-        upper_bound = np.percentile(trajectories, 97.5, axis=0)
+        mean_vals = tf.reduce_mean(trajectories, axis=0)
+        lower_bound = tfp.stats.percentile(trajectories, 2.5, axis=0)
+        upper_bound = tfp.stats.percentile(trajectories, 97.5, axis=0)
 
         print(f"\n{name}")
         print(f"{'Year':<5} | {'Mean':<15} | {'2.5% CI':<15} | {'97.5% CI':<15}")
         print("-" * 60)
         for t in range(len(mean_vals)):
-            mean_usd = mean_vals[t] * model.amount_scale
-            lower_usd = lower_bound[t] * model.amount_scale
-            upper_usd = upper_bound[t] * model.amount_scale
+            mean_usd = float(mean_vals[t]) * model.amount_scale
+            lower_usd = float(lower_bound[t]) * model.amount_scale
+            upper_usd = float(upper_bound[t]) * model.amount_scale
             print(
                 f"{t+1:<5} | {mean_usd:<15.2e} | {lower_usd:<15.2e} | {upper_usd:<15.2e}"
             )
@@ -566,20 +564,20 @@ def run_monte_carlo_forecast(
     scale = model.amount_scale
 
     # Compute mean trajectories (in scaled units, i.e. billions)
-    mean_nca = np.mean(nca_trajectories, axis=0)
-    mean_adv_pp = np.mean(adv_pay_purch_trajectories, axis=0)
-    mean_ar = np.mean(ar_trajectories, axis=0)
-    mean_inv = np.mean(inv_trajectories, axis=0)
-    mean_cash = np.mean(cash_trajectories, axis=0)
-    mean_ims = np.mean(ims_trajectories, axis=0)
-    mean_total_assets = np.mean(assets_trajectories, axis=0)
+    mean_nca = tf.reduce_mean(nca_trajectories, axis=0)
+    mean_adv_pp = tf.reduce_mean(adv_pay_purch_trajectories, axis=0)
+    mean_ar = tf.reduce_mean(ar_trajectories, axis=0)
+    mean_inv = tf.reduce_mean(inv_trajectories, axis=0)
+    mean_cash = tf.reduce_mean(cash_trajectories, axis=0)
+    mean_ims = tf.reduce_mean(ims_trajectories, axis=0)
+    mean_total_assets = tf.reduce_mean(assets_trajectories, axis=0)
 
-    mean_ap = np.mean(ap_trajectories, axis=0)
-    mean_aps = np.mean(aps_trajectories, axis=0)
-    mean_eff_st = np.mean(effective_st_debt_trajectories, axis=0)
-    mean_curr_lt = np.mean(current_lt_debt_trajectories, axis=0)
-    mean_ncl = np.mean(non_current_liabilities_trajectories, axis=0)
-    mean_equity = np.mean(equity_trajectories, axis=0)
+    mean_ap = tf.reduce_mean(ap_trajectories, axis=0)
+    mean_aps = tf.reduce_mean(aps_trajectories, axis=0)
+    mean_eff_st = tf.reduce_mean(effective_st_debt_trajectories, axis=0)
+    mean_curr_lt = tf.reduce_mean(current_lt_debt_trajectories, axis=0)
+    mean_ncl = tf.reduce_mean(non_current_liabilities_trajectories, axis=0)
+    mean_equity = tf.reduce_mean(equity_trajectories, axis=0)
     mean_total_liabilities = mean_ap + mean_aps + mean_eff_st + mean_curr_lt + mean_ncl
     mean_total_liab_equity = mean_total_liabilities + mean_equity
     mean_check = mean_total_assets - mean_total_liab_equity
@@ -620,12 +618,12 @@ def run_monte_carlo_forecast(
     )
 
     # --- Income Statement (requested formula view) ---
-    mean_sales = np.asarray(sales_forecast, dtype=np.float64)
-    mean_depr = np.mean(depreciation_trajectories, axis=0)
-    mean_cogs = np.mean(cogs_trajectories, axis=0)
-    mean_opex = np.mean(opex_trajectories, axis=0)
-    mean_interest = np.mean(interest_payment_trajectories, axis=0)
-    mean_ms_return = np.mean(ms_return_trajectories, axis=0)
+    mean_sales = tf.cast(sales_forecast, dtype=tf.float64)
+    mean_depr = tf.reduce_mean(depreciation_trajectories, axis=0)
+    mean_cogs = tf.reduce_mean(cogs_trajectories, axis=0)
+    mean_opex = tf.reduce_mean(opex_trajectories, axis=0)
+    mean_interest = tf.reduce_mean(interest_payment_trajectories, axis=0)
+    mean_ms_return = tf.reduce_mean(ms_return_trajectories, axis=0)
     mean_ebit = mean_sales - mean_cogs - mean_opex - mean_depr
     mean_ebt = mean_ebit - mean_interest + mean_ms_return
     eff_tax = float(model.income_tax_pct.numpy())
@@ -635,7 +633,7 @@ def run_monte_carlo_forecast(
     mean_net_income_formula = mean_ebt - mean_income_taxes_formula
     # Use simulated dividend outputs directly because the model applies
     # Lintner smoothing with prior-year NI and prior-year dividends.
-    mean_dividends_prev = np.mean(dividends_trajectories, axis=0)
+    mean_dividends_prev = tf.reduce_mean(dividends_trajectories, axis=0)
     income_statement_rows = [
         ("Revenue (Sales_t)", mean_sales),
         ("COGS", mean_cogs),
@@ -657,9 +655,9 @@ def run_monte_carlo_forecast(
     )
 
     # --- Cash Budget (5 modules, requested decomposition) ---
-    mean_equity_financing = np.mean(equity_financing_trajectories, axis=0)
-    mean_new_lt_loan = np.mean(new_lt_loan_trajectories, axis=0)
-    mean_stock_buyback = np.mean(stock_buyback_trajectories, axis=0)
+    mean_equity_financing = tf.reduce_mean(equity_financing_trajectories, axis=0)
+    mean_new_lt_loan = tf.reduce_mean(new_lt_loan_trajectories, axis=0)
+    mean_stock_buyback = tf.reduce_mean(stock_buyback_trajectories, axis=0)
 
     # CapEx formula in the model: asset_maintain * depreciation + sales_t * asset_growth
     mean_capex = (
@@ -667,14 +665,14 @@ def run_monte_carlo_forecast(
         + float(model.asset_growth.numpy()) * mean_sales
     )
 
-    prev_eff_st = np.concatenate(
-        ([float(initial_state["effective_st_debt"].numpy())], mean_eff_st[:-1])
+    prev_eff_st = tf.concat(
+        [tf.expand_dims(initial_state["effective_st_debt"], 0), mean_eff_st[:-1]], axis=0
     )
-    prev_curr_lt = np.concatenate(
-        ([float(initial_state["current_lt_debt"].numpy())], mean_curr_lt[:-1])
+    prev_curr_lt = tf.concat(
+        [tf.expand_dims(initial_state["current_lt_debt"], 0), mean_curr_lt[:-1]], axis=0
     )
-    prev_ncl = np.concatenate(
-        ([float(initial_state["non_current_liabilities"].numpy())], mean_ncl[:-1])
+    prev_ncl = tf.concat(
+        [tf.expand_dims(initial_state["non_current_liabilities"], 0), mean_ncl[:-1]], axis=0
     )
     mean_st_principal = prev_eff_st
     mean_lt_principal = prev_curr_lt
@@ -689,7 +687,7 @@ def run_monte_carlo_forecast(
     operating_outflows = mean_cogs + mean_opex + mean_income_taxes_formula
     operating_ncb = operating_inflows - operating_outflows
 
-    investing_inflows = np.zeros_like(mean_sales)
+    investing_inflows = tf.zeros_like(mean_sales)
     investing_outflows = mean_capex
     investing_ncb = investing_inflows - investing_outflows
 
@@ -704,7 +702,7 @@ def run_monte_carlo_forecast(
     owners_ncb = owners_inflows - owners_outflows
 
     discretionary_inflows = mean_ms_return
-    discretionary_outflows = np.zeros_like(mean_sales)
+    discretionary_outflows = tf.zeros_like(mean_sales)
     discretionary_ncb = discretionary_inflows - discretionary_outflows
 
     cash_budget_rows = [
@@ -756,7 +754,7 @@ def run_monte_carlo_forecast(
     )
 
     # --- Balance Sheet Identity Check ---
-    max_abs_check = np.max(np.abs(mean_check * scale))
+    max_abs_check = float(tf.reduce_max(tf.abs(mean_check * scale)))
     print(f"\nBalance Sheet Identity Check (Assets = Liabilities + Equity):")
     print(f"  Max absolute mismatch across years (mean): ${max_abs_check:,.2f}")
     if max_abs_check < 1.0:
@@ -768,7 +766,7 @@ def run_monte_carlo_forecast(
     else:
         print(f"  WARNING: Balance sheet mismatch detected!")
         for t in range(n_years):
-            check_val = mean_check[t] * scale
+            check_val = float(mean_check[t]) * scale
             if abs(check_val) >= 1000.0:
                 print(f"    {year_labels[t]}: Assets - (Liab+Eq) = ${check_val:,.2f}")
 
@@ -782,8 +780,8 @@ def run_monte_carlo_forecast(
         + equity_trajectories
     )
     check_all = assets_trajectories - total_liab_equity_all
-    max_abs_check_all = np.max(np.abs(check_all)) * scale
-    mean_abs_check_all = np.mean(np.abs(check_all)) * scale
+    max_abs_check_all = float(tf.reduce_max(tf.abs(check_all))) * scale
+    mean_abs_check_all = float(tf.reduce_mean(tf.abs(check_all))) * scale
     print(f"\n  Per-sample check (across all {n_samples} samples x {n_years} years):")
     print(f"    Max absolute mismatch:  ${max_abs_check_all:,.2f}")
     print(f"    Mean absolute mismatch: ${mean_abs_check_all:,.2f}")

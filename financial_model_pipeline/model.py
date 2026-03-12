@@ -866,7 +866,7 @@ class TrainableFinancialModel(tf.Module):
         print("-" * 50)
 
         if plot_vi and vi_history["epochs"]:
-            epochs_hist = np.array(vi_history["epochs"])
+            epochs_hist = tf.constant(vi_history["epochs"], dtype=tf.float64)
             fig, axs = plt.subplots(4, 1, figsize=(10, 14), sharex=True)
 
             axs[0].plot(
@@ -883,12 +883,12 @@ class TrainableFinancialModel(tf.Module):
 
             axs[1].plot(
                 epochs_hist,
-                np.array(vi_history["q_base_opex_loc"]) * self.amount_scale,
+                tf.constant(vi_history["q_base_opex_loc"], dtype=tf.float64) * self.amount_scale,
                 label="q_base_opex_loc (USD)",
             )
             axs[1].plot(
                 epochs_hist,
-                np.array(vi_history["q_base_opex_scale"]) * self.amount_scale,
+                tf.constant(vi_history["q_base_opex_scale"], dtype=tf.float64) * self.amount_scale,
                 label="q_base_opex_scale (USD)",
             )
             axs[1].set_ylabel("Baseline OpEx (USD)")
@@ -897,7 +897,7 @@ class TrainableFinancialModel(tf.Module):
 
             axs[2].plot(
                 epochs_hist,
-                np.array(vi_history["noise_sigma"]) * self.amount_scale,
+                tf.constant(vi_history["noise_sigma"], dtype=tf.float64) * self.amount_scale,
                 label="noise_sigma (USD)",
             )
             axs[2].set_ylabel("Noise Sigma (USD)")
@@ -924,7 +924,7 @@ class TrainableFinancialModel(tf.Module):
 
         # --- Simple Parameters Training Diagnostics ---
         if plot_vi and simple_history["epochs"]:
-            epochs_hist = np.array(simple_history["epochs"])
+            epochs_hist = tf.constant(simple_history["epochs"], dtype=tf.float64)
             fig, axs = plt.subplots(4, 1, figsize=(10, 15))
 
             # Panel 1: Total loss
@@ -978,10 +978,10 @@ class TrainableFinancialModel(tf.Module):
 
             # Panel 4: Final fitted logit(CR) vs historical logit(CR)
             if historical_years is not None:
-                cr_x = np.array(historical_years)
+                cr_x = tf.constant(historical_years, dtype=tf.float64)
                 axs[3].set_xlabel("Year")
             else:
-                cr_x = np.arange(len(historical_sales))
+                cr_x = tf.cast(tf.range(len(historical_sales)), dtype=tf.float64)
                 axs[3].set_xlabel("Time Index")
             final_logit_cr_pred = (
                 self.cost_ratio_alpha + self.cost_ratio_beta * time_indices
@@ -1077,8 +1077,9 @@ class TrainableFinancialModel(tf.Module):
         cum_inf_t = tf.math.cumprod(1 + inf_t)
 
         if historical_years is None:
-            historical_years = np.arange(
-                self.base_year, self.base_year + len(historical_sales)
+            historical_years = tf.cast(
+                tf.range(self.base_year, self.base_year + len(historical_sales)),
+                dtype=tf.float64,
             )
         years_t = _as_float64_tensor(historical_years)
         time_idx_t = years_t - tf.constant(float(self.base_year), dtype=tf.float64)
@@ -1283,7 +1284,7 @@ class TrainableFinancialModel(tf.Module):
 
         # --- Structural Parameters Training Diagnostics ---
         if structural_history["epochs"]:
-            epochs_hist = np.array(structural_history["epochs"])
+            epochs_hist = tf.constant(structural_history["epochs"], dtype=tf.float64)
             fig, axs = plt.subplots(2, 1, figsize=(10, 8), sharex=True)
 
             # Panel 1: Total loss
