@@ -1,16 +1,17 @@
 path = "trained_parameters_dont_include_tax_anomalies.npz"
 import os
-import numpy as np
+import numpy as np  # Only used for loading parameters
+import tensorflow as tf
 from historical_data import get_apple_historical_data
 
 
 def sigmoid(x):
-    return 1.0 / (1.0 + np.exp(-x))
+    return 1.0 / (1.0 + tf.exp(-x))
 
 
 if not os.path.exists(path):
     raise FileNotFoundError(f"Parameter file not found: {path}")
-data = np.load(path)
+data = np.load(path)  # np.load for .npz file I/O
 
 historical_data = get_apple_historical_data()
 historical_sales = historical_data["sales"]

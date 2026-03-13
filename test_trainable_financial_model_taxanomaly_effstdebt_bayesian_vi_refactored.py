@@ -13,7 +13,6 @@ Run the script by:
 python -m pytest -q test_trainable_financial_model_taxanomaly_effstdebt_bayesian_vi_refactored.py
 """
 
-import numpy as np
 import pytest
 import tensorflow as tf
 
@@ -24,7 +23,6 @@ from financial_model_pipeline.model import TrainableFinancialModel
 @pytest.fixture
 def model():
     """Yield a fresh model instance with deterministic random seeds."""
-    np.random.seed(7)
     tf.random.set_seed(7)
     return TrainableFinancialModel(base_year=2018)
 
@@ -36,40 +34,40 @@ def mock_historical_data():
     Values are intentionally small and smooth to keep gradients stable while still
     preserving realistic ratio relationships (for example, COGS/Sales in (0, 1)).
     """
-    sales = np.array([1.00, 1.05, 1.10, 1.15, 1.20], dtype=np.float64)
-    cogs = np.array([0.58, 0.60, 0.62, 0.64, 0.66], dtype=np.float64)
-    inventory = np.array([0.03, 0.032, 0.034, 0.036, 0.038], dtype=np.float64)
+    sales = tf.constant([1.00, 1.05, 1.10, 1.15, 1.20], dtype=tf.float64)
+    cogs = tf.constant([0.58, 0.60, 0.62, 0.64, 0.66], dtype=tf.float64)
+    inventory = tf.constant([0.03, 0.032, 0.034, 0.036, 0.038], dtype=tf.float64)
 
     # Keep purchases coherent with the inventory identity:
     # purchases_t = cogs_t + (inventory_t - inventory_{t-1})
-    purchases = np.empty_like(sales)
-    purchases[0] = cogs[0]
-    purchases[1:] = cogs[1:] + (inventory[1:] - inventory[:-1])
+    purchases_first = tf.expand_dims(cogs[0], axis=0)
+    purchases_rest = cogs[1:] + (inventory[1:] - inventory[:-1])
+    purchases = tf.concat([purchases_first, purchases_rest], axis=0)
 
-    nca = np.array([0.90, 0.92, 0.95, 0.98, 1.01], dtype=np.float64)
-    depreciation = np.array([0.045, 0.046, 0.047, 0.048, 0.049], dtype=np.float64)
-    adv_pay_sales = np.array([0.020, 0.021, 0.022, 0.023, 0.024], dtype=np.float64)
-    adv_pay_purch = np.array([0.040, 0.041, 0.042, 0.043, 0.044], dtype=np.float64)
-    ar = np.array([0.16, 0.165, 0.170, 0.175, 0.180], dtype=np.float64)
-    ap = np.array([0.25, 0.255, 0.260, 0.265, 0.270], dtype=np.float64)
-    cash = np.array([0.11, 0.112, 0.114, 0.116, 0.118], dtype=np.float64)
-    ims = np.array([0.12, 0.123, 0.126, 0.129, 0.132], dtype=np.float64)
-    net_income = np.array([0.075, 0.078, 0.081, 0.084, 0.087], dtype=np.float64)
-    dividends = np.array([0.012, 0.0125, 0.013, 0.0135, 0.014], dtype=np.float64)
-    stock_buyback = np.array([0.010, 0.0105, 0.011, 0.0115, 0.012], dtype=np.float64)
-    opex = np.array([0.18, 0.185, 0.19, 0.195, 0.20], dtype=np.float64)
-    tax = np.array([0.012, 0.0125, 0.013, 0.0135, 0.014], dtype=np.float64)
-    eff_st_debt = np.array([0.12, 0.122, 0.124, 0.126, 0.128], dtype=np.float64)
-    current_lt_debt = np.array([0.10, 0.101, 0.102, 0.103, 0.104], dtype=np.float64)
-    non_current_liabilities = np.array(
-        [0.28, 0.283, 0.286, 0.289, 0.292], dtype=np.float64
+    nca = tf.constant([0.90, 0.92, 0.95, 0.98, 1.01], dtype=tf.float64)
+    depreciation = tf.constant([0.045, 0.046, 0.047, 0.048, 0.049], dtype=tf.float64)
+    adv_pay_sales = tf.constant([0.020, 0.021, 0.022, 0.023, 0.024], dtype=tf.float64)
+    adv_pay_purch = tf.constant([0.040, 0.041, 0.042, 0.043, 0.044], dtype=tf.float64)
+    ar = tf.constant([0.16, 0.165, 0.170, 0.175, 0.180], dtype=tf.float64)
+    ap = tf.constant([0.25, 0.255, 0.260, 0.265, 0.270], dtype=tf.float64)
+    cash = tf.constant([0.11, 0.112, 0.114, 0.116, 0.118], dtype=tf.float64)
+    ims = tf.constant([0.12, 0.123, 0.126, 0.129, 0.132], dtype=tf.float64)
+    net_income = tf.constant([0.075, 0.078, 0.081, 0.084, 0.087], dtype=tf.float64)
+    dividends = tf.constant([0.012, 0.0125, 0.013, 0.0135, 0.014], dtype=tf.float64)
+    stock_buyback = tf.constant([0.010, 0.0105, 0.011, 0.0115, 0.012], dtype=tf.float64)
+    opex = tf.constant([0.18, 0.185, 0.19, 0.195, 0.20], dtype=tf.float64)
+    tax = tf.constant([0.012, 0.0125, 0.013, 0.0135, 0.014], dtype=tf.float64)
+    eff_st_debt = tf.constant([0.12, 0.122, 0.124, 0.126, 0.128], dtype=tf.float64)
+    current_lt_debt = tf.constant([0.10, 0.101, 0.102, 0.103, 0.104], dtype=tf.float64)
+    non_current_liabilities = tf.constant(
+        [0.28, 0.283, 0.286, 0.289, 0.292], dtype=tf.float64
     )
-    interest_payment = np.array([0.021, 0.0215, 0.022, 0.0225, 0.023], dtype=np.float64)
-    ms_return = np.array([0.0058, 0.0060, 0.0062, 0.0064, 0.0066], dtype=np.float64)
-    equity = np.array([0.55, 0.57, 0.59, 0.61, 0.63], dtype=np.float64)
-    inflation = np.array([0.020, 0.021, 0.020, 0.019, 0.020], dtype=np.float64)
-    tax_onetime_payments = np.zeros(5, dtype=np.float64)
-    years = np.array([2018, 2019, 2020, 2021, 2022], dtype=np.float64)
+    interest_payment = tf.constant([0.021, 0.0215, 0.022, 0.0225, 0.023], dtype=tf.float64)
+    ms_return = tf.constant([0.0058, 0.0060, 0.0062, 0.0064, 0.0066], dtype=tf.float64)
+    equity = tf.constant([0.55, 0.57, 0.59, 0.61, 0.63], dtype=tf.float64)
+    inflation = tf.constant([0.020, 0.021, 0.020, 0.019, 0.020], dtype=tf.float64)
+    tax_onetime_payments = tf.zeros(5, dtype=tf.float64)
+    years = tf.constant([2018, 2019, 2020, 2021, 2022], dtype=tf.float64)
 
     return {
         "sales": sales,
@@ -164,9 +162,9 @@ def test_sample_opex_params(model):
     assert base_opex_sample.shape.rank == 0
     assert kl_div.shape.rank == 0
 
-    assert np.isfinite(float(var_opex_sample.numpy()))
-    assert np.isfinite(float(base_opex_sample.numpy()))
-    assert np.isfinite(float(kl_div.numpy()))
+    assert tf.math.is_finite(var_opex_sample)
+    assert tf.math.is_finite(base_opex_sample)
+    assert tf.math.is_finite(kl_div)
 
 
 def test_save_load_parameters(model, tmp_path):
@@ -299,7 +297,7 @@ def test_training_step_execution(
         model.avg_maturity_years,
     ]
     for param in critical_params:
-        assert np.isfinite(float(param.numpy()))
+        assert tf.math.is_finite(tf.cast(param, tf.float64))
 
     # One deterministic forecast call post-training should also remain finite.
     state_next = model.forecast_step(
@@ -308,16 +306,16 @@ def test_training_step_execution(
         use_mean_opex=True,
     )
     for value in state_next.values():
-        assert np.isfinite(float(value.numpy()))
+        assert tf.math.is_finite(tf.cast(value, tf.float64))
 
 
 def test_monte_carlo_stability(model, mock_forecast_state):
     """Monte Carlo trajectories should stay finite for debt and earnings paths."""
     n_years = 15
-    sales_forecast = np.full(n_years, 1.20, dtype=np.float64)
-    inflation_forecast = np.full(n_years, 0.02, dtype=np.float64)
-    cum_inf_forecast = np.cumprod(1.0 + inflation_forecast).astype(np.float64)
-    forecast_years = np.arange(2019, 2019 + n_years, dtype=np.float64)
+    sales_forecast = tf.fill([n_years], tf.constant(1.20, dtype=tf.float64))
+    inflation_forecast = tf.fill([n_years], tf.constant(0.02, dtype=tf.float64))
+    cum_inf_forecast = tf.cast(tf.math.cumprod(1.0 + inflation_forecast), tf.float64)
+    forecast_years = tf.cast(tf.range(2019, 2019 + n_years), tf.float64)
 
     trajectories = run_monte_carlo_forecast(
         model=model,
@@ -329,9 +327,9 @@ def test_monte_carlo_stability(model, mock_forecast_state):
     )
 
     # Explicitly assert requested key trajectories.
-    assert np.isfinite(trajectories["effective_st_debt"]).all()
-    assert np.isfinite(trajectories["net_income"]).all()
+    assert tf.reduce_all(tf.math.is_finite(trajectories["effective_st_debt"]))
+    assert tf.reduce_all(tf.math.is_finite(trajectories["net_income"]))
 
     # Guardrail: all tracked outputs should stay finite in this short stress run.
     for arr in trajectories.values():
-        assert np.isfinite(arr).all()
+        assert tf.reduce_all(tf.math.is_finite(arr))

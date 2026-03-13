@@ -68,7 +68,11 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--query",
         action="append",
-        default=[],
+        default=[
+            "Consolidated Balance Sheet",
+            "Consolidated Income Statement",
+            "Consolidated Cash Flow Statement",
+        ],
         help="Target table name to extract (repeatable).",
     )
     parser.add_argument(
@@ -126,7 +130,7 @@ def resolve_endpoint(override: str | None) -> str:
 
 def build_extraction_prompt(query: str, pages_text: str) -> str:
     prompt = (
-        f"Find the table that corresponds to {query} and output it in a nice tabular form from the following pages data.\n"
+        f"Find the table that corresponds to {query} and output it in a nice tabular form (in English) from the following pages data.\n"
         f"Pages:\n{pages_text}"
     )
     return prompt
@@ -187,7 +191,7 @@ def build_supplementary_extraction_prompt(
         "(for example, breakdowns/expansions/schedules/notes such as an expanded "
         "'Other Income' table). "
         "You can be generous with the supplementary tables you extract since it is better to have more than not have necessary information.\n"
-        "Return in a nice tabular format.\n"
+        "Return in a nice tabular format (in English).\n"
         'If none are found, return "No supplementary tables found".\n\n'
         f"Pages:\n{pages_text}"
     )
@@ -328,7 +332,7 @@ def run_pipeline(
 
 def main() -> None:
     args = parse_args()
-    queries = args.query or ["Consolidated Balance Sheet"]
+    queries = args.query
     parameters = parse_parameters(args.parameters)
     endpoint = resolve_endpoint(args.endpoint)
 

@@ -150,7 +150,7 @@ def plot_opex_fit_with_aleatoric_noise(
     x_right = x_max + x_pad
 
     # Extend the regression lines to the padded range
-    sales_grid_usd = tf.linspace(x_left, x_right, 200)
+    sales_grid_usd = tf.linspace(tf.constant(x_left, dtype=tf.float64), tf.constant(x_right, dtype=tf.float64), 200)
     sales_grid_bil = sales_grid_usd / amount_scale
     # Center the sales grid using the offset
     sales_grid_bil_centered = sales_grid_bil - sales_offset

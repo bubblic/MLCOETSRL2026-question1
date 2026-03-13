@@ -1,7 +1,7 @@
 """Trainable financial model definition and training logic."""
 
 import os
-import numpy as np
+import numpy as np  # Used only for .npz file I/O (save/load parameters)
 import tensorflow as tf
 import tensorflow_probability as tfp
 import matplotlib.pyplot as plt

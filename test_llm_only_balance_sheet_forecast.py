@@ -9,8 +9,8 @@ import importlib.util
 from pathlib import Path
 import sys
 
-import numpy as np
 import pytest
+import tensorflow as tf
 
 
 @pytest.fixture
@@ -50,7 +50,7 @@ def test_parse_multi_year_response_top_level_arrays(llm_bs_module):
     )
     payload = {k: [1.0, 2.0, 3.0] for k in llm_bs_module.ELEMENT_KEYS}
     parsed = forecaster._parse_multi_year_response(payload, horizon=2)
-    assert parsed["sales"].tolist() == [1.0, 2.0]
+    assert parsed["sales"].numpy().tolist() == [1.0, 2.0]
 
 
 def test_parse_multi_year_response_raw_response_raises(llm_bs_module):
@@ -63,39 +63,39 @@ def test_parse_multi_year_response_raw_response_raises(llm_bs_module):
 
 def test_identity_enforcement_and_validation(llm_bs_module):
     forecast = {
-        k: np.array([1.0, 2.0], dtype=np.float64) for k in llm_bs_module.ELEMENT_KEYS
+        k: tf.constant([1.0, 2.0], dtype=tf.float64) for k in llm_bs_module.ELEMENT_KEYS
     }
     # Break equity then enforce.
-    forecast["equity"] = np.array([999.0, 999.0], dtype=np.float64)
+    forecast["equity"] = tf.constant([999.0, 999.0], dtype=tf.float64)
     llm_bs_module.AzureReasoningBalanceSheetForecaster._enforce_identity_inplace(
         forecast
     )
     llm_bs_module.AzureReasoningBalanceSheetForecaster._validate_identity(forecast)
-    assert np.isfinite(forecast["equity"]).all()
+    assert tf.reduce_all(tf.math.is_finite(forecast["equity"]))
 
 
 def test_load_historical_balance_sheet_mapping(llm_bs_module, monkeypatch):
     fake = {
-        "inventory": np.array([1.0]),
-        "nca": np.array([2.0]),
-        "accounts_receivable": np.array([3.0]),
-        "cash": np.array([4.0]),
-        "ims": np.array([5.0]),
-        "advance_payments_purchases": np.array([6.0]),
-        "accounts_payable": np.array([7.0]),
-        "advance_payments_sales": np.array([8.0]),
-        "current_liabilities": np.array([9.0]),
-        "non_current_liabilities": np.array([10.0]),
-        "equity": np.array([11.0]),
-        "dividends": np.array([12.0]),
-        "net_income": np.array([13.0]),
-        "sales": np.array([14.0]),
-        "cogs": np.array([15.0]),
-        "depreciation": np.array([16.0]),
-        "opex": np.array([17.0]),
-        "tax": np.array([18.0]),
-        "stock_buyback": np.array([19.0]),
-        "years": np.array([2024]),
+        "inventory": tf.constant([1.0]),
+        "nca": tf.constant([2.0]),
+        "accounts_receivable": tf.constant([3.0]),
+        "cash": tf.constant([4.0]),
+        "ims": tf.constant([5.0]),
+        "advance_payments_purchases": tf.constant([6.0]),
+        "accounts_payable": tf.constant([7.0]),
+        "advance_payments_sales": tf.constant([8.0]),
+        "current_liabilities": tf.constant([9.0]),
+        "non_current_liabilities": tf.constant([10.0]),
+        "equity": tf.constant([11.0]),
+        "dividends": tf.constant([12.0]),
+        "net_income": tf.constant([13.0]),
+        "sales": tf.constant([14.0]),
+        "cogs": tf.constant([15.0]),
+        "depreciation": tf.constant([16.0]),
+        "opex": tf.constant([17.0]),
+        "tax": tf.constant([18.0]),
+        "stock_buyback": tf.constant([19.0]),
+        "years": tf.constant([2024]),
     }
     monkeypatch.setattr(llm_bs_module, "get_apple_historical_data", lambda: fake)
     mapped = llm_bs_module.load_historical_balance_sheet()
@@ -105,14 +105,15 @@ def test_load_historical_balance_sheet_mapping(llm_bs_module, monkeypatch):
 
 def test_run_llm_balance_sheet_forecast_orchestrates(monkeypatch, llm_bs_module):
     hist = {
-        k: np.array([1.0, 2.0, 3.0], dtype=np.float64)
+        k: tf.constant([1.0, 2.0, 3.0], dtype=tf.float64)
         for k in llm_bs_module.ELEMENT_KEYS
     }
-    hist["years"] = np.array([2022, 2023, 2024])
+    hist["years"] = tf.constant([2022, 2023, 2024], dtype=tf.float64)
 
     monkeypatch.setattr(llm_bs_module, "load_historical_balance_sheet", lambda: hist)
     dummy_forecast = {
-        k: np.array([10.0, 11.0], dtype=np.float64) for k in llm_bs_module.ELEMENT_KEYS
+        k: tf.constant([10.0, 11.0], dtype=tf.float64)
+        for k in llm_bs_module.ELEMENT_KEYS
     }
 
     class DummyForecaster:
@@ -133,5 +134,5 @@ def test_run_llm_balance_sheet_forecast_orchestrates(monkeypatch, llm_bs_module)
     out = llm_bs_module.run_llm_balance_sheet_forecast(
         horizon_years=2, show_plot=False, blind_mode=True
     )
-    assert out["equity"].tolist() == [10.0, 11.0]
+    assert out["equity"].numpy().tolist() == [10.0, 11.0]
     assert len(plot_calls) == 1

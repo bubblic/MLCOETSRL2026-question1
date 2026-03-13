@@ -4,11 +4,8 @@ Definition used:
 - A value is hallucinated if it is not equal to the median value for that
   (company_id, year, field) distribution.
 
-Examples:
-    python calculate_hallucination_rates.py --run-values-file deepseek_financial_statements_runs/runs_3_with_operating_cost_for_generating_income/extraction_run_values.json
-    python calculate_hallucination_rates.py --run-values-file deepseek_financial_statements_runs/runs_3_with_operating_cost_for_generating_income/extraction_run_values.json --output-file hallucination_rates.json
+Example:
     python calculate_hallucination_rates.py --run-values-file deepseek_financial_statements_runs/runs_3_with_operating_cost_for_generating_income/extraction_run_values.json --output-file hallucination_rates.json --top-k 10
-    python calculate_hallucination_rates.py --run-values-file deepseek_financial_statements_runs/runs_3_with_operating_cost_for_generating_income/extraction_run_values.json --output-file hallucination_rates.json --top-k 10 --output-file hallucination_rates.json
 """
 
 import argparse

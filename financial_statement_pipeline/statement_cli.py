@@ -118,7 +118,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--ratios-aggregation",
         choices=["single", "median"],
-        default="median",
+        default="single",
         help=(
             "How to aggregate field values before ratio calculation. "
             "'single' reads one normalized directory. "

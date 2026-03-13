@@ -774,8 +774,8 @@ def run_training_and_forecast():
 
     # Training (using all data except last for backtesting)
     train_data = {k: v[:-1] for k, v in historical_data.items()}
-    model.train_simple_policies(train_data)
-    model.train_structural_parameters(train_data)
+    model.train_simple_policies(train_data, epochs=5000)
+    model.train_structural_parameters(train_data, epochs=5000)
 
     print("-" * 50)
     print("Simple Policy Trained Variables")

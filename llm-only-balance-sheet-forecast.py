@@ -17,7 +17,8 @@ from datetime import datetime
 from typing import Any, Dict, Optional
 
 import matplotlib.pyplot as plt
-import numpy as np
+import numpy as np  # Only used for plotting
+import tensorflow as tf
 from dotenv import load_dotenv
 
 from azure_llm_client import AzureLLMClient
@@ -58,8 +59,8 @@ LLM_AMOUNT_SCALE = 1e12
 class ForecastInputs:
     """Inputs for multi-year balance-sheet forecasting."""
 
-    historical_values: Dict[str, np.ndarray]
-    historical_years: np.ndarray
+    historical_values: Dict[str, tf.Tensor]
+    historical_years: tf.Tensor
     forecast_horizon: int
     blind_mode: bool = True
     company_name: Optional[str] = None
@@ -82,7 +83,7 @@ class AzureReasoningBalanceSheetForecaster:
         inputs: ForecastInputs,
         message: str,
         parameters: Optional[Dict[str, Any]] = None,
-    ) -> Dict[str, np.ndarray]:
+    ) -> Dict[str, tf.Tensor]:
         """Generate forecast arrays for each element key."""
         params = parameters or {"temperature": 0, "max_tokens": 12000, "top_k": 1}
         prompt = self._build_prompt(inputs)
@@ -179,7 +180,7 @@ class AzureReasoningBalanceSheetForecaster:
 
     def _parse_multi_year_response(
         self, data: Dict[str, Any], horizon: int
-    ) -> Dict[str, np.ndarray]:
+    ) -> Dict[str, tf.Tensor]:
         if "raw_response" in data:
             raise ValueError(
                 f"Please try again. Model response was not JSON: {data['raw_response']}"
@@ -193,9 +194,9 @@ class AzureReasoningBalanceSheetForecaster:
                     f"Forecast length {len(rows)} is shorter than required horizon {horizon}."
                 )
             parsed = {
-                key: np.array(
+                key: tf.constant(
                     [self._safe_float(row.get(key), key) for row in rows[:horizon]],
-                    dtype=np.float64,
+                    dtype=tf.float64,
                 )
                 for key in ELEMENT_KEYS
             }
@@ -210,9 +211,9 @@ class AzureReasoningBalanceSheetForecaster:
                     raise ValueError(
                         f"Invalid list for '{key}'. Need at least {horizon} values."
                     )
-                parsed[key] = np.array(
+                parsed[key] = tf.constant(
                     [self._safe_float(v, key) for v in values[:horizon]],
-                    dtype=np.float64,
+                    dtype=tf.float64,
                 )
             return parsed
 
@@ -229,7 +230,7 @@ class AzureReasoningBalanceSheetForecaster:
             raise ValueError(f"Invalid value for '{field}': {value}") from exc
 
     @staticmethod
-    def _enforce_identity_inplace(forecast: Dict[str, np.ndarray]) -> None:
+    def _enforce_identity_inplace(forecast: Dict[str, tf.Tensor]) -> None:
         lhs = (
             forecast["inventory"]
             + forecast["nca"]
@@ -248,7 +249,7 @@ class AzureReasoningBalanceSheetForecaster:
         forecast["equity"] = lhs - rhs_without_equity
 
     @staticmethod
-    def _validate_identity(forecast: Dict[str, np.ndarray]) -> None:
+    def _validate_identity(forecast: Dict[str, tf.Tensor]) -> None:
         lhs = (
             forecast["inventory"]
             + forecast["nca"]
@@ -264,17 +265,17 @@ class AzureReasoningBalanceSheetForecaster:
             + forecast["non_current_liabilities"]
             + forecast["equity"]
         )
-        if not np.allclose(lhs, rhs, rtol=0.0, atol=1e-6):
+        if not tf.reduce_all(tf.abs(lhs - rhs) < 1e-6):
             raise ValueError("Accounting identity validation failed after enforcement.")
 
     @staticmethod
     def _rescale_forecast(
-        forecast: Dict[str, np.ndarray], factor: float
-    ) -> Dict[str, np.ndarray]:
+        forecast: Dict[str, tf.Tensor], factor: float
+    ) -> Dict[str, tf.Tensor]:
         return {key: values * factor for key, values in forecast.items()}
 
 
-def load_historical_balance_sheet() -> Dict[str, np.ndarray]:
+def load_historical_balance_sheet() -> Dict[str, tf.Tensor]:
     """Load and map historical Apple financial fields used by this script."""
     data = get_apple_historical_data()
     mapped = {
@@ -309,10 +310,10 @@ def _get_output_path(file_name: str) -> str:
 
 
 def plot_forecast_elements(
-    historical_years: np.ndarray,
-    historical_data: Dict[str, np.ndarray],
-    forecast_years: np.ndarray,
-    forecast_data: Dict[str, np.ndarray],
+    historical_years: tf.Tensor,
+    historical_data: Dict[str, tf.Tensor],
+    forecast_years: tf.Tensor,
+    forecast_data: Dict[str, tf.Tensor],
     holdout_year: Optional[int] = None,
     holdout_actual: Optional[Dict[str, float]] = None,
     mode_label: str = "blind",
@@ -412,10 +413,10 @@ def run_llm_balance_sheet_forecast(
     message: str = "gen-ai-response",
     blind_mode: bool = True,
     show_plot: bool = False,
-) -> Dict[str, np.ndarray]:
+) -> Dict[str, tf.Tensor]:
     """Run end-to-end LLM forecasting and plotting."""
     hist = load_historical_balance_sheet()
-    all_years = hist["years"].astype(int)
+    all_years = tf.cast(hist["years"], tf.int32)
     all_values = {k: hist[k] for k in ELEMENT_KEYS}
 
     # Hold out the final observed year from LLM inputs for a backtest point.
@@ -440,10 +441,10 @@ def run_llm_balance_sheet_forecast(
     forecaster = AzureReasoningBalanceSheetForecaster()
     forecast = forecaster.forecast(inputs=inputs, message=message)
 
-    forecast_years = np.arange(
+    forecast_years = tf.range(
         holdout_year,
         holdout_year + horizon_years,
-        dtype=int,
+        dtype=tf.int32,
     )
 
     print("\n10-year LLM forecast (USD):")

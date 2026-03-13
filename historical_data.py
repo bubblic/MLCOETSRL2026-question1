@@ -5,14 +5,14 @@ All monetary values are in USD. Fiscal years are Apple's fiscal years
 (ending in late September).
 """
 
-import numpy as np
+import tensorflow as tf
 
 
 def get_apple_historical_data():
-    """Return Apple's historical financial data as a dictionary of numpy arrays.
+    """Return Apple's historical financial data as a dictionary of TensorFlow tensors.
 
     Returns:
-        dict with the following keys (all np.float64 arrays):
+        dict with the following keys (all tf.float64 tensors):
 
         Metadata:
             years             – fiscal year labels [2018..2025]
@@ -53,12 +53,12 @@ def get_apple_historical_data():
             inflation       – annual CPI inflation rates
 
         Note:
-            Fields may contain np.nan for years where a value is unavailable.
+            Fields may contain float('nan') for years where a value is unavailable.
     """
-    years = np.arange(2018, 2026)
+    years = tf.range(2018, 2026, dtype=tf.float64)
 
     # --- Income Statement ---
-    sales = np.array(
+    sales = tf.constant(
         [
             2.65595e11,
             2.60174e11,
@@ -69,9 +69,9 @@ def get_apple_historical_data():
             3.91035e11,
             4.16161e11,
         ],
-        dtype=np.float64,
+        dtype=tf.float64,
     )
-    cogs = np.array(
+    cogs = tf.constant(
         [
             1.52853e11,
             1.49235e11,
@@ -82,9 +82,9 @@ def get_apple_historical_data():
             1.98907e11,
             2.09262e11,
         ],
-        dtype=np.float64,
+        dtype=tf.float64,
     )
-    depreciation = np.array(
+    depreciation = tf.constant(
         [
             10903000000,
             12547000000,
@@ -95,9 +95,9 @@ def get_apple_historical_data():
             11445000000,
             11698000000,
         ],
-        dtype=np.float64,
+        dtype=tf.float64,
     )
-    opex = np.array(
+    opex = tf.constant(
         [
             30941000000,
             34462000000,
@@ -108,9 +108,9 @@ def get_apple_historical_data():
             57467000000,
             62151000000,
         ],
-        dtype=np.float64,
+        dtype=tf.float64,
     )
-    net_income = np.array(
+    net_income = tf.constant(
         [
             59531000000,
             55256000000,
@@ -121,9 +121,9 @@ def get_apple_historical_data():
             93736000000,
             1.1201e11,
         ],
-        dtype=np.float64,
+        dtype=tf.float64,
     )
-    tax = np.array(
+    tax = tf.constant(
         [
             13372000000,
             10481000000,
@@ -134,11 +134,11 @@ def get_apple_historical_data():
             29749000000,
             20719000000,
         ],
-        dtype=np.float64,
+        dtype=tf.float64,
     )
     # Extracted from extracted_text/apple_YYYY.tax-anomalies-contingencies.llm.json.
     # Source values are in billions; null values are mapped to 0.0.
-    tax_onetime_payments = np.array(
+    tax_onetime_payments = tf.constant(
         [
             1.5e9,  # 2018
             0.0,  # 2019 (null)
@@ -149,9 +149,9 @@ def get_apple_historical_data():
             10.2e9,  # 2024
             0.0,  # 2025 (null)
         ],
-        dtype=np.float64,
+        dtype=tf.float64,
     )
-    interest_expense = np.array(
+    interest_expense = tf.constant(
         [
             3240e6,
             3576e6,
@@ -159,19 +159,19 @@ def get_apple_historical_data():
             2645e6,
             2931e6,
             3933e6,
-            np.nan,  # Placeholder removed: data unavailable for this fiscal year
-            np.nan,  # Placeholder removed: data unavailable for this fiscal year
+            float('nan'),  # Placeholder removed: data unavailable for this fiscal year
+            float('nan'),  # Placeholder removed: data unavailable for this fiscal year
         ],
-        dtype=np.float64,
+        dtype=tf.float64,
     )
-    ms_investment_return = np.array(
+    ms_investment_return = tf.constant(
         [-3406e6, 3827e6, 1139e6, -967e6, -11899e6, 1816e6, 6054e6, 1231e6],
-        dtype=np.float64,
+        dtype=tf.float64,
     )
 
     # --- Balance Sheet ---
     # Includes one additional year at the beginning to derive purchases
-    inventory_plus_one = np.array(
+    inventory_plus_one = tf.constant(
         [
             4855000000,
             3956000000,
@@ -183,9 +183,9 @@ def get_apple_historical_data():
             7286000000,
             5718000000,
         ],
-        dtype=np.float64,
+        dtype=tf.float64,
     )
-    nca = np.array(
+    nca = tf.constant(
         [
             2.34386e11,
             1.75697e11,
@@ -196,9 +196,9 @@ def get_apple_historical_data():
             2.11993e11,
             2.11284e11,
         ],
-        dtype=np.float64,
+        dtype=tf.float64,
     )
-    accounts_receivable = np.array(
+    accounts_receivable = tf.constant(
         [
             48995000000,
             45804000000,
@@ -209,9 +209,9 @@ def get_apple_historical_data():
             66243000000,
             72957000000,
         ],
-        dtype=np.float64,
+        dtype=tf.float64,
     )
-    accounts_payable = np.array(
+    accounts_payable = tf.constant(
         [
             55888000000,
             46236000000,
@@ -222,9 +222,9 @@ def get_apple_historical_data():
             68960000000,
             69860000000,
         ],
-        dtype=np.float64,
+        dtype=tf.float64,
     )
-    advance_payments_purchases = np.array(
+    advance_payments_purchases = tf.constant(
         [
             12087000000,
             12352000000,
@@ -235,9 +235,9 @@ def get_apple_historical_data():
             14287000000,
             14585000000,
         ],
-        dtype=np.float64,
+        dtype=tf.float64,
     )
-    advance_payments_sales = np.array(
+    advance_payments_sales = tf.constant(
         [
             5966000000,
             5522000000,
@@ -248,9 +248,9 @@ def get_apple_historical_data():
             8249000000,
             9055000000,
         ],
-        dtype=np.float64,
+        dtype=tf.float64,
     )
-    cash = np.array(
+    cash = tf.constant(
         [
             25913000000,
             48844000000,
@@ -261,9 +261,9 @@ def get_apple_historical_data():
             29943000000,
             35934000000,
         ],
-        dtype=np.float64,
+        dtype=tf.float64,
     )
-    ims = np.array(
+    ims = tf.constant(
         [
             40388000000,
             51713000000,
@@ -274,9 +274,9 @@ def get_apple_historical_data():
             35228000000,
             18763000000,
         ],
-        dtype=np.float64,
+        dtype=tf.float64,
     )
-    current_liabilities = np.array(
+    current_liabilities = tf.constant(
         [
             115929e6,
             105718e6,
@@ -287,13 +287,13 @@ def get_apple_historical_data():
             176392e6,
             165631e6,
         ],
-        dtype=np.float64,
+        dtype=tf.float64,
     )
-    current_lt_debt = np.array(
+    current_lt_debt = tf.constant(
         [8784e6, 10260e6, 8773e6, 9613e6, 11128e6, 9822e6, 10912e6, 12350e6],
-        dtype=np.float64,
+        dtype=tf.float64,
     )
-    non_current_liabilities = np.array(
+    non_current_liabilities = tf.constant(
         [
             1.41712e11,
             1.4231e11,
@@ -304,9 +304,9 @@ def get_apple_historical_data():
             1.31638e11,
             1.19877e11,
         ],
-        dtype=np.float64,
+        dtype=tf.float64,
     )
-    equity = np.array(
+    equity = tf.constant(
         [
             1.07147e11,
             90488000000,
@@ -317,11 +317,11 @@ def get_apple_historical_data():
             56950000000,
             73733000000,
         ],
-        dtype=np.float64,
+        dtype=tf.float64,
     )
 
     # --- Cash Flow ---
-    dividends = np.array(
+    dividends = tf.constant(
         [
             13712000000,
             14119000000,
@@ -332,9 +332,9 @@ def get_apple_historical_data():
             15234000000,
             15421000000,
         ],
-        dtype=np.float64,
+        dtype=tf.float64,
     )
-    stock_buyback = np.array(
+    stock_buyback = tf.constant(
         [
             72738000000,
             66897000000,
@@ -345,7 +345,7 @@ def get_apple_historical_data():
             94949000000,
             90711000000,
         ],
-        dtype=np.float64,
+        dtype=tf.float64,
     )
 
     # --- Derived ---
@@ -354,9 +354,9 @@ def get_apple_historical_data():
     cost_of_revenue = cogs + depreciation
 
     # --- Macro ---
-    inflation = np.array(
+    inflation = tf.constant(
         [0.024, 0.018, 0.012, 0.047, 0.08, 0.041, 0.029, 0.027],
-        dtype=np.float64,
+        dtype=tf.float64,
     )
 
     return {
