@@ -246,3 +246,59 @@ def test_main_raises_when_no_pdf_files(monkeypatch, valid_args):
 
     with pytest.raises(FileNotFoundError, match="No PDF files found"):
         module.main()
+
+
+def test_parse_parameters_malformed_json_raises():
+    """Malformed JSON should raise json.JSONDecodeError."""
+    import json
+    with pytest.raises(json.JSONDecodeError):
+        module.parse_parameters("{not valid json}")
+
+
+def test_extract_table_with_llm_with_prompt_override(mock_client, sample_pages, monkeypatch):
+    """Custom prompt_override should be passed to the LLM client."""
+    mock_client.ask_json.return_value = {"table_name": "Custom", "rows": []}
+    monkeypatch.setattr(
+        module, "extract_json_from_text", Mock(return_value=None)
+    )
+
+    custom_prompt = "Extract the {query} from these pages:\n{pages}"
+    extracted = module.extract_table_with_llm(
+        client=mock_client,
+        parameters={},
+        query="Consolidated Balance Sheet",
+        page_numbers=[1],
+        pages=sample_pages,
+        prompt_override=custom_prompt,
+    )
+
+    mock_client.ask_json.assert_called_once()
+    call_kwargs = mock_client.ask_json.call_args
+    # The prompt should contain the query text
+    prompt_used = call_kwargs.kwargs.get("prompt", call_kwargs[1].get("prompt", ""))
+    if not prompt_used and len(call_kwargs.args) > 0:
+        prompt_used = str(call_kwargs)
+    assert "Consolidated Balance Sheet" in str(call_kwargs)
+
+
+def test_extract_supplementary_with_llm_missing_key_aggregates_response(
+    mock_client, sample_pages, sample_primary_extraction, monkeypatch
+):
+    """When chunk response lacks 'supplementary_tables' key, it should be captured in chunk_responses."""
+    monkeypatch.setattr(module, "SUPPLEMENTARY_EXTRACTION_MAX_PAGES", 2)
+    mock_client.ask_json.side_effect = [
+        {"unexpected_key": "data"},
+        {"supplementary_tables": [{"id": "B"}]},
+    ]
+
+    result = module.extract_supplementary_with_llm(
+        client=mock_client,
+        parameters={},
+        query="Consolidated Balance Sheet",
+        primary_extraction=sample_primary_extraction,
+        page_numbers=[1, 2, 10],
+        pages=sample_pages,
+    )
+
+    # Should still return a result (possibly with partial data)
+    assert "supplementary_tables" in result

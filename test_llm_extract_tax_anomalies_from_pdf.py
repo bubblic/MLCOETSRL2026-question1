@@ -204,3 +204,59 @@ def test_main_raises_when_no_pdfs_found(monkeypatch, valid_args):
 
     with pytest.raises(FileNotFoundError, match="No PDF files found"):
         module.main()
+
+
+def test_parse_parameters_malformed_json_raises():
+    """Malformed JSON should raise json.JSONDecodeError."""
+    import json
+    with pytest.raises(json.JSONDecodeError):
+        module.parse_parameters("{not valid json}")
+
+
+def test_extract_tax_json_with_llm_fallback_when_extraction_returns_none(
+    sample_pages, monkeypatch
+):
+    """When extract_json_from_text returns None, should fall back to the raw LLM response."""
+    mock_client = Mock()
+    mock_client.ask_json.return_value = {
+        "raw_response": "some text",
+        "tax_onetime_amount": 2.5,
+        "tax_onetime_note": "Note",
+        "tax_contingency_amount": 0.0,
+        "tax_contingency_note": "None",
+    }
+    monkeypatch.setattr(
+        module, "extract_json_from_text", Mock(return_value=None)
+    )
+
+    result = module.extract_tax_json_with_llm(
+        client=mock_client,
+        parameters={},
+        page_numbers=[5, 6],
+        pages=sample_pages,
+        prompt_template="Tax extraction.\nPages:\n{pages}",
+    )
+
+    # Should still return a result (from the original response)
+    assert result is not None
+    assert "tax_onetime_amount" in result
+
+
+def test_extract_tax_json_with_llm_partial_keys(sample_pages, monkeypatch):
+    """Response with some missing keys should still return available fields."""
+    mock_client = Mock()
+    mock_client.ask_json.return_value = {
+        "tax_onetime_amount": 1.0,
+        # Missing other keys
+    }
+
+    result = module.extract_tax_json_with_llm(
+        client=mock_client,
+        parameters={},
+        page_numbers=[5, 6],
+        pages=sample_pages,
+        prompt_template="Tax extraction.\nPages:\n{pages}",
+    )
+
+    assert result is not None
+    assert result["tax_onetime_amount"] == 1.0

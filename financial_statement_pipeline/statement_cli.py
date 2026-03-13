@@ -4,6 +4,7 @@ import argparse
 from pathlib import Path
 
 from .statement_extraction import run_extraction_pipeline
+from .statement_hallucination import run_hallucination_analysis
 from .statement_ratios import (
     compute_ratios_from_median_runs,
     compute_ratios_from_normalized_files,
@@ -140,6 +141,33 @@ def parse_args() -> argparse.Namespace:
         default="field_value_distributions",
         help="Output directory for generated field-distribution plots.",
     )
+    parser.add_argument(
+        "--hallucination-report",
+        dest="hallucination_report",
+        action="store_true",
+        default=True,
+        help=(
+            "Compute hallucination rates after multi-run median aggregation. "
+            "Enabled by default when --ratios-aggregation=median."
+        ),
+    )
+    parser.add_argument(
+        "--skip-hallucination-report",
+        dest="hallucination_report",
+        action="store_false",
+        help="Skip hallucination rate calculation.",
+    )
+    parser.add_argument(
+        "--hallucination-output-file",
+        default="hallucination_rates.json",
+        help="Output JSON file path for the hallucination report.",
+    )
+    parser.add_argument(
+        "--hallucination-top-k",
+        type=int,
+        default=15,
+        help="Print top-k highest non-null hallucination-rate rows to stdout.",
+    )
     return parser.parse_args()
 
 
@@ -194,9 +222,30 @@ def run_ratio_pipeline(args: argparse.Namespace) -> None:
     )
 
 
+def run_hallucination_pipeline(args: argparse.Namespace) -> None:
+    """Run hallucination analysis when multi-run median aggregation was used."""
+    if not args.hallucination_report:
+        return
+    if args.ratios_aggregation != "median":
+        return
+
+    runs_root = Path(args.runs_output_dir)
+    run_values_file = resolve_output_path(runs_root, args.run_values_output_file)
+    hallucination_output_file = resolve_output_path(
+        runs_root, args.hallucination_output_file
+    )
+
+    run_hallucination_analysis(
+        run_values_file=run_values_file,
+        output_file=hallucination_output_file,
+        top_k=args.hallucination_top_k,
+    )
+
+
 def main() -> None:
-    """Entry point for extraction and ratio workflows."""
+    """Entry point for extraction, ratio, and hallucination workflows."""
     args = parse_args()
     validate_args(args)
     run_extraction_pipeline(args)
     run_ratio_pipeline(args)
+    run_hallucination_pipeline(args)

@@ -43,6 +43,9 @@ def valid_args(tmp_path):
         run_values_output_file="extraction_run_values.json",
         plot_distributions=False,
         plots_dir="field_value_distributions",
+        hallucination_report=True,
+        hallucination_output_file="hallucination_rates.json",
+        hallucination_top_k=15,
     )
 
 
@@ -189,9 +192,13 @@ def test_main_orchestrates_parse_validate_extract_and_ratios(monkeypatch, valid_
     def _ratios(args):
         calls.append(("ratios", args))
 
+    def _hallucination(args):
+        calls.append(("hallucination", args))
+
     monkeypatch.setattr(statement_cli, "validate_args", _validate)
     monkeypatch.setattr(statement_cli, "run_extraction_pipeline", _extract)
     monkeypatch.setattr(statement_cli, "run_ratio_pipeline", _ratios)
+    monkeypatch.setattr(statement_cli, "run_hallucination_pipeline", _hallucination)
 
     statement_cli.main()
 
@@ -199,4 +206,88 @@ def test_main_orchestrates_parse_validate_extract_and_ratios(monkeypatch, valid_
         ("validate", valid_args),
         ("extract", valid_args),
         ("ratios", valid_args),
+        ("hallucination", valid_args),
     ]
+
+
+def test_validate_args_rejects_negative_num_runs(valid_args):
+    """Negative num_extraction_runs should be rejected."""
+    valid_args.num_extraction_runs = -1
+
+    with pytest.raises(ValueError, match="--num-extraction-runs must be >= 1"):
+        statement_cli.validate_args(valid_args)
+
+
+def test_validate_args_rejects_negative_max_workers(valid_args):
+    """Negative max_workers should be rejected."""
+    valid_args.max_workers = -5
+
+    with pytest.raises(ValueError, match="--max-workers must be >= 1"):
+        statement_cli.validate_args(valid_args)
+
+
+def test_validate_args_boundary_values(valid_args):
+    """Boundary values (exactly 1) should be accepted."""
+    valid_args.num_extraction_runs = 1
+    valid_args.max_workers = 1
+    statement_cli.validate_args(valid_args)  # should not raise
+
+
+def test_run_ratio_pipeline_unknown_aggregation_raises(valid_args):
+    """An unknown ratios_aggregation mode should raise."""
+    valid_args.ratios_aggregation = "unknown_mode"
+    with pytest.raises((ValueError, KeyError)):
+        statement_cli.run_ratio_pipeline(valid_args)
+
+
+def test_run_hallucination_pipeline_skipped_when_disabled(monkeypatch, valid_args):
+    """When hallucination_report is False, analysis should not run."""
+    valid_args.hallucination_report = False
+    valid_args.ratios_aggregation = "median"
+    mocked_analysis = Mock()
+    monkeypatch.setattr(statement_cli, "run_hallucination_analysis", mocked_analysis)
+
+    statement_cli.run_hallucination_pipeline(valid_args)
+
+    mocked_analysis.assert_not_called()
+
+
+def test_run_hallucination_pipeline_skipped_when_single_aggregation(
+    monkeypatch, valid_args
+):
+    """When ratios_aggregation is 'single', hallucination analysis should not run."""
+    valid_args.hallucination_report = True
+    valid_args.ratios_aggregation = "single"
+    mocked_analysis = Mock()
+    monkeypatch.setattr(statement_cli, "run_hallucination_analysis", mocked_analysis)
+
+    statement_cli.run_hallucination_pipeline(valid_args)
+
+    mocked_analysis.assert_not_called()
+
+
+def test_run_hallucination_pipeline_calls_analysis_for_median(
+    monkeypatch, valid_args, tmp_path
+):
+    """Median aggregation with hallucination enabled should call analysis."""
+    valid_args.hallucination_report = True
+    valid_args.ratios_aggregation = "median"
+    valid_args.runs_output_dir = str(tmp_path / "runs_root")
+    valid_args.hallucination_top_k = 10
+
+    monkeypatch.setattr(
+        statement_cli,
+        "resolve_output_path",
+        Mock(side_effect=lambda root, rel: Path(root) / rel),
+    )
+    mocked_analysis = Mock()
+    monkeypatch.setattr(statement_cli, "run_hallucination_analysis", mocked_analysis)
+
+    statement_cli.run_hallucination_pipeline(valid_args)
+
+    mocked_analysis.assert_called_once()
+    kwargs = mocked_analysis.call_args.kwargs
+    runs_root = Path(valid_args.runs_output_dir)
+    assert kwargs["run_values_file"] == runs_root / valid_args.run_values_output_file
+    assert kwargs["output_file"] == runs_root / valid_args.hallucination_output_file
+    assert kwargs["top_k"] == 10

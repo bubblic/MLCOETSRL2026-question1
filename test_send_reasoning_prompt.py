@@ -40,7 +40,6 @@ def test_main_json_mode_calls_ask_json(monkeypatch, capsys):
         top_k=1,
         raw=False,
     )
-    mock_client = pytest.MonkeyPatch()
     monkeypatch.setattr(module, "parse_args", lambda: args)
     client_double = type(
         "ClientDouble",
@@ -55,7 +54,6 @@ def test_main_json_mode_calls_ask_json(monkeypatch, capsys):
     module.main()
     captured = capsys.readouterr().out
     assert "ok-json" in captured
-    mock_client.undo()
 
 
 def test_main_raw_mode_calls_ask_text(monkeypatch, capsys):
@@ -82,3 +80,40 @@ def test_main_raw_mode_calls_ask_text(monkeypatch, capsys):
     module.main()
     captured = capsys.readouterr().out
     assert "ok-text" in captured
+
+
+def test_parse_args_custom_values(monkeypatch):
+    """Custom CLI args should be passed through correctly."""
+    monkeypatch.setattr(
+        "sys.argv",
+        ["send_reasoning_prompt.py", "--temperature", "0.8", "--max-tokens", "2048", "--top-k", "10"],
+    )
+    args = module.parse_args()
+    assert args.temperature == 0.8
+    assert args.max_tokens == 2048
+    assert args.top_k == 10
+
+
+def test_main_json_mode_passes_parameters_to_client(monkeypatch, capsys):
+    """Non-raw mode should pass temperature, max_tokens, top_k to the LLM client."""
+    captured_kwargs = {}
+    args = argparse.Namespace(
+        message="gen-ai-response",
+        temperature=0.5,
+        max_tokens=256,
+        top_k=20,
+        raw=False,
+    )
+    monkeypatch.setattr(module, "parse_args", lambda: args)
+
+    def fake_ask_json(**kwargs):
+        captured_kwargs.update(kwargs)
+        return {"raw_response": "ok"}
+
+    client_double = type(
+        "ClientDouble", (), {"ask_json": lambda self, **kw: fake_ask_json(**kw)}
+    )()
+    monkeypatch.setattr(module, "AzureLLMClient", lambda: client_double)
+    module.main()
+    assert "parameters" in captured_kwargs
+    assert captured_kwargs["parameters"]["temperature"] == 0.5

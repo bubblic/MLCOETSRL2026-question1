@@ -136,3 +136,63 @@ def test_run_llm_balance_sheet_forecast_orchestrates(monkeypatch, llm_bs_module)
     )
     assert out["equity"].numpy().tolist() == [10.0, 11.0]
     assert len(plot_calls) == 1
+
+
+def test_parsed_forecast_dtypes_are_float64(llm_bs_module):
+    """Parsed forecast tensors should be float64 to avoid downstream dtype mismatches."""
+    forecaster = llm_bs_module.AzureReasoningBalanceSheetForecaster(
+        endpoint="http://dummy"
+    )
+    row = {k: 1.0 for k in llm_bs_module.ELEMENT_KEYS}
+    parsed = forecaster._parse_multi_year_response({"forecast": [row, row]}, horizon=2)
+    for key, tensor in parsed.items():
+        assert tensor.dtype == tf.float64, (
+            f"{key} has dtype {tensor.dtype}, expected float64"
+        )
+
+
+def test_safe_float_accepts_valid_types(llm_bs_module):
+    """_safe_float should accept int and float values."""
+    sf = llm_bs_module.AzureReasoningBalanceSheetForecaster._safe_float
+    assert sf(42, "test") == 42.0
+    assert sf(3.14, "test") == pytest.approx(3.14)
+    assert sf("2.5", "test") == pytest.approx(2.5)
+
+
+def test_validate_identity_raises_on_violation(llm_bs_module):
+    """_validate_identity should raise when accounting identity is violated."""
+    forecast = {
+        k: tf.constant([1.0, 2.0], dtype=tf.float64)
+        for k in llm_bs_module.ELEMENT_KEYS
+    }
+    # Intentionally break equity without enforcing
+    forecast["equity"] = tf.constant([999.0, 999.0], dtype=tf.float64)
+    with pytest.raises(ValueError):
+        llm_bs_module.AzureReasoningBalanceSheetForecaster._validate_identity(forecast)
+
+
+def test_enforce_identity_preserves_non_equity_keys(llm_bs_module):
+    """_enforce_identity_inplace should only modify equity, not other keys."""
+    forecast = {
+        k: tf.constant([1.0, 2.0], dtype=tf.float64)
+        for k in llm_bs_module.ELEMENT_KEYS
+    }
+    original_nca = forecast["nca"].numpy().copy()
+    original_cash = forecast["cash"].numpy().copy()
+    forecast["equity"] = tf.constant([999.0, 999.0], dtype=tf.float64)
+
+    llm_bs_module.AzureReasoningBalanceSheetForecaster._enforce_identity_inplace(
+        forecast
+    )
+    assert forecast["nca"].numpy().tolist() == original_nca.tolist()
+    assert forecast["cash"].numpy().tolist() == original_cash.tolist()
+
+
+def test_parse_multi_year_response_short_forecast_raises(llm_bs_module):
+    """Forecast list shorter than horizon should raise."""
+    forecaster = llm_bs_module.AzureReasoningBalanceSheetForecaster(
+        endpoint="http://dummy"
+    )
+    row = {k: 1.0 for k in llm_bs_module.ELEMENT_KEYS}
+    with pytest.raises((ValueError, IndexError)):
+        forecaster._parse_multi_year_response({"forecast": [row]}, horizon=5)

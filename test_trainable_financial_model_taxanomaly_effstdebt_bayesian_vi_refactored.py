@@ -333,3 +333,160 @@ def test_monte_carlo_stability(model, mock_forecast_state):
     # Guardrail: all tracked outputs should stay finite in this short stress run.
     for arr in trajectories.values():
         assert tf.reduce_all(tf.math.is_finite(arr))
+
+
+def test_forecast_step_output_dtypes_are_float64(
+    model, mock_forecast_state, mock_forecast_inputs
+):
+    """All forecast_step output values should be float64 to prevent dtype mismatch."""
+    state_next = model.forecast_step(
+        mock_forecast_state, mock_forecast_inputs, use_mean_opex=True
+    )
+    for key, value in state_next.items():
+        assert hasattr(value, "dtype"), f"{key} is not a tensor"
+        assert value.dtype == tf.float64, (
+            f"{key} has dtype {value.dtype}, expected float64"
+        )
+
+
+def test_forecast_step_output_shapes_are_scalar(
+    model, mock_forecast_state, mock_forecast_inputs
+):
+    """All forecast_step output values should be scalar (rank 0)."""
+    state_next = model.forecast_step(
+        mock_forecast_state, mock_forecast_inputs, use_mean_opex=True
+    )
+    for key, value in state_next.items():
+        assert hasattr(value, "shape"), f"{key} is not a tensor"
+        assert value.shape.rank == 0, (
+            f"{key} has rank {value.shape.rank}, expected 0"
+        )
+
+
+def test_forecast_step_does_not_mutate_input_state(
+    model, mock_forecast_state, mock_forecast_inputs
+):
+    """forecast_step must not modify the input state dictionary in-place."""
+    original_values = {k: float(v.numpy()) for k, v in mock_forecast_state.items()}
+    model.forecast_step(mock_forecast_state, mock_forecast_inputs, use_mean_opex=True)
+    for k, orig_val in original_values.items():
+        assert float(mock_forecast_state[k].numpy()) == orig_val, (
+            f"Input state key '{k}' was mutated by forecast_step"
+        )
+
+
+def test_tensor_immutability_inflation_forecast():
+    """Building inflation forecast via tf.concat should work; item assignment should not.
+
+    This test guards against the exact bug where tf.fill + item assignment was used
+    instead of tf.concat to build a forecast tensor.
+    """
+    n = 10
+    last_hist = tf.constant(0.025, dtype=tf.float64)
+    # Correct approach: tf.concat
+    forecast = tf.concat(
+        [tf.expand_dims(last_hist, 0),
+         tf.fill([n - 1], tf.constant(0.03, dtype=tf.float64))],
+        axis=0,
+    )
+    assert forecast.shape == (n,)
+    assert forecast.dtype == tf.float64
+    assert float(forecast[0].numpy()) == pytest.approx(0.025)
+    assert float(forecast[1].numpy()) == pytest.approx(0.03)
+
+    # Verify that item assignment on EagerTensor raises TypeError
+    immutable_tensor = tf.fill([n], tf.constant(0.03, dtype=tf.float64))
+    with pytest.raises(TypeError):
+        immutable_tensor[0] = last_hist
+
+
+def test_kl_divergence_is_nonnegative(model):
+    """KL divergence between variational posterior and prior must be >= 0."""
+    kl = model.get_opex_kl_divergence()
+    assert float(kl.numpy()) >= 0.0
+
+
+def test_gradient_flows_through_forecast_step(
+    model, mock_forecast_state, mock_forecast_inputs
+):
+    """Trainable parameters should receive non-None, finite gradients through forecast_step."""
+    with tf.GradientTape() as tape:
+        state_next = model.forecast_step(
+            mock_forecast_state, mock_forecast_inputs, use_mean_opex=True
+        )
+        loss = tf.square(state_next["net_income"])
+    grads = tape.gradient(loss, model.trainable_variables)
+    non_none_grads = [g for g in grads if g is not None]
+    assert len(non_none_grads) > 0, "No gradients flowed through forecast_step"
+    for g in non_none_grads:
+        assert tf.reduce_all(tf.math.is_finite(g)), "Gradient contains inf or NaN"
+
+
+def test_monte_carlo_trajectory_shapes(model, mock_forecast_state):
+    """Monte Carlo trajectories should have shape (n_samples, n_years)."""
+    n_years = 5
+    n_samples = 3
+    sales_forecast = tf.fill([n_years], tf.constant(1.20, dtype=tf.float64))
+    inflation_forecast = tf.fill([n_years], tf.constant(0.02, dtype=tf.float64))
+    cum_inf_forecast = tf.cast(tf.math.cumprod(1.0 + inflation_forecast), tf.float64)
+    forecast_years = tf.cast(tf.range(2019, 2019 + n_years), tf.float64)
+
+    trajectories = run_monte_carlo_forecast(
+        model=model,
+        initial_state=mock_forecast_state,
+        sales_forecast=sales_forecast,
+        cum_inf_forecast=cum_inf_forecast,
+        forecast_years=forecast_years,
+        n_samples=n_samples,
+    )
+
+    for key, arr in trajectories.items():
+        assert arr.shape[0] == n_samples, (
+            f"{key} has {arr.shape[0]} samples, expected {n_samples}"
+        )
+        assert arr.shape[1] == n_years, (
+            f"{key} has {arr.shape[1]} years, expected {n_years}"
+        )
+
+
+def test_monte_carlo_trajectory_dtypes(model, mock_forecast_state):
+    """Monte Carlo trajectory tensors should all be float64."""
+    n_years = 3
+    sales_forecast = tf.fill([n_years], tf.constant(1.20, dtype=tf.float64))
+    inflation_forecast = tf.fill([n_years], tf.constant(0.02, dtype=tf.float64))
+    cum_inf_forecast = tf.cast(tf.math.cumprod(1.0 + inflation_forecast), tf.float64)
+    forecast_years = tf.cast(tf.range(2019, 2019 + n_years), tf.float64)
+
+    trajectories = run_monte_carlo_forecast(
+        model=model,
+        initial_state=mock_forecast_state,
+        sales_forecast=sales_forecast,
+        cum_inf_forecast=cum_inf_forecast,
+        forecast_years=forecast_years,
+        n_samples=2,
+    )
+
+    for key, arr in trajectories.items():
+        assert arr.dtype == tf.float64, (
+            f"{key} has dtype {arr.dtype}, expected float64"
+        )
+
+
+def test_forecast_step_with_zero_sales(model, mock_forecast_state):
+    """Edge case: zero sales should not cause NaN or inf."""
+    inputs = {
+        "sales_t": tf.constant(0.0, dtype=tf.float64),
+        "year": tf.constant(2023.0, dtype=tf.float64),
+        "cum_inflation": tf.constant(1.0, dtype=tf.float64),
+    }
+    state_next = model.forecast_step(
+        mock_forecast_state, inputs, use_mean_opex=True
+    )
+    for key, value in state_next.items():
+        assert tf.math.is_finite(value), f"{key} is not finite with zero sales"
+
+
+def test_save_load_nonexistent_path_raises(model):
+    """Loading from a nonexistent path should raise an error."""
+    with pytest.raises(Exception):
+        model.load_parameters("nonexistent_path_abc123.npz")

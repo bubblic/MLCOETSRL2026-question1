@@ -1,49 +1,14 @@
-"""Compute per-company, per-field hallucination rates from extraction_run_values.json.
+"""Compute per-company, per-field hallucination rates from extraction run values.
 
-Definition used:
-- A value is hallucinated if it is not equal to the median value for that
-  (company_id, year, field) distribution.
-
-Example:
-    python calculate_hallucination_rates.py --run-values-file deepseek_financial_statements_runs/runs_3_with_operating_cost_for_generating_income/extraction_run_values.json --output-file hallucination_rates.json --top-k 10
+A value is hallucinated if it is not equal to the median value for that
+(company_id, year, field) distribution.
 """
 
-import argparse
 import json
 import math
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
-
-
-def parse_args() -> argparse.Namespace:
-    """Parse CLI args."""
-    parser = argparse.ArgumentParser(
-        description=(
-            "Calculate hallucination rates for each company_id and field from "
-            "an extraction_run_values.json file."
-        )
-    )
-    parser.add_argument(
-        "--run-values-file",
-        required=True,
-        help="Path to extraction_run_values.json.",
-    )
-    parser.add_argument(
-        "--output-file",
-        default="hallucination_rates.json",
-        help=(
-            "Output JSON file path. If relative, it is resolved against the "
-            "run-values file directory."
-        ),
-    )
-    parser.add_argument(
-        "--top-k",
-        type=int,
-        default=15,
-        help="Print top-k highest non-null hallucination-rate rows to stdout.",
-    )
-    return parser.parse_args()
 
 
 def values_equal(lhs: Optional[float], rhs: Optional[float]) -> bool:
@@ -180,14 +145,6 @@ def build_hallucination_report(data: Dict[str, Any]) -> Dict[str, Any]:
     }
 
 
-def resolve_output_path(run_values_file: Path, output_file_arg: str) -> Path:
-    """Resolve output path from args."""
-    output_path = Path(output_file_arg)
-    if output_path.is_absolute():
-        return output_path
-    return run_values_file.parent / output_path
-
-
 def print_top_rows(rows: List[Dict[str, Any]], top_k: int) -> None:
     """Print top-k rows by non-null hallucination rate."""
     ranked = [
@@ -196,9 +153,24 @@ def print_top_rows(rows: List[Dict[str, Any]], top_k: int) -> None:
         if isinstance(row.get("hallucination_rate_non_null_values"), (int, float))
     ]
     ranked.sort(key=lambda row: row["hallucination_rate_non_null_values"], reverse=True)
+    shown = min(top_k, len(ranked))
+    print()
+    print("=" * 72)
+    print("Hallucination Rate Summary")
+    print("-" * 72)
     print(
-        f"Top {min(top_k, len(ranked))} company-field hallucination rates (non-null):"
+        "A value is considered hallucinated when it differs from the median"
     )
+    print(
+        "across extraction runs for the same company, year, and field."
+    )
+    print(
+        "Rates below are computed over non-null values only, aggregated"
+    )
+    print("across all years per company-field pair.")
+    print("=" * 72)
+    print(f"Top {shown} company-field pairs by hallucination rate:")
+    print()
     for row in ranked[:top_k]:
         print(
             f"- {row['company_id']} | {row['field']} | "
@@ -207,25 +179,22 @@ def print_top_rows(rows: List[Dict[str, Any]], top_k: int) -> None:
         )
 
 
-def main() -> None:
-    """Run hallucination-rate analysis CLI."""
-    args = parse_args()
-    run_values_file = Path(args.run_values_file)
+def run_hallucination_analysis(
+    run_values_file: Path,
+    output_file: Path,
+    top_k: int = 15,
+) -> None:
+    """Load run values, compute hallucination report, write output, and print summary."""
     if not run_values_file.exists():
         raise FileNotFoundError(f"Run values file not found: {run_values_file}")
 
-    with run_values_file.open("r", encoding="utf-8") as file:
-        data = json.load(file)
+    with run_values_file.open("r", encoding="utf-8") as fh:
+        data = json.load(fh)
 
     report = build_hallucination_report(data)
-    output_file = resolve_output_path(run_values_file, args.output_file)
     output_file.parent.mkdir(parents=True, exist_ok=True)
-    with output_file.open("w", encoding="utf-8") as file:
-        json.dump(report, file, ensure_ascii=False, indent=2)
+    with output_file.open("w", encoding="utf-8") as fh:
+        json.dump(report, fh, ensure_ascii=False, indent=2)
 
     print(f"Hallucination report written to: {output_file}")
-    print_top_rows(report["per_company_field"], top_k=args.top_k)
-
-
-if __name__ == "__main__":
-    main()
+    print_top_rows(report["per_company_field"], top_k=top_k)
