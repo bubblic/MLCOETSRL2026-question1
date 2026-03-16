@@ -1,0 +1,4454 @@
+% type the following command to generate pdf file:
+%   tectonic "Report for JPMorgan Chase MLCOE internship - Q1 final report - extension.tex"
+
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+\documentclass[
+]{article}
+\usepackage{xcolor}
+\usepackage{amsmath,amssymb}
+\setcounter{secnumdepth}{-\maxdimen} % remove section numbering
+\usepackage{iftex}
+\ifPDFTeX
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math} % this also loads fontspec
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+  \usepackage{xeCJK}
+  \setCJKmainfont{Hiragino Sans GB}
+\fi
+\usepackage{lmodern}
+\ifPDFTeX\else
+  % xetex/luatex font selection
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+\usepackage[margin=1in]{geometry}
+\usepackage{listings}
+\definecolor{codebg}{RGB}{245,245,245}
+\definecolor{codegreen}{RGB}{0,128,0}
+\definecolor{codegray}{RGB}{100,100,100}
+\definecolor{codeblue}{RGB}{0,0,180}
+\definecolor{codepurple}{RGB}{128,0,128}
+\lstdefinestyle{python}{
+  language=Python,
+  backgroundcolor=\color{codebg},
+  basicstyle=\ttfamily\small,
+  keywordstyle=\color{codeblue}\bfseries,
+  stringstyle=\color{codegreen},
+  commentstyle=\color{codegray}\itshape,
+  breaklines=true,
+  breakatwhitespace=false,
+  frame=single,
+  rulecolor=\color{codegray!30},
+  xleftmargin=4pt,
+  xrightmargin=4pt,
+  aboveskip=8pt,
+  belowskip=8pt,
+  showstringspaces=false,
+  columns=flexible,
+  literate={\_}{\_}1,
+}
+\lstdefinestyle{json}{
+  backgroundcolor=\color{codebg},
+  basicstyle=\ttfamily\small,
+  stringstyle=\color{codegreen},
+  breaklines=true,
+  breakatwhitespace=false,
+  frame=single,
+  rulecolor=\color{codegray!30},
+  xleftmargin=4pt,
+  xrightmargin=4pt,
+  aboveskip=8pt,
+  belowskip=8pt,
+  showstringspaces=false,
+  columns=flexible,
+  literate={\_}{\_}1,
+}
+\lstdefinestyle{console}{
+  backgroundcolor=\color{codebg},
+  basicstyle=\ttfamily\small,
+  breaklines=true,
+  breakatwhitespace=false,
+  frame=single,
+  rulecolor=\color{codegray!30},
+  xleftmargin=4pt,
+  xrightmargin=4pt,
+  aboveskip=8pt,
+  belowskip=8pt,
+  showstringspaces=false,
+  columns=flexible,
+}
+\usepackage{graphicx}
+\makeatletter
+\newsavebox\pandoc@box
+\newcommand*\pandocbounded[1]{% scales image to fit in text height/width
+  \sbox\pandoc@box{#1}%
+  \Gscale@div\@tempa{\textheight}{\dimexpr\ht\pandoc@box+\dp\pandoc@box\relax}%
+  \Gscale@div\@tempb{\linewidth}{\wd\pandoc@box}%
+  \ifdim\@tempb\p@<\@tempa\p@\let\@tempa\@tempb\fi% select the smaller of both
+  \ifdim\@tempa\p@<\p@\scalebox{\@tempa}{\usebox\pandoc@box}%
+  \else\usebox{\pandoc@box}%
+  \fi%
+}
+% Set default figure placement to htbp
+\def\fps@figure{htbp}
+\makeatother
+\ifLuaTeX
+  \usepackage{luacolor}
+  \usepackage[soul]{lua-ul}
+\else
+  \usepackage{soul}
+\fi
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\usepackage{bookmark}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\urlstyle{same}
+\hypersetup{
+  colorlinks=true,
+  linkcolor=blue,
+  urlcolor=blue,
+  citecolor=blue,
+  pdfcreator={LaTeX via pandoc}}
+
+\author{}
+\date{}
+
+\begin{document}
+
+\textbf{Final Report for JPMorgan Chase MLCOE internship -- Question 1}
+
+Jaebum (Albert) Chung
+
+February 26, 2026
+
+\textbf{Table of Content}
+\begin{quote}
+Introduction
+
+Part 1
+\begin{quote}
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\item
+  The Balance Sheet Elements
+\item
+  Mathematical Equations Governing the Balance Sheet Elements
+\item
+  Time Series Representation of the Balance Sheet
+\item
+  Training the Model
+\item
+  Applying Machine Learning
+\item
+  Projected Balance Sheet, Income Statement, and Cash Budget
+\end{enumerate}
+\end{quote}
+
+Reviewer's Feedback
+
+Part 2
+\begin{quote}
+\begin{enumerate}
+\def\labelenumi{\alph{enumi})}
+\item
+  LLM Selection and Infrastructure Setup
+\item
+  LLM-Only Balance Sheet Forecasting
+\item
+  Combining LLM with the Balance Sheet Forecasting Model (Tax Anomalies)
+\item
+  Strategic Recommendations for CEO/CFO
+\item[e, f, g)] Financial Ratios and Automated Extraction Pipeline
+\item[h, i)] Applicability to Other Annual Reports
+\end{enumerate}
+\end{quote}
+\end{quote}
+
+\textbf{Introduction}
+
+\ul{Literature Review}
+
+\emph{The Limitations of "Plug" Variables in Financial Forecasting}
+
+Financial statement forecasting is a foundational practice in corporate
+finance, yet traditional methodologies often compromise the integrity of
+the double-entry accounting system. As reviewed in Pareja et al. (2007)
+and Pareja (2009), a significant portion of existing literature relies
+on the use of "plugs": balancing variables forced to reconcile the
+difference between Assets and Liabilities plus Equity. Typically,
+analysts assign a specific account (often Cash, Debt or Equity
+\hyperlink{ref:pareja09}{[Pareja(09)]}) to absorb any discrepancies in the forecast.
+
+While this approach ensures a balanced sheet mathematically, it is
+methodologically flawed for robust forecasting. By using a plug, the
+analyst effectively overrides the natural evolution of the balance
+sheet, obscuring the causal relationships between operating decisions
+and financial health. More critically, the use of a plug erodes the
+primary validation mechanism of the double-entry principle. If the
+balance sheet is forced to balance, it becomes impossible to detect
+logical errors or inconsistencies in the underlying code. As noted in
+the critiques within the Pareja framework, a model that balances by
+force rather than by logic fails to serve as a reliable tool for stress
+testing or error detection.
+
+Financial statements are governed by strictly defined accounting
+identities and deterministic valuation rules, such as the First-In,
+First-Out (FIFO) inventory method \hyperlink{ref:iasb21}{[IASB(21)]}. Consequently, the
+direct application of machine learning algorithms, such as Long
+Short-Term Memory (LSTM) networks, to forecast individual line items is
+often methodologically flawed. Because these \textquotesingle black
+box\textquotesingle{} models treat variables as probabilistic time
+series rather than components of an integrated system, they fail to
+enforce the structural interconnectedness required by double-entry
+bookkeeping. This limitation frequently results in forecasts that
+violate the fundamental accounting equation (Assets = Liabilities +
+Equity), thereby rendering the model incapable of accurately assessing a
+company's overall financial health.
+
+\ul{Proposed Methodology: A Structural "No-Plug" Approach}
+
+To address these limitations, this report implements a structural
+forecasting model based on the framework proposed by Pareja (2009). The
+core distinction of this method is the rejection of circular references
+and balancing plugs. Instead, the model relies on a fully integrated
+system where the Balance Sheet is derived endogenously from the Cash
+Budget and Income Statement.
+
+In this approach, every line item is driven by specific causal factors
+(e.g., Receivables driven by Sales, Payables driven by Operating
+Expense) and the calculation of debt, and the ending cash balance is a
+calculated result of these flows rather than a residual plug.
+
+In Pareja (2009)'s framework, all the policy variables are known, and
+the models are used to forecast the balance sheet based on predicted
+sales and purchases accounting for pricing and volume relationship and
+inflation. In our case, we do not know the policy variables, but know a
+company's past financial statements. Using simple linear equations and
+machine learning algorithms, we train the policy variables that will
+satisfy the historical financial data. We initially assume that the
+variables remain constant within our training data, and in later
+sections apply machine learning methods to account for probability
+distribution of certain variables to provide richer predictions.
+
+We have further refined the Pareja (2009) framework to better reflect
+the treasury strategies of modern multinational corporations like Apple
+or General Motors. Where the original model might treat Marketable
+Securities solely as a reservoir for excess cash, our implementation
+models these securities as a distinct portion of the
+company\textquotesingle s liquidity strategy \hyperlink{ref:almeida14}{[Almeida(14)]}. This
+adjustment allows for a more realistic depiction of how large firms
+manage capital allocation between operational cash and interest-bearing
+assets.
+
+Moreover, Pareja (2009) assumes long-term debt to always have 10-year
+maturity. In reality, various debt products with varying maturity
+schedules exist. We, therefore, use an average maturity value as a
+variable to be also trained.
+
+Once the relationships and policy variables connecting the financial
+statement elements are established, the methodology utilizes Sales
+Revenue and Purchases as the central drivers. By anchoring the forecast
+to these core operational activities, the model can accurately predict
+the evolution of the balance sheet and income statement while
+maintaining the necessary accounting linkages.
+
+\ul{Testing and Validation Plan}
+
+The validity of this implementation is verified through a rigorous
+"Balance Check." Because the model eschews plugs, the fundamental
+accounting identity (\emph{Assets = Liabilities + Equity}) serves as a
+strict test of correctness rather than a guaranteed outcome.
+
+Our testing plan involves running the forecast over a multi-year horizon
+and calculating the delta between Total Assets and Total Claims at every
+time step. In this "no-plug" environment, a delta of zero confirms that
+all cash inflows and outflows have been correctly captured and routed
+through the Cash Budget. Any deviation from zero indicates a specific
+error in the logic (e.g., a "leak" in the system where an expense was
+recorded but cash was not deducted), allowing us to pinpoint and resolve
+structural flaws that traditional models would mask.
+
+The following sections (\textbf{1. The Balance Sheet Elements},
+\textbf{2. Mathematical Equations Governing the Balance Sheet Elements,}
+and \textbf{3. Time Series Representation of the Balance Sheet)} are
+answers to the questions 1 and 2, submitted codes are answers to
+questions 3 and 4, and the remaining sections (\textbf{4. Training the
+Model} and \textbf{5. Applying Machine Learning}) provide answers to
+questions 5, 6, 7, 8. For Part 2, the answers to the questions a)
+\textasciitilde{} i) are directly mapped to its headings.
+
+\textbf{Part 1}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\item
+  \textbf{The Balance Sheet Elements}
+\end{enumerate}
+
+The elements of a balance sheet from \hyperlink{ref:pareja09}{Pareja(09)} are as follows:
+
+Assets
+
+Net fixed assets (NFA)
+
+Advance payments to suppliers for purchases (AdvPP)
+
+Account receivables (AR)
+
+Inventory (Inventory)
+
+Short-term investments (Invest)
+
+Cash equivalent (Cash)
+
+Liabilities
+
+Account payables (AP)
+
+Advance payments from customers for sales (AdvPS)
+
+Short-term debt (STDebt)
+
+Long-term debt (LTDebt)
+
+Equity
+
+Equity invested (EI)
+
+Cumulated retained earnings (CRE)
+
+Cumulated buyback of equity (CBB)
+
+Net Income (NI)
+
+On the balance sheets of real companies, there are likely to be more
+elements. For example, there could be current and non-current `other
+liabilities' other than the 4 mentioned above, and there could be
+various other assets including deferred tax, non-current account
+receivables, Goodwill, and other intangible assets. For the purpose of
+this simple modeling exercise, we first identify the elements listed in
+the above balance sheet, and lump all unaccounted-for elements as shown
+below, using GM's balance sheet as example:
+
+\begin{itemize}
+\item
+  Assets
+
+  \begin{itemize}
+  \item
+    All unaccounted-for non-interest-bearing elements are lumped with
+    ``non-current assets'' along with net PPE.
+
+    \begin{itemize}
+    \item
+      Deferred tax, non-current account receivables, goodwill, other
+      assets
+    \item
+      Depreciation rate based on net fixed asset will be reduced
+      accordingly.
+    \end{itemize}
+  \item
+    We use other current assets as the proxy for advance payments to
+    suppliers for purchases.
+  \item
+    Short-term and long-term investments in market securities are lumped
+    into ``investments in market securities.''
+
+    \begin{itemize}
+    \item
+      Earn a combined average interest.
+    \end{itemize}
+  \item
+    We also combine cash equivalents with investments in market
+    securities to for ``total liquidity'' because companies do not just
+    hold onto a pile of cash, but rather invest a significant portion of
+    cash in securities to earn interest, which is different from
+    \hyperlink{ref:pareja09}{Pareja(09)}'s logic of only investing in excess cash after meeting a
+    minimum cash balance.
+
+    \begin{itemize}
+    \item
+      Total liquidity = cash equivalent + investments in market
+      securities
+    \end{itemize}
+  \end{itemize}
+\item
+  Liabilities
+
+  \begin{itemize}
+  \item
+    Advance payments from customers to be fulfilled next year are
+    represented as deferred revenue in company balance sheets.
+  \item
+    All unaccounted-for elements are lumped with long-term debt, to be
+    labeled ``non-current liabilities''
+
+    \begin{itemize}
+    \item
+      Includes non-current long-term debt, employee benefits,
+      non-current deferred revenue, non-current accrued expenses,
+      long-term capital lease obligation
+
+      \begin{itemize}
+      \item
+        These other non-current liabilities are like interest-free
+        long-term debt
+      \item
+        The total long-term liability is assumed to have the average
+        maturity of AvgM years, and it generates an average LT interest
+        (AvgLTInt) owed by the company
+      \end{itemize}
+    \item
+      Something important to note is that the ``long-term debt'' in an
+      actual balance sheet EXCLUDES the principal owed next year.
+
+      \begin{itemize}
+      \item
+        Non-current liabilities\textsubscript{t} = Total LT
+        liability\textsubscript{t} * (1 -- 1/AvgM)
+      \end{itemize}
+    \end{itemize}
+  \end{itemize}
+\end{itemize}
+
+\begin{quote}
+= Total LT liability\textsubscript{t} * (AvgM - 1) / AvgM
+\end{quote}
+
+\begin{itemize}
+\item
+  We group all other liabilities due next year as ``current
+  liabilities.''
+
+  \begin{itemize}
+  \item
+    Includes STDebt, current accrued expenses which include dealer and
+    customer allowances, claims and discounts, product warranty,
+    payrolls and benefits, and others, to be considered as ``short-term
+    loan''
+
+    \begin{itemize}
+    \item
+      Accrued expenses are like interest-free short-term debt.
+    \item
+      Short-term loan (STLoan\textsubscript{t}) generates an average ST
+      interest (AvgSTInt\textsubscript{t}) owed by the company
+    \end{itemize}
+  \item
+    Also includes current debt which includes principal payment from
+    short-term debt and ALSO INCLUDES the current portion of the total
+    LT liability
+
+    \begin{itemize}
+    \item
+      Current liabilities\textsubscript{t} = Total ST
+      liability\textsubscript{t} + Total LT liability\textsubscript{t} /
+      AvgM
+    \end{itemize}
+  \end{itemize}
+\end{itemize}
+
+\begin{quote}
+= Total ST liability\textsubscript{t} + Non-current
+liabilities\textsubscript{t} / (AvgM -- 1)
+\end{quote}
+
+\begin{itemize}
+\item
+  Equity
+
+  \begin{itemize}
+  \item
+    Represented by Stockholders Equity (SE\textsubscript{t})
+
+    \begin{itemize}
+    \item
+      SE\textsubscript{t} = SE\textsubscript{t-1} + EF\textsubscript{t}
+      + NI\textsubscript{t} -- Dividends\textsubscript{t-1} --
+      BB\textsubscript{t}
+
+      \begin{itemize}
+      \item
+        SE\textsubscript{t-1} = stockholder equity last year
+      \item
+        EF\textsubscript{t} = equity financing to cover portion of CapEx
+        spending
+      \item
+        NI\textsubscript{t} = net income this year
+      \item
+        Dividends\textsubscript{t-1} = Dividends earned last year, paid
+        this year
+      \item
+        BB\textsubscript{t} = stock buyback this year
+      \end{itemize}
+    \end{itemize}
+  \end{itemize}
+\end{itemize}
+
+So, our updated balance sheet, along with subitems for clarity, becomes:
+
+Assets
+
+Non-current assets (\textbf{NCA\textsubscript{t}})
+
+\begin{itemize}
+\item
+  Net PPE, deferred tax, non-current account receivables, goodwill,
+  other assets
+\end{itemize}
+
+Advance payments to suppliers for purchases
+(\textbf{AdvPP\textsubscript{t}})
+
+Account receivables (\textbf{AR\textsubscript{t}})
+
+Inventory (\textbf{Inv\textsubscript{t}})
+
+Total liquidity (\textbf{TL\textsubscript{t}})
+
+\begin{itemize}
+\item
+  Investments in market securities (\textbf{IMS\textsubscript{t}})
+
+  \begin{itemize}
+  \item
+    Short-term and long-term investments
+  \end{itemize}
+\item
+  Cash equivalent (\textbf{Cash\textsubscript{t}})
+\end{itemize}
+
+Liabilities
+
+Account payables (\textbf{AP\textsubscript{t}})
+
+Advance payments from customers for sales
+(\textbf{AdvPS\textsubscript{t}})
+
+Non-current liabilities (\textbf{NLiab\textsubscript{t}})
+
+\begin{itemize}
+\item
+  Non-current employee benefits, non-current deferred revenue,
+  non-current accrued expenses, long-term debt and capital lease
+  obligations MINUS next year's principal, other non-current liabilities
+\item
+  \textbf{NLiab\textsubscript{t}} = Total LT liability\textsubscript{t}
+  * (1 -- 1/\textbf{AvgM})
+\end{itemize}
+
+Current liabilities (\textbf{CLiab\textsubscript{t}})
+
+\begin{itemize}
+\item
+  ST debt, current accrued expenses, other current liabilities, and
+  current portion of the long-term debt and capital lease obligations
+  principals
+\item
+  \textbf{STLoan\textsubscript{t}} = ST debt\textsubscript{t} + current
+  accrued expenses\textsubscript{t} + other current
+  liabilities\textsubscript{t}
+\item
+  \textbf{CLiab\textsubscript{t}} = \textbf{STLoan\textsubscript{t}} +
+  Total LT liability\textsubscript{t} / \textbf{AvgM} =
+  \textbf{STLoan\textsubscript{t}} + \textbf{NLiab\textsubscript{t}} /
+  (\textbf{AvgM} -- 1)
+\end{itemize}
+
+Equity
+
+Stockholder equity (\textbf{SE\textsubscript{t}})
+
+\begin{itemize}
+\item
+  \textbf{SE\textsubscript{t}} = \textbf{SE\textsubscript{t-1}} +
+  \textbf{EF\textsubscript{t}} + \textbf{NI\textsubscript{t}} --
+  \textbf{Dividends\textsubscript{t-1}} -- \textbf{BB\textsubscript{t}}
+
+  \begin{itemize}
+  \item
+    SE\textsubscript{t-1} : total stockholder equity last year
+  \item
+    EF\textsubscript{t} : equity financing to cover portion of CapEx
+    spending
+  \item
+    NI\textsubscript{t} : net income this year
+  \item
+    Dividends\textsubscript{t-1} = Dividends earned last year, paid this
+    year
+  \item
+    BB\textsubscript{t} : stock buyback this year
+  \end{itemize}
+\end{itemize}
+
+\ul{Post Part 1:}
+
+We further upgrade the models to better represent Apple's historical
+data, namely the effective ST debt in Current liabilities:
+
+Assets
+
+\emph{Same as before}
+
+Liabilities
+
+Account payables (\textbf{AP\textsubscript{t}})
+
+Advance payments from customers for sales
+(\textbf{AdvPS\textsubscript{t}})
+
+Non-current liabilities (\textbf{NLiab\textsubscript{t}})
+
+\begin{itemize}
+\item
+  Non-current employee benefits, non-current deferred revenue,
+  non-current accrued expenses, long-term debt and capital lease
+  obligations MINUS next year's principal, other non-current liabilities
+\item
+  \textbf{NLiab\textsubscript{t}} = Total LT liability\textsubscript{t}
+  * (1 -- 1/\textbf{AvgM})
+\end{itemize}
+
+Current liabilities (\textbf{CLiab\textsubscript{t}})
+
+\begin{itemize}
+\item
+  Consists of the operational short-term obligations (Effective ST Debt)
+  plus the principal due this year on long-term loans.
+\item
+  Effective ST Debt (\textbf{EffSTDebt\textsubscript{t}}): ST debt
+  (commercial paper), current accrued expenses, and other current
+  liabilities.
+
+  \begin{itemize}
+  \item
+    Modeled as a logit-linear policy ratio of sales:
+    EffSTDebt\textsubscript{t} = Sales\textsubscript{t} *
+    \%STDebt\textsubscript{t}
+  \end{itemize}
+\item
+  Current LT Debt (\textbf{CurrLTDebt\textsubscript{t}}): Current
+  portion of the long-term debt and capital lease obligations
+  principals.
+
+  \begin{itemize}
+  \item
+    CurrLTDebt\textsubscript{t} = Total LT liability\textsubscript{t} /
+    AvgM = NLiab\textsubscript{t} / (AvgM -- 1)
+  \end{itemize}
+\item
+  Total Current Liabilities Calculation: CLiab\textsubscript{t} =
+  EffSTDebt\textsubscript{t} + CurrLTDebt\textsubscript{t}
+\end{itemize}
+
+Equity
+
+\emph{Same as before}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\setcounter{enumi}{1}
+\item
+  \textbf{Mathematical Equations Governing the Balance Sheet Elements}
+\end{enumerate}
+
+We refer to \hyperlink{ref:pareja09}{Pareja(09)} for constructing the mathematical equations that
+link all the elements on the balance sheet without circularity or plugs.
+First, we define a single primary driver that will predict the evolution
+of the balance sheet's elements.
+
+\begin{itemize}
+\item
+  Sales\textsubscript{t} : the total revenue generated by the company in
+  year t
+\end{itemize}
+
+This is a different approach from \hyperlink{ref:pareja09}{Pareja(09)} where they modeled the unit
+price, the unit cost, and the volume sold based on market research data
+on volume's price sensitivity. For the scope of this problem set, we
+lump these variables into an overarching sales driver whose evolution is
+modeled independently based on historical data.
+
+We begin by modeling the asset elements.
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\item
+  \ul{Assets}
+
+  \begin{enumerate}
+  \def\labelenumii{\arabic{enumii}.}
+  \item
+    \emph{Non-Current Assets (NCA)}
+  \end{enumerate}
+\end{enumerate}
+
+The balance of non-current assets evolves sequentially as existing fixed
+assets depreciate over their useful lifecycle and new capital
+expenditures (CapEx) are capitalized. The fundamental roll-forward
+equation is defined as:
+
+\begin{equation}\label{eq:nca_rollforward}
+\text{NCA}_t = \text{NCA}_{t-1} - \text{Depreciation}_t + \text{CapEx}_t
+\end{equation}
+
+Depreciation is modeled as a percentage of the beginning-of-period
+non-current asset base:
+
+\begin{equation}\label{eq:depreciation}
+\text{Depreciation}_t = \text{NCA}_{t-1} \cdot \text{\%Depreciation}
+\end{equation}
+
+Note: Because our model aggregates all Non-Current Assets, which may
+include non-depreciable assets such as land or goodwill, the trained
+effective depreciation rate (\%Depr) will naturally be lower than the
+strict accounting depreciation rate applied purely to Plant, Property,
+and Equipment (PP\&E).
+
+To model CapEx, we diverge from a rigid steady-state assumption where
+maintenance perfectly offsets depreciation. Instead, we decompose CapEx
+into a maintenance component (scaled by a trainable parameter, \%AM, to
+reflect partial, full, or inflationary replacement) and a growth
+component driven by sales expansion:
+
+\begin{equation}\label{eq:capex}
+\text{CapEx}_t = \text{\%AM} \cdot \text{Depreciation}_t + \text{\%AG} \cdot \text{Sales}_t
+\end{equation}
+
+By substituting \eqref{eq:depreciation} and \eqref{eq:capex} into \eqref{eq:nca_rollforward}, we can express
+the net change in non-current assets (ΔNCA\textsubscript{t}) purely in
+terms of our modeled variables. During model training, the optimizer
+learns the parameters for the effective depreciation rate (\%Depr), the
+maintenance replacement ratio (\%AM), and the incremental asset growth
+coefficient (\%AG).
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\setcounter{enumi}{1}
+\item
+  \emph{Cost of Goods Sold (COGS) and Inventory}
+\end{enumerate}
+
+Instead of modeling purchases independently and using the Cost of Goods
+Sold (COGS) as a plug, we directly model COGS based on historical margin
+trends. We define the Cost Ratio (CR) as the proportion of sales
+consumed by COGS:
+
+\begin{equation}\label{eq:cost_ratio}
+\text{CR}_t = \text{COGS}_t / \text{Sales}_t
+\end{equation}
+
+To ensure our predicted cost ratio remains strictly bounded between 0
+and 1, we transform the historical cost ratio using the logit function
+and model it as a linear function of time (t):
+
+\begin{equation}\label{eq:cost_ratio_logit}
+\text{logit}(\text{CR}_t) = \ln \left( \frac{\text{CR}_t}{1 - \text{CR}_t} \right) = \alpha_{\text{CR}} + \beta_{\text{CR}} \cdot t
+\end{equation}
+
+The parameters $\alpha$\textsubscript{CR} and $\beta$\textsubscript{CR} are trained
+on historical data by minimizing the mean squared error between the
+historical logit(CR) and the predicted logit(CR). Once the future Cost
+Ratio is predicted, COGS is calculated directly:
+
+\begin{equation}\label{eq:cogs}
+\text{COGS}_t = \text{CR}_t \cdot \text{Sales}_t
+\end{equation}
+
+Next, inventory can be modeled as a function of last year's inventory,
+this year's purchases, and this year's COGS:
+
+\begin{equation}\label{eq:inventory_rollforward}
+\text{Inv}_t = \text{Inv}_{t-1} + \text{Purchases}_t - \text{COGS}_t
+\end{equation}
+
+As done in \hyperlink{ref:pareja09}{Pareja(09)}, we set the inventory target as a percentage of
+sales:
+
+\begin{equation}\label{eq:inventory_target}
+\text{Inv}_t = \text{\%Inv} \cdot \text{Sales}_t
+\end{equation}
+
+By substituting our known variables into \eqref{eq:inventory_rollforward}, we can solve for
+Purchases\textsubscript{t}, which now acts as the necessary plug to
+balance the inventory account:
+
+\begin{equation}\label{eq:purchases}
+\text{Purchases}_t = \text{Inv}_t - \text{Inv}_{t-1} + \text{COGS}_t
+\end{equation}
+
+\begin{equation}\label{eq:purchases_expanded}
+\text{Purchases}_t = \text{\%Inv} \cdot (\text{Sales}_t - \text{Sales}_{t-1}) + \text{COGS}_t
+\end{equation}
+
+We add \%Inventory (\%Inv), $\alpha$\textsubscript{CR} and $\beta$\textsubscript{CR}
+to the variables to be trained.
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\setcounter{enumi}{2}
+\item
+  \emph{Advance Payments for Purchases}
+\end{enumerate}
+
+Advance payments to suppliers for purchases (AdvPP) can be modeled as
+strictly proportional to the total purchases made during the current
+year. This approach relies on the simplifying assumption that current
+purchasing volumes serve as a reliable proxy for near-term future
+demand. Therefore, we define:
+
+\begin{equation}\label{eq:advpp}
+\text{AdvPP}_t = \text{\%AdvPP} \cdot \text{Purchases}_t
+\end{equation}
+
+We add \%Advance payments to suppliers (\%AdvPP) to the variables to
+learn in our training.
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\setcounter{enumi}{3}
+\item
+  \emph{Account Receivables}
+\end{enumerate}
+
+Next, we have account receivables. A fraction of this year's sales to
+customers are on credit and is receivable next year:
+
+\begin{equation}\label{eq:account_receivables}
+\text{AR}_t = \text{\%AR} \cdot \text{Sales}_t
+\end{equation}
+
+We add \%Account receivables (\%AR) to the variables to learn in our
+training.
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\setcounter{enumi}{4}
+\item
+  \emph{Total Liquidity}
+\end{enumerate}
+
+Finally, the last element in our assets is total liquidity (TL).
+Following \hyperlink{ref:pareja09}{Pareja(09)}, we model the total liquidity available as a
+percentage of sales. Within the liquidity, we assume that a portion of
+it is invested in market securities (IMS):
+
+\begin{equation}\label{eq:total_liquidity}
+\text{TL}_t = \text{\%TL} \cdot \text{Sales}_t
+\end{equation}
+
+\begin{equation}\label{eq:cash}
+\text{Cash}_t = \text{\%Cash} \cdot \text{TL}_t
+\end{equation}
+
+\begin{equation}\label{eq:ims}
+\text{IMS}_t = (1 - \text{\%Cash}) \cdot \text{TL}_t
+\end{equation}
+
+We add \%TL and \%Cash to our variables to be trained.
+
+Before we move onto liabilities, it is helpful to generate a Liquidity
+Budget to model the flow of cash in and out of cash balance and
+short-term investment into market securities. We have updated the name
+from Cash Budget to Liquidity Budget to reflect our use of total
+liquidity to represent both cash and market securities investment.
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\setcounter{enumi}{1}
+\item
+  \ul{Liquidity Budget}
+\end{enumerate}
+
+We can break down flows into/out of liquidity balance into net liquidity
+balances (NLB) pertaining to the following activities: operating,
+capital expense, financing, external investment, and transaction with
+owners. The final liquidity is the sum of all NLBs.
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\item
+  \emph{Operating NLB}
+\end{enumerate}
+
+Operating activity captures all inflows from sales (current year sales
+revenue, account receivables from last year, advance payments from
+customers for next year) and all outflows (current year purchases,
+account payables from last year, advance payments to suppliers for next
+year, operating expenses, income tax):
+
+\begin{equation}\label{eq:operating_inflows}
+\text{Inflows}_t = \text{AR}_{t-1} + \text{AdvPS}_t + \text{Sales}_t \cdot (1 - \text{\%AR} - \text{\%AdvPS})
+\end{equation}
+
+\begin{equation}\label{eq:operating_outflows}
+\text{Outflows}_t = \text{AP}_{t-1} + \text{AdvPP}_t + \text{Purchases}_t \cdot (1 - \text{\%AP} - \text{\%AdvPP}) + \text{OpEx}_t + \text{IT}_t
+\end{equation}
+
+\begin{equation}\label{eq:operating_nlb}
+\text{Operating NLB}_t = \text{Inflows}_t - \text{Outflows}_t
+\end{equation}
+
+where OpEx\textsubscript{t} is the operating expense, and
+IT\textsubscript{t} is income tax. We can model OpEx\textsubscript{t} as
+a function of sales and inflation:
+
+\begin{equation}\label{eq:opex}
+\text{OpEx}_t = \text{\%OR} \cdot \text{Sales}_t + \text{OB}_{t-1} \cdot (1 + \text{Inflation}_t)
+\end{equation}
+
+where OB is the base operating expense that increases with inflation
+each year (rent, insurance), and \%OR is the rate of increase
+proportional to this year's sales revenue that impacts the variable
+portion of the operating expense. Inflation data can be obtained from
+U.S. Bureau of Labor Statistics.
+
+We can model IT\textsubscript{t} as a percentage of net income
+(NI\textsubscript{t}):
+
+\begin{equation}\label{eq:income_tax}
+\text{IT}_t = \text{\%IT} \cdot \text{NI}_t / (1 - \text{\%IT}) = \text{NI}_t / (1/\text{\%IT} - 1)
+\end{equation}
+
+We add \%IT, OB\textsubscript{T\_start} (base operating expense of the
+first element in a time series) and \%OR to our variables to be trained.
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\setcounter{enumi}{1}
+\item
+  \emph{Capital Expense NLB}
+\end{enumerate}
+
+Investment is made into the non-current assets to:
+
+\begin{enumerate}
+\def\labelenumi{\alph{enumi})}
+\item
+  keep non-current assets price the same by accounting for depreciation
+\item
+  grow non-current assets by some percentage.
+\end{enumerate}
+
+We have already done the calculation in \eqref{eq:capex}, which we reproduce
+here:
+
+$\text{CapEx}_t = \text{Depreciation}_t + \text{Sales}_t \cdot \text{\%Asset growth}$ from \eqref{eq:capex}
+
+\begin{equation}\label{eq:capex_nlb}
+\text{CapEx NLB}_t = -\text{CapEx}_t = -\text{Depreciation}_t - \text{Sales}_t \cdot \text{\%Asset growth}
+\end{equation}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\item
+  \emph{Financing NLB}
+\end{enumerate}
+
+This is the net liquidity balance after obtaining more liquidity from
+new short-term loan (STLoan\textsubscript{t}) and new long-term loan
+(LTLoan\textsubscript{t}), and paying all debt obligations this year.
+
+\begin{equation}\label{eq:financing_nlb}
+\text{Financing NLB}_t = \text{STLoan}_t + \text{LTLoan}_t - \text{CLiab}_{t-1} - \text{Avg.\ ST interest}_t - \text{Avg.\ LT interest}_t
+\end{equation}
+
+where current liabilities\textsubscript{t-1} (CLiab\textsubscript{t-1})
+are the principals from short-term liabilities and long-term liabilities
+paid this year, represented by:
+
+\begin{equation}\label{eq:cliab_prev}
+\text{CLiab}_{t-1} = \text{STLoan}_{t-1} + \text{NLiab}_{t-1} / (\text{AvgM} - 1)
+\end{equation}
+
+The average short-term interest (AvgSTInt\textsubscript{t}) and average
+long-term interest (AvgLTInt\textsubscript{t}) owed are calculated as
+follows:
+
+\begin{equation}\label{eq:avg_st_interest}
+\text{AvgSTInt}_t = \text{\%AvgSTInt} \cdot \text{STLoan}_{t-1} = \text{\%AvgSTInt} \cdot (\text{CLiab}_{t-1} - \text{NLiab}_{t-1} / (\text{AvgM} - 1))
+\end{equation}
+
+\begin{equation}\label{eq:avg_lt_interest}
+\text{AvgLTInt}_t = \text{\%AvgLTInt} \cdot \text{Total LT liability}_{t-1} = \text{\%AvgLTInt} \cdot (\text{NLiab}_{t-1} / (1 - 1/\text{AvgM}))
+\end{equation}
+
+We add AvgM, \%AvgSTInt and \%AvgLTInt to our variables to learn. We
+derive the expression for STLoan\textsubscript{t} and
+LTLoan\textsubscript{t} in \ul{2.3 Liabilities}.
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\setcounter{enumi}{1}
+\item
+  \emph{External Investment NLB}
+\end{enumerate}
+
+We redeem external investments from last year with a fixed percentage of
+return (\%MSReturn), and make new investments this year:
+
+\begin{equation}\label{eq:ext_invest_nlb}
+\text{External investment NLB}_t = \text{IMS}_{t-1} \cdot (1 + \text{\%MSReturn}) - \text{IMS}_t
+\end{equation}
+
+Instead of only allocating the excess cash in market securities, we
+invest a proportion of total liquidity balance. Using \eqref{eq:ims}:
+
+\begin{equation}\label{eq:ext_invest_nlb_expanded}
+\text{External investment NLB}_t = (1 - \text{\%Cash}) \cdot (\text{TL}_{t-1} \cdot (1 + \text{\%MSReturn}) - \text{TL}_t)
+\end{equation}
+
+We add \%MSReturn to our training variables to be learned.
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\setcounter{enumi}{2}
+\item
+  \emph{Transaction with owners NLB}
+\end{enumerate}
+
+In \hyperlink{ref:pareja09}{Pareja(09)}'s model, owners can make additional investments to finance a
+portion of long-term debt, which counts as an inflow to liquidity. The
+company pays dividends to owners and can also engage in stock buybacks:
+
+\begin{equation}\label{eq:owners_nlb}
+\text{Owners transaction NLB}_t = \text{Equity financing}_t - \text{Dividends}_{t-1} - \text{Stock buybacks}_t
+\end{equation}
+
+where
+
+\begin{equation}\label{eq:equity_financing}
+\text{Equity financing}_t = \text{LTLoan}_t \cdot \text{\%EF} / (1 - \text{\%EF})
+\end{equation}
+
+\begin{equation}\label{eq:target_dividends}
+\text{Target Dividends}_{t-1} = \text{\%Payout ratio} \cdot \text{Net income}_{t-1}
+\end{equation}
+
+Rather than calculating dividends strictly as a fixed percentage of
+current net income, we apply the Lintner Model to account for dividend
+smoothing. Corporate management typically prefers stable dividend
+payouts to avoid signaling financial distress to investors. Therefore,
+the modeled dividend is represented as a weighted average between a
+target payout (driven by a baseline \%Payout\_Ratio) and the actual
+dividends paid in the prior period, regulated by an optimized
+Adjustment\_Speed parameter. So, the actual dividends equation becomes:
+
+\begin{equation}\label{eq:lintner_dividends}
+\text{Dividends}_{t-1} = \text{Adj.\ Speed} \cdot \text{Target Dividends}_{t-1} + (1 - \text{Adj.\ Speed}) \cdot \text{Dividends}_{t-2}
+\end{equation}
+
+\begin{equation}\label{eq:stock_buybacks}
+\text{Stock buybacks}_t = \text{\%Buyback ratio} \cdot \text{Depreciation}_t + \text{Any excess cash after meeting liquidity target}
+\end{equation}
+
+For companies like Apple, their revenue generates tremendous amount of
+cash that they sometimes use the excess cash to buy back shares to
+spread the earnings to shareholders instead of paying a higher dividend
+which has tax implications. We add \%Equity financing (\%EF), \%Payout
+ratio (\%PR) and \%Buyback ratio (\%BB) to our variables to learn. We
+will define the equations for Net income\textsubscript{t} in \ul{2.4.
+Income Statement}.
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\setcounter{enumi}{3}
+\item
+  \emph{Final NLB}
+\end{enumerate}
+
+We obtain the final net liquidity balance\textsubscript{t} by summing
+all the different activities' NLB\textsubscript{t}:
+
+\begin{multline}\label{eq:final_nlb}
+\text{Final NLB}_t = \text{Operating NLB}_t + \text{CapEx NLB}_t + \text{Financing NLB}_t \\
++ \text{External investment NLB}_t + \text{Owners transaction NLB}_t
+\end{multline}
+
+This is how we obtain the net liquidity balance at time t without plugs
+or circularity. The unknown variables in the equation can be trained
+because we have the target liquidity balance given by \eqref{eq:total_liquidity}:
+
+$\text{TL}_t = \text{\%TL} \cdot \text{Sales}_t$ from \eqref{eq:total_liquidity}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\item
+  \ul{Liabilities}
+
+  \begin{enumerate}
+  \def\labelenumii{\arabic{enumii}.}
+  \item
+    \emph{Account Payables}
+  \end{enumerate}
+\end{enumerate}
+
+Account payables are modeled as a percentage of total purchases made
+this year, payable next year to the suppliers:
+
+\begin{equation}\label{eq:account_payables}
+\text{AP}_t = \text{\%AP} \cdot \text{Purchases}_t
+\end{equation}
+
+We add \%AP to our variables to be trained.
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\setcounter{enumi}{1}
+\item
+  \emph{Advance Payments for Future Sales}
+\end{enumerate}
+
+Advance payments received from customers for future sales
+(AdvPS\textsubscript{t}) are modeled as a direct proportion of the
+current year\textquotesingle s total sales. This assumes that the volume
+of upfront customer payments scales linearly with overall revenue
+generation. Therefore, we define:
+
+\begin{equation}\label{eq:advps}
+\text{AdvPS}_t = \text{\%AdvPS} \cdot \text{Sales}_t
+\end{equation}
+
+We add \%AdvPS to our variables to be trained.
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\setcounter{enumi}{2}
+\item
+  \emph{Current Liabilities}
+\end{enumerate}
+
+\emph{From Part 1:}
+
+To model the current liabilities, we first model the effective
+short-term loan (STLoan\textsubscript{t}) issued this year. Short-term
+loan covers any excess cash needed to cover operational expenses and
+last year's short-term loan obligation (principal + interest) due this
+year and bring the total liquidity to this year's liquidity target. We
+also account for the return from investment in market securities here
+because the size of investment is directly proportional to cash,
+\textbf{instead of} investing excess cash after ST and LT loan
+calculations which is done in \hyperlink{ref:pareja09}{Pareja(09)}:
+
+\begin{multline}\label{eq:st_cash_deficit}
+\text{Short-term cash deficit}_t = \text{TL}_t - \text{TL}_{t-1} - \text{Operating NLB}_t \\
++ \text{STLoan}_{t-1} \cdot (1 + \text{\%AvgSTInt}) - \text{\%MSReturn} \cdot \text{IMS}_{t-1}
+\end{multline}
+
+\begin{equation}\label{eq:stloan}
+\text{STLoan}_t = \max(0,\; \text{Short-term cash deficit}_t)
+\end{equation}
+
+Then, we calculate the effective long-term loan
+(LTLoan\textsubscript{t}) issued this year to finance
+CapEx\textsubscript{t}, last year's current portion of the long-term
+liability, interest on long-term liability, and dividends to bring the
+liquidity to this year's target after accounting for the equity
+financing:
+
+\begin{multline}\label{eq:ltloan}
+\text{LTLoan}_t = \max(0,\; \text{Short-term cash deficit}_t - \text{STLoan}_t - \text{CapEx NLB}_t \\
++ \text{NLiab}_{t-1} / (\text{AvgM} - 1) + \text{AvgLTInt}_t + \text{Dividends}_{t-1} + \text{Stock buybacks}_t) \cdot (1 - \text{\%EF})
+\end{multline}
+
+Current liabilities are summation of the effective short-term loan and
+the current portion of non-current liabilities, and are represented by:
+
+\begin{equation}\label{eq:cliab}
+\text{CLiab}_t = \text{STLoan}_t + \text{Total LT liability}_t / \text{AvgM}
+\end{equation}
+
+where
+
+\begin{equation}\label{eq:total_lt_liability}
+\text{Total LT liability}_t = \text{LTLoan}_t + \text{NLiab}_{t-1}
+\end{equation}
+
+\emph{Post Part 1:}
+
+We adjust how we model the current liabilities to better fit Apple's
+historical data.
+
+\subsubsection{Modeling Effective Short-Term
+Debt}\label{modeling-effective-short-term-debt}
+
+\ul{The Problem}
+
+A strictly deficit-driven approach calculates new short-term loans as a
+reaction to cash shortfalls. This forces short-term borrowing to zero
+when a company has surplus liquidity. However, in reality, large
+corporations (e.g., Apple) strategically carry significant commercial
+paper and revolving credit lines (\$45B--\$88B) despite holding massive
+cash reserves.
+
+The forecasted Current and non-current liabilities thus fall to zero:
+
+\includegraphics[width=\textwidth]{report_latex_media/media/image1.png}
+
+\ul{Defining the Metric}
+
+Effective short-term debt isolates the operational and short-term
+financing liabilities that scale directly with the size of the business,
+stripping out strict trade payables and the current portion of long-term
+debt.
+
+The balance sheet identity is defined as:
+
+\begin{multline}\label{eq:eff_st_debt_identity}
+\text{Effective ST Debt}_t = \text{Current Liabilities}_t - \text{Accounts Payable}_t \\
+- \text{Advance Payments Sales}_t - \text{Current LT Debt}_t
+\end{multline}
+
+Which equates to the core components we are modeling:
+
+\begin{equation}\label{eq:eff_st_debt_components}
+\text{Effective ST Debt}_t = \text{ST Debt}_t + \text{Accrued Expenses}_t + \text{Other Current Liabilities}_t
+\end{equation}
+
+\ul{The Solution \& Implementation}
+
+To reflect actual corporate financing behavior, effective short-term
+debt is now modeled as a policy-driven metric rather than a
+deficit-driven reaction. It is projected as a logit-linear ratio of
+sales, mirroring the methodology used for the cost ratio and target
+liquidity.
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\item
+  \textbf{Logit-Linear Trend:} We calculate the target short-term debt
+  as a percentage of sales using a sigmoid function over the time index
+  t. This utilizes the learned parameters $\alpha$\textsubscript{ST\_Debt} and
+  $\beta$\textsubscript{ST\_Debt}:
+\end{enumerate}
+
+\begin{equation}\label{eq:pct_stdebt_sigmoid}
+\text{\%STDebt}_t = \text{sigmoid}(\alpha_{\text{ST\_Debt}} + t \cdot \beta_{\text{ST\_Debt}})
+\end{equation}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\setcounter{enumi}{1}
+\item
+  \textbf{Effective ST Debt Calculation:} The actual target volume is
+  then derived directly from the forecasted sales for that period:
+\end{enumerate}
+
+\begin{equation}\label{eq:eff_st_debt_calc}
+\text{Effective ST Debt}_t = \text{Sales}_t \cdot \text{\%STDebt}_t
+\end{equation}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\setcounter{enumi}{2}
+\item
+  \textbf{Liquidity Cascade:} Because short-term debt is now an
+  established structural policy, it acts as an \emph{input} to the
+  long-term liquidity deficit. The calculated effective short-term debt
+  funds a portion of the required capital, shifting the role of the
+  purely deficit-driven "plug" entirely to the long-term financing
+  variable.
+
+  \begin{enumerate}
+  \def\labelenumii{\arabic{enumii}.}
+  \item
+    \emph{Non-current Liabilities}
+  \end{enumerate}
+\end{enumerate}
+
+Non-current liabilities include the new effective
+LTLoan\textsubscript{t} issued this year, and last year's non-current
+liabilities minus the current portion of this year's non-current
+liabilities.
+
+\begin{equation}\label{eq:nliab}
+\text{NLiab}_t = \text{Total LT liability}_t \cdot (1 - 1/\text{AvgM})
+\end{equation}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\item
+  \ul{Equity}
+\end{enumerate}
+
+This year's equity accounts for the additional equity financing this
+year, net income from this year, dividends paid out this year, and stock
+buyback this year:
+
+\begin{equation}\label{eq:stockholder_equity}
+\text{SE}_t = \text{SE}_{t-1} + \text{EF}_t + \text{NI}_t - \text{Dividends}_{t-1} - \text{BB}_t
+\end{equation}
+
+where
+
+\begin{equation}\label{eq:ef}
+\text{EF}_t = \text{LTLoan}_t / (1 - \text{\%EF}) \cdot \text{\%EF}
+\end{equation}
+
+\begin{equation}\label{eq:dividends}
+\text{Dividends}_{t-1} = \text{\%PR} \cdot \text{NI}_{t-1}
+\end{equation}
+
+\begin{equation}\label{eq:bb}
+\text{BB}_t = \text{\%BB} \cdot \text{\%Depreciation} \cdot \text{NCA}_{t-1} + \text{any excess cash after meeting liquidity target}
+\end{equation}
+
+We have most of what we need to learn the training variables except
+dividends and income tax, which will come from modeling the net income
+in the income statement.
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\setcounter{enumi}{1}
+\item
+  \ul{Income Statement}
+\end{enumerate}
+
+We have all the components needed from the previous sections to
+construct the elements related to net income.
+
+EBITDA\textsubscript{t} (earnings before interest, taxes, depreciation,
+and amortization) can be calculated by:
+
+\begin{equation}\label{eq:ebitda}
+\text{EBITDA}_t = \text{Sales}_t - \text{COGS}_t - \text{OpEx}_t
+\end{equation}
+
+Earnings before tax is calculated by subtracting interest payments,
+depreciation (and amortization):
+
+\begin{equation}\label{eq:ebt}
+\text{EBT}_t = \text{EBITDA}_t - \text{Depreciation}_t - \text{AvgSTInt}_t - \text{AvgLTInt}_t + \text{\%MSReturn} \cdot \text{IMS}_{t-1}
+\end{equation}
+
+Net income (NI\textsubscript{t}) is determined by subtracting the income
+tax:
+
+\begin{equation}\label{eq:net_income}
+\text{NI}_t = \text{EBT} \cdot (1 - \text{\%IT})
+\end{equation}
+
+Next year's dividends were already modeled in \eqref{eq:target_dividends}
+
+$\text{Dividends}_t = \text{\%PR} \cdot \text{NI}_t$ from \eqref{eq:target_dividends}
+
+We now have everything we need to represent every element in the balance
+sheet as a time series.
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\setcounter{enumi}{2}
+\item
+  \textbf{Time Series Representation of the Balance Sheet}
+\end{enumerate}
+
+We re-write every element in the balance sheet as a time series that
+have been simplified by combining the equations above. The primary
+drivers are Sales\textsubscript{t} and Purchases\textsubscript{t}, which
+drive every element given the variables to be trained are learned.
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\item
+  \ul{Variables to be trained}
+\end{enumerate}
+
+\begin{itemize}
+\item
+  \%AG : Asset growth rate as a percentage of non-current assets
+\item
+  \%AM : Asset maintenance ratio as a percentage of depreciation
+\item
+  \%Depr : Depreciation rate as a percentage of non-current assets
+\item
+  \%AdvPS : Advance payments from customers as a percentage of next
+  year's sales
+\item
+  \%AdvPP : Advance payments to suppliers as a percentage of next year's
+  purchases
+\item
+  \%AR : Account receivables as a percentage of this year's sales
+\item
+  \%AP : Account payables as a percentage of this year's purchases
+\item
+  \%Inv : Inventory target as a percentage of this year's sales
+\item
+  $\alpha$\textsubscript{CR} and $\beta$\textsubscript{CR} : Variables that make up
+  the Cost Ratio via logit model
+
+  \begin{itemize}
+  \item
+    logit(CR\textsubscript{t}) = ln ( CR\textsubscript{t} / (1 --
+    CR\textsubscript{t}) ) = $\alpha$\textsubscript{CR} + $\beta$\textsubscript{CR} *
+    t
+  \end{itemize}
+\item
+  \%TL : Total liquidity as a percentage of this year's sales
+\item
+  \%Cash : Cash as a percentage of total liquidity
+\item
+  \%IT : Income tax as a percentage of net income this year
+\item
+  \%OR : Variable portion of OpEx that increases in proportion to this
+  year's sales
+\item
+  OB\textsubscript{T\_start} : Baseline OpEx that increases with this
+  year's average inflation
+\item
+  $\alpha$\textsubscript{ST\_Debt} and $\beta$\textsubscript{ST\_Debt} : parameters
+  for sigmoid function for calculating Effective ST debt
+\item
+  \%AvgSTInt : Average short-term interest on the effective short-term
+  loan
+\item
+  \%AvgLTInt : Average interest on total long-term liabilities
+\item
+  AvgM : Average maturity of total long-term liability
+\item
+  \%MSReturn : Percentage return on the investment in market securities
+\item
+  \%EF : Equity financing as a percentage of total excess cash needed
+  after accounting for long-term investments and long-term obligations
+\item
+  \%PR : Dividends payout ratio as a percentage of net income this year,
+  paid next year
+\item
+  Adj. speed : Speed at which to adjust the dividends amount paid next
+  year
+\item
+  \%BB : Stock buyback as a percentage of asset depreciation this year
+
+  \begin{enumerate}
+  \def\labelenumi{\arabic{enumi}.}
+  \item
+    \ul{Parameter Constraints and Bounds}
+  \end{enumerate}
+\end{itemize}
+
+To ensure the model generates economically logical and mathematically
+stable financial statements, strict constraints are enforced on both the
+trainable variables and the underlying equations. These constraints are
+implemented natively within the optimizer using TensorFlow Probability
+Bijectors.
+
+\textbf{1. Domain Constraints on Trainable Variables}
+
+\begin{itemize}
+\item
+  \textbf{Strict Positivity (\$x \textgreater{} 0\$):} Variables that
+  cannot logically be negative, such as the Depreciation Rate (\%Depr),
+  Asset Growth (\%AG), and Interest Rates (\%AvgSTInt, \%AvgLTInt), are
+  constrained using a Softplus activation function. This prevents the
+  optimizer from testing negative rates during gradient descent.
+\item
+  \textbf{Percentage Bounds (\$0 \textless{} x \textless{} 1\$):}
+  Variables representing fractions of a whole, such as the Income Tax
+  Percentage (\%IT), Dividend Payout Ratio (\%PR), and the Lintner
+  Dividend Adjustment Speed (\$\textbackslash alpha\$), are constrained
+  using a Sigmoid function.
+\item
+  \textbf{Maturity Boundary (\$AvgM \textgreater{} 1.001\$):} Because
+  the calculation for the current portion of long-term debt divides by
+  \$(AvgM - 1)\$, the average maturity must strictly exceed 1 year to
+  prevent mathematical singularity and infinite liability generation.
+  This is enforced using a chained bijector: a Softplus function shifted
+  by a constant of 1.001.
+\end{itemize}
+
+\begin{itemize}
+\item
+  \textbf{Trended Ratios:} Time-varying policies, such as the Cost Ratio
+  (CR) and Effective Short-Term Debt percentage, are modeled as
+  logit-linear trends. By wrapping the linear trend
+  \$(\textbackslash alpha + \textbackslash beta t)\$ in a sigmoid
+  function, the forecasted ratios are strictly bounded between 0 and 1,
+  even if extrapolated decades into the future.
+\end{itemize}
+
+\textbf{2. Logical Constraints on Equations}
+
+\begin{itemize}
+\item
+  \textbf{Non-Negative Borrowing:} A company cannot issue "negative"
+  debt to reduce cash. In the Liquidity Budget equations, the issuance
+  of new short-term and long-term loans is constrained using a maximum
+  function: \$New\textbackslash\_Loan\_t = \textbackslash max(0,
+  Liquidity\textbackslash\_Deficit\_t)\$. If there is a cash surplus,
+  borrowing falls to exactly zero, and the excess cash cascades into
+  stock buybacks.
+\item
+  \textbf{Structural Identity Check:} The fundamental accounting
+  equation (\$Assets = Liabilities + Equity\$) is strictly evaluated at
+  every time step \$t\$. Rather than enforcing this via a loss function
+  penalty (which would allow minor deviations), it is enforced
+  structurally by the double-entry routing of the Cash Budget. The
+  simulation calculates a delta to verify that the mismatch is exactly
+  zero.
+
+  \begin{enumerate}
+  \def\labelenumi{\arabic{enumi}.}
+  \item
+    \ul{Variables from External Environment}
+  \end{enumerate}
+\end{itemize}
+
+Since we assume a flat short-term and long-term interest for loans and
+return on market securities, the only external variable is inflation.
+
+\begin{itemize}
+\item
+  Inflation\textsubscript{t} : Average inflation at year t
+
+  \begin{enumerate}
+  \def\labelenumi{\arabic{enumi}.}
+  \item
+    \ul{Assets}
+  \end{enumerate}
+\item
+  Non-current assets
+
+  \begin{itemize}
+  \item
+    NCA\textsubscript{t} = NCA\textsubscript{t-1} --
+    Depreciation\textsubscript{t} + CapEx\textsubscript{t}
+
+    \begin{itemize}
+    \item
+      Where CapEx\textsubscript{t} = Depreciation\textsubscript{t} +
+      Sales\textsubscript{t} * \%AG
+    \end{itemize}
+  \end{itemize}
+\item
+  Advance payments to suppliers for purchases
+
+  \begin{itemize}
+  \item
+    AdvPP\textsubscript{t} = \%AdvPP * Purchases\textsubscript{t}
+  \end{itemize}
+\item
+  Account receivables
+
+  \begin{itemize}
+  \item
+    AR\textsubscript{t} = \%AR * Sales\textsubscript{t}
+  \end{itemize}
+\item
+  Inventory
+
+  \begin{itemize}
+  \item
+    Inv\textsubscript{t} = \%Inv * Sales\textsubscript{t}
+  \end{itemize}
+\item
+  Total liquidity (\textbf{TL\textsubscript{t}})
+
+  \begin{itemize}
+  \item
+    Target TL\textsubscript{t} = \%TL * Sales\textsubscript{t}
+
+    \begin{itemize}
+    \item
+      Investments in market securities
+
+      \begin{itemize}
+      \item
+        IMS\textsubscript{t} = (1 - \%Cash) * TL\textsubscript{t}
+      \end{itemize}
+    \item
+      Cash equivalent
+
+      \begin{itemize}
+      \item
+        Cash\textsubscript{t} = \%Cash * TL\textsubscript{t}
+      \end{itemize}
+    \end{itemize}
+  \item
+    Should be equivalent to: Final TL\textsubscript{t} = Operating
+    NLB\textsubscript{t} + CapEx NLB\textsubscript{t} + Financing
+    NLB\textsubscript{t} + External investment NLB\textsubscript{t} +
+    Owners transactions NLB\textsubscript{t}
+  \end{itemize}
+
+  \begin{enumerate}
+  \def\labelenumi{\arabic{enumi}.}
+  \item
+    \ul{Liabilities}
+  \end{enumerate}
+\item
+  Account payables
+
+  \begin{itemize}
+  \item
+    AP\textsubscript{t} = \%AP * Purchases\textsubscript{t}
+  \end{itemize}
+\item
+  Advance payments from customers for sales
+
+  \begin{itemize}
+  \item
+    AdvPS\textsubscript{t} = \%AdvPS * Sales\textsubscript{t}
+  \end{itemize}
+\item
+  Current liabilities
+
+  \begin{itemize}
+  \item
+    CLiab\textsubscript{t}
+  \end{itemize}
+\end{itemize}
+
+\begin{quote}
+= STLoan\textsubscript{t} + NLiab\textsubscript{t} / (AvgM -- 1)
+
+where
+\end{quote}
+
+\begin{itemize}
+\item
+  STLoan\textsubscript{t} = max(0, STCashDeficit\textsubscript{t})
+\item
+  STCashDeficit\textsubscript{t} = TL\textsubscript{t} --
+  TL\textsubscript{t-1} -- Operating NLB\textsubscript{t} +
+  STLoan\textsubscript{t-1} * (1 + \%AvgSTInt) -- \%MSReturn *
+  IMS\textsubscript{t-1}
+\item
+  STLoan\textsubscript{t-1} = CLiab\textsubscript{t-1} -
+  NLiab\textsubscript{t-1} / (AvgM -- 1)
+\item
+  Operating NLB\textsubscript{t} = AR\textsubscript{t-1} +
+  AdvPS\textsubscript{t} + Sales\textsubscript{t} * (1 - \%AR - \%AdvPS)
+  -- (AP\textsubscript{t-1} + AdvPP\textsubscript{t} +
+  Purchases\textsubscript{t} * (1 - \%AP - \%AdvPP) +
+  OpEx\textsubscript{t} + IT\textsubscript{t})
+\item
+  AP\textsubscript{t-1} = \%AP * Purchases\textsubscript{t-1}
+\item
+  AdvPP\textsubscript{t} = \%AdvPP * Purchases\textsubscript{t}
+\item
+  OpEx\textsubscript{t} = \%OR * Sales\textsubscript{t} +
+  OB\textsubscript{t-1} * (1 + Inflation\textsubscript{t})
+\item
+  IT\textsubscript{t} = NI\textsubscript{t} / (1/\%IT - 1)
+\item
+  AR\textsubscript{t-1} = \%AR * Sales\textsubscript{t-1}
+\item
+  AdvPS\textsubscript{t} = \%AdvPS * Sales\textsubscript{t}
+\end{itemize}
+
+\begin{itemize}
+\item
+  Non-current liabilities
+
+  \begin{itemize}
+  \item
+    NLiab\textsubscript{t}
+  \end{itemize}
+\end{itemize}
+
+\begin{quote}
+= (LTLoan\textsubscript{t} + NLiab\textsubscript{t-1}) * (AvgM --
+1)/AvgM
+
+where
+\end{quote}
+
+\begin{itemize}
+\item
+  LTLoan\textsubscript{t} = (max(0, STCashDeficit\textsubscript{t} --
+  STLoan\textsubscript{t} -- CapEx NLB\textsubscript{t} +
+  NLiab\textsubscript{t} / (AvgM -- 1) + AvgLTInt\textsubscript{t} +
+  Dividends\textsubscript{t-1} + Stock buybacks\textsubscript{t}) * (1 -
+  \%EF)
+\item
+  CapEx NLB\textsubscript{t} = NCA\textsubscript{t-1} * \%Depr + \%AG *
+  Sales\textsubscript{t}
+\item
+  Dividends\textsubscript{t-1} = \%PR * NI\textsubscript{t-1}
+\item
+  NI\textsubscript{t-1} : net income from last year
+\end{itemize}
+
+\begin{quote}
+= (1 - \%IT) * (Sales\textsubscript{t-1} -- COGS\textsubscript{t-1} --
+OpEx\textsubscript{t-1} -- Depreciation\textsubscript{t-1} --
+AvgSTInt\textsubscript{t-1} -- AvgLTInt\textsubscript{t-1} + \%MSReturn
+* (1 - \%Cash) * TL\textsubscript{t-1})
+\end{quote}
+
+\begin{itemize}
+\item
+  TL\textsubscript{t-1} = Total liquidity last year.
+\item
+  COGS\textsubscript{t-1} = \%Inv * (Sales\textsubscript{t-2} --
+  Sales\textsubscript{t-1}) + Purchases\textsubscript{t-1}
+\item
+  OpEx\textsubscript{t-1} = \%OR * Sales\textsubscript{t-1} +
+  OB\textsubscript{t-2} * (1 + Inflation\textsubscript{t-1})
+\item
+  Depreciation\textsubscript{t} = NCA\textsubscript{t-1} * \%Depr
+\item
+  AvgSTInt\textsubscript{t} = \%AvgSTInt * (CLiab\textsubscript{t-t} --
+  NLiab\textsubscript{t-t} / (AvgM -- 1))
+\item
+  AvgLTInt\textsubscript{t} = \%AvgLTInt * (NLiab\textsubscript{t-1} /
+  (1 -- 1/AvgM))
+\item
+  Stock buybacks\textsubscript{t} = \%BB * Depreciation\textsubscript{t}
+  + excess cash after meeting liquidity target
+\end{itemize}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\item
+  \ul{Equity}
+\end{enumerate}
+
+\begin{itemize}
+\item
+  Stockholder equity
+
+  \begin{itemize}
+  \item
+    SE\textsubscript{t}
+  \end{itemize}
+\end{itemize}
+
+\begin{quote}
+= SE\textsubscript{t-1} + LTLoan\textsubscript{t} / (1 - \%EF) * \%EF +
+NI\textsubscript{t} -- \%PR * NI\textsubscript{t-1} -- \%BB * \%Depr *
+NCA\textsubscript{t-1} -- excess cash after meeting liquidity target
+\end{quote}
+
+We see in all elements' equations that they are driven by Sales and
+Purchases and elements from previous years, indicating no circularity or
+plugs. The net liquidity balance calculation and the new short-term and
+long-term borrowing equations ensure that the assets and liabilities +
+equity are increased/decreased the same. Thus, assets = liabilities +
+equity will always be satisfied. We can check with test values in our
+simple TensorFlow model.
+
+This forward model has been implemented in Python in
+\textbf{simple\_financial\_model.py} using data from Apple's financial
+statements. The financial statements were first obtained from Yahoo
+finance as suggested by Question 4 (we wrote the script in
+\textbf{yahoofinance.py}), but we could only access past 4 years of
+data, which is not sufficient for training in the following section. We
+managed to obtain older financial data by directly pulling from Apple's
+10-K filings. The script that we wrote and used for the data extraction
+is found in \textbf{sec-edgar-download-extractor.py.}
+
+The following is the output of the code when run with: python
+.\textbackslash simple\_financial\_mode.py :
+
+\includegraphics[width=4.67615in,height=0.9667in]{report_latex_media/media/image2.png}
+
+Even without using any plugs, we see that the assets = liabilities +
+equity identity is satisfied because our model follows the double-entry
+principle with any inflows and outflows on the balance sheet as done by
+\hyperlink{ref:pareja09}{Pareja(09)}.
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\setcounter{enumi}{3}
+\item
+  \textbf{Training the Model}
+\end{enumerate}
+
+Out of the variables to be trained, there are quite a few that are
+easily trained independently from other variables by looking at balance
+sheets and income statements. We first note the primary driver for our
+model:
+
+\begin{itemize}
+\item
+  Sales\textsubscript{t} : Total revenue in balance sheet
+\end{itemize}
+
+We can train the rest of the variables like the following:
+
+\begin{itemize}
+\item
+  \%AG, \%AM : Learn from change in all non-current assets in balance
+  sheet
+\item
+  \%Depr : Learn from depreciation in income statement and non-current
+  assets in balance sheet
+\item
+  $\alpha$\textsubscript{CR} , $\beta$\textsubscript{CR} : Learn from COGS and Sales
+  data
+\item
+  \%AR : Learn from Sales and account receivables data in balance sheet
+\item
+  \%AP : Learn from Purchases and account payables data in balance sheet
+\item
+  \%AdvPS : Learn from current deferred revenue data and current year's
+  Sales in balance sheet
+\item
+  \%AdvPP : Learn from Purchases and current other assets in balance
+  sheet
+\item
+  \%Inv : Learn from inventory data in balance sheet
+\item
+  \%Cash : Learn from short-term investments in balance sheet
+\item
+  \%TL : Learn from revenue and Cash Equivalents And Short Term
+  Investments in balance sheet
+\item
+  \%IT : Learn from net income and tax provision in income statement
+\item
+  \%OR, OB\textsubscript{T\_start} : Learn from inflation data and
+  operating expense in income statement
+\item
+  \%PR, Adj. Speed : Learn from common stock dividends in Cash Flow and
+  net income in income statement
+\item
+  \%BB : Learn from Repurchase Of Capital Stock and depreciation in Cash
+  Flow
+\end{itemize}
+
+Each of the variables above can be related to an element from Cash Flow,
+Balance Sheet, or Income Statement, and can be trained with a simple
+mean-square-error minimization for each.
+
+The following variables (i.e. structural parameters) can be trained
+together using the above trained variables:
+
+\begin{itemize}
+\item
+  \%AvgSTInt : Average short-term interest on the effective short-term
+  loan
+\item
+  \%AvgLTInt : Average interest on total long-term liabilities
+\item
+  AvgM : Average maturity of total long-term liability
+\item
+  \%MSReturn : Percentage return on the investment in market securities
+\item
+  \%EF : Equity financing as a percentage of total excess cash needed
+  after accounting for long-term investments and long-term obligations
+\end{itemize}
+
+Using net income, interest payments, return from investment in market
+securities, stockholders equity and current and non-current
+liabilities data, we can train AvgM, \%AvgSTInt, \%AvgLTInt, \%MSReturn,
+and \%EF concurrently via simple gradient while minimizing mean-square
+error between predicted and actual net income, stockholders equity,
+current liabilities, and non-current liabilities.
+
+The code has been implemented in trainable\_financial\_model.py. For
+this simple training model, \%AM = 100\% and Purchases are also used
+together with Sales as dual driver.
+
+In order to test the model's prediction capability, we train the
+parameters from Apple's 2018\textasciitilde2024 data, predict 2025 data,
+and compare it with the actual data. The following is the output after
+running \textbf{trainable\_financial\_model.py}:
+
+\includegraphics[width=\textwidth]{report_latex_media/media/image3.png}
+
+It shows a modest prediction ability, which is unsurprising because we
+have lumped various balance sheet elements together to form several
+elements to be more consistent with models described in \hyperlink{ref:pareja07}{Pareja(07)} and
+\hyperlink{ref:pareja09}{Pareja(09)}, as we have explained in \textbf{1. The Balance Sheet
+Elements}. Also, there is a limitation of assuming a liquidity balance
+(cash + investment in market securities) that varies linearly with
+sales, especially for a cash-rich company like Apple whose cash balance
+and stock buybacks are governed by the recent buyback programs in order
+to reduce its cash balance instead of being proportional to asset
+depreciation, which is done here as done by \hyperlink{ref:pareja09}{Pareja(09)}.
+
+Our model can also forecast earnings because net income is automatically
+calculated when predicting the elements on the balance sheet, and is
+outputted as ``net\_income'' as shown above.
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\setcounter{enumi}{4}
+\item
+  \textbf{Applying Machine Learning}
+\end{enumerate}
+
+As our model is rather a simple model based on \hyperlink{ref:pareja09}{Pareja(09)}, there is a lot
+of improvements that could make the model more performant. A short list
+of potential improvements is as follows:
+
+\begin{itemize}
+\item
+  Predicting purchases and sales of future years using Long Short-Term
+  Memory and macroeconomic indicators (e.g., inflation, interest rate)
+\item
+  Implementing Bayesian model to account for probability distribution of
+  accounting variables (e.g., company policy for capital expenditure,
+  operating expense prediction, cash balance targets) to account for the
+  noise term, n(t).
+\item
+  Implementing neural networks for each accounting variables that take
+  into consideration macroeconomic signals (e.g., incorporate consumer
+  price index, GDP growth, and interest rates to predict advance
+  purchases percentage)
+\item
+  Incorporating the company's stock buyback target if it has been
+  disclosed publicly into training the buyback ratio with a neural
+  network
+\end{itemize}
+
+For our model, we choose to implement Bayesian learning with Variational
+Inference method \hyperlink{ref:durr20}{[Dürr(20)]} to train the operational expense because
+
+\begin{enumerate}
+\def\labelenumi{\alph{enumi}.}
+\item
+  OpEx is influential in the net income value
+\item
+  OpEx, in our model, is heavily influenced by sales revenue, which is
+  one of the main drivers in our model, up to 23\%
+\end{enumerate}
+
+Applying Variational Inference allows us to model the aleatoric and
+epistemic uncertainties of OpEx by calculating the posterior
+distribution of OpEx's linear regression parameters given the past OpEx,
+sales, and inflation data instead of a singular set of parameters (i.e.,
+slope and offset) that a simple linear regression gives you. It allows
+us to predict the OpEx, and therefore the earnings and other balance
+sheet elements, with a confidence interval.
+
+Most of the code from trainable\_financial\_model.py remains unchanged
+except how we model the OpEx during training. The following updates are
+made:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\item
+  Bayesian Conversion: Replaced the deterministic \%OR and
+  OB\textsubscript{T\_start} variables with Variational Posteriors.
+\end{enumerate}
+
+\begin{itemize}
+\item
+  We learn a Mean ($\mu$) and a Standard Deviation($\sigma$) for each of these
+  variables.
+\item
+  During training/inference, we sample their values from their
+  distributions:
+
+  \begin{itemize}
+  \item
+    Value = $\mu$ + $\sigma$ * $\epsilon$, where $\epsilon$ $\sim$$\mathcal{N}$(0, 1)
+  \end{itemize}
+\end{itemize}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\setcounter{enumi}{1}
+\item
+  Loss Function: Replaced the simple Mean Squared Error (MSE) for OpEx
+  with Negative Log Likelihood + KL Divergence.
+\end{enumerate}
+
+\begin{itemize}
+\item
+  This balances fitting the data (Likelihood) with keeping the
+  distribution close to our prior beliefs (KL).
+\end{itemize}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\setcounter{enumi}{2}
+\item
+  Monte Carlo Simulation: Added a run\_monte\_carlo\_forecast function.
+  Instead of predicting one single Net Income line, we run the forecast
+  1,000 times, sampling different OpEx values each time, to generate
+  Confidence Intervals.
+\end{enumerate}
+
+So, to answer the `Hint', we are improving the model such that when we
+predict the earnings (i.e. net income), we can now model n(t) with the
+confidence intervals given by the Monte Carlo simulation. After we have
+trained all the variables, they become the very function that take in
+this year's y(t) and input x(t) to predict y(t+1). The input x(t)
+includes the primary drivers, which are sales and purchases time series,
+and inflation, which is the external environment variable that we
+include in the model for predicting the operating expense.
+
+{\sloppy We implemented the updated Bayesian model in \textbf{trainable\_financial\_model\_taxanomaly\_effstdebt\_bayesian\_vi\_refactored.py}
+with the include\_tax\_anomalies = False, and the output is reproduced
+below:\par}
+
+\noindent\rule{\textwidth}{0.4pt}
+
+\begin{lstlisting}[style=console]
+Simple parameters:
+
+Final %AG: 0.00000
+Final %AM: 0.94062
+Final %Depr: 0.05553
+Final %AdvPS: 0.02126
+Final %AdvPP: 0.07840
+Final %AR: 0.15866
+Final %AP: 0.30794
+Final %Inv: 0.01603
+Total Liquidity (baseline + logit-linear): baseline=0.6013, alpha=-2.3463, beta=-0.411579
+=> %TL at t=0: 0.0874, %TL at t=7: 0.0053
+Cash % of Liquidity (logit-linear): alpha=-0.2235, beta=0.032385
+=> %Cash at t=0: 0.4444, %Cash at t=7: 0.5008
+Final %IT: 0.17021
+Final %PR: 0.99969
+Final DivAdjSpeed (alpha): 0.00371
+Stock Buyback (baseline + ratio*depr): baseline=1.5540, ratio=-6.610795
+Effective ST Debt % of Sales (logit-linear): alpha=-1.7458, beta=0.059738
+=> %EffSTDebt at t=0: 0.1486, %EffSTDebt at t=7: 0.2095
+Cost Ratio (logit-linear): alpha=0.3459, beta=-0.0475
+=> CR at t=0: 0.5856, CR at t=7: 0.5034
+Bayesian OpEx Variable %: Mean=0.0923, Std=0.0155
+Bayesian OpEx Baseline (USD): Mean=3.91e+10, Std=8.09e+08
+OpEx aleatoric uncertainty (USD): 2.49e+09
+\end{lstlisting}
+
+\noindent\rule{\textwidth}{0.4pt}
+
+\begin{lstlisting}[style=console]
+Structural parameters:
+
+Final %AvgSTInt: 0.03970
+Final %AvgLTInt: 0.00692
+Final AvgM: 15.36485
+Final %MSReturn: 0.01119
+Equity Financing % (logit-linear): alpha=0.5389, beta=0.018432
+=> %EF at t=0: 0.6316, %EF at t=7: 0.6610
+\end{lstlisting}
+
+\noindent\rule{\textwidth}{0.4pt}
+
+The Operation Expense learned with Bayesian Variational Inference is as
+follows:
+
+\includegraphics[width=\textwidth]{report_latex_media/media/image4.png}
+
+And the net income now has a confidence level due to the noise term, and
+we see that the uncertainty increases the further the forecast year as
+expected for Variational Inference model's increasing epistemic
+uncertainty outside of the training range:
+
+\begin{lstlisting}[style=console]
+Net Income
+
+Year | Mean     | 2.5% CI  | 97.5% CI
+-----|----------|----------|----------
+2025 | 1.09e+11 | 1.04e+11 | 1.14e+11
+2026 | 1.20e+11 | 1.15e+11 | 1.25e+11
+2027 | 1.30e+11 | 1.25e+11 | 1.35e+11
+2028 | 1.41e+11 | 1.35e+11 | 1.47e+11
+2029 | 1.52e+11 | 1.46e+11 | 1.58e+11
+2030 | 1.63e+11 | 1.57e+11 | 1.70e+11
+2031 | 1.75e+11 | 1.68e+11 | 1.81e+11
+2032 | 1.87e+11 | 1.80e+11 | 1.95e+11
+2033 | 2.00e+11 | 1.92e+11 | 2.07e+11
+2034 | 2.12e+11 | 2.04e+11 | 2.20e+11
+\end{lstlisting}
+
+\includegraphics[width=\textwidth]{report_latex_media/media/image5.png}
+\includegraphics[width=\textwidth]{report_latex_media/media/image6.png}
+\includegraphics[width=\textwidth]{report_latex_media/media/image7.png}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\setcounter{enumi}{5}
+\item
+  \textbf{Projected Balance Sheet, Income Statement, and Cash Budget}
+\end{enumerate}
+
+We describe how we calculate the cash budget and income statement which
+are related to the balance sheet.
+
+We can start with the revenue on the income statement which appears at
+the top.
+
+Revenue is equivalent to Sales\_t.
+
+It is followed by operating costs, which include:
+
+\begin{itemize}
+\item
+  Cost of goods sold (COGS)
+\item
+  Operational expenses (OpEx such as administrative and sales)
+\item
+  Depreciation and amortization
+\end{itemize}
+
+EBIT (earnings before interests and taxes) is calculated by
+
+EBIT = Revenue -- COGS -- OpEx -- Depreciation
+
+Then, we account for interest payments and ST investment returns, which
+are used to calculate EBT (earnings before taxes):
+
+EBT = EBIT -- interest payments + ST returns
+
+Then, we assess the income tax by multiplying EBT by the effective tax
+rate:
+
+Income Taxes = EBT * \%EffTax
+
+Then, net income is found by subtracting the income taxes from EBT:
+
+Net Income = EBT -- Income Taxes
+
+From the net income, we allocate a percentage of it for dividends to be
+paid out next year, and the rest goes to cumulated retained earnings
+(CRE) which is part of equity:
+
+Next year dividends = Net Income * \%Payout
+
+CRE\_t = CRE\_t-1 + Net Income
+
+Cash Budget has 5 modules: Operating Activities, Investing Activities,
+External Financing, Transactions with Owners, and Discretionary
+Transactions.
+
+\textbf{Module 1: Operating Activities}
+
+\ul{Cash Inflows}
+
+Inflows from sales
+
+\emph{Total inflows = Inflows from sales}
+
+\ul{Cash Outflows}
+
+Payments for purchases = COGS
+
+Operational Expenses = OpEx
+
+Income Tax
+
+\emph{Total outflows = COGS + OpEx + Income Tax}
+
+\ul{Operating Net Cash Balance}
+
+= Total inflows -- Total outflows
+
+= Sales -- COGS -- OpEx -- Income Tax
+
+\textbf{Module 2: Investing Activities}
+
+\ul{Cash Inflow}
+
+\emph{Total inflows = 0}
+
+\ul{Cash Outflow}
+
+Investment in fixed assets = CapEx
+
+\emph{Total outflows = CapEx}
+
+\ul{Investing Net Cash Balance}
+
+= Inflow -- Outflow
+
+= -CapEx
+
+\textbf{Module 3: External Financing}
+
+\ul{Cash Inflows}
+
+ST loan
+
+LT loan
+
+\emph{Total inflows = ST loan + LT loan}
+
+\ul{Cash Outflows}
+
+ST principal payment
+
+ST interest
+
+LT principal payment
+
+LT interest
+
+\emph{Total outflows = ST principal + ST interest + LT principal + LT
+interest}
+
+\ul{Financing Net Cash Balance}
+
+= Inflow -- Outflow
+
+= ST loan + LT loan -- ST principal -- LT principal -- ST interest -- LT
+interest
+
+\textbf{Module 4: Transactions with Owners}
+
+\ul{Cash Inflows}
+
+Invested equity = Equity financing
+
+\emph{Total Inflows = Invested equity}
+
+\ul{Cash Outflows}
+
+Dividends from last year
+
+Stock Buyback
+
+\emph{Total Outflows = Dividends from last year + Stock buyback}
+
+\ul{Owners' Transaction Net Cash Balance}
+
+= Inflows -- Outflows
+
+= Equity financing -- Dividends from last year -- Stock buyback
+
+\textbf{Module 5: Discretionary Transactions}
+
+\ul{Cash Inflows}
+
+Return from ST investments
+
+\emph{Total inflows = Return from ST investments}
+
+\ul{Cash Outflows}
+
+No outflow because our model's policy allocates a fraction of total
+liquidity to ST investments instead of allocating excess cash to it
+
+\ul{Discretionary Transaction Net Cash Balance}
+
+= Inflows -- Outflows
+
+= Return from ST investments
+
+The forecasted 10 years (with inflation = 3\%, sales growing linearly at
+the historical rate of training data) of Balance Sheet, Income
+Statement, and Cash Budget is attached below:
+
+\includegraphics[width=\textwidth]{report_latex_media/media/image8.png}
+\includegraphics[width=\textwidth]{report_latex_media/media/image9.png}
+
+\includegraphics[width=\textwidth]{report_latex_media/media/image10.png}
+\includegraphics[width=\textwidth]{report_latex_media/media/image11.png}
+
+\textbf{\hfill\break
+}
+
+\textbf{Reviewer's Feedback}
+
+\emph{(1) You identified the principle of ``no plug'' and some
+accounting identities, such as non-current assets (NCA) being a function
+of depreciation and capex:}
+
+\emph{NCA\_t = NCA\_t-1 -- Depreciation\_t + CapEx\_t}
+
+\emph{However, later, while formulating the time-series model, you
+consider the non-current asset at time t to be driven by a ratio:}
+
+\emph{NCA\_t = NCA\_t-1 * (1 + \%AG)}
+
+\emph{Is it possible to design a workflow that fully respects the
+accounting identities (like the first equation) and can be driven by
+drivers?}
+
+\ul{Response:} Thank you for catching this mistake. This was a typo in
+the report; the actual script had the correct relationship of CapEx\_t =
+\%AG * Sales\_t . We fixed the typo in the report
+
+\emph{(2) What is the difference between the FIFO and LIFO principles in
+accounting? Under what circumstances will these two accounting choices
+make a difference? Is it possible to avoid using COGS as a plug?}
+
+\ul{Response:} FIFO (First-In, First-Out): Under FIFO, the oldest
+inventory costs are matched against current sales revenues.
+
+LIFO (Last-In, First-Out): Under LIFO, the most recent inventory costs
+are matched against current sales revenues.
+
+The most difference can arise from these two accounting standards when
+there is a rapid inflationary (deflationary) environment. Under FIFO,
+the cost ratio will be smoother and slightly lower (higher) than the
+actual current cost of replacement. Under LIFO, the cost ratio will be
+more volatile since the recent inventory cost is used, and it will
+tightly track the inflation (deflation) and will squeeze (grow) the
+margin immediately. Under inflation = 0\%, FIFO and LIFO should equal
+each other because old cost = new cost. Under high inflation, FIFO
+profit \textgreater{} LIFO profit.
+
+In our model, we avoid using COGS as a plug by updating it so that we
+learn the cost ratio (CR\textsubscript{t}) directly from the historical
+COGS and sales data by modeling cost ratio as a logit and learning the
+underlying parameters $\alpha$ and $\beta$ to ensure positivity :
+
+$\text{logit}(\text{CR}_t) = \ln(\text{CR}_t / (1 - \text{CR}_t)) = \alpha + \beta \cdot t$ (from \eqref{eq:cost_ratio_logit})
+
+$\text{CR}_t = \text{COGS}_t / \text{Sales}_t$
+(from \eqref{eq:cost_ratio})
+
+(3) Similar to (1), can you list out all the entities (rows) in the
+income statement, cash budget, and balance sheet (simplified versions
+are fine)? Then analyze how these three statements connect with each
+other. You may start with revenue on the income statement.
+
+Response: We now include the 10-year forecasted Balance Sheet, Income
+Statement, and Cash Budget in \textbf{6. Projected Balance Sheet, Income
+Statement, and Cash Budget.}
+
+\emph{(4) Advance payment is defined as: AdvPP\_t = \%AdvPP *
+Purchase\_t+1}
+
+\emph{Is it possible to remove the future dependency on this variable?
+It may break causal timing and introduce leakage during training. Are
+there alternative approaches to model this term?}
+
+\ul{Response:} We updated our model such that the advance payments for
+purchases (AdvPP) are proportional to this year's purchases instead of
+next year, with the justification:
+
+\begin{itemize}
+\item
+  From 2.1.3. Advance Payments for Purchases : ``Advance payments to
+  suppliers for purchases (\$AdvPP\$) can be modeled as strictly
+  proportional to the total purchases made during the current year. This
+  approach relies on the simplifying assumption that current purchasing
+  volumes serve as a reliable proxy for near-term future demand.''
+\end{itemize}
+
+Same is applied for advance payments from customers for sales (AdvPS):
+
+\begin{itemize}
+\item
+  From 2.3.2. Advance Payments for Future Sales: ``Advance payments
+  received from customers for future sales (\$AdvPC\$) are modeled as a
+  direct proportion of the current year\textquotesingle s total sales.
+  This assumes that the volume of upfront customer payments scales
+  linearly with overall revenue generation.''
+\end{itemize}
+
+\emph{(5) For CapEx, it's great that you split this term into
+maintenance capex and growth capex:}
+
+\emph{CapEx\_t = MaintenanceCapex\_t + GrowthCapex\_t}
+
+\emph{You further assume maintenance capex is tied to depreciation. This
+is a common approach when forecasting future cash flows by assuming a
+firm is in a steady state. What if the firm is not in a steady state?}
+
+\ul{Response:} We updated our model to handle the case where the asset
+replacement rate is not unitary (= 1.0). We reflect that change in the
+report as well:
+
+\begin{itemize}
+\item
+  From \emph{Non-Current Assets (NCA):} ``To model CapEx, we diverge
+  from a rigid steady-state assumption where maintenance perfectly
+  offsets depreciation. Instead, we decompose CapEx into a maintenance
+  component (scaled by a trainable parameter, \%AM, to reflect partial,
+  full, or inflationary replacement) and a growth component driven by
+  sales expansion:
+\end{itemize}
+
+$\text{CapEx}_t = \text{\%AM} \cdot \text{Depreciation}_t + \text{\%AG} \cdot \text{Sales}_t$ \eqref{eq:capex}''
+
+\emph{(6) In your report, the financing dynamics on debt are as
+follows:}
+
+\emph{Debt\_t-1 =\textgreater{} Interest\_t, PrincipalDue\_t
+=\textgreater{} deficit\_t =\textgreater{} Debt\_t}
+
+\emph{Can you plot the amount of debt and see whether the outcome is
+sensible?}
+
+\noindent\begin{minipage}{0.48\textwidth}\centering\includegraphics[width=\linewidth]{report_latex_media/media/image12.png}\end{minipage}\hfill\begin{minipage}{0.48\textwidth}\centering\includegraphics[width=\linewidth]{report_latex_media/media/image13.png}\end{minipage}
+
+\ul{Response:} We have plotted the forecasted debt levels (see above).
+The outcome is sensible and mathematically stable. We verified that the
+model does not fall into an explosive \textquotesingle debt
+spiral.\textquotesingle{} The financing dynamics converge realistically.
+
+Specifically for Apple, the model accurately captures two key trends:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\item
+  Short-Term Debt: The model predicts short-term debt scaling
+  proportionally with Sales. This correctly reflects
+  Apple\textquotesingle s real-world strategy of utilizing revolving
+  credit and commercial paper for working capital needs, despite
+  possessing a large cash balance.
+\item
+  Long-Term Debt: The forecast accurately continues the historical trend
+  of Apple slowly paying down its non-current liabilities.Ultimately,
+  the plot confirms that the endogenous deficit calculation handles debt
+  rollover gracefully without compounding errors.
+\end{enumerate}
+
+\emph{(7) Some rules seem a bit ad hoc. Is it possible to tie this to
+terms with a stronger financial relationship?}
+
+\ul{Response:} We can redefine our training variables from arbitrary
+percentages to these time-based efficiency metrics.
+
+Receivables: Instead of \%AR, we can train a target DSO (Days Sale
+Outstanding) parameter.
+
+AR\textsubscript{t} = DSO / 365 * Sales\textsubscript{t}
+
+Inventory: Inventory is a function of the cost to produce goods, not the
+final sales price. Tie it to COGS using DSI (Days Sales of Inventory)
+
+Inv\textsubscript{t} = DSI / 365 * COGS\textsubscript{t}
+
+Payables: We can use DPO (Days Purchases Outstanding) instead of \%AP:
+
+AP\textsubscript{t} = DPO / 365 * Purchases\textsubscript{t}
+
+(8) Can you specify the possible constraints for the variables and
+equations? Please add them to the report and implement them in the code.
+
+\ul{Response:} Thank you. We have added a new section \ul{Parameter
+Constraints and Bounds}
+
+\emph{(9) After you have trained the model, can you also perform
+inference and simulate a firm's financial statements for several years?}
+
+\ul{Response:} We now include the 10-year forecasted Balance Sheet,
+Income Statement, and Cash Budget in \textbf{6. Projected Balance Sheet,
+Income Statement, and Cash Budget.}
+
+(10) Remember to write test cases.
+
+Response: Thank you for the reminder. We wrote test cases for all the
+scripts appearing in this report:
+
+simple\_financial\_model.py
+
+trainable\_financial\_model.py
+
+llm-only-balance-sheet-forecast.py
+
+llm\_extract\_tax\_anomalies\_from\_pdf.py
+
+send\_reasoning\_prompt.py
+
+\ul{llm\_extract\_financial\_statement\_from\_pdf.py}
+
+llm\_extract\_json\_from\_financial\_statements.py
+
+The test scripts have `test\_' in front of each name.
+
+\textbf{Part 2}
+
+\begin{enumerate}
+\def\labelenumi{\alph{enumi})}
+\item
+  \textbf{LLM Selection and Infrastructure Setup}
+\end{enumerate}
+
+My favorite LLM is DeepSeek V3.2 for reasoning which has 128k context
+window and gpt-5-nano for non-reasoning task which has 400k context
+window. From my daily usage, DeepSeekV3.2 follows instructions well with
+less hallucinations than other models from competitors. Gpt-5-nano, from
+my experience, is an inexpensive model that performs well for pretty
+complicated tasks but hallucinates more. I use Microsoft's Azure Foundry
+to access these models via Azure API. We have set up an AWS Lambda
+function that makes the API calls so that we can hide the API keys for
+our Azure API. The AWS Lambda address is saved as an environment
+variable in a .env file, with its content being:
+
+{\small AZURE\_DEEPSEEK\_ENDPOINT=\url{https://dru54knwxa7sb4rlwrgws3kaze0jdvtj.lambda-url.us-west-1.on.aws/}}
+
+We have included the .env file in the zipped file attached with our
+report submission.
+
+\begin{enumerate}
+\def\labelenumi{\alph{enumi})}
+\setcounter{enumi}{1}
+\item
+  \textbf{LLM-Only Balance Sheet Forecasting}
+\end{enumerate}
+
+We can use the same input data from part 1 and feed it to DeepSeekV3.2
+to forecast the balance sheet, as done in
+llm-only-balance-sheet-forecast.py.
+
+\begin{quote}
+We use the following prompt with the identity check that assets =
+liabilities + equity:
+\end{quote}
+
+\begin{lstlisting}[style=python]
+prompt: Dict[str, Any] = {
+    "task": "Forecast all required financial elements for future years. "
+            "Return ONLY valid JSON (no markdown).",
+    "historical_facts": historical_rows,
+    "value_units": "trillions_of_usd",
+    "value_scale_to_usd": LLM_AMOUNT_SCALE,
+    "required_elements": ELEMENT_KEYS,
+    "accounting_identity": (
+        "inventory + nca + accounts_receivable + cash + "
+        "investment_in_market_securities + advance_payments_purchases = "
+        "accounts_payable + advance_payments_sales + current_liabilities + "
+        "non_current_liabilities + equity"
+    ),
+    "output_schema": {
+        "forecast": [
+            {
+                "inventory": "float",
+                "nca": "float",
+                "accounts_receivable": "float",
+                "cash": "float",
+                "investment_in_market_securities": "float",
+                "advance_payments_purchases": "float",
+                "accounts_payable": "float",
+                "advance_payments_sales": "float",
+                "current_liabilities": "float",
+                "non_current_liabilities": "float",
+                "equity": "float",
+                "dividends": "float",
+                "net_income": "float",
+                "sales": "float",
+                "cogs": "float",
+                "depreciation": "float",
+                "opex": "float",
+                "tax": "float",
+                "stock_buyback": "float",
+            }
+        ]
+    },
+}
+\end{lstlisting}
+
+The returned fields are further processed within the script
+\textbf{llm-only-balance-sheet-forecast.py} to ensure the balance sheet
+identity holds. The forecasted values are plotted below:
+
+\includegraphics[width=\textwidth]{report_latex_media/media/image14.png}
+
+\includegraphics[width=\textwidth]{report_latex_media/media/image15.png}
+
+We see in ``Stockholders' Equity'' graph that it drops to negative. This
+is because the LLM actually failed to return the projected balance sheet
+fields that abide by the accounting identity of assets = liabilities +
+equity, so the script's procedure that ensures the identity results in
+negative equity value. It is clear that LLM-only forecasting of balance
+sheet fields is severely inadequate.
+
+\begin{enumerate}
+\def\labelenumi{\alph{enumi})}
+\setcounter{enumi}{2}
+\item
+  \textbf{Combining LLM with the Balance Sheet Forecasting Model (Tax
+  Anomalies)}
+\end{enumerate}
+
+Is it possible to combine LLM with the balance sheet forecasting model?
+Yes. When we look at the forecasted model, we see that one of the major
+contributors for predicted income discrepancy from data is the
+calculated tax (income underestimated by \textasciitilde5 billion, and
+tax overestimated by \textasciitilde2 billion). Net income
+(\textasciitilde100 billion dollars) is sales -- cogs -- opex --
+depreciation -- debt interest + market securities return -- tax, and we
+actually see good predicted values for COGS, opex, and depreciation
+(market securities return and interest payments are uncertain due to
+incomplete data, but their combined amount is order of magnitude smaller
+than tax) all show discrepancy from data of less than 1 billion, while
+tax, which takes \textasciitilde30\% of net income, is off from the data
+by \textasciitilde2 billion, almost 10\% higher than predicted which
+lowers the predicted net income.
+
+In the case of Apple, there was a spike in effective tax rate in 2024
+due to a one-time income tax charge resulting from the final resolution
+of the European Commission State Aid Decision. This skewed the learned
+effective tax rate upwards during training, as evidenced by the
+consistent over-estimation of tax for one-step forecast model fit.
+
+\noindent\begin{minipage}{0.48\textwidth}\centering\includegraphics[width=\linewidth]{report_latex_media/media/image16.png}\end{minipage}\hfill\begin{minipage}{0.48\textwidth}\centering\includegraphics[width=\linewidth]{report_latex_media/media/image17.png}\end{minipage}
+
+To avoid this issue, we can ask LLM to notify us of any one-time tax
+payments like this so that we can appropriately handle it during
+training. When calculating the MSE between predicted and actual tax
+owed, the ground truth data can be offsetted by the one-time amount to
+better learn the baseline effective tax rate.
+
+We can feed the 10-K to LLM and ask it to identify pages that contain
+the one-off tax information, and extract this data in JSON format for
+model consumption:
+
+Script: \textbf{llm\_extract\_tax\_anomalies\_from\_pdf.py}
+
+\begin{lstlisting}[style=python]
+DEFAULT_SELECTION_QUERY = (
+    "Item 7 Management's Discussion and Analysis (MD&A), "
+    "and Item 8 Financial "
+    'Statements and Supplementary Data sections specifically '
+    'covering "Income Taxes" '
+    'and "Commitments and Contingencies".'
+)
+\end{lstlisting}
+
+\begin{lstlisting}[style=python]
+DEFAULT_SELECTION_PROMPT = (
+    "You are given pages from a Form 10-K annual report.\n"
+    "Identify all pages that contain any of the following:\n"
+    "1) Item 7: Management's Discussion and Analysis (MD&A)\n"
+    "2) Item 8: Financial Statements and Supplementary Data notes "
+    "for:\n"
+    " - Income Taxes\n"
+    " - Commitments and Contingencies\n\n"
+    "Include pages with headings, substantive discussion, tables, "
+    "and continuations of "
+    "these sections.\n"
+    'Return ONLY valid JSON with this exact shape: '
+    '{{"pages": [<page_number>, ...]}}.\n'
+    'If none match, return {{"pages": []}}.\n\n'
+    "Query: {query}\n\n"
+    "Pages:\n{pages}"
+)
+\end{lstlisting}
+
+\begin{lstlisting}[style=python]
+DEFAULT_EXTRACTION_PROMPT = (
+    "You are an expert financial analyst. Your task is to analyze the "
+    "provided excerpts "
+    "from a company's Form 10-K (MD&A and Financial Footnotes) and "
+    "extract data regarding "
+    "one-time tax anomalies and future tax contingencies.\n\n"
+    "Carefully evaluate the text for the following:\n\n"
+    "Current Year Anomalies: Identify any massive, non-recurring, "
+    "discrete tax charges "
+    "or benefits that heavily skewed the current year's net income "
+    "(e.g., finalized state "
+    "aid decisions, sudden impacts from new tax legislation).\n\n"
+    "Future Contingencies: Identify any quantified maximum tax "
+    "exposures, unreserved tax "
+    "liabilities, or significant unrecognized tax benefits (UTBs) "
+    "that management indicates "
+    "could be resolved or assessed in future years (e.g., tax funds "
+    "held in escrow pending "
+    "appeal, estimated UTB decreases in the next 12 months).\n\n"
+    "You must respond ONLY with a valid JSON object using the exact "
+    "schema below. Do not "
+    "include any markdown formatting, preamble, or postscript. If a "
+    "specific data point is "
+    "not explicitly mentioned or cannot be reliably quantified from "
+    "the text, output null "
+    "for that field.\n\n"
+    "JSON Schema:\n"
+    "{{\n"
+    ' "tax_onetime_amount": <number in billions or null>,\n'
+    ' "tax_onetime_note": "<string explaining the anomaly or null>",\n'
+    ' "tax_contingency_amount": <number in billions or null>,\n'
+    ' "tax_contingency_note": "<string explaining the future reserve '
+    'or null>"\n'
+    "}}\n\n"
+    "Pages:\n{pages}"
+)
+\end{lstlisting}
+
+LLM was able to extract the one-time tax payment from this portion of
+10-K:
+
+2024 10-K page 24:
+
+\includegraphics[width=\textwidth]{report_latex_media/media/image18.png}
+
+And page 39:
+
+\includegraphics[width=\textwidth]{report_latex_media/media/image19.png}
+
+JSON output:
+
+\begin{lstlisting}[style=json]
+{
+    "query": "Item 7 Management's Discussion and Analysis (MD&A), and Item 8 Financial Statements and Supplementary Data sections specifically covering \"Income Taxes\" and \"Commitments and Contingencies\".",
+    "selected_pages": [
+        23, 24, 25, 26, 27, 41, 42, 43, 45, 46, 47
+    ],
+    "extraction": {
+        "tax_onetime_amount": 10.2,
+        "tax_onetime_note": "One-time income tax charge of $10.2 billion net related to the European Commission State Aid Decision.",
+        "tax_contingency_amount": 13,
+        "tax_contingency_note": "Gross unrecognized tax benefits could decrease between approximately $5 billion and $13 billion in the next 12 months, primarily related to intercompany transfer pricing and deemed repatriation tax."
+    }
+}
+\end{lstlisting}
+
+We update our balance sheet forecasting script to include the
+tax\_onetime\_amount for better learning of the baseline tax rate. We
+run the script
+trainable\_financial\_model\_taxanomaly\_effstdebt\_bayesian\-\_vi\_refactored.py
+with include\_tax\_anomalies=True.
+
+Effective tax rate drops from 17\% to 15.5\%! And the learning loss is
+smaller for the effective tax rate \%IT:
+
+\ul{\hfill\break
+}
+
+\ul{Before:}
+
+\includegraphics[width=\textwidth]{report_latex_media/media/image20.png}
+
+\includegraphics[width=\textwidth]{report_latex_media/media/image21.png}
+
+\noindent\begin{minipage}{0.48\textwidth}\centering\includegraphics[width=\linewidth]{report_latex_media/media/image16.png}\end{minipage}\hfill\begin{minipage}{0.48\textwidth}\centering\includegraphics[width=\linewidth]{report_latex_media/media/image17.png}\end{minipage}
+
+Before accounting for tax anomalies. The predicted net income is 1.09e11
+dollars, which is off by 2.68\%, or 3 billion dollars, from the actual
+value of 1.12e11 dollars.
+
+\ul{\hfill\break
+}
+
+\ul{After:}
+
+\includegraphics[width=\textwidth]{report_latex_media/media/image22.png}
+
+\includegraphics[width=\textwidth]{report_latex_media/media/image23.png}
+
+\noindent\begin{minipage}{0.48\textwidth}\centering\includegraphics[width=\linewidth]{report_latex_media/media/image24.png}\end{minipage}\hfill\begin{minipage}{0.48\textwidth}\centering\includegraphics[width=\linewidth]{report_latex_media/media/image25.png}\end{minipage}
+
+After accounting for tax anomalies. The predicted net income in 2025 is
+1.11e11 dollars, which is only off by 0.89\%, or 1 billion dollars, from
+the actual value of 1.12e11 dollars! The income tax MSE loss during
+training also drops by an order of magnitude.
+
+\begin{enumerate}
+\def\labelenumi{\alph{enumi})}
+\setcounter{enumi}{3}
+\item
+  \textbf{Strategic Recommendations for CEO/CFO}
+\end{enumerate}
+
+For recommendation to CEO/CFO given our result, we feed the following
+prompt, and attach the historical and 10-year forecast of balance sheet
+and income statement:
+
+Prompt = ``\,''\,''
+
+You are an elite Corporate Finance Advisor and Strategic Capital Expert
+at a top-tier investment bank. You specialize in advising the CEOs and
+CFOs of mature, cash-generative mega-cap technology firms on capital
+structure optimization, liquidity management, and capital allocation.
+
+Context \& Task:
+
+I will provide you with two sets of financial data for a target company:
+
+Historical Baseline: Actual financial performance from recent years.
+
+ML Forecast: A multi-year financial forecast (Balance Sheet, Income
+Statement, and Cash Budget) generated by an advanced Monte Carlo machine
+learning ensemble.
+
+Your task is to analyze the historical data against the forecast to
+identify the three most critical financial leverage points (risks or
+opportunities) over the forecasted period.
+
+STRICT GUARDRAILS (CRITICAL):
+
+NO OPERATIONAL ADVICE: You are strictly forbidden from recommending
+operational, marketing, or business strategy changes. Do not suggest
+"launching new products," "increasing sales efforts," or "improving
+supply chain efficiency."
+
+STRICTLY FINANCIAL DOMAIN: Your recommendations must be confined purely
+to Corporate Finance: Capital Structure (debt/equity mix, WACC),
+Liquidity \& Treasury (working capital, commercial paper), and Capital
+Allocation (dividends, share repurchases, CapEx).
+
+MANDATORY EVIDENCE: You cannot make a claim without citing specific
+numbers from the provided tables.
+
+Analytical Heuristics (The Mega-Cap Tech Lens \& Trend Analysis):
+
+Historical Benchmarking (Crucial): Always contextualize the forecast by
+comparing it to the historical baseline. Identify structural breaks
+(where the forecast deviates significantly from historical trends) or
+trend accelerations.
+
+Strategic Leverage vs. Distress: Do not penalize shrinking Accounting
+Equity. If Equity is declining due to aggressive Stock Buybacks and
+Dividends, treat this as highly efficient Capital Return and WACC
+optimization---NOT financial distress---provided Net Income and Free
+Cash Flow remain historically strong.
+
+Net Debt Focus: Evaluate liquidity by looking at Cash + Marketable
+Securities against Liabilities. Mega-cap tech companies often issue debt
+simply to lower their cost of capital; evaluate if the forecasted debt
+load is easily serviced by operating cash flows relative to historical
+interest coverage.
+
+Operating Leverage: Note if the forecast predicts Revenue and Net Income
+growing at a faster or slower rate than historical Operating Expenses
+(OpEx).
+
+Output Format:
+
+Provide exactly 3 strategic priorities. For each, use this exact
+structure:
+
+Observation: {[}State the specific quantitative trend, explicitly
+contrasting the forecasted figures against the historical baseline. Cite
+exact numbers and years{]}.
+
+Implication: {[}Explain the financial/credit risk or the WACC
+optimization opportunity this trend creates for the balance sheet{]}.
+
+Recommendation: {[}State the precise corporate finance action the
+CFO/CEO must execute to manage this specific trajectory{]}.
+
+Data Input:
+
+\emph{{[}Insert Historical Tables / JSON here{]}}
+
+\emph{{[}Insert ML Forecast Tables / JSON here{]}}
+
+``\,''\,''
+
+The prompt with the context of the 10-year forecast is sent to our
+reasoning model by calling send\_reasoning\_prompt.py
+
+And here is the recommendation that our reasoning model generated:
+
+\subsubsection{\texorpdfstring{\textbf{Analysis of Financial Leverage
+Points}}{Analysis of Financial Leverage Points}}\label{analysis-of-financial-leverage-points}
+
+\textbf{Observation:}~The forecast projects a significant and
+accelerating decline in Stockholders\textquotesingle{} Equity, from
+\$70.7B in FY2025 to \$40.8B in FY2034, while Net Income grows from
+\$111.1B to \$215.4B over the same period. This is a structural break
+from the historical baseline (2017-2023), where Equity averaged \$78.5B
+and showed no consistent downward trend, even as Net Income grew.
+
+\textbf{Implication:}~This trajectory indicates an extremely aggressive
+capital return policy is embedded in the forecast, far exceeding
+historical levels. While this optimizes WACC by shrinking the equity
+base, it creates a critical dependency on continuous, high levels of
+free cash flow. The balance sheet is being deliberately levered,
+shifting from an equity-heavy to a more debt-dependent structure.
+
+\textbf{Recommendation:}~The CFO must formally establish and communicate
+a~\textbf{Sustainable Capital Return Framework}. This framework should
+define the maximum allowable annual capital return (dividends +
+buybacks) as a percentage of forward-looking Free Cash Flow (e.g.,
+80-90\%), ensuring it does not jeopardize the credit rating or the
+ability to service the forecasted rising debt load. This moves the
+policy from implicit to explicit, managing investor expectations and
+credit agency concerns.
+
+\textbf{Observation:}~The forecast shows a dramatic increase
+in~\textbf{Effective Short-Term Debt}, which balloons from \$87.2B in
+FY2025 to \$190.3B by FY2034. Concurrently, highly liquid assets (Cash +
+Marketable Securities) are projected to decline from a combined \$62.3B
+to \$60.2B. This creates a rising~\textbf{Net Debt}~position.
+Historically (2020-2023), the company maintained a robust liquidity
+buffer, with Cash + Securities averaging \$55.8B against much lower debt
+levels.
+
+\textbf{Implication:}~The company is forecasted to become significantly
+more reliant on short-term wholesale funding. This introduces
+substantial refinancing and interest rate risk, especially as interest
+payments are projected to rise from \$4.5B to \$7.5B. The shrinking
+liquidity coverage ratio could pressure credit spreads and commercial
+paper rates during market stress.
+
+\textbf{Recommendation:}~Execute a~\textbf{Strategic Liability
+Management Exercise}. The Treasury must term out a significant portion
+of the forecasted short-term debt into longer-dated fixed-rate bonds.
+This locks in historically low(er) long-term rates for a mega-cap tech
+issuer, reduces refinancing risk, and better matches the duration of the
+company\textquotesingle s long-lived assets. Concurrently, establish a
+minimum liquidity covenant (e.g., Cash + Securities $\geq$ 1.0x ST Debt) for
+internal risk management.
+
+\textbf{Observation:}~The forecast predicts a powerful~\textbf{positive
+operating leverage}~trend. From FY2025 to FY2034, Revenue grows by
+46.5\% (\$416B to \$610B), while the combined growth of COGS and OpEx is
+only 39.5\%. This divergence accelerates EBIT margin expansion. This is
+a continuation but acceleration of a historical trend; from 2017-2023,
+Revenue grew 47.2\% while COGS+OpEx grew 45.8\%.
+
+\textbf{Implication:}~This trajectory will generate super-linear growth
+in Free Cash Flow, the fundamental driver for all capital allocation
+decisions (debt service, buybacks, dividends). It provides immense
+balance sheet flexibility and debt capacity. However, it also raises the
+strategic opportunity cost of holding excess, low-yielding cash on the
+balance sheet.
+
+\begin{quote}
+\textbf{Recommendation:}~Initiate a~\textbf{Dynamic Share Repurchase
+Program}~tied to Free Cash Flow Surplus. Instead of a fixed buyback
+amount, the program should automatically allocate a percentage of
+quarterly FCF in excess of a pre-determined threshold (e.g., FCF above
+levels needed for debt service and a baseline dividend) to repurchases.
+This mechanism directly links the benefit of operating leverage to
+per-share earnings accretion and WACC optimization, while maintaining a
+cash safety net.
+\end{quote}
+
+\textbf{e, f, g) Financial Ratios and Automated Extraction Pipeline}
+
+We need to calculate cost-to-income, quick ratio, debt-to-equity ratio,
+debt-to-assets ratio, debt-to-capital ratio, debt-to-EBITDA ratio, and
+interest coverage ratio:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\item
+  Cost-to-Income ratio = Operating Expense / Revenue
+\end{enumerate}
+
+\begin{quote}
+= Describes company's operating efficiency. Operating Expense includes
+cost of revenue.
+\end{quote}
+
+\begin{itemize}
+\item
+  LLM to extract \textbf{Revenue} and \textbf{Operating Expense} from
+  \textbf{Income Statement}. Operating Expense may not be a simple line
+  item, may need to combine a few lines, e.g., GM has line for
+  ``Automotive and other cost of sales'', ``GM Financial interest,
+  operating and other expenses'' and ``Automotive and other selling,
+  general and administrative expense''
+\end{itemize}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\setcounter{enumi}{1}
+\item
+  Quick Ratio = (Cash \& Cash Equivalents + Short-Term Market Securities
+  + Accounts Receivable) / Current Liabilities
+\end{enumerate}
+
+= Ability to meet short-term liabilities with the most liquid assets
+
+\begin{itemize}
+\item
+  LLM to extract \textbf{Cash \& Cash Equivalents}, \textbf{Short-Term
+  Market Securities}, \textbf{Accounts Receivable}, and \textbf{Current
+  Liabilities} from \textbf{Balance Sheet}
+\end{itemize}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\setcounter{enumi}{2}
+\item
+  Debt-to-Equity ratio = (Short-Term Debt + Long-Term Debt) / Total
+  Equity
+\end{enumerate}
+
+\begin{itemize}
+\item
+  LLM to extract \textbf{Total Debt} (including short-term and long-term
+  debts) and \textbf{Total Equity} from \textbf{Balance Sheet}
+\end{itemize}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\setcounter{enumi}{3}
+\item
+  Debt-to-Assets ratio = (Short-Term Debt + Long-Term Debt) / Total
+  Assets
+\end{enumerate}
+
+\begin{itemize}
+\item
+  Total Debt already extracted. LLM to extract \textbf{Total Assets}
+  from \textbf{Balance Sheet}
+\end{itemize}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\setcounter{enumi}{4}
+\item
+  Debt-to-Capital ratio = (Short-Term Debt + Long-Term Debt) /
+  (Short-Term Debt + Long-Term Debt + Total Equity)
+\end{enumerate}
+
+\begin{itemize}
+\item
+  Total Debt and Total Equity already extracted.
+\end{itemize}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\setcounter{enumi}{5}
+\item
+  Debt-to-EBITDA ratio = (Short-Term Debt + Long-Term Debt) / EBITDA
+\end{enumerate}
+
+= How many years it would take for a company to pay back its debt using
+its EBITDA
+
+\begin{itemize}
+\item
+  Total Debt already extracted. LLM to extract \textbf{Net Income},
+  \textbf{Taxes}, and \textbf{Interest Expenses} from \textbf{Income
+  Statement}; and \textbf{Depreciation and Amortization} from
+  \textbf{Cash Flows} to calculate EBITDA = Net Income + Interest
+  Expenses + Taxes + Depreciation + Amortization
+\end{itemize}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\setcounter{enumi}{6}
+\item
+  Interest Coverage ratio = EBIT / Interest Expense
+\end{enumerate}
+
+= How easily a company can pay interest on its outstanding debt
+
+\begin{itemize}
+\item
+  Interest Expense already extracted. Calculate EBIT = Net Income +
+  Interest Expenses + Taxes
+\end{itemize}
+
+\textbf{\hfill\break
+}
+
+\textbf{List of fields to be extracted:}
+
+\ul{Balance Sheet}
+
+\begin{itemize}
+\item
+  Cash \& Cash Equivalents
+\item
+  Short-Term Market Securities
+\item
+  Accounts Receivables
+\item
+  Total Current Liabilities
+\item
+  Total Debt (Short-Term and Long-Term)
+\item
+  Total Equity
+\item
+  Total Assets
+\end{itemize}
+
+\ul{Income Statement}
+
+\begin{itemize}
+\item
+  Revenue
+\item
+  Operating Expenses
+\item
+  Net Income
+\item
+  Taxes
+\item
+  Interest Expenses
+\end{itemize}
+
+\ul{Cash Flows}
+
+\begin{itemize}
+\item
+  Depreciation and Amortization
+\end{itemize}
+
+When extracting these values, also give LLM context in which we are
+obtaining these values, such that in case there isn't a 1:1 mapping of
+these variables to line items in these statements, LLM can assign the
+relevant fields and/or combine fields to return the field of interest
+(e.g., operating expenses in ExxonMobile include:
+
+\begin{itemize}
+\item
+  Crude oil and product purchases
+\item
+  Production and manufacturing expenses
+\item
+  Selling, general and administrative expenses
+\item
+  Depreciation and depletion
+\item
+  Exploration expenses, including dry holes
+\item
+  Non-service pension and postretirement benefit expense
+\item
+  Other taxes and duties
+\end{itemize}
+
+When extracting the financial statements, also we had to make sure that
+we extract any supplementary tables. For example, Google's Income
+Statement had a line for `Other Income' which combined interest income,
+interest expenses, and others, without listing out individual
+components. Only in a separate `Other Income (Expenses), Net' table do
+we see the line item `Interest expense' which we need for calculating
+Interest Coverage ratio and Debt-to-EBITDA ratio. So, we had to update
+the LLM query to also extract supplementary tables.
+
+The extraction step is broken down into three LLM agents for extraction
+and a Python script for actual calculation:
+
+\includegraphics[width=\textwidth]{report_latex_media/media/image26.jpg}
+
+Input annual report pdf -\textgreater{} pdfplumber to extract raw text
+-\textgreater{} Feed raw text to efficient non-reasoning model to
+identify pages that contain financial statements and supplementary
+tables of interest -\textgreater{} Feed the relevant pages to the more
+resource-intensive reasoning model to extract the text of the primary
+table and supplementary tables -\textgreater{} Feed the extracted text
+data to the reasoning model to identify all the relevant financial line
+items for fields of interest in a rigid json format ready for
+consumption by a Python script -\textgreater{} Python script consumes
+the json data to calculate the financial ratios
+
+We have tried using embeddings as done in \hyperlink{ref:zhang25}{[Zhang(25)]}, but we
+noticed that it is not effective in 2 ways:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\item
+  Vectorization of each page fails to encapsulate all the semantic
+  content. For example, if a page contains a supplementary table of
+  interest along with other supplementary tables and texts, the
+  vectorization of that page may not align closely with our query vector
+  for that supplementary table of interest, and we cannot retrieve that
+  information.
+\item
+  Embeddings are more sensitive than LLM to use of different synonyms or
+  languages. We have observed from our attempt to use embedding models
+  on Alibaba's annual report that our query for `Consolidated Income
+  Statement' failed to retrieve the page with ``合併利潤表''
+\end{enumerate}
+
+LLMs excel in this area because they are incredibly good at semantic
+understanding and most of them are trained on multi-lingual data, giving
+them multi-lingual ability as an emergent property. However, LLMs are
+susceptible to hallucination. If you try to get it to do too many things
+at once, or perform a highly quantitative task, it will hallucinate and
+produce wrong answers. It is essential to break the task down into a
+step-by-step process that reduces hallucination and response quality,
+similar to how chain-of-thought prompting improves output quality
+\hyperlink{ref:wei22}{[Wei(22)]}. Also, by first extracting the relevant text before
+feeding it to the LLM to extract the financial fields, we prevent
+context dilution which is known to degrade output quality \hyperlink{ref:liu23}{[Liu(23)]}.
+
+\textbf{\ul{llm\_extract\_financial\_statement\_from\_pdf.py}}
+
+\textbf{Primary financial statement extraction:}
+
+\ul{Step 1: Page number identifying step}
+
+\begin{lstlisting}[style=python]
+prompt = (
+    "You are given multiple pages from an annual report. "
+    f"Identify which pages contain the table "
+    "for the requested query. "
+    'Return ONLY JSON in the shape: {"pages": '
+    '[<page_number>, ...]}. '
+    f"Include all pages that contain the table or line items. "
+    'If none, return {"pages": []}.\n\n'
+    f"Query: {query}\n\n"
+    f"Pages:\n{pages_text}"
+)
+\end{lstlisting}
+
+Where:
+
+\begin{itemize}
+\item
+  \hl{query} is one of {[}``Consolidated Balance Sheet'', ``Consolidated
+  Income Statement'', ``Consolidated Cash Flow Statement''{]}
+\item
+  \hl{pages\_text} is the entire text from annual report directly
+  extracted with pdfplumber
+\end{itemize}
+
+\ul{Step 2: Table extraction step}
+
+\begin{lstlisting}[style=python]
+prompt = (
+    f"Find the table that corresponds to {query} and output it "
+    f"in a nice tabular form from the following pages data.\n"
+    f"Pages:\n{pages_text}"
+)
+\end{lstlisting}
+
+Where:
+
+\begin{itemize}
+\item
+  \hl{query} is one of {[}``Consolidated Balance Sheet'', ``Consolidated
+  Income Statement'', ``Consolidated Cash Flow Statement''{]}
+\item
+  \hl{pages\_text} is the portion of the pdfplumber-extracted text from
+  only the pages identified in \ul{Step 1}
+\end{itemize}
+
+Output from Step 2:
+
+\includegraphics[width=3.94631in,height=4.18705in]{report_latex_media/media/image27.png}
+
+\textbf{Supplementary tables extraction:}
+
+\ul{Step 3: Page number identifying step}
+
+\begin{lstlisting}[style=python]
+supplementary_query = (
+    f"Supplementary disclosures, breakdowns, expansions, "
+    f"and note tables for {query}. "
+    f"Use this extracted primary statement as context to "
+    f"infer relevant line items and "
+    f"find related supplementary pages: {primary_context}"
+)
+
+prompt = (
+    "You are given multiple pages from an annual report. "
+    f"Identify which pages contain the table "
+    "for the requested query. "
+    'Return ONLY JSON in the shape: {"pages": '
+    '[<page_number>, ...]}. '
+    f"Include all pages that contain the table or line items. "
+    'If none, return {"pages": []}.\n\n'
+    f"Query: {supplementary_query}\n\n"
+    f"Pages:\n{pages_text}"
+)
+\end{lstlisting}
+
+Where:
+
+\begin{itemize}
+\item
+  \hl{query} is one of {[}``Consolidated Balance Sheet'', ``Consolidated
+  Income Statement'', ``Consolidated Cash Flow Statement''{]}
+\item
+  \hl{primary\_context} is the extracted table from \ul{Step 2}
+\item
+  \hl{pages\_text} is the entire text from annual report directly
+  extracted with pdfplumber
+\end{itemize}
+
+\ul{Step 4: Table extraction step}
+
+\begin{lstlisting}[style=python]
+prompt = (
+    "You are extracting supplementary financial disclosures "
+    "from annual report pages.\n"
+    f"Primary statement: {query}\n"
+    "Primary statement extraction context:\n"
+    f"{primary_context}\n\n"
+    "Infer the line items from the primary statement context "
+    "above. "
+    "Extract supplementary tables related to those inferred "
+    "line items "
+    "(for example, breakdowns/expansions/schedules/notes such "
+    "as an expanded "
+    "'Other Income' table). "
+    "You can be generous with the supplementary tables you "
+    "extract since it is better to have more than not have "
+    "necessary information.\n"
+    "Return in a nice tabular format.\n"
+    'If none are found, return "No supplementary tables '
+    'found".\n\n'
+    f"Pages:\n{pages_text}"
+)
+\end{lstlisting}
+
+Where:
+
+\begin{itemize}
+\item
+  \hl{query} is one of {[}``Consolidated Balance Sheet'', ``Consolidated
+  Income Statement'', ``Consolidated Cash Flow Statement''{]}
+\item
+  \hl{primary\_context} is the extracted table from \ul{Step 2}
+\item
+  \hl{pages\_text} is the portion of the pdfplumber-extracted text from
+  only the pages identified in \ul{Step 3}
+\end{itemize}
+
+Output from Step 4:
+
+\includegraphics[width=\textwidth]{report_latex_media/media/image28.png}
+
+\includegraphics[width=\textwidth]{report_latex_media/media/image29.png}
+\includegraphics[width=\textwidth]{report_latex_media/media/image30.png}
+\includegraphics[width=\textwidth]{report_latex_media/media/image31.png}
+\includegraphics[width=\textwidth]{report_latex_media/media/image32.png}
+\includegraphics[width=\textwidth]{report_latex_media/media/image33.png}
+
+\ul{\hfill\break
+}
+
+\ul{Step 5: Extracting relevant fields as JSON for ratio calculation}
+
+Then, from this final extracted information containing primary and
+supplementary tables, we extract the relevant elements from each
+financial statement (Balance Sheet, Income Statement, or Cash Flows).
+When crafting the prompt, it is important to be careful so that it
+prevents LLM from hallucinating as much as possible. LLM is quite bad at
+doing math on the spot, but is much better at copying numbers. So, for
+retrieving fields that often requires summation of multiple elements, we
+ask LLM to copy the elements into an array instead of asking it to sum
+them up and return a single value. We use the following prompt:
+
+\begin{lstlisting}[style=python]
+STATEMENT_CONFIGS: Dict[str, Dict[str, Any]] = {
+    "consolidated-balance-sheet": {
+        "suffix": ".consolidated-balance-sheet.llm.json",
+        "output_suffix": ".consolidated-balance-sheet.normalized.json",
+        "fields": [
+            "cash_and_cash_equivalents",
+            "marketable_securities",
+            "accounts_receivable",
+            "total_current_liabilities",
+            "total_debt_short_term_and_long_term",
+            "total_equity",
+            "total_assets",
+        ],
+    },
+    "consolidated-income-statement": {
+        "suffix": ".consolidated-income-statement.llm.json",
+        "output_suffix": ".consolidated-income-statement.normalized.json",
+        "fields": [
+            "revenue",
+            "total_operating_cost",
+            "net_income",
+            "taxes",
+            "interest_expenses",
+        ],
+    },
+    "consolidated-cash-flow-statement": {
+        "suffix": ".consolidated-cash-flow-statement.llm.json",
+        "output_suffix": ".consolidated-cash-flow-statement.normalized.json",
+        "fields": [
+            "depreciation_and_amortization",
+        ],
+    },
+}
+
+fields_schema = ",\n".join(
+    [f'  "{field}": number[]'
+     for field in required_fields]
+)
+
+prompt = (
+    "You are a financial statement extraction engine.\n"
+    f"Extract normalized {statement_type} values from the "
+    f"statement and supplementary tables.\n\n"
+    "Return ONLY valid JSON with this exact schema:\n"
+    "{\n"
+    '  "company_id": "string",\n'
+    '  "periods": [\n'
+    "    {\n"
+    '      "year": "string",\n'
+    '      "currency": "string",\n'
+    '      "values": {\n'
+    f"        {fields_schema}\n"
+    "      }\n"
+    "    }\n"
+    "  ],\n"
+    '  "notes": string\n'
+    "}\n\n"
+    "Rules:\n"
+    "1) Use every period/column available in the statement.\n"
+    "2) Return numeric array values only (no commas, no currency "
+    "symbols, no percent signs).\n"
+    "3) If a value cannot be directly mapped to a field, try to "
+    "map number(s) to the corresponding field by taking into "
+    "account the industry the company is in, and note what you "
+    "did in notes field. If you cannot find a match, return an "
+    "empty array.\n"
+    "4) If multiple numbers make up a field, return them in an "
+    "array without adding them up.\n"
+    "5) If there are multiple close synonyms, use best "
+    "accounting match.\n"
+    "6) For parentheses negatives, return negative numbers.\n"
+    "7) For year, report the year of the period only.\n"
+    "8) For currency, report its formal 3-letter acronym.\n"
+    "9) For total_operating_cost, list all elements that should "
+    "be included in standard practice for the industry the "
+    "company is in. Elements that should be subtracted should "
+    "be negative. The sign convention should be such that if an "
+    "element is a cost, it should be negative, and if it is an "
+    "income, it should be positive.\n"
+    "10) Return JSON only.\n\n"
+    f"company_id: {company_id}\n\n"
+    "statement and supplementary tables:\n"
+    f"{statement_and_supplementary_tables}\n"
+)
+\end{lstlisting}
+
+Where
+
+\begin{itemize}
+\item
+  \hl{required\_fields} are selected from \hl{STATEMENT\_CONFIGS} and
+  are dependent on the type of financial statement we are feeding the
+  LLM
+\item
+  \hl{statement\_type} is one of {[}``Consolidated Balance Sheet'',
+  ``Consolidated Income Statement'', ``Consolidated Cash Flow
+  Statement''{]}
+\item
+  \hl{statement\_text} is the extracted primary and supplementary tables
+  from Step 4
+\end{itemize}
+
+The LLM struggled to identify the correct elements for marketable
+securities. So, we add the definition of marketable securities according
+to definition:
+
+\begin{itemize}
+\item
+  short\_term\_market\_securities: these are liquid, unrestricted debt
+  or equity investments intended to be sold in the short term, e.g.,
+  U.S. Treasuries, commercial paper, money market funds, publicly traded
+  equities, short-term investments.
+\end{itemize}
+
+The LLM kept wanting to add up the components before reporting them in a
+single field, e.g., it kept calculating the total debt by adding up the
+short-term and long-term borrowings often with hallucination and
+incorrect summed results.
+
+So, we had to explicitly tell LLM to return the original source label
+and its value as an array of maps:
+
+\begin{lstlisting}[style=python]
+fields_schema = ",\n".join(
+    [
+        f'  "{field}": [{{"source_label": number}}]'
+        for field in required_fields
+    ]
+)
+
+prompt = (
+    "You are a financial statement extraction engine.\n"
+    f"Extract normalized {statement_type} values from the "
+    f"statement and supplementary tables.\n\n"
+    "Return ONLY valid JSON with this exact schema:\n"
+    "{\n"
+    '  "company_id": "string",\n'
+    '  "periods": [\n'
+    "    {\n"
+    '      "year": "string",\n'
+    '      "currency": "string",\n'
+    '      "scale": number,\n'
+    '      "values": {\n'
+    f"        {fields_schema}\n"
+    "      }\n"
+    "    }\n"
+    "  ],\n"
+    '  "notes": string\n'
+    "}\n\n"
+    "Rules:\n"
+    "1) Use every period/column available in the statement.\n"
+    "2) Return an array of maps that make up each field where "
+    "each map is {source_label: number} (source_label = actual "
+    "label from the statement; no commas, no currency symbols, "
+    "no percent signs in numbers).\n"
+    "3) Ensure that the elements in the array correctly make up "
+    "the total value of the field.\n"
+    "4) If multiple elements need to be combined to make up a "
+    "field, return all of them individually in an array.\n"
+    "5) If a value(s) cannot be directly mapped to a field, "
+    "try to map element(s) to the corresponding field by "
+    "taking into account the industry the company is in, and "
+    "note your reasoning in the notes field. If you cannot "
+    "find a match, return an empty array.\n"
+    "6) If there are multiple close synonyms, use best "
+    "accounting match.\n"
+    "7) For year, report the year of the period only.\n"
+    "8) For currency, report its formal 3-letter acronym.\n"
+    "9) For scale, report the scale of the values in the "
+    "statement. For example, if the values are in millions, "
+    "the scale should be 1E6.\n"
+    "10) For total_operating_cost, list all elements that "
+    "reflect the total operational costs incurred in "
+    "generating income and are included in standard practice "
+    "for the industry the company is in.\n"
+    "11) For taxes, it is the tax assessed on the income. If "
+    "a tax belongs to the cost of revenue, it should be part "
+    "of total_operating_cost.\n"
+    "12) Generally, numbers in parentheses are negative.\n"
+    "13) For taxes, interest_expenses, and "
+    "total_operating_cost, the sign convention is the "
+    "opposite: if an element reduces income, it should be "
+    "positive; and if it increases income, it should be "
+    "negative.\n"
+    "14) For short_term_market_securities, these are liquid, "
+    "unrestricted debt or equity investments intended to be "
+    "sold in the short term, e.g., U.S. Treasuries, "
+    "commercial paper, money market funds, publicly traded "
+    "equities, short-term investments.\n"
+    "15) Return JSON only.\n\n"
+    f"company_id: {company_id}\n\n"
+    "statement and supplementary tables:\n"
+    f"{statement_and_supplementary_tables}\n"
+)
+\end{lstlisting}
+
+Output example for GM's 2023 annual report:
+
+\ul{Before: LLM attempts to add the total debt by itself}
+
+\begin{lstlisting}[style=json]
+{
+    "year": "2023",
+    "currency": "USD",
+    "values": {
+        "cash_and_cash_equivalents": [18853.0],
+        "short_term_market_securities": [7613.0],
+        "accounts_receivable": [12378.0],
+        "total_current_liabilities": [94445.0],
+        "total_debt_short_term_and_long_term": [16413.0, 105327.0],
+        "total_equity": [68189.0],
+        "total_assets": [273064.0]
+    }
+},
+\end{lstlisting}
+
+\ul{After: LLM lists out all the original elements without summation}
+
+\begin{lstlisting}[style=json]
+{
+    "year": "2023",
+    "currency": "USD",
+    "scale": 1000000,
+    "values": {
+        "cash_and_cash_equivalents": [
+            {"Cash and cash equivalents": 18853.0}
+        ],
+        "short_term_market_securities": [
+            {"Marketable debt securities": 7613.0}
+        ],
+        "accounts_receivable": [
+            {"Accounts and notes receivable, net": 12378.0},
+            {"GM Financial receivables, net (current)": 39076.0}
+        ],
+        "total_current_liabilities": [
+            {"Total current liabilities": 94445.0}
+        ],
+        "total_debt_short_term_and_long_term": [
+            {"Short-term debt and current portion of long-term debt - Automotive": 428.0},
+            {"Short-term debt and current portion of long-term debt - GM Financial": 38540.0},
+            {"Long-term debt - Automotive": 15985.0},
+            {"Long-term debt - GM Financial": 66788.0}
+        ],
+        "total_equity": [
+            {"Total Equity": 68189.0}
+        ],
+        "total_assets": [
+            {"Total Assets": 273064.0}
+        ]
+    }
+},
+...
+\end{lstlisting}
+
+Even with clever prompt engineering, LLM still hallucinates. To measure
+its hallucination rate, we repeated Step 5 (i.e., extracting json from
+financial statements for financial ratio calculations) for 101 runs and
+plotted each field value vs run using the following scripts:
+
+Run \textbf{llm\_extract\_json\_from\_financial\_statements.py} with
+these arguments:
+
+\begin{lstlisting}[style=console]
+python llm_extract_json_from_financial_statements.py \
+  --input-dir extracted_text \
+  --num-extraction-runs 101 \
+  --runs-output-dir deepseek_financial_statements_runs \
+  --max-workers 9 \
+  --plot-distributions
+\end{lstlisting}
+
+Then, run a simple script, \textbf{calculate\_hallucination\_rates.py},
+to plot the extracted json data to visualize hallucination rates for
+different financial fields from different companies:
+
+\begin{lstlisting}[style=console]
+python calculate_hallucination_rates.py \
+  --run-values-file deepseek_financial_statements_runs/\
+    runs_3_with_operating_cost_for_generating_income/\
+    extraction_run_values.json \
+  --output-file hallucination_rates.json \
+  --top-k 10
+\end{lstlisting}
+
+The results are reproduced below for GM, LVMH, Tencent, Alibaba,
+JPMorgan Chase, Exxon Mobil, Volkswagen, Microsoft, and Google:
+
+\includegraphics[width=\textwidth]{report_latex_media/media/image34.png}
+
+\includegraphics[width=\textwidth]{report_latex_media/media/image35.png}
+
+\includegraphics[width=\textwidth]{report_latex_media/media/image36.png}
+
+\includegraphics[width=\textwidth]{report_latex_media/media/image37.png}
+
+\includegraphics[width=\textwidth]{report_latex_media/media/image38.png}
+
+\includegraphics[width=\textwidth]{report_latex_media/media/image39.png}
+
+\includegraphics[width=\textwidth]{report_latex_media/media/image40.png}
+
+\includegraphics[width=\textwidth]{report_latex_media/media/image41.png}
+
+\includegraphics[width=\textwidth]{report_latex_media/media/image42.png}
+
+We also calculate the top 15 hallucinated fields as below:
+
+\begin{lstlisting}[style=console]
+- exxon_2024 | total_operating_cost | rate_non_null=0.2970 (90/303)
+- microsoft_2025 | depreciation_and_amortization | rate_non_null=0.1980 (60/303)
+- volkswagen_2024 | total_accounts_receivable | rate_non_null=0.1881 (38/202)
+- jpmorgan_2024 | depreciation_and_amortization | rate_non_null=0.1683 (51/303)
+- volkswagen_2024 | depreciation_and_amortization | rate_non_null=0.1683 (34/202)
+- volkswagen_2024 | total_operating_cost | rate_non_null=0.1287 (26/202)
+- alibaba_2025 | cash_and_cash_equivalents | rate_non_null=0.0990 (20/202)
+- alibaba_2025 | short_term_market_securities | rate_non_null=0.0990 (20/202)
+- alibaba_2025 | total_accounts_receivable | rate_non_null=0.0990 (20/202)
+- alibaba_2025 | total_assets | rate_non_null=0.0990 (20/202)
+- alibaba_2025 | total_current_liabilities | rate_non_null=0.0990 (20/202)
+- alibaba_2025 | total_debt_short_term_and_long_term | rate_non_null=0.0990 (20/202)
+- alibaba_2025 | total_equity | rate_non_null=0.0990 (20/202)
+- tencent_2024 | short_term_market_securities | rate_non_null=0.0990 (20/202)
+- jpmorgan_2024 | total_operating_cost | rate_non_null=0.0792 (24/303)
+\end{lstlisting}
+
+As you can see, the hallucination is much better than a coin-toss; LLM
+retrieves the correct values more than 70\% of the time. Thus, it is
+important to repeat the extraction step multiple times to retrieve the
+correct values to do any further quantitative analysis.
+
+The most hallucinated value was ExxonMobile's operating cost because LLM
+was not sure whether to include ``Other taxes and duties'' as part of
+operating cost. It reasoned more often than not that it is part of the
+operating cost. There are several ways to reduce this hallucination
+rate. One is to give direct examples of what we want for this specific
+item for this company. Another is to reword the name or the definition
+of ``Operating Cost'' in a way that there are less ambiguities for LLM
+in determining the elements that belong to this field.
+
+As an example of this second point, we were able to reduce the
+hallucination rate in extracting the Short-Term Market Securities from
+JPMorgan Chase's annual report. Previously, we used the following name
+and definition in the LLM prompt:
+
+For marketable\_securities, these are most liquid, unrestricted debt or
+equity investments intended to be sold in the near term (e.g., U.S.
+Treasuries, commercial paper, money market funds, publicly traded
+equities)
+
+And we observed high hallucination rate for this field because LLM
+outputted different array of elements that made up marketable
+securities, as evidenced by the following 3 extraction runs:
+
+Run 1:
+
+\begin{lstlisting}[style=json]
+"marketable_securities": [
+  {"Federal funds sold and securities purchased under resale agreements": 295001.0},
+  {"Securities borrowed": 219546.0},
+  {"Available-for-sale securities": 406852.0}
+],
+\end{lstlisting}
+
+Run 2:
+
+\begin{lstlisting}[style=json]
+"marketable_securities": [
+  {"Federal funds sold and securities purchased under resale agreements": 295001.0},
+  {"Securities borrowed": 219546.0},
+  {"Trading assets": 637784.0},
+  {"Available-for-sale securities": 406852.0}
+],
+\end{lstlisting}
+
+Run 5:
+
+\begin{lstlisting}[style=json]
+"marketable_securities": [
+  {"Federal funds sold and securities purchased under resale agreements": 295001.0},
+  {"Securities borrowed": 219546.0}
+],
+\end{lstlisting}
+
+Then we updated our naming and definition from
+``marketable\_securities'' to ``short\_term\_market\_securities'':
+
+For short\_term\_market\_securities, these are liquid, unrestricted debt
+or equity investments intended to be sold in the short term, e.g., U.S.
+Treasuries, commercial paper, money market funds, publicly traded
+equities, short-term investments.
+
+We see that the hallucination rate practically goes to zero:
+
+\noindent\begin{minipage}{0.48\textwidth}\centering\includegraphics[width=\linewidth]{report_latex_media/media/image43.png}\end{minipage}\hfill\begin{minipage}{0.48\textwidth}\centering\includegraphics[width=\linewidth]{report_latex_media/media/image44.png}\end{minipage}
+
+After obtaining the correct field values, calculating the various
+financial ratios is straightforward. We write a Python script for the
+calculation, which gives us definite results. The script is part of this
+json extraction script that runs automatically after extracting the
+relevant fields:
+\textbf{llm\_extract\_json\_from\_financial\_statements.py}
+
+Calculated fields and financial ratios for GM are as follows for 2022
+and 2023 in the 2023 annual report:
+
+\begin{lstlisting}[style=json]
+{
+  "year": "2022",
+  "currency": "USD",
+  "field_values": {
+    "cash_and_cash_equivalents": 19153000000.0,
+    "short_term_market_securities": 12150000000.0,
+    "total_accounts_receivable": 46956000000.0,
+    "total_current_liabilities": 91173000000.0,
+    "total_debt_short_term_and_long_term": 114699000000.0,
+    "total_equity": 71927000000.0,
+    "total_assets": 264037000000.0,
+    "total_revenue": 156735000000.0,
+    "total_operating_cost": 146421000000.0,
+    "net_income": 9708000000.0,
+    "taxes": 1888000000.0,
+    "interest_expenses": 987000000.0,
+    "depreciation_and_amortization": 11290000000.0
+  },
+  "derived_values": {
+    "ebit": 12583000000.0,
+    "ebitda": 23873000000.0,
+    "quick_assets": 78259000000.0,
+    "debt_plus_equity": 186626000000.0
+  },
+  "ratios": {
+    "cost_to_income_ratio": 0.9341946597760551,
+    "quick_ratio": 0.8583571890801005,
+    "debt_to_equity_ratio": 1.5946584731741904,
+    "debt_to_assets_ratio": 0.43440502656824614,
+    "debt_to_capital_ratio": 0.6145928220076516,
+    "debt_to_ebitda_ratio": 4.804549072173585,
+    "interest_coverage_ratio": 12.74873353596758
+  }
+},
+{
+  "year": "2023",
+  "currency": "USD",
+  "field_values": {
+    "cash_and_cash_equivalents": 18853000000.0,
+    "short_term_market_securities": 7613000000.0,
+    "total_accounts_receivable": 51454000000.0,
+    "total_current_liabilities": 94445000000.0,
+    "total_debt_short_term_and_long_term": 121741000000.0,
+    "total_equity": 68189000000.0,
+    "total_assets": 273064000000.0,
+    "total_revenue": 171842000000.0,
+    "total_operating_cost": 162544000000.0,
+    "net_income": 9840000000.0,
+    "taxes": 563000000.0,
+    "interest_expenses": 911000000.0,
+    "depreciation_and_amortization": 11888000000.0
+  },
+  "derived_values": {
+    "ebit": 11314000000.0,
+    "ebitda": 23202000000.0,
+    "quick_assets": 77920000000.0,
+    "debt_plus_equity": 189930000000.0
+  },
+  "ratios": {
+    "cost_to_income_ratio": 0.9458921567486412,
+    "quick_ratio": 0.8250304409974059,
+    "debt_to_equity_ratio": 1.7853466101570634,
+    "debt_to_assets_ratio": 0.44583321126182873,
+    "debt_to_capital_ratio": 0.640978255146633,
+    "debt_to_ebitda_ratio": 5.247004568571675,
+    "interest_coverage_ratio": 12.419319429198683
+  }
+}
+\end{lstlisting}
+
+\textbf{h, i) Applicability to Other Annual Reports}
+
+Our script works for other annual reports as well, including LVMH,
+Tencent, Alibaba, JPMorgan Chase, ExxonMobil, Volkswagen, Microsoft, and
+Google:
+
+LVMH:
+
+\begin{lstlisting}[style=json]
+{
+  "year": "2022",
+  "currency": "EUR",
+  "field_values": {
+    "cash_and_cash_equivalents": 7301000000.0,
+    "short_term_market_securities": 3552000000.0,
+    "total_accounts_receivable": 4258000000.0,
+    "total_current_liabilities": 31543000000.0,
+    "total_debt_short_term_and_long_term": 19739000000.0,
+    "total_equity": 56604000000.0,
+    "total_assets": 134646000000.0,
+    "total_revenue": 79184000000.0,
+    "total_operating_cost": 58220000000.0,
+    "net_income": 14084000000.0,
+    "taxes": 5362000000.0,
+    "interest_expenses": 271000000.0,
+    "depreciation_and_amortization": 6226000000.0
+  },
+  "derived_values": {
+    "ebit": 19717000000.0,
+    "ebitda": 25943000000.0,
+    "quick_assets": 15111000000.0,
+    "debt_plus_equity": 76343000000.0
+  },
+  "ratios": {
+    "cost_to_income_ratio": 0.7352495453626995,
+    "quick_ratio": 0.4790603303427068,
+    "debt_to_equity_ratio": 0.3487209384495795,
+    "debt_to_assets_ratio": 0.14659923057498922,
+    "debt_to_capital_ratio": 0.2585567766527383,
+    "debt_to_ebitda_ratio": 0.7608603476853101,
+    "interest_coverage_ratio": 72.75645756457564
+  }
+},
+{
+  "year": "2023",
+  "currency": "EUR",
+  "field_values": {
+    "cash_and_cash_equivalents": 7774000000.0,
+    "short_term_market_securities": 3490000000.0,
+    "total_accounts_receivable": 4728000000.0,
+    "total_current_liabilities": 33145000000.0,
+    "total_debt_short_term_and_long_term": 21907000000.0,
+    "total_equity": 62701000000.0,
+    "total_assets": 143694000000.0,
+    "total_revenue": 86153000000.0,
+    "total_operating_cost": 63600000000.0,
+    "net_income": 15174000000.0,
+    "taxes": 5673000000.0,
+    "interest_expenses": 760000000.0,
+    "depreciation_and_amortization": 7177000000.0
+  },
+  "derived_values": {
+    "ebit": 21607000000.0,
+    "ebitda": 28784000000.0,
+    "quick_assets": 15992000000.0,
+    "debt_plus_equity": 84608000000.0
+  },
+  "ratios": {
+    "cost_to_income_ratio": 0.7382215361043725,
+    "quick_ratio": 0.4824860461608086,
+    "debt_to_equity_ratio": 0.3493883670116904,
+    "debt_to_assets_ratio": 0.1524559132601222,
+    "debt_to_capital_ratio": 0.2589235060514372,
+    "debt_to_ebitda_ratio": 0.7610825458588104,
+    "interest_coverage_ratio": 28.430263157894736
+  }
+},
+{
+  "year": "2024",
+  "currency": "EUR",
+  "field_values": {
+    "cash_and_cash_equivalents": 9631000000.0,
+    "short_term_market_securities": 3956000000.0,
+    "total_accounts_receivable": 4731000000.0,
+    "total_current_liabilities": 33696000000.0,
+    "total_debt_short_term_and_long_term": 22942000000.0,
+    "total_equity": 69287000000.0,
+    "total_assets": 149190000000.0,
+    "total_revenue": 84683000000.0,
+    "total_operating_cost": 65804000000.0,
+    "net_income": 12550000000.0,
+    "taxes": 5157000000.0,
+    "interest_expenses": 952000000.0,
+    "depreciation_and_amortization": 7796000000.0
+  },
+  "derived_values": {
+    "ebit": 18659000000.0,
+    "ebitda": 26455000000.0,
+    "quick_assets": 18318000000.0,
+    "debt_plus_equity": 92229000000.0
+  },
+  "ratios": {
+    "cost_to_income_ratio": 0.7770626926301619,
+    "quick_ratio": 0.5436253561253561,
+    "debt_to_equity_ratio": 0.3311155050731017,
+    "debt_to_assets_ratio": 0.15377706280581807,
+    "debt_to_capital_ratio": 0.24875039304340282,
+    "debt_to_ebitda_ratio": 0.8672084672084672,
+    "interest_coverage_ratio": 19.599789915966387
+  }
+}
+\end{lstlisting}
+
+Tencent:
+
+\begin{lstlisting}[style=json]
+{
+  "year": "2023",
+  "currency": "CNY",
+  "field_values": {
+    "cash_and_cash_equivalents": 172320000000.0,
+    "short_term_market_securities": 14903000000.0,
+    "total_accounts_receivable": 46606000000.0,
+    "total_current_liabilities": 352157000000.0,
+    "total_debt_short_term_and_long_term": 348618000000.0,
+    "total_equity": 873681000000.0,
+    "total_assets": 1577246000000.0,
+    "total_revenue": 609015000000.0,
+    "total_operating_cost": 453642000000.0,
+    "net_income": 118048000000.0,
+    "taxes": 43276000000.0,
+    "interest_expenses": 12268000000.0,
+    "depreciation_and_amortization": 59008000000.0
+  },
+  "derived_values": {
+    "ebit": 173592000000.0,
+    "ebitda": 232600000000.0,
+    "quick_assets": 233829000000.0,
+    "debt_plus_equity": 1222299000000.0
+  },
+  "ratios": {
+    "cost_to_income_ratio": 0.744878204970321,
+    "quick_ratio": 0.6639907768410113,
+    "debt_to_equity_ratio": 0.3990220686955536,
+    "debt_to_assets_ratio": 0.22102956672579926,
+    "debt_to_capital_ratio": 0.285214992403659,
+    "debt_to_ebitda_ratio": 1.4987876182287188,
+    "interest_coverage_ratio": 14.149983697424194
+  }
+},
+{
+  "year": "2024",
+  "currency": "CNY",
+  "field_values": {
+    "cash_and_cash_equivalents": 132519000000.0,
+    "short_term_market_securities": 12913000000.0,
+    "total_accounts_receivable": 48203000000.0,
+    "total_current_liabilities": 396909000000.0,
+    "total_debt_short_term_and_long_term": 338615000000.0,
+    "total_equity": 1053896000000.0,
+    "total_assets": 1780995000000.0,
+    "total_revenue": 660257000000.0,
+    "total_operating_cost": 460160000000.0,
+    "net_income": 196467000000.0,
+    "taxes": 45018000000.0,
+    "interest_expenses": 11981000000.0,
+    "depreciation_and_amortization": 56213000000.0
+  },
+  "derived_values": {
+    "ebit": 253466000000.0,
+    "ebitda": 309679000000.0,
+    "quick_assets": 193635000000.0,
+    "debt_plus_equity": 1392511000000.0
+  },
+  "ratios": {
+    "cost_to_income_ratio": 0.6969407367131284,
+    "quick_ratio": 0.4878574181991338,
+    "debt_to_equity_ratio": 0.3212983064742631,
+    "debt_to_assets_ratio": 0.19012686728486042,
+    "debt_to_capital_ratio": 0.24316863565171118,
+    "debt_to_ebitda_ratio": 1.093438689740021,
+    "interest_coverage_ratio": 21.155663133294382
+  }
+}
+\end{lstlisting}
+
+Alibaba:
+
+\begin{lstlisting}[style=json]
+{
+  "year": "2024",
+  "currency": "CNY",
+  "field_values": {
+    "cash_and_cash_equivalents": 248125000000.0,
+    "short_term_market_securities": 262955000000.0,
+    "total_accounts_receivable": 29362000000.0,
+    "total_current_liabilities": 421507000000.0,
+    "total_debt_short_term_and_long_term": 170776000000.0,
+    "total_equity": 1101871000000.0,
+    "total_assets": 1764829000000.0,
+    "total_revenue": 941168000000.0,
+    "total_operating_cost": 827818000000.0,
+    "net_income": 71332000000.0,
+    "taxes": 22529000000.0,
+    "interest_expenses": 7947000000.0,
+    "depreciation_and_amortization": 44504000000.0
+  },
+  "derived_values": {
+    "ebit": 101808000000.0,
+    "ebitda": 146312000000.0,
+    "quick_assets": 540442000000.0,
+    "debt_plus_equity": 1272647000000.0
+  },
+  "ratios": {
+    "cost_to_income_ratio": 0.8795645410808697,
+    "quick_ratio": 1.282166132472296,
+    "debt_to_equity_ratio": 0.1549872898007117,
+    "debt_to_assets_ratio": 0.0967663156033814,
+    "debt_to_capital_ratio": 0.13418960638731714,
+    "debt_to_ebitda_ratio": 1.1672043304718684,
+    "interest_coverage_ratio": 12.810872027180068
+  }
+},
+{
+  "year": "2025",
+  "currency": "CNY",
+  "field_values": {
+    "cash_and_cash_equivalents": 145487000000.0,
+    "short_term_market_securities": 228826000000.0,
+    "total_accounts_receivable": 30652000000.0,
+    "total_current_liabilities": 435346000000.0,
+    "total_debt_short_term_and_long_term": 230703000000.0,
+    "total_equity": 1078393000000.0,
+    "total_assets": 1804227000000.0,
+    "total_revenue": 996347000000.0,
+    "total_operating_cost": 856203000000.0,
+    "net_income": 125976000000.0,
+    "taxes": 35445000000.0,
+    "interest_expenses": 9596000000.0,
+    "depreciation_and_amortization": 42459000000.0
+  },
+  "derived_values": {
+    "ebit": 171017000000.0,
+    "ebitda": 213476000000.0,
+    "quick_assets": 404965000000.0,
+    "debt_plus_equity": 1309096000000.0
+  },
+  "ratios": {
+    "cost_to_income_ratio": 0.8593421769724805,
+    "quick_ratio": 0.9302141285322479,
+    "debt_to_equity_ratio": 0.21393221209707408,
+    "debt_to_assets_ratio": 0.12786805651395305,
+    "debt_to_capital_ratio": 0.17623077299143836,
+    "debt_to_ebitda_ratio": 1.0806975959826866,
+    "interest_coverage_ratio": 17.821696540225094
+  }
+}
+\end{lstlisting}
+
+JPMorgan Chase:
+
+\begin{lstlisting}[style=json]
+{
+  "year": "2023",
+  "currency": "USD",
+  "field_values": {
+    "cash_and_cash_equivalents": 624151000000.0,
+    "short_term_market_securities": 476588000000.0,
+    "total_accounts_receivable": 107363000000.0,
+    "total_current_liabilities": 3155690000000.0,
+    "total_debt_short_term_and_long_term": 436537000000.0,
+    "total_equity": 327878000000.0,
+    "total_assets": 3875393000000.0,
+    "total_revenue": 239425000000.0,
+    "total_operating_cost": 177813000000.0,
+    "net_income": 49552000000.0,
+    "taxes": 12060000000.0,
+    "interest_expenses": 81321000000.0,
+    "depreciation_and_amortization": 7512000000.0
+  },
+  "derived_values": {
+    "ebit": 142933000000.0,
+    "ebitda": 150445000000.0,
+    "quick_assets": 1208102000000.0,
+    "debt_plus_equity": 764415000000.0
+  },
+  "ratios": {
+    "cost_to_income_ratio": 0.7426668058891093,
+    "quick_ratio": 0.38283291451314927,
+    "debt_to_equity_ratio": 1.3314007039203606,
+    "debt_to_assets_ratio": 0.11264328546808026,
+    "debt_to_capital_ratio": 0.5710733044223361,
+    "debt_to_ebitda_ratio": 2.90163847253149,
+    "interest_coverage_ratio": 1.7576394781175835
+  }
+},
+{
+  "year": "2024",
+  "currency": "USD",
+  "field_values": {
+    "cash_and_cash_equivalents": 469317000000.0,
+    "short_term_market_securities": 514547000000.0,
+    "total_accounts_receivable": 101223000000.0,
+    "total_current_liabilities": 3256638000000.0,
+    "total_debt_short_term_and_long_term": 454311000000.0,
+    "total_equity": 344758000000.0,
+    "total_assets": 4002814000000.0,
+    "total_revenue": 278906000000.0,
+    "total_operating_cost": 203825000000.0,
+    "net_income": 58471000000.0,
+    "taxes": 16610000000.0,
+    "interest_expenses": 101350000000.0,
+    "depreciation_and_amortization": 7938000000.0
+  },
+  "derived_values": {
+    "ebit": 176431000000.0,
+    "ebitda": 184369000000.0,
+    "quick_assets": 1085087000000.0,
+    "debt_plus_equity": 799069000000.0
+  },
+  "ratios": {
+    "cost_to_income_ratio": 0.7308017755085943,
+    "quick_ratio": 0.33319239043455245,
+    "debt_to_equity_ratio": 1.3177678255471954,
+    "debt_to_assets_ratio": 0.11349790422437815,
+    "debt_to_capital_ratio": 0.5685504005286152,
+    "debt_to_ebitda_ratio": 2.464139849974779,
+    "interest_coverage_ratio": 1.740809077454366
+  }
+}
+\end{lstlisting}
+
+ExxonMobil:
+
+\begin{lstlisting}[style=json]
+{
+  "year": "2023",
+  "currency": "USD",
+  "field_values": {
+    "cash_and_cash_equivalents": 31568000000.0,
+    "short_term_market_securities": 0.0,
+    "total_accounts_receivable": 38015000000.0,
+    "total_current_liabilities": 65316000000.0,
+    "total_debt_short_term_and_long_term": 41573000000.0,
+    "total_equity": 212538000000.0,
+    "total_assets": 376317000000.0,
+    "total_revenue": 344582000000.0,
+    "total_operating_cost": 290950000000.0,
+    "net_income": 36010000000.0,
+    "taxes": 15429000000.0,
+    "interest_expenses": 849000000.0,
+    "depreciation_and_amortization": 20641000000.0
+  },
+  "derived_values": {
+    "ebit": 52288000000.0,
+    "ebitda": 72929000000.0,
+    "quick_assets": 69583000000.0,
+    "debt_plus_equity": 254111000000.0
+  },
+  "ratios": {
+    "cost_to_income_ratio": 0.8443563505928923,
+    "quick_ratio": 1.065328556555821,
+    "debt_to_equity_ratio": 0.19560266869924436,
+    "debt_to_assets_ratio": 0.11047335092488514,
+    "debt_to_capital_ratio": 0.163601733100889,
+    "debt_to_ebitda_ratio": 0.5700475805235229,
+    "interest_coverage_ratio": 61.58775029446407
+  }
+},
+{
+  "year": "2024",
+  "currency": "USD",
+  "field_values": {
+    "cash_and_cash_equivalents": 23187000000.0,
+    "short_term_market_securities": 0.0,
+    "total_accounts_receivable": 43681000000.0,
+    "total_current_liabilities": 70307000000.0,
+    "total_debt_short_term_and_long_term": 41710000000.0,
+    "total_equity": 270606000000.0,
+    "total_assets": 453475000000.0,
+    "total_revenue": 349585000000.0,
+    "total_operating_cost": 299716000000.0,
+    "net_income": 33680000000.0,
+    "taxes": 13810000000.0,
+    "interest_expenses": 996000000.0,
+    "depreciation_and_amortization": 23442000000.0
+  },
+  "derived_values": {
+    "ebit": 48486000000.0,
+    "ebitda": 71928000000.0,
+    "quick_assets": 66868000000.0,
+    "debt_plus_equity": 312316000000.0
+  },
+  "ratios": {
+    "cost_to_income_ratio": 0.8573479983408899,
+    "quick_ratio": 0.951085951612215,
+    "debt_to_equity_ratio": 0.1541355328411048,
+    "debt_to_assets_ratio": 0.09197860962566845,
+    "debt_to_capital_ratio": 0.1335506346136605,
+    "debt_to_ebitda_ratio": 0.5798854409965521,
+    "interest_coverage_ratio": 48.68072289156626
+  }
+}
+\end{lstlisting}
+
+Volkswagen:
+
+\begin{lstlisting}[style=json]
+{
+  "year": "2023",
+  "currency": "EUR",
+  "field_values": {
+    "cash_and_cash_equivalents": 43449000000.0,
+    "short_term_market_securities": 26772000000.0,
+    "total_accounts_receivable": 88230000000.0,
+    "total_current_liabilities": 206036000000.0,
+    "total_debt_short_term_and_long_term": 232799000000.0,
+    "total_equity": 189186000000.0,
+    "total_assets": 600649000000.0,
+    "total_revenue": 322284000000.0,
+    "total_operating_cost": 314907000000.0,
+    "net_income": 17861000000.0,
+    "taxes": 5237000000.0,
+    "interest_expenses": 3640000000.0,
+    "depreciation_and_amortization": 27566000000.0
+  },
+  "derived_values": {
+    "ebit": 26738000000.0,
+    "ebitda": 54304000000.0,
+    "quick_assets": 158451000000.0,
+    "debt_plus_equity": 421985000000.0
+  },
+  "ratios": {
+    "cost_to_income_ratio": 0.9771102505864393,
+    "quick_ratio": 0.7690452153992506,
+    "debt_to_equity_ratio": 1.2305297432156714,
+    "debt_to_assets_ratio": 0.3875791019380703,
+    "debt_to_capital_ratio": 0.5516760074410227,
+    "debt_to_ebitda_ratio": 4.286958603417796,
+    "interest_coverage_ratio": 7.345604395604395
+  }
+},
+{
+  "year": "2024",
+  "currency": "EUR",
+  "field_values": {
+    "cash_and_cash_equivalents": 40296000000.0,
+    "short_term_market_securities": 27326000000.0,
+    "total_accounts_receivable": 89985000000.0,
+    "total_current_liabilities": 217039000000.0,
+    "total_debt_short_term_and_long_term": 254081000000.0,
+    "total_equity": 196731000000.0,
+    "total_assets": 632905000000.0,
+    "total_revenue": 324656000000.0,
+    "total_operating_cost": 320570000000.0,
+    "net_income": 12394000000.0,
+    "taxes": 4411000000.0,
+    "interest_expenses": 3446000000.0,
+    "depreciation_and_amortization": 31346000000.0
+  },
+  "derived_values": {
+    "ebit": 20251000000.0,
+    "ebitda": 51597000000.0,
+    "quick_assets": 157607000000.0,
+    "debt_plus_equity": 450812000000.0
+  },
+  "ratios": {
+    "cost_to_income_ratio": 0.9874143709033562,
+    "quick_ratio": 0.7261690295292551,
+    "debt_to_equity_ratio": 1.2915148095622957,
+    "debt_to_assets_ratio": 0.40145203466555013,
+    "debt_to_capital_ratio": 0.5636074461194467,
+    "debt_to_ebitda_ratio": 4.924336686241448,
+    "interest_coverage_ratio": 5.876668601276843
+  }
+}
+\end{lstlisting}
+
+Microsoft:
+
+\begin{lstlisting}[style=json]
+{
+  "year": "2024",
+  "currency": "USD",
+  "field_values": {
+    "cash_and_cash_equivalents": 18315000000.0,
+    "short_term_market_securities": 57228000000.0,
+    "total_accounts_receivable": 56924000000.0,
+    "total_current_liabilities": 125286000000.0,
+    "total_debt_short_term_and_long_term": 51630000000.0,
+    "total_equity": 268477000000.0,
+    "total_assets": 512163000000.0,
+    "total_revenue": 245122000000.0,
+    "total_operating_cost": 135689000000.0,
+    "net_income": 88136000000.0,
+    "taxes": 19651000000.0,
+    "interest_expenses": 2935000000.0,
+    "depreciation_and_amortization": 22287000000.0
+  },
+  "derived_values": {
+    "ebit": 110722000000.0,
+    "ebitda": 133009000000.0,
+    "quick_assets": 132467000000.0,
+    "debt_plus_equity": 320107000000.0
+  },
+  "ratios": {
+    "cost_to_income_ratio": 0.5535570042672628,
+    "quick_ratio": 1.0573168590265472,
+    "debt_to_equity_ratio": 0.19230697601656752,
+    "debt_to_assets_ratio": 0.10080775065750552,
+    "debt_to_capital_ratio": 0.16128981871686654,
+    "debt_to_ebitda_ratio": 0.38816922163161893,
+    "interest_coverage_ratio": 37.72470187393527
+  }
+},
+{
+  "year": "2025",
+  "currency": "USD",
+  "field_values": {
+    "cash_and_cash_equivalents": 30242000000.0,
+    "short_term_market_securities": 64323000000.0,
+    "total_accounts_receivable": 69905000000.0,
+    "total_current_liabilities": 141218000000.0,
+    "total_debt_short_term_and_long_term": 43151000000.0,
+    "total_equity": 343479000000.0,
+    "total_assets": 619003000000.0,
+    "total_revenue": 281724000000.0,
+    "total_operating_cost": 153196000000.0,
+    "net_income": 101832000000.0,
+    "taxes": 21795000000.0,
+    "interest_expenses": 2385000000.0,
+    "depreciation_and_amortization": 34153000000.0
+  },
+  "derived_values": {
+    "ebit": 126012000000.0,
+    "ebitda": 160165000000.0,
+    "quick_assets": 164470000000.0,
+    "debt_plus_equity": 386630000000.0
+  },
+  "ratios": {
+    "cost_to_income_ratio": 0.5437804375914015,
+    "quick_ratio": 1.1646532311744962,
+    "debt_to_equity_ratio": 0.12562922332951942,
+    "debt_to_assets_ratio": 0.06971048605580264,
+    "debt_to_capital_ratio": 0.11160799731008975,
+    "debt_to_ebitda_ratio": 0.2694159148378235,
+    "interest_coverage_ratio": 52.835220125786165
+  }
+}
+\end{lstlisting}
+
+Google:
+
+\begin{lstlisting}[style=json]
+{
+  "year": "2023",
+  "currency": "USD",
+  "field_values": {
+    "cash_and_cash_equivalents": 24048000000.0,
+    "short_term_market_securities": 86868000000.0,
+    "total_accounts_receivable": 47964000000.0,
+    "total_current_liabilities": 81814000000.0,
+    "total_debt_short_term_and_long_term": 11870000000.0,
+    "total_equity": 283379000000.0,
+    "total_assets": 402392000000.0,
+    "total_revenue": 307394000000.0,
+    "total_operating_cost": 223101000000.0,
+    "net_income": 73795000000.0,
+    "taxes": 11922000000.0,
+    "interest_expenses": 308000000.0,
+    "depreciation_and_amortization": 11946000000.0
+  },
+  "derived_values": {
+    "ebit": 86025000000.0,
+    "ebitda": 97971000000.0,
+    "quick_assets": 158880000000.0,
+    "debt_plus_equity": 295249000000.0
+  },
+  "ratios": {
+    "cost_to_income_ratio": 0.7257818955477335,
+    "quick_ratio": 1.941965922702716,
+    "debt_to_equity_ratio": 0.04188736638918198,
+    "debt_to_assets_ratio": 0.02949859838167757,
+    "debt_to_capital_ratio": 0.040203353779352344,
+    "debt_to_ebitda_ratio": 0.12115830194649437,
+    "interest_coverage_ratio": 279.30194805194805
+  }
+},
+{
+  "year": "2024",
+  "currency": "USD",
+  "field_values": {
+    "cash_and_cash_equivalents": 23466000000.0,
+    "short_term_market_securities": 72191000000.0,
+    "total_accounts_receivable": 52340000000.0,
+    "total_current_liabilities": 89122000000.0,
+    "total_debt_short_term_and_long_term": 10883000000.0,
+    "total_equity": 325084000000.0,
+    "total_assets": 450256000000.0,
+    "total_revenue": 350018000000.0,
+    "total_operating_cost": 237628000000.0,
+    "net_income": 100118000000.0,
+    "taxes": 19697000000.0,
+    "interest_expenses": 268000000.0,
+    "depreciation_and_amortization": 15311000000.0
+  },
+  "derived_values": {
+    "ebit": 120083000000.0,
+    "ebitda": 135394000000.0,
+    "quick_assets": 147997000000.0,
+    "debt_plus_equity": 335967000000.0
+  },
+  "ratios": {
+    "cost_to_income_ratio": 0.678902227885423,
+    "quick_ratio": 1.6606112968739482,
+    "debt_to_equity_ratio": 0.033477501199689924,
+    "debt_to_assets_ratio": 0.02417069400518816,
+    "debt_to_capital_ratio": 0.03239306241386803,
+    "debt_to_ebitda_ratio": 0.08038022364358834,
+    "interest_coverage_ratio": 448.07089552238807
+  }
+}
+\end{lstlisting}
+
+\textbf{\hfill\break
+}
+
+\textbf{References}
+
+\hypertarget{ref:almeida14}{}\hyperlink{ref:almeida14}{[Almeida(14)]} Almeida, Heitor et al., (2014), ``Corporate Liquidity
+Management: A Conceptual Framework and Survey'', Available at SSRN:
+\url{http://ssrn.com/abstract_id=2336367}
+
+\hypertarget{ref:benninga06}{}\hyperlink{ref:benninga06}{[Benninga(06)]} Benninga, Simon, (2006), Principles of Finance with
+Excel, Oxford, London.
+
+\hypertarget{ref:durr20}{}\hyperlink{ref:durr20}{[Dürr(20)]} Dürr, O., Sick, B., \& Murina, E. (2020). Probabilistic
+deep learning: With Python, Keras and TensorFlow probability. Manning.
+
+\hypertarget{ref:iasb21}{}\hyperlink{ref:iasb21}{[IASB(21)]} International Accounting Standards Board (IASB). (2021).
+IAS 2: Inventories.
+\url{https://www.ifrs.org/content/dam/ifrs/publications/pdf-standards/english/2024/issued/part-a/ias-2-inventories.pdf?bypass=on}
+
+\hypertarget{ref:liu23}{}\hyperlink{ref:liu23}{[Liu(23)]} Liu, Nelson F. et al, (2023), ``Lost in the Middle: How
+Language Models Use Long Contexts'',
+\url{https://arxiv.org/abs/2307.03172}
+
+\hypertarget{ref:pareja07}{}\hyperlink{ref:pareja07}{[Pareja(07)]} Vélez Pareja, Ignacio, (2007), ``Forecasting Financial
+Statement with No Plugs and No Circularity'', Available at SSRN:
+\url{http://ssrn.com/abstract=1031735}
+
+\hypertarget{ref:pareja09}{}\hyperlink{ref:pareja09}{[Pareja(09)]} Vélez Pareja, Ignacio, (2009), ``Constructing
+Consistent Financial Planning Models for Valuation'' (August 15),
+Available at SSRN: \url{http://ssrn.com/abstract=1455304}
+
+\hypertarget{ref:wei22}{}\hyperlink{ref:wei22}{[Wei(22)]} Wei, Jason et al., (2022), ``Chain-of-Thought Prompting
+Elicits Reasoning in Large Language Models'',
+\url{https://arxiv.org/abs/2201.11903}
+
+\hypertarget{ref:zhang25}{}\hyperlink{ref:zhang25}{[Zhang(25)]} Zhang, Haichao et al., (2025), ``Research on Financial
+Statement Checking Relationship Recognition System Based on Large
+Language Models'',
+\url{https://dl.acm.org/doi/pdf/10.1145/3745238.3745291}
+
+\end{document}
