@@ -1,0 +1,33 @@
+[build-system]
+requires = ["setuptools>=68.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "financial-forecast"
+version = "0.1.0"
+description = "Financial forecasting models using TensorFlow with Bayesian inference"
+requires-python = ">=3.9"
+dependencies = [
+    "tensorflow>=2.14",
+    "tensorflow-probability>=0.22",
+    "matplotlib>=3.7",
+    "python-dotenv>=1.0",
+    "pdfplumber>=0.10",
+    "numpy>=1.24",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0",
+]
+
+[project.scripts]
+run-forecast = "scripts.run_forecast:main"
+run-extraction = "scripts.run_extraction:main"
+run-bayesian-forecast = "scripts.run_bayesian_forecast:main"
+
+[tool.setuptools.packages.find]
+include = ["financial_forecast*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

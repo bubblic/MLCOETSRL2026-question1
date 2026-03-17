@@ -3,7 +3,7 @@ from __future__ import annotations
 import argparse
 import json
 
-from azure_llm_client import AzureLLMClient
+from financial_forecast.clients.azure_llm_client import AzureLLMClient
 
 
 def parse_args() -> argparse.Namespace:

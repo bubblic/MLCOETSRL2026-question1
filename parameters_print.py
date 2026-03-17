@@ -2,7 +2,7 @@ path = "trained_parameters_dont_include_tax_anomalies.npz"
 import os
 import numpy as np  # Only used for loading parameters
 import tensorflow as tf
-from historical_data import get_apple_historical_data
+from financial_forecast.data.historical_data import get_apple_historical_data
 
 
 def sigmoid(x):
