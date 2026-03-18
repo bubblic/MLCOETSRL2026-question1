@@ -26,9 +26,31 @@ from financial_forecast.serialization.parameter_io import (
     save_parameters as _save_parameters,
     load_parameters as _load_parameters,
 )
+from financial_forecast.inference.state_index import (
+    R_NCA,
+    R_ADV_PP,
+    R_AR,
+    R_INV,
+    R_CASH,
+    R_IMS,
+    R_AP,
+    R_ADV_PS,
+    R_EFF_ST_DEBT,
+    R_CUR_LT_DEBT,
+    R_NCL,
+    R_EQUITY,
+    R_NET_INCOME,
+    R_DIVIDENDS,
+    RECURRENT_KEYS,
+    DIAGNOSTIC_KEYS,
+)
 
 tfd = tfp.distributions
 tfb = tfp.bijectors
+
+# Graph-mode-safe zero constant.  Bare Python ``0.0`` defaults to float32
+# inside ``@tf.function``, which causes dtype mismatches with float64 tensors.
+_ZERO = tf.constant(0.0, dtype=tf.float64)
 
 
 class BayesianFinancialModel(BaseFinancialModel):
@@ -331,6 +353,7 @@ class BayesianFinancialModel(BaseFinancialModel):
     # Forecast (overrides base class template)
     # ------------------------------------------------------------------
 
+    @tf.function
     def forecast_step(
         self,
         state,
@@ -339,14 +362,13 @@ class BayesianFinancialModel(BaseFinancialModel):
         sampled_var_opex=None,
         sampled_base_opex=None,
     ):
-        """Advance the financial state by one period.
+        """Advance the financial state by one period (graph-compiled).
 
-        Overrides :meth:`BaseFinancialModel.forecast_step` with the full
-        Bayesian Cash Budget construction including time-varying parameters,
-        Lintner dividend smoothing, and policy-driven short-term debt.
+        Thin wrapper around :meth:`forecast_step_compiled` that converts
+        between the dict-based interface and packed tensor representation.
 
         Args:
-            state: Dict or :class:`FinancialState` at *t-1*.
+            state: Dict at *t-1* with balance-sheet entries.
             inputs: Dict with ``sales_t``, ``year``, ``cum_inflation``,
                 and optional ``tax_onetime_payment``.
             use_mean_opex: Use posterior mean (no sampling/noise).
@@ -356,39 +378,120 @@ class BayesianFinancialModel(BaseFinancialModel):
         Returns:
             Dict mapping output keys to scalar tensors for period *t*.
         """
-        # --- Unpack previous state (t-1) ---
-        nca_prev = state["nca"]
-        advance_payments_purchases_prev = state["advance_payments_purchases"]
-        accounts_receivable_prev = state["accounts_receivable"]
-        inventory_prev = state["inventory"]
-        cash_prev = state["cash"]
-        investment_in_market_securities_prev = state["investment_in_market_securities"]
-        accounts_payable_prev = state["accounts_payable"]
-        advance_payments_sales_prev = state["advance_payments_sales"]
-        effective_st_debt_prev = state["effective_st_debt"]
-        current_lt_debt_prev = state["current_lt_debt"]
-        non_current_liabilities_prev = state["non_current_liabilities"]
-        equity_prev = state["equity"]
-        net_income_prev = state["net_income"]
-        dividends_prev_actual = state["dividends"]
 
-        # --- Unpack current inputs (t) ---
-        sales_t = inputs["sales_t"]
-        year = inputs["year"]
-        cum_inflation = inputs["cum_inflation"]
+        # Convert dict state -> [1, 14] tensor
+        state_tensor = tf.expand_dims(
+            tf.stack([tf.cast(state[k], tf.float64) for k in RECURRENT_KEYS]),
+            0,
+        )
+
+        # Prepare per-sample inputs (n_samples=1)
+        sales_t = tf.reshape(inputs["sales_t"], [1])
+        tax_onetime = tf.reshape(
+            tf.cast(inputs.get("tax_onetime_payment", 0.0), tf.float64), [1]
+        )
+
+        if use_mean_opex:
+            var_opex = tf.reshape(self.q_var_opex_loc, [1])
+            base_opex = tf.reshape(self.q_base_opex_loc, [1])
+            noise = tf.zeros([1], dtype=tf.float64)
+        else:
+            var_opex = tf.reshape(
+                (
+                    sampled_var_opex
+                    if sampled_var_opex is not None
+                    else self.q_var_opex_loc
+                ),
+                [1],
+            )
+            base_opex = tf.reshape(
+                (
+                    sampled_base_opex
+                    if sampled_base_opex is not None
+                    else self.q_base_opex_loc
+                ),
+                [1],
+            )
+            noise = tfd.Normal(_ZERO, self.noise_sigma).sample([1])
+
+        _, diagnostics = self.forecast_step_compiled(
+            state_tensor,
+            sales_t,
+            inputs["year"],
+            inputs["cum_inflation"],
+            var_opex,
+            base_opex,
+            noise,
+            tax_onetime,
+        )
+
+        return {key: diagnostics[0, i] for i, key in enumerate(DIAGNOSTIC_KEYS)}
+
+    def forecast_step_compiled(
+        self,
+        state,
+        sales_t,
+        year,
+        cum_inflation,
+        var_opex,
+        base_opex,
+        noise,
+        tax_onetime_payment=None,
+    ):
+        """Batched single-period forecast — single source of truth.
+
+        All financial arithmetic lives here.  Called directly by the compiled
+        Monte Carlo loop and wrapped by :meth:`forecast_step` for dict-based
+        callers.
+
+        Args:
+            state: ``[n_samples, 14]`` recurrent state tensor.
+            sales_t: ``[n_samples]`` sales for this period.
+            year: Scalar float64 calendar year.
+            cum_inflation: Scalar float64 cumulative inflation factor.
+            var_opex: ``[n_samples]`` pre-sampled variable OpEx percentage.
+            base_opex: ``[n_samples]`` pre-sampled baseline OpEx.
+            noise: ``[n_samples]`` pre-sampled aleatoric noise.
+            tax_onetime_payment: Optional ``[n_samples]`` one-time tax
+                adjustment.  Defaults to zero.
+
+        Returns:
+            Tuple ``(new_state, diagnostics)`` where *new_state* has shape
+            ``[n_samples, 14]`` and *diagnostics* has shape
+            ``[n_samples, 27]``.
+        """
+
+        zero = tf.constant(0.0, dtype=tf.float64)
         time_index = year - tf.constant(float(self.base_year), dtype=tf.float64)
+
+        # --- Unpack recurrent state (t-1) ---
+        nca_prev = state[:, R_NCA]
+        adv_pp_prev = state[:, R_ADV_PP]
+        ar_prev = state[:, R_AR]
+        inv_prev = state[:, R_INV]
+        cash_prev = state[:, R_CASH]
+        ims_prev = state[:, R_IMS]
+        ap_prev = state[:, R_AP]
+        adv_ps_prev = state[:, R_ADV_PS]
+        eff_st_debt_prev = state[:, R_EFF_ST_DEBT]
+        cur_lt_debt_prev = state[:, R_CUR_LT_DEBT]
+        ncl_prev = state[:, R_NCL]
+        equity_prev = state[:, R_EQUITY]
+        ni_prev = state[:, R_NET_INCOME]
+        div_prev_actual = state[:, R_DIVIDENDS]
 
         # --- 1. Asset Evolution ---
         depreciation = nca_prev * self.depreciation_rate
+
         # Stock buyback: fixed baseline + multiple of depreciation
         stock_buyback = self.sb_baseline + self.sb_ratio * depreciation
 
         # Lintner dividend smoothing: D_t = alpha*(PR*NI_{t-1}) + (1-alpha)*D_{t-1}
         # alpha=1 -> pure payout ratio; alpha=0 -> constant dividends
-        dividend_target = net_income_prev * self.dividend_payout_ratio_pct
+        dividend_target = ni_prev * self.dividend_payout_ratio_pct
         dividends_prev = (
             self.dividend_adjustment_speed * dividend_target
-            + (1.0 - self.dividend_adjustment_speed) * dividends_prev_actual
+            + (1.0 - self.dividend_adjustment_speed) * div_prev_actual
         )
 
         # Cost ratio CR_t = sigmoid(alpha + beta*t) follows a logit-linear trend.
@@ -396,105 +499,76 @@ class BayesianFinancialModel(BaseFinancialModel):
         cost_ratio_t = tf.sigmoid(
             self.cost_ratio_alpha + self.cost_ratio_beta * time_index
         )
+
         # CapEx = maintenance (asset_maintain * depr) + growth (asset_growth * sales)
         capex = self.asset_maintain * depreciation + sales_t * self.asset_growth
         nca_curr = nca_prev - depreciation + capex
 
-        accounts_receivable_curr = sales_t * self.account_receivables_pct
-        inventory_curr = sales_t * self.inventory_pct
+        ar_curr = sales_t * self.account_receivables_pct
+        inv_curr = sales_t * self.inventory_pct
         # Inventory identity: COGS = Inv_prev + Purchases - Inv_curr
-        purchases_t = sales_t * cost_ratio_t + (inventory_curr - inventory_prev)
-        advance_payments_purchases_curr = (
-            purchases_t * self.advance_payments_purchases_pct
-        )
+        purchases_t = sales_t * cost_ratio_t + (inv_curr - inv_prev)
+        adv_pp_curr = purchases_t * self.advance_payments_purchases_pct
 
         # Total liquidity: baseline floor + sales * sigmoid(logit-linear trend)
         tl_pct = tf.sigmoid(self.tl_alpha + self.tl_beta * time_index)
         total_liquidity_curr = self.tl_baseline + sales_t * tl_pct
+
         # Cash split: sigmoid trend ensures cash fraction stays in (0, 1)
         cash_pct = tf.sigmoid(self.cash_alpha + self.cash_beta * time_index)
         cash_curr = total_liquidity_curr * cash_pct
-        investment_in_market_securities_curr = total_liquidity_curr - cash_curr
+        ims_curr = total_liquidity_curr - cash_curr
 
         # --- 2. Income Statement ---
         # COGS = Inv_prev + Purchases - Inv_curr = Sales * CR_t  (by construction)
-        cogs = inventory_prev + purchases_t - inventory_curr
-
-        # Bayesian OpEx: OpEx = base*inflation + var_pct*centered_sales + noise
-        if use_mean_opex:
-            var_opex = self.q_var_opex_loc
-            base_opex = self.q_base_opex_loc
-            noise = 0.0
-        else:
-            var_opex = (
-                sampled_var_opex
-                if sampled_var_opex is not None
-                else self.q_var_opex_loc
-            )
-            base_opex = (
-                sampled_base_opex
-                if sampled_base_opex is not None
-                else self.q_base_opex_loc
-            )
-            noise = tfd.Normal(0.0, self.noise_sigma).sample()
+        cogs = inv_prev + purchases_t - inv_curr
 
         sales_t_centered = sales_t - self.sales_offset
         opex = (base_opex * cum_inflation) + (sales_t_centered * var_opex) + noise
         ebitda = sales_t - cogs - opex
 
         # Debt servicing based on PREVIOUS debt levels (avoids circularity)
-        principal_lt = current_lt_debt_prev
-        interest_lt = self.avg_long_term_interest_pct * (
-            non_current_liabilities_prev + current_lt_debt_prev
-        )
-        principal_st = effective_st_debt_prev
+        principal_lt = cur_lt_debt_prev
+        interest_lt = self.avg_long_term_interest_pct * (ncl_prev + cur_lt_debt_prev)
+        principal_st = eff_st_debt_prev
         interest_st = self.avg_short_term_interest_pct * principal_st
 
-        ms_return = (
-            investment_in_market_securities_prev * self.market_securities_return_pct
-        )
+        ms_return = ims_prev * self.market_securities_return_pct
         ebt = ebitda - depreciation - (interest_st + interest_lt) + ms_return
-        tax_onetime_payment = tf.cast(
-            inputs.get("tax_onetime_payment", 0.0), dtype=tf.float64
+        tax_onetime = (
+            tax_onetime_payment
+            if tax_onetime_payment is not None
+            else tf.zeros_like(sales_t)
         )
-        tax = ebt * self.income_tax_pct + tax_onetime_payment
-        net_income_curr = ebt - tax
+        tax = ebt * self.income_tax_pct + tax_onetime
+        ni_curr = ebt - tax
 
         # --- 3. Liquidity Budget ---
         # Five-module structure: operating, investing, external, financing, owners
 
         # 3.1 Operating NLB: cash inflows from sales vs outflows for purchases/opex/tax
-        sales_curr = (
-            sales_t * (1 - self.account_receivables_pct) - advance_payments_sales_prev
-        )
-        advance_payments_sales_curr = sales_t * self.advance_payments_sales_pct
-        inflows = sales_curr + accounts_receivable_prev + advance_payments_sales_curr
+        sales_curr = sales_t * (1 - self.account_receivables_pct) - adv_ps_prev
+        adv_ps_curr = sales_t * self.advance_payments_sales_pct
+        inflows = sales_curr + ar_prev + adv_ps_curr
 
-        purchases_curr = (
-            purchases_t * (1 - self.account_payables_pct)
-            - advance_payments_purchases_prev
-        )
-        outflows = (
-            purchases_curr
-            + accounts_payable_prev
-            + advance_payments_purchases_curr
-            + opex
-            + tax
-        )
+        purchases_curr = purchases_t * (1 - self.account_payables_pct) - adv_pp_prev
+        outflows = purchases_curr + ap_prev + adv_pp_curr + opex + tax
         operating_nlb = inflows - outflows
 
-        capex_nlb = -capex  # 3.2 Capital expenditure outflow
-        external_investment_nlb = ms_return  # 3.3 Return on market securities
+        # 3.2 Capital expenditure outflow
+        capex_nlb = -capex
+
+        # 3.3 Return on market securities
+        external_investment_nlb = ms_return
 
         # 3.4 Financing: ST debt is policy-driven (logit-linear % of sales),
         # not deficit-driven — reflects corporate treasury/revolving credit policy
         st_debt_pct = tf.sigmoid(self.st_debt_alpha + self.st_debt_beta * time_index)
-        effective_st_debt_curr = sales_t * st_debt_pct
+        eff_st_debt_curr = sales_t * st_debt_pct
 
-        # Diagnostic: short-term liquidity gap before new financing
         liquidity_deficit_st = (
             total_liquidity_curr
-            - (cash_prev + investment_in_market_securities_prev)
+            - (cash_prev + ims_prev)
             - operating_nlb
             + principal_st
             + interest_st
@@ -502,7 +576,7 @@ class BayesianFinancialModel(BaseFinancialModel):
 
         liquidity_deficit_lt = (
             liquidity_deficit_st
-            - effective_st_debt_curr
+            - eff_st_debt_curr
             - external_investment_nlb
             - capex_nlb
             + principal_lt
@@ -510,26 +584,27 @@ class BayesianFinancialModel(BaseFinancialModel):
             + dividends_prev
             + stock_buyback
         )
-        long_term_financing = tf.maximum(0.0, liquidity_deficit_lt)
+        long_term_financing = tf.maximum(zero, liquidity_deficit_lt)
 
         # Equity-financing mix: logit-linear trend for debt vs equity split
         ef_pct = tf.sigmoid(self.ef_alpha + self.ef_beta * time_index)
-        new_long_term_loan = long_term_financing * (1 - ef_pct)
+        new_lt_loan = long_term_financing * (1 - ef_pct)
         equity_financing = long_term_financing * ef_pct
 
         # Any surplus cash beyond the liquidity target funds additional buybacks,
         # ensuring the liquidity budget closes exactly.
-        excess_cash_buyback = tf.maximum(0.0, -liquidity_deficit_lt)
+        excess_cash_buyback = tf.maximum(zero, -liquidity_deficit_lt)
         stock_buyback = stock_buyback + excess_cash_buyback
 
         financing_nlb = (
-            effective_st_debt_curr
-            + new_long_term_loan
+            eff_st_debt_curr
+            + new_lt_loan
             - principal_st
             - principal_lt
             - interest_st
             - interest_lt
         )
+
         # 3.5 Transaction with owners: equity issuance minus payouts
         transaction_with_owners_nlb = equity_financing - dividends_prev - stock_buyback
         total_nlb = (
@@ -539,76 +614,87 @@ class BayesianFinancialModel(BaseFinancialModel):
             + external_investment_nlb
             + transaction_with_owners_nlb
         )
-        liquidity_check = (
-            (cash_prev + investment_in_market_securities_prev)
-            + total_nlb
-            - total_liquidity_curr
-        )
+        liquidity_check = (cash_prev + ims_prev) + total_nlb - total_liquidity_curr
 
         # --- 4. Liabilities Evolution ---
-        accounts_payable_curr = purchases_t * self.account_payables_pct
-        total_long_term_liabilities = new_long_term_loan + non_current_liabilities_prev
-        non_current_liabilities_curr = total_long_term_liabilities * (
-            1 - 1 / self.avg_maturity_years
-        )
-        current_lt_debt_curr = total_long_term_liabilities / self.avg_maturity_years
+        ap_curr = purchases_t * self.account_payables_pct
+        total_lt_liabilities = new_lt_loan + ncl_prev
+        ncl_curr = total_lt_liabilities * (1 - 1 / self.avg_maturity_years)
+        cur_lt_debt_curr = total_lt_liabilities / self.avg_maturity_years
 
         equity_curr = (
-            equity_prev
-            + equity_financing
-            + net_income_curr
-            - dividends_prev
-            - stock_buyback
+            equity_prev + equity_financing + ni_curr - dividends_prev - stock_buyback
         )
 
-        # --- 5. Balance Sheet Identity Check ---
-        # Assets = Liabilities + Equity  (should be near zero if logic is consistent)
+        # --- 5. Total Assets & Balance Sheet Check ---
         total_assets = (
-            nca_curr
-            + advance_payments_purchases_curr
-            + accounts_receivable_curr
-            + inventory_curr
-            + cash_curr
-            + investment_in_market_securities_curr
+            nca_curr + adv_pp_curr + ar_curr + inv_curr + cash_curr + ims_curr
         )
         total_liab_equity = (
-            accounts_payable_curr
-            + advance_payments_sales_curr
-            + current_lt_debt_curr
-            + effective_st_debt_curr
-            + non_current_liabilities_curr
+            ap_curr
+            + adv_ps_curr
+            + eff_st_debt_curr
+            + cur_lt_debt_curr
+            + ncl_curr
             + equity_curr
         )
         check = total_assets - total_liab_equity
 
-        return {
-            "nca": nca_curr,
-            "advance_payments_purchases": advance_payments_purchases_curr,
-            "accounts_receivable": accounts_receivable_curr,
-            "inventory": inventory_curr,
-            "cash": cash_curr,
-            "investment_in_market_securities": investment_in_market_securities_curr,
-            "accounts_payable": accounts_payable_curr,
-            "advance_payments_sales": advance_payments_sales_curr,
-            "effective_st_debt": effective_st_debt_curr,
-            "non_current_liabilities": non_current_liabilities_curr,
-            "equity": equity_curr,
-            "cogs": cogs,
-            "opex": opex,
-            "tax": tax,
-            "ms_return": ms_return,
-            "interest_payment": interest_lt + interest_st,
-            "net_income": net_income_curr,
-            "depreciation": depreciation,
-            "dividends": dividends_prev,
-            "stock_buyback": stock_buyback,
-            "current_lt_debt": current_lt_debt_curr,
-            "new_long_term_loan": new_long_term_loan,
-            "equity_financing": equity_financing,
-            "liquidity_deficit_st": liquidity_deficit_st,
-            "liquidity_check": liquidity_check,
-            "check": check,
-        }
+        # --- Pack outputs ---
+        new_state = tf.stack(
+            [
+                nca_curr,
+                adv_pp_curr,
+                ar_curr,
+                inv_curr,
+                cash_curr,
+                ims_curr,
+                ap_curr,
+                adv_ps_curr,
+                eff_st_debt_curr,
+                cur_lt_debt_curr,
+                ncl_curr,
+                equity_curr,
+                ni_curr,
+                dividends_prev,
+            ],
+            axis=1,
+        )
+
+        diagnostics = tf.stack(
+            [
+                total_assets,
+                nca_curr,
+                adv_pp_curr,
+                ar_curr,
+                inv_curr,
+                cash_curr,
+                ims_curr,
+                ap_curr,
+                adv_ps_curr,
+                eff_st_debt_curr,
+                cur_lt_debt_curr,
+                ncl_curr,
+                equity_curr,
+                ni_curr,
+                depreciation,
+                cogs,
+                opex,
+                tax,
+                ms_return,
+                interest_lt + interest_st,
+                dividends_prev,
+                stock_buyback,
+                new_lt_loan,
+                equity_financing,
+                liquidity_deficit_st,
+                liquidity_check,
+                check,
+            ],
+            axis=1,
+        )
+
+        return new_state, diagnostics
 
 
 # Backward-compatible alias

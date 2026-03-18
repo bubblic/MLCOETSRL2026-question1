@@ -205,18 +205,28 @@ class StructuralTrainer(BaseTrainer):
         print("Training structural parameters...")
         num_transitions = len(historical_sales) - 1
 
-        # For each consecutive pair (t, t+1), run forecast_step from actual
-        # state at t with deterministic mean OpEx, then compare predicted
-        # state at t+1 against observed values.
-        for i in range(epochs):
+        # Cast gradient clip norm to tensor for graph-mode compatibility
+        clip_norm = (
+            tf.constant(gradient_clip_norm, dtype=tf.float64)
+            if gradient_clip_norm is not None and gradient_clip_norm > 0
+            else None
+        )
+        _zero = tf.constant(0.0, dtype=tf.float64)
+
+        # --- Compiled training step ---
+        # @tf.function compiles the full transition loop + gradient update
+        # into a TF graph.  The inner Python loop over transitions is
+        # unrolled at trace time (typically ~6 iterations, trivial).
+        @tf.function
+        def _compiled_train_step():
             with tf.GradientTape() as tape:
-                total_loss = 0.0
-                total_loss_ni = 0.0
-                total_loss_interest = 0.0
-                total_loss_ms_return = 0.0
-                total_loss_curr_lt = 0.0
-                total_loss_ncl = 0.0
-                total_loss_equity = 0.0
+                total_loss = _zero
+                total_loss_ni = _zero
+                total_loss_interest = _zero
+                total_loss_ms_return = _zero
+                total_loss_curr_lt = _zero
+                total_loss_ncl = _zero
+                total_loss_equity = _zero
 
                 for t in range(num_transitions):
                     state_prev = {
@@ -242,15 +252,13 @@ class StructuralTrainer(BaseTrainer):
                         "tax_onetime_payment": tax_onetime_t[t + 1],
                     }
 
-                    # Use deterministic mean OpEx so structural params are
-                    # trained against the most-likely OpEx path, not noise.
+                    # Deterministic mean OpEx for structural training
                     state_pred = model.forecast_step(
                         state_prev,
                         inputs_curr,
                         use_mean_opex=True,
                     )
 
-                    # Compare predicted vs actual state at t+1
                     loss_ni = tf.square(
                         (state_pred["net_income"] - ni_t[t + 1]) / scale_ni
                     )
@@ -269,8 +277,7 @@ class StructuralTrainer(BaseTrainer):
                     loss_equity = tf.square(
                         (state_pred["equity"] - equity_t[t + 1]) / scale_equity
                     )
-                    # Interest may be NaN/Inf for missing observations;
-                    # replace target with prediction so residual = 0.
+                    # Interest may be NaN/Inf for missing observations
                     valid_interest = tf.cast(
                         tf.math.is_finite(interest_t[t + 1]), tf.float64
                     )
@@ -284,17 +291,13 @@ class StructuralTrainer(BaseTrainer):
                         / scale_interest
                     )
                     loss_ms_return = tf.square(
-                        (state_pred["ms_return"] - ms_return_t[t + 1]) / scale_ms_return
+                        (state_pred["ms_return"] - ms_return_t[t + 1])
+                        / scale_ms_return
                     )
 
                     total_loss += (
-                        loss_ni
-                        + loss_eff_st
-                        + loss_curr_lt
-                        + loss_ncl
-                        + loss_equity
-                        + loss_interest
-                        + loss_ms_return
+                        loss_ni + loss_eff_st + loss_curr_lt + loss_ncl
+                        + loss_equity + loss_interest + loss_ms_return
                     )
                     total_loss_ni += loss_ni
                     total_loss_curr_lt += loss_curr_lt
@@ -304,27 +307,38 @@ class StructuralTrainer(BaseTrainer):
                     total_loss_ms_return += loss_ms_return
 
             grads = tape.gradient(total_loss, vars_to_train)
-            if gradient_clip_norm is not None and gradient_clip_norm > 0:
+            if clip_norm is not None:
                 grads = [
-                    None if g is None else tf.clip_by_norm(g, gradient_clip_norm)
+                    None if g is None else tf.clip_by_norm(g, clip_norm)
                     for g in grads
                 ]
             optimizer.apply_gradients(zip(grads, vars_to_train))
 
+            return tf.stack([
+                total_loss, total_loss_ni, total_loss_interest,
+                total_loss_ms_return, total_loss_curr_lt,
+                total_loss_ncl, total_loss_equity,
+            ])
+
+        # Index mapping for the stacked loss tensor
+        _L_TOTAL, _L_NI, _L_INT, _L_MSR, _L_CLT, _L_NCL, _L_EQ = range(7)
+
+        for i in range(epochs):
+            loss_stack = _compiled_train_step()
+
             if i % plot_every == 0:
+                v = loss_stack.numpy()
                 structural_history["epochs"].append(i)
-                structural_history["loss_total"].append(total_loss.numpy())
-                structural_history["loss_ni"].append(total_loss_ni.numpy())
-                structural_history["loss_interest"].append(total_loss_interest.numpy())
-                structural_history["loss_ms_return"].append(
-                    total_loss_ms_return.numpy()
-                )
-                structural_history["loss_curr_lt"].append(total_loss_curr_lt.numpy())
-                structural_history["loss_ncl"].append(total_loss_ncl.numpy())
-                structural_history["loss_equity"].append(total_loss_equity.numpy())
+                structural_history["loss_total"].append(v[_L_TOTAL])
+                structural_history["loss_ni"].append(v[_L_NI])
+                structural_history["loss_interest"].append(v[_L_INT])
+                structural_history["loss_ms_return"].append(v[_L_MSR])
+                structural_history["loss_curr_lt"].append(v[_L_CLT])
+                structural_history["loss_ncl"].append(v[_L_NCL])
+                structural_history["loss_equity"].append(v[_L_EQ])
 
             if i % 1000 == 0:
-                print(f"Epoch {i}: Structural Loss={total_loss.numpy():.4e}")
+                print(f"Epoch {i}: Structural Loss={loss_stack[_L_TOTAL].numpy():.4e}")
 
         print("Structural Training Complete.")
         print(f"Final %AvgSTInt: {model.avg_short_term_interest_pct.numpy():.5f}")

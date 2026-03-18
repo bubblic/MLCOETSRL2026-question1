@@ -297,16 +297,28 @@ class PolicyTrainer(BaseTrainer):
             "loss_prior_am": [],
         }
 
-        for i in range(epochs):
+        # Cast prior strength to float64 tensor for graph-mode compatibility
+        prior_strength_am = tf.constant(
+            prior_strength_asset_maintain, dtype=tf.float64
+        )
+        _zero = tf.constant(0.0, dtype=tf.float64)
+        _one = tf.constant(1.0, dtype=tf.float64)
+
+        # --- Compiled training step ---
+        # @tf.function compiles the loss computation + gradient update into
+        # an optimized TF graph, eliminating Python overhead per epoch.
+        # All losses are returned as a stacked tensor so the Python loop
+        # can log them with a single GPU-to-CPU transfer.
+        @tf.function
+        def _compiled_train_step():
             with tf.GradientTape() as tape:
-                # --- Deterministic Losses (MSE on historical ratio targets) ---
-                # Asset growth: delta_NCA = (AM-1)*Depr + AG*Sales
+                # Deterministic Losses (MSE on historical ratio targets)
                 loss_growth = tf.reduce_mean(
                     tf.square(
                         (
                             delta_nca_true
                             - (
-                                (model.asset_maintain - 1) * depr_true
+                                (model.asset_maintain - _one) * depr_true
                                 + sales_aligned_growth * model.asset_growth
                             )
                         )
@@ -372,7 +384,8 @@ class PolicyTrainer(BaseTrainer):
                     )
                 )
                 tax_pred_total = (
-                    ni_tensor / (1 / model.income_tax_pct - 1) + tax_onetime_tensor
+                    ni_tensor / (_one / model.income_tax_pct - _one)
+                    + tax_onetime_tensor
                 )
                 loss_tax = tf.reduce_mean(
                     tf.square((tax_tensor - tax_pred_total) / scale_tax)
@@ -380,7 +393,7 @@ class PolicyTrainer(BaseTrainer):
                 div_target = ni_prev_aligned * model.dividend_payout_ratio_pct
                 div_pred = (
                     model.dividend_adjustment_speed * div_target
-                    + (1.0 - model.dividend_adjustment_speed) * div_prev_aligned
+                    + (_one - model.dividend_adjustment_speed) * div_prev_aligned
                 )
                 loss_div = tf.reduce_mean(tf.square((div_true - div_pred) / scale_div))
                 bb_pred = model.sb_baseline + model.sb_ratio * depr_tensor
@@ -405,55 +418,59 @@ class PolicyTrainer(BaseTrainer):
                     )
                 )
 
-                # --- Bayesian OpEx Loss (ELBO = NLL + KL) ---
-                # Sample from variational posterior via reparameterization trick,
-                # then compute negative log-likelihood + KL divergence against
-                # wide Gaussian priors (approximately uniform).
+                # Bayesian OpEx Loss (ELBO = NLL + KL)
                 var_opex_sample, base_opex_sample = model.sample_opex_params()
                 pred_opex_raw = (base_opex_sample * cum_inf_tensor) + (
                     var_opex_sample * sales_tensor_centered
                 )
                 residuals = (opex_tensor - pred_opex_raw) / scale_opex
                 likelihood_dist = tfd.Normal(
-                    loc=0.0, scale=(model.noise_sigma / scale_opex)
+                    loc=_zero, scale=(model.noise_sigma / scale_opex)
                 )
-                neg_log_likelihood = -tf.reduce_sum(likelihood_dist.log_prob(residuals))
+                neg_log_likelihood = -tf.reduce_sum(
+                    likelihood_dist.log_prob(residuals)
+                )
                 kl = model.get_opex_kl_divergence()
                 loss_opex_bayes = (neg_log_likelihood + kl) / num_opex_obs
 
-                # Quadratic prior on asset_maintain centered at 1.0:
-                # AM ≈ 1.0 means capex fully replaces depreciation (maintenance).
-                # Without this prior, the optimizer can collapse AM → 0 and absorb
-                # everything into asset_growth, which is economically implausible.
-                prior_loss_am = prior_strength_asset_maintain * tf.square(
-                    model.asset_maintain - 1.0
+                # Quadratic prior on asset_maintain centered at 1.0
+                prior_loss_am = prior_strength_am * tf.square(
+                    model.asset_maintain - _one
                 )
 
                 total_loss = (
-                    loss_growth
-                    + loss_depr
-                    + loss_adv_ps
-                    + loss_adv_pp
-                    + loss_ar
-                    + loss_ap
-                    + loss_inv
-                    + loss_tl
-                    + loss_cash
-                    + loss_tax
-                    + loss_div
-                    + loss_bb
-                    + loss_cost_ratio
-                    + loss_eff_st_debt
-                    + loss_opex_bayes
-                    + prior_loss_am
+                    loss_growth + loss_depr + loss_adv_ps + loss_adv_pp
+                    + loss_ar + loss_ap + loss_inv + loss_tl + loss_cash
+                    + loss_tax + loss_div + loss_bb + loss_cost_ratio
+                    + loss_eff_st_debt + loss_opex_bayes + prior_loss_am
                 )
 
             grads = tape.gradient(total_loss, vars_to_train)
             optimizer.apply_gradients(zip(grads, vars_to_train))
 
+            # Return all losses as a single stacked tensor for efficient
+            # GPU-to-CPU transfer during logging.
+            return tf.stack([
+                total_loss, loss_growth, loss_depr, loss_adv_ps, loss_adv_pp,
+                loss_ar, loss_ap, loss_inv, loss_tl, loss_cash, loss_tax,
+                loss_div, loss_bb, loss_cost_ratio, loss_eff_st_debt,
+                loss_opex_bayes, prior_loss_am,
+            ])
+
+        # Index mapping for the stacked loss tensor
+        _L_TOTAL, _L_GROWTH, _L_DEPR = 0, 1, 2
+        _L_ADV_PS, _L_ADV_PP, _L_AR, _L_AP, _L_INV = 3, 4, 5, 6, 7
+        _L_TL, _L_CASH, _L_TAX, _L_DIV, _L_BB = 8, 9, 10, 11, 12
+        _L_CR, _L_EFF_ST, _L_OPEX_VI, _L_PRIOR_AM = 13, 14, 15, 16
+
+        for i in range(epochs):
+            loss_stack = _compiled_train_step()
+
             if i % plot_every == 0:
+                v = loss_stack.numpy()
+
                 vi_history["epochs"].append(i)
-                vi_history["loss_vi"].append(loss_opex_bayes.numpy())
+                vi_history["loss_vi"].append(v[_L_OPEX_VI])
                 vi_history["q_var_opex_loc"].append(model.q_var_opex_loc.numpy())
                 vi_history["q_var_opex_scale"].append(model.q_var_opex_scale.numpy())
                 vi_history["q_base_opex_loc"].append(model.q_base_opex_loc.numpy())
@@ -461,30 +478,30 @@ class PolicyTrainer(BaseTrainer):
                 vi_history["noise_sigma"].append(model.noise_sigma.numpy())
 
                 simple_history["epochs"].append(i)
-                simple_history["loss_total"].append(total_loss.numpy())
-                simple_history["loss_growth"].append(loss_growth.numpy())
-                simple_history["loss_depr"].append(loss_depr.numpy())
-                simple_history["loss_adv_ps"].append(loss_adv_ps.numpy())
-                simple_history["loss_adv_pp"].append(loss_adv_pp.numpy())
-                simple_history["loss_ar"].append(loss_ar.numpy())
-                simple_history["loss_ap"].append(loss_ap.numpy())
-                simple_history["loss_inv"].append(loss_inv.numpy())
-                simple_history["loss_tl"].append(loss_tl.numpy())
-                simple_history["loss_cash"].append(loss_cash.numpy())
-                simple_history["loss_tax"].append(loss_tax.numpy())
-                simple_history["loss_div"].append(loss_div.numpy())
-                simple_history["loss_bb"].append(loss_bb.numpy())
-                simple_history["loss_cost_ratio"].append(loss_cost_ratio.numpy())
-                simple_history["loss_eff_st_debt"].append(loss_eff_st_debt.numpy())
-                simple_history["loss_prior_am"].append(prior_loss_am.numpy())
+                simple_history["loss_total"].append(v[_L_TOTAL])
+                simple_history["loss_growth"].append(v[_L_GROWTH])
+                simple_history["loss_depr"].append(v[_L_DEPR])
+                simple_history["loss_adv_ps"].append(v[_L_ADV_PS])
+                simple_history["loss_adv_pp"].append(v[_L_ADV_PP])
+                simple_history["loss_ar"].append(v[_L_AR])
+                simple_history["loss_ap"].append(v[_L_AP])
+                simple_history["loss_inv"].append(v[_L_INV])
+                simple_history["loss_tl"].append(v[_L_TL])
+                simple_history["loss_cash"].append(v[_L_CASH])
+                simple_history["loss_tax"].append(v[_L_TAX])
+                simple_history["loss_div"].append(v[_L_DIV])
+                simple_history["loss_bb"].append(v[_L_BB])
+                simple_history["loss_cost_ratio"].append(v[_L_CR])
+                simple_history["loss_eff_st_debt"].append(v[_L_EFF_ST])
+                simple_history["loss_prior_am"].append(v[_L_PRIOR_AM])
 
                 print(
-                    f"Epoch {i}: Loss={total_loss.numpy():.4e} | "
-                    f"OpEx VI Loss={loss_opex_bayes.numpy():.4e} | "
+                    f"Epoch {i}: Loss={v[_L_TOTAL]:.4e} | "
+                    f"OpEx VI Loss={v[_L_OPEX_VI]:.4e} | "
                     f"OpEx Noise={(model.noise_sigma.numpy() * model.amount_scale):.2e} | "
                     f"AM={model.asset_maintain.numpy():.4f} "
                     f"AG={model.asset_growth.numpy():.6f} "
-                    f"Prior_AM={prior_loss_am.numpy():.4e}"
+                    f"Prior_AM={v[_L_PRIOR_AM]:.4e}"
                 )
 
         # --- Print final parameter values ---

@@ -1,140 +1,23 @@
 """Monte Carlo forecast execution helpers.
 
 This module runs forward simulations from an initial balance-sheet state and
-returns per-year trajectory arrays for each forecasted metric.
+returns per-year trajectory arrays for each forecasted metric.  The simulation
+uses a ``tf.while_loop`` compiled via ``@tf.function`` for performance.
 """
 
 from __future__ import annotations
 
-from typing import Any, Dict, List, Mapping
+from typing import Any, Dict
+from financial_forecast.inference.state_index import (
+    initial_state_to_batched,
+    DIAGNOSTIC_KEYS,
+)
 
 import tensorflow as tf
 import tensorflow_probability as tfp
 
-TrajectoryStore = Dict[str, List[List[float]]]
-"""Nested list structure holding per-sample, per-year scalar values."""
-
 StateDict = Dict[str, Any]
 """Dictionary representing a single-period balance-sheet state."""
-
-_STATE_METRICS: Dict[str, str] = {
-    "net_income": "net_income",
-    "equity": "equity",
-    "nca": "nca",
-    "advance_payments_purchases": "advance_payments_purchases",
-    "accounts_receivable": "accounts_receivable",
-    "inventory": "inventory",
-    "cash": "cash",
-    "investment_in_market_securities": "investment_in_market_securities",
-    "effective_st_debt": "effective_st_debt",
-    "non_current_liabilities": "non_current_liabilities",
-    "accounts_payable": "accounts_payable",
-    "advance_payments_sales": "advance_payments_sales",
-    "depreciation": "depreciation",
-    "cogs": "cogs",
-    "opex": "opex",
-    "tax": "tax",
-    "ms_return": "ms_return",
-    "interest_payment": "interest_payment",
-    "dividends": "dividends",
-    "stock_buyback": "stock_buyback",
-    "current_lt_debt": "current_lt_debt",
-    "new_long_term_loan": "new_long_term_loan",
-    "equity_financing": "equity_financing",
-    "liquidity_deficit_st": "liquidity_deficit_st",
-}
-
-
-def _build_forecast_inputs(
-    sales_value: float, year_value: float, cumulative_inflation: float
-) -> Dict[str, tf.Tensor]:
-    """Build the per-step model input dictionary.
-
-    Args:
-        sales_value: Sales amount for the forecast step (scaled).
-        year_value: Calendar year of the forecast step.
-        cumulative_inflation: Cumulative inflation factor up to this step.
-
-    Returns:
-        Dictionary with ``sales_t``, ``year``, and ``cum_inflation`` tensor
-        entries.
-    """
-    return {
-        "sales_t": tf.constant(sales_value),
-        "year": tf.constant(float(year_value), dtype=tf.float64),
-        "cum_inflation": tf.constant(cumulative_inflation),
-    }
-
-
-def _extract_total_assets(state: Mapping[str, Any]) -> float:
-    """Compute total assets from the forecast state.
-
-    Args:
-        state: Model state dictionary containing individual asset tensors.
-
-    Returns:
-        Total assets as a Python float.
-    """
-    total_assets = (
-        state["nca"]
-        + state["advance_payments_purchases"]
-        + state["accounts_receivable"]
-        + state["inventory"]
-        + state["cash"]
-        + state["investment_in_market_securities"]
-    )
-    return float(total_assets.numpy())
-
-
-def _extract_scalar_metrics(state: Mapping[str, Any]) -> Dict[str, float]:
-    """Extract scalar numpy values from the state for tracked metrics.
-
-    Args:
-        state: Model state dictionary after a single forecast step.
-
-    Returns:
-        Dictionary mapping metric names to Python float values, including
-        a computed ``total_assets`` entry.
-    """
-    metrics: Dict[str, float] = {"total_assets": _extract_total_assets(state)}
-    for output_name, state_key in _STATE_METRICS.items():
-        metrics[output_name] = float(state[state_key].numpy())
-    return metrics
-
-
-def _initialize_trajectory_store() -> TrajectoryStore:
-    """Create an empty trajectory container.
-
-    Returns:
-        Dictionary with one empty list per tracked metric key.
-    """
-    keys = ["total_assets", *list(_STATE_METRICS.keys())]
-    return {key: [] for key in keys}
-
-
-def _append_sample(store: TrajectoryStore, sample: Dict[str, List[float]]) -> None:
-    """Append one simulation sample into the trajectory store.
-
-    Args:
-        store: Trajectory store accumulating all samples.
-        sample: Single-sample dictionary mapping metric names to lists of
-            per-year float values.
-    """
-    for key, values in sample.items():
-        store[key].append(values)
-
-
-def _to_tf_trajectories(store: TrajectoryStore) -> Dict[str, tf.Tensor]:
-    """Convert trajectory lists to TensorFlow tensors.
-
-    Args:
-        store: Completed trajectory store with all samples collected.
-
-    Returns:
-        Dictionary mapping metric names to rank-2 ``tf.Tensor`` objects
-        with shape ``[n_samples, n_years]``.
-    """
-    return {key: tf.constant(values, dtype=tf.float64) for key, values in store.items()}
 
 
 def _summarize_trajectories(
@@ -163,71 +46,21 @@ def _summarize_trajectories(
         )
 
 
-def run_monte_carlo_forecast(
-    model: Any,
-    initial_state: StateDict,
-    sales_forecast: tf.Tensor,
-    cum_inf_forecast: tf.Tensor,
-    forecast_years: tf.Tensor,
-    n_samples: int = 1000,
-) -> Dict[str, tf.Tensor]:
-    """Run Monte Carlo trajectories for all forecast years.
-
-    The model structure and equations are unchanged; this function only
-    orchestrates repeated calls to ``model.forecast_step``.
+def _print_forecast_report(
+    trajectories: Dict[str, tf.Tensor],
+    amount_scale: float,
+    forecast_years,
+    n_samples: int,
+) -> None:
+    """Print summary tables and balance sheet for forecast trajectories.
 
     Args:
-        model: Trained financial model exposing ``forecast_step`` and
-            ``sample_opex_params`` methods.
-        initial_state: Balance-sheet state at the start of the forecast
-            horizon.
-        sales_forecast: 1-D tensor of forecasted sales (scaled).
-        cum_inf_forecast: 1-D tensor of cumulative inflation factors.
-        forecast_years: 1-D tensor of calendar years for each step.
+        trajectories: Dict mapping metric names to ``[n_samples, n_years]``
+            tensors.
+        amount_scale: Multiplier to convert scaled values back to USD.
+        forecast_years: 1-D tensor of calendar years.
         n_samples: Number of Monte Carlo simulation paths.
-
-    Returns:
-        Dictionary mapping metric names to rank-2 tensors of shape
-        ``[n_samples, n_years]``.
     """
-    print(f"\n--- Running Monte Carlo Forecast ({n_samples} samples) ---")
-
-    # NOTE: This loop uses Python lists rather than tf.TensorArray because each
-    # forecast_step call returns a Python dict with eager tensor values and uses
-    # Bayesian sampling (model.sample_opex_params) that is inherently eager.
-    # Converting to tf.TensorArray + tf.while_loop would require the model's
-    # forecast_step to operate on flat tensor signatures, which conflicts with
-    # the dict-based BayesianFinancialModel interface.  The final conversion to
-    # tf.constant tensors in _to_tf_trajectories still enables vectorized
-    # summary statistics via tf.reduce_mean / tfp.stats.percentile.
-    store = _initialize_trajectory_store()
-    for _ in range(n_samples):
-        current_state = initial_state.copy()
-        var_opex_sample, base_opex_sample = model.sample_opex_params()
-        sample_store: Dict[str, List[float]] = {key: [] for key in store}
-
-        for step in range(len(sales_forecast)):
-            inputs = _build_forecast_inputs(
-                sales_value=sales_forecast[step],
-                year_value=forecast_years[step],
-                cumulative_inflation=cum_inf_forecast[step],
-            )
-            current_state = model.forecast_step(
-                current_state,
-                inputs,
-                use_mean_opex=False,
-                sampled_var_opex=var_opex_sample,
-                sampled_base_opex=base_opex_sample,
-            )
-            metrics = _extract_scalar_metrics(current_state)
-            for key, value in metrics.items():
-                sample_store[key].append(value)
-
-        _append_sample(store, sample_store)
-
-    trajectories = _to_tf_trajectories(store)
-    amount_scale = model.amount_scale
-
     _summarize_trajectories("Net Income", trajectories["net_income"], amount_scale)
     _summarize_trajectories("Total Assets", trajectories["total_assets"], amount_scale)
     _summarize_trajectories(
@@ -311,7 +144,10 @@ def run_monte_carlo_forecast(
             "  Adv Payments (Purch)",
             tf.reduce_mean(trajectories["advance_payments_purchases"], axis=0),
         ),
-        ("  Accounts Receivable", tf.reduce_mean(trajectories["accounts_receivable"], axis=0)),
+        (
+            "  Accounts Receivable",
+            tf.reduce_mean(trajectories["accounts_receivable"], axis=0),
+        ),
         ("  Inventory", tf.reduce_mean(trajectories["inventory"], axis=0)),
         ("  Cash", tf.reduce_mean(trajectories["cash"], axis=0)),
         (
@@ -321,12 +157,18 @@ def run_monte_carlo_forecast(
         ("TOTAL ASSETS", mean_total_assets),
         ("", None),
         ("LIABILITIES", None),
-        ("  Accounts Payable", tf.reduce_mean(trajectories["accounts_payable"], axis=0)),
+        (
+            "  Accounts Payable",
+            tf.reduce_mean(trajectories["accounts_payable"], axis=0),
+        ),
         (
             "  Adv Payments (Sales)",
             tf.reduce_mean(trajectories["advance_payments_sales"], axis=0),
         ),
-        ("  Effective ST Debt", tf.reduce_mean(trajectories["effective_st_debt"], axis=0)),
+        (
+            "  Effective ST Debt",
+            tf.reduce_mean(trajectories["effective_st_debt"], axis=0),
+        ),
         ("  Current LT Debt", tf.reduce_mean(trajectories["current_lt_debt"], axis=0)),
         (
             "  Non-Current Liabilities",
@@ -350,7 +192,7 @@ def run_monte_carlo_forecast(
         f"{label:>{col_width}}" for label in year_labels
     )
     print("\n" + "=" * len(header))
-    print("FORECAST BALANCE SHEET — Mean across Monte Carlo samples (USD)")
+    print("FORECAST BALANCE SHEET \u2014 Mean across Monte Carlo samples (USD)")
     print("=" * len(header))
     print(header)
     print("-" * len(header))
@@ -358,7 +200,9 @@ def run_monte_carlo_forecast(
         if data is None:
             print(f"{label:>{label_width}}")
             continue
-        values_str = "".join(f"{float(value) * scale:>{col_width},.0f}" for value in data)
+        values_str = "".join(
+            f"{float(value) * scale:>{col_width},.0f}" for value in data
+        )
         print(f"{label:>{label_width}}{values_str}")
     print("-" * len(header))
 
@@ -394,5 +238,122 @@ def run_monte_carlo_forecast(
     print(f"\n  Per-sample check (across all {n_samples} samples x {n_years} years):")
     print(f"    Max absolute mismatch:  ${max_abs_check_all:,.2f}")
     print(f"    Mean absolute mismatch: ${mean_abs_check_all:,.2f}")
+
+
+def run_monte_carlo_forecast(
+    model,
+    initial_state: StateDict,
+    sales_forecast: tf.Tensor,
+    cum_inf_forecast: tf.Tensor,
+    forecast_years: tf.Tensor,
+    n_samples: int = 1000,
+) -> Dict[str, tf.Tensor]:
+    """Run Monte Carlo forecast using a compiled ``tf.while_loop``.
+
+    Batches all samples into a single ``[n_samples, 14]`` state tensor and
+    iterates over forecast years with ``tf.while_loop`` inside
+    ``@tf.function``.  All stochastic values are pre-sampled in eager mode
+    before entering the compiled graph.
+
+    Args:
+        model: Trained :class:`BayesianFinancialModel`.
+        initial_state: Balance-sheet state dict at the forecast start.
+        sales_forecast: 1-D tensor of forecasted sales (scaled).
+        cum_inf_forecast: 1-D tensor of cumulative inflation factors.
+        forecast_years: 1-D tensor of calendar years.
+        n_samples: Number of Monte Carlo simulation paths.
+
+    Returns:
+        Dictionary mapping metric names to rank-2 tensors of shape
+        ``[n_samples, n_years]``.
+    """
+
+    print(f"\n--- Running Compiled Monte Carlo Forecast ({n_samples} samples) ---")
+
+    n_years = len(sales_forecast)
+
+    # Pre-sample all stochastic values in eager mode before graph entry.
+    # var_opex / base_opex: sampled once per trajectory (constant across years).
+    # noise: sampled independently per year per sample.
+    q_var = tfp.distributions.Normal(
+        loc=model.q_var_opex_loc, scale=model.q_var_opex_scale
+    )
+    q_base = tfp.distributions.Normal(
+        loc=model.q_base_opex_loc, scale=model.q_base_opex_scale
+    )
+    var_opex_samples = q_var.sample([n_samples])
+    base_opex_samples = q_base.sample([n_samples])
+    noise_all = tfp.distributions.Normal(
+        tf.constant(0.0, dtype=tf.float64), model.noise_sigma
+    ).sample([n_years, n_samples])
+
+    # Batch initial state: [n_samples, 14]
+    state0 = initial_state_to_batched(initial_state, n_samples)
+
+    # Materialize forecast inputs as float64 tensors
+    sales_arr = tf.cast(sales_forecast, tf.float64)
+    cum_inf_arr = tf.cast(cum_inf_forecast, tf.float64)
+    years_arr = tf.cast(forecast_years, tf.float64)
+
+    @tf.function
+    def _run_loop(
+        state0,
+        sales_arr,
+        cum_inf_arr,
+        years_arr,
+        var_opex_samples,
+        base_opex_samples,
+        noise_all,
+    ):
+        n_steps = tf.shape(sales_arr)[0]
+        diag_ta = tf.TensorArray(
+            dtype=tf.float64,
+            size=n_steps,
+            dynamic_size=False,
+        )
+
+        def body(step, state, diag_ta):
+            sales_t = tf.ones_like(state[:, 0]) * sales_arr[step]
+            new_state, diagnostics = model.forecast_step_compiled(
+                state,
+                sales_t,
+                years_arr[step],
+                cum_inf_arr[step],
+                var_opex_samples,
+                base_opex_samples,
+                noise_all[step],
+            )
+            diag_ta = diag_ta.write(step, diagnostics)
+            return step + 1, new_state, diag_ta
+
+        def cond(step, state, diag_ta):
+            return step < n_steps
+
+        _, _, diag_ta = tf.while_loop(
+            cond,
+            body,
+            loop_vars=[tf.constant(0), state0, diag_ta],
+        )
+        return diag_ta.stack()
+
+    # Execute compiled loop: [n_years, n_samples, N_DIAGNOSTIC]
+    all_diag = _run_loop(
+        state0,
+        sales_arr,
+        cum_inf_arr,
+        years_arr,
+        var_opex_samples,
+        base_opex_samples,
+        noise_all,
+    )
+
+    # Transpose to [n_samples, n_years, N_DIAGNOSTIC] and unpack
+    all_diag = tf.transpose(all_diag, perm=[1, 0, 2])
+
+    trajectories: Dict[str, tf.Tensor] = {}
+    for i, key in enumerate(DIAGNOSTIC_KEYS):
+        trajectories[key] = all_diag[:, :, i]
+
+    _print_forecast_report(trajectories, model.amount_scale, forecast_years, n_samples)
 
     return trajectories
