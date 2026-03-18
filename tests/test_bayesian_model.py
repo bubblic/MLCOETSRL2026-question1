@@ -1,4 +1,4 @@
-"""Pytest suite for the refactored trainable financial model pipeline.
+"""Pytest suite for the trainable financial model pipeline.
 
 This suite focuses on:
 - Accounting identity integrity in single-step forecasting.
@@ -17,14 +17,16 @@ import pytest
 import tensorflow as tf
 
 from financial_forecast.inference.forecast import run_monte_carlo_forecast
-from financial_forecast.models.bayesian_model import BayesianFinancialModel as TrainableFinancialModel
+from financial_forecast.models.bayesian_model import BayesianFinancialModel
+from financial_forecast.training.policy_trainer import PolicyTrainer
+from financial_forecast.training.structural_trainer import StructuralTrainer
 
 
 @pytest.fixture
 def model():
     """Yield a fresh model instance with deterministic random seeds."""
     tf.random.set_seed(7)
-    return TrainableFinancialModel(base_year=2018)
+    return BayesianFinancialModel(base_year=2018)
 
 
 @pytest.fixture
@@ -62,7 +64,9 @@ def mock_historical_data():
     non_current_liabilities = tf.constant(
         [0.28, 0.283, 0.286, 0.289, 0.292], dtype=tf.float64
     )
-    interest_payment = tf.constant([0.021, 0.0215, 0.022, 0.0225, 0.023], dtype=tf.float64)
+    interest_payment = tf.constant(
+        [0.021, 0.0215, 0.022, 0.0225, 0.023], dtype=tf.float64
+    )
     ms_return = tf.constant([0.0058, 0.0060, 0.0062, 0.0064, 0.0066], dtype=tf.float64)
     equity = tf.constant([0.55, 0.57, 0.59, 0.61, 0.63], dtype=tf.float64)
     inflation = tf.constant([0.020, 0.021, 0.020, 0.019, 0.020], dtype=tf.float64)
@@ -230,7 +234,8 @@ def test_training_step_execution(
     d = mock_historical_data
 
     # Simple policy training: very short run just for execution and finite outputs.
-    model.train_simple_policies(
+    PolicyTrainer().train(
+        model,
         historical_sales=d["sales"],
         historical_purchases=d["purchases"],
         historical_cogs=d["cogs"],
@@ -259,7 +264,8 @@ def test_training_step_execution(
     )
 
     # Structural parameter training: short run and check for finite post-training state.
-    model.train_structural_parameters(
+    StructuralTrainer().train(
+        model,
         historical_sales=d["sales"],
         historical_nca=d["nca"],
         historical_adv_pay_sales=d["adv_pay_sales"],
@@ -344,9 +350,9 @@ def test_forecast_step_output_dtypes_are_float64(
     )
     for key, value in state_next.items():
         assert hasattr(value, "dtype"), f"{key} is not a tensor"
-        assert value.dtype == tf.float64, (
-            f"{key} has dtype {value.dtype}, expected float64"
-        )
+        assert (
+            value.dtype == tf.float64
+        ), f"{key} has dtype {value.dtype}, expected float64"
 
 
 def test_forecast_step_output_shapes_are_scalar(
@@ -358,9 +364,7 @@ def test_forecast_step_output_shapes_are_scalar(
     )
     for key, value in state_next.items():
         assert hasattr(value, "shape"), f"{key} is not a tensor"
-        assert value.shape.rank == 0, (
-            f"{key} has rank {value.shape.rank}, expected 0"
-        )
+        assert value.shape.rank == 0, f"{key} has rank {value.shape.rank}, expected 0"
 
 
 def test_forecast_step_does_not_mutate_input_state(
@@ -370,9 +374,9 @@ def test_forecast_step_does_not_mutate_input_state(
     original_values = {k: float(v.numpy()) for k, v in mock_forecast_state.items()}
     model.forecast_step(mock_forecast_state, mock_forecast_inputs, use_mean_opex=True)
     for k, orig_val in original_values.items():
-        assert float(mock_forecast_state[k].numpy()) == orig_val, (
-            f"Input state key '{k}' was mutated by forecast_step"
-        )
+        assert (
+            float(mock_forecast_state[k].numpy()) == orig_val
+        ), f"Input state key '{k}' was mutated by forecast_step"
 
 
 def test_tensor_immutability_inflation_forecast():
@@ -385,8 +389,10 @@ def test_tensor_immutability_inflation_forecast():
     last_hist = tf.constant(0.025, dtype=tf.float64)
     # Correct approach: tf.concat
     forecast = tf.concat(
-        [tf.expand_dims(last_hist, 0),
-         tf.fill([n - 1], tf.constant(0.03, dtype=tf.float64))],
+        [
+            tf.expand_dims(last_hist, 0),
+            tf.fill([n - 1], tf.constant(0.03, dtype=tf.float64)),
+        ],
         axis=0,
     )
     assert forecast.shape == (n,)
@@ -441,12 +447,12 @@ def test_monte_carlo_trajectory_shapes(model, mock_forecast_state):
     )
 
     for key, arr in trajectories.items():
-        assert arr.shape[0] == n_samples, (
-            f"{key} has {arr.shape[0]} samples, expected {n_samples}"
-        )
-        assert arr.shape[1] == n_years, (
-            f"{key} has {arr.shape[1]} years, expected {n_years}"
-        )
+        assert (
+            arr.shape[0] == n_samples
+        ), f"{key} has {arr.shape[0]} samples, expected {n_samples}"
+        assert (
+            arr.shape[1] == n_years
+        ), f"{key} has {arr.shape[1]} years, expected {n_years}"
 
 
 def test_monte_carlo_trajectory_dtypes(model, mock_forecast_state):
@@ -467,9 +473,7 @@ def test_monte_carlo_trajectory_dtypes(model, mock_forecast_state):
     )
 
     for key, arr in trajectories.items():
-        assert arr.dtype == tf.float64, (
-            f"{key} has dtype {arr.dtype}, expected float64"
-        )
+        assert arr.dtype == tf.float64, f"{key} has dtype {arr.dtype}, expected float64"
 
 
 def test_forecast_step_with_zero_sales(model, mock_forecast_state):
@@ -479,9 +483,7 @@ def test_forecast_step_with_zero_sales(model, mock_forecast_state):
         "year": tf.constant(2023.0, dtype=tf.float64),
         "cum_inflation": tf.constant(1.0, dtype=tf.float64),
     }
-    state_next = model.forecast_step(
-        mock_forecast_state, inputs, use_mean_opex=True
-    )
+    state_next = model.forecast_step(mock_forecast_state, inputs, use_mean_opex=True)
     for key, value in state_next.items():
         assert tf.math.is_finite(value), f"{key} is not finite with zero sales"
 
