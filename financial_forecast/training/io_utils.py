@@ -10,7 +10,7 @@ import os
 TRAINING_RESULTS_DIR = "training_results"
 
 
-def _get_training_results_path(filename: str) -> str:
+def get_training_results_path(filename: str) -> str:
     """Return the full path for a file under the training results directory.
 
     Creates the directory if it does not already exist.

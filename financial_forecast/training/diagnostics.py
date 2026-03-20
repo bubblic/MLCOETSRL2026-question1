@@ -8,7 +8,7 @@ from datetime import datetime
 import matplotlib.pyplot as plt
 import tensorflow as tf
 
-from financial_forecast.training.io_utils import _get_training_results_path
+from financial_forecast.training.io_utils import get_training_results_path
 
 
 def plot_vi_diagnostics(vi_history, amount_scale, show_plot=False):
@@ -65,7 +65,7 @@ def plot_vi_diagnostics(vi_history, amount_scale, show_plot=False):
     fig.suptitle("Variational Inference Parameters and Loss Over Epochs")
     plt.tight_layout()
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    plot_path = _get_training_results_path(f"vi_training_diagnostics_{timestamp}.png")
+    plot_path = get_training_results_path(f"vi_training_diagnostics_{timestamp}.png")
     plt.savefig(plot_path, dpi=150)
     if show_plot:
         plt.show()
@@ -172,7 +172,7 @@ def plot_simple_policy_diagnostics(
     fig.suptitle("Simple Parameters Training Diagnostics")
     plt.tight_layout()
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    plot_path = _get_training_results_path(
+    plot_path = get_training_results_path(
         f"simple_training_diagnostics_{timestamp}.png"
     )
     plt.savefig(plot_path, dpi=150)
@@ -229,7 +229,7 @@ def plot_structural_diagnostics(structural_history, show_plot=False):
     fig.suptitle("Structural Parameters Training Diagnostics")
     plt.tight_layout()
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    plot_path = _get_training_results_path(
+    plot_path = get_training_results_path(
         f"structural_training_diagnostics_{timestamp}.png"
     )
     plt.savefig(plot_path, dpi=150)

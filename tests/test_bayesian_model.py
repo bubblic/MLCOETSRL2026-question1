@@ -16,7 +16,7 @@ python -m pytest -q tests/test_bayesian_model.py
 import pytest
 import tensorflow as tf
 
-from financial_forecast.inference.forecast import run_monte_carlo_forecast
+from financial_forecast.inference.monte_carlo_forecast import run_monte_carlo_forecast
 from financial_forecast.models.bayesian_model import BayesianFinancialModel
 from financial_forecast.training.policy_trainer import PolicyTrainer
 from financial_forecast.training.structural_trainer import StructuralTrainer
@@ -26,7 +26,10 @@ from financial_forecast.training.structural_trainer import StructuralTrainer
 def model():
     """Yield a fresh model instance with deterministic random seeds."""
     tf.random.set_seed(7)
-    return BayesianFinancialModel(base_year=2018)
+    m = BayesianFinancialModel()
+    m.base_year = 2018
+    m.amount_scale = 1.0
+    return m
 
 
 @pytest.fixture
@@ -150,8 +153,8 @@ def test_forecast_step_identities(model, mock_forecast_state, mock_forecast_inpu
 
 def test_sample_opex_params(model):
     """Posterior samples and KL term should be finite scalar float64 tensors."""
-    var_opex_sample, base_opex_sample = model.sample_opex_params()
-    kl_div = model.get_opex_kl_divergence()
+    var_opex_sample, base_opex_sample = model.opex_module.sample()
+    kl_div = model.opex_module.kl_divergence()
 
     assert isinstance(var_opex_sample, tf.Tensor)
     assert isinstance(base_opex_sample, tf.Tensor)
@@ -201,9 +204,9 @@ def test_parameter_bounds(model):
         model.account_receivables_pct,
         model.account_payables_pct,
         model.inventory_pct,
-        model.q_var_opex_scale,
-        model.q_base_opex_scale,
-        model.noise_sigma,
+        model.opex_module.q_var_opex_scale,
+        model.opex_module.q_base_opex_scale,
+        model.opex_module.noise_sigma,
         model.avg_short_term_interest_pct,
         model.avg_long_term_interest_pct,
         model.market_securities_return_pct,
@@ -212,7 +215,7 @@ def test_parameter_bounds(model):
         assert float(param.numpy()) >= 0.0
 
     sigmoid_params = [
-        model.income_tax_pct,
+        model.tax_module.income_tax_pct,
         model.dividend_payout_ratio_pct,
         model.dividend_adjustment_speed,
     ]
@@ -254,7 +257,6 @@ def test_training_step_execution(
         historical_opex=d["opex"],
         historical_tax=d["tax"],
         historical_eff_st_debt=d["eff_st_debt"],
-        historical_tax_onetime_payments=d["tax_onetime_payments"],
         historical_inflation=d["inflation"],
         historical_years=d["years"],
         epochs=2,
@@ -286,7 +288,6 @@ def test_training_step_execution(
         historical_interest_payment=d["interest_payment"],
         historical_ms_return=d["ms_return"],
         historical_equity=d["equity"],
-        historical_tax_onetime_payments=d["tax_onetime_payments"],
         historical_inflation=d["inflation"],
         historical_years=d["years"],
         epochs=2,
@@ -297,7 +298,7 @@ def test_training_step_execution(
     critical_params = [
         model.asset_growth,
         model.depreciation_rate,
-        model.income_tax_pct,
+        model.tax_module.income_tax_pct,
         model.avg_short_term_interest_pct,
         model.avg_long_term_interest_pct,
         model.avg_maturity_years,
@@ -408,7 +409,7 @@ def test_tensor_immutability_inflation_forecast():
 
 def test_kl_divergence_is_nonnegative(model):
     """KL divergence between variational posterior and prior must be >= 0."""
-    kl = model.get_opex_kl_divergence()
+    kl = model.opex_module.kl_divergence()
     assert float(kl.numpy()) >= 0.0
 
 

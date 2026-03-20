@@ -64,7 +64,6 @@ class StructuralTrainer(BaseTrainer):
         historical_interest_payment,
         historical_ms_return,
         historical_equity,
-        historical_tax_onetime_payments=None,
         historical_inflation=None,
         historical_years=None,
         learning_rate=0.001,
@@ -105,7 +104,6 @@ class StructuralTrainer(BaseTrainer):
                 NaN/Inf for missing observations).
             historical_ms_return: Returns from market securities.
             historical_equity: Stockholders' equity.
-            historical_tax_onetime_payments: Optional one-time tax payments.
             historical_inflation: Optional annual inflation rates.
             historical_years: Optional fiscal years.
             learning_rate: Adam optimizer learning rate.
@@ -135,11 +133,6 @@ class StructuralTrainer(BaseTrainer):
         interest_t = _as_float64_tensor(historical_interest_payment)
         ms_return_t = _as_float64_tensor(historical_ms_return)
         equity_t = _as_float64_tensor(historical_equity)
-        if historical_tax_onetime_payments is None:
-            tax_onetime_t = tf.zeros_like(ni_t)
-        else:
-            tax_onetime_t = _as_float64_tensor(historical_tax_onetime_payments)
-
         if historical_inflation is None:
             historical_inflation = tf.zeros_like(sales_t)
         inf_t = _as_float64_tensor(historical_inflation)
@@ -249,7 +242,6 @@ class StructuralTrainer(BaseTrainer):
                         "sales_t": sales_t[t + 1],
                         "year": years_t[t + 1],
                         "cum_inflation": cum_inf_t[t + 1],
-                        "tax_onetime_payment": tax_onetime_t[t + 1],
                     }
 
                     # Deterministic mean OpEx for structural training

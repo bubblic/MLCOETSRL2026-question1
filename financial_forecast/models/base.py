@@ -66,13 +66,6 @@ class BaseFinancialModel(tf.Module, ABC):
         3. Determining financing needs via the liquidity budget.
         4. Assembling the final balance-sheet state with identity checks.
 
-        Note:
-            This method is **not** decorated with ``@tf.function`` because it
-            accepts Python dicts/dataclasses and constructs intermediate dicts,
-            which would cause excessive retracing in graph mode.  The arithmetic
-            within each sub-method still uses TensorFlow ops and benefits from
-            automatic differentiation via ``tf.GradientTape``.
-
         Args:
             state: Previous period financial state (t-1).
             inputs: Economic drivers for the current period (t).

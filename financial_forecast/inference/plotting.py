@@ -11,7 +11,7 @@ import matplotlib.pyplot as plt
 import tensorflow as tf
 import tensorflow_probability as tfp
 
-from financial_forecast.training.io_utils import _get_training_results_path
+from financial_forecast.training.io_utils import get_training_results_path
 
 tfd = tfp.distributions
 
@@ -53,10 +53,10 @@ def plot_opex_fit_with_aleatoric_noise(
         historical_inflation = tf.zeros_like(historical_sales_bil)
     cum_inf = tf.math.cumprod(1 + historical_inflation)
 
-    mean_var_opex = model.q_var_opex_loc.numpy()
-    mean_base_opex = model.q_base_opex_loc.numpy()
-    sigma_opex = model.noise_sigma.numpy()
-    sales_offset = model.sales_offset.numpy()
+    mean_var_opex = model.opex_module.q_var_opex_loc.numpy()
+    mean_base_opex = model.opex_module.q_base_opex_loc.numpy()
+    sigma_opex = model.opex_module.noise_sigma.numpy()
+    sales_offset = model.opex_module.sales_offset.numpy()
 
     # Center sales using the offset from training
     historical_sales_bil_centered = historical_sales_bil - sales_offset
@@ -66,8 +66,8 @@ def plot_opex_fit_with_aleatoric_noise(
 
     if use_gaussian_ci:
         # Analytical Gaussian predictive intervals (exact for linear-Gaussian model)
-        var_var = float(model.q_var_opex_scale.numpy()) ** 2
-        var_base = float(model.q_base_opex_scale.numpy()) ** 2
+        var_var = float(model.opex_module.q_var_opex_scale.numpy()) ** 2
+        var_base = float(model.opex_module.q_base_opex_scale.numpy()) ** 2
         var_noise = float(sigma_opex) ** 2
         cum_inf_tf = tf.cast(cum_inf, dtype=tf.float64)
         # Use centered sales for variance calculation
@@ -81,8 +81,8 @@ def plot_opex_fit_with_aleatoric_noise(
         upper_opex_bil = mean_opex_bil + z_up * std_opex_bil
     else:
         # Posterior predictive samples with aleatoric noise (sigma)
-        q_var = tfd.Normal(loc=model.q_var_opex_loc, scale=model.q_var_opex_scale)
-        q_base = tfd.Normal(loc=model.q_base_opex_loc, scale=model.q_base_opex_scale)
+        q_var = tfd.Normal(loc=model.opex_module.q_var_opex_loc, scale=model.opex_module.q_var_opex_scale)
+        q_base = tfd.Normal(loc=model.opex_module.q_base_opex_loc, scale=model.opex_module.q_base_opex_scale)
         var_samples = q_var.sample(n_samples)  # [S]
         base_samples = q_base.sample(n_samples)  # [S]
 
@@ -151,7 +151,7 @@ def plot_opex_fit_with_aleatoric_noise(
     plt.tight_layout()
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     tag = "gaussian_ci" if use_gaussian_ci else "monte_carlo"
-    plot_path = _get_training_results_path(
+    plot_path = get_training_results_path(
         f"opex_probabilistic_fit_{timestamp}_{tag}.png"
     )
     plt.savefig(plot_path, dpi=150)
@@ -181,8 +181,8 @@ def plot_opex_fit_with_aleatoric_noise(
     mean_opex_grid_usd = mean_opex_grid_bil * amount_scale
 
     if use_gaussian_ci:
-        var_var = float(model.q_var_opex_scale.numpy()) ** 2
-        var_base = float(model.q_base_opex_scale.numpy()) ** 2
+        var_var = float(model.opex_module.q_var_opex_scale.numpy()) ** 2
+        var_base = float(model.opex_module.q_base_opex_scale.numpy()) ** 2
         var_noise = float(sigma_opex) ** 2
         # Use centered sales for variance calculation
         std_opex_grid_bil = tf.sqrt(
@@ -195,8 +195,8 @@ def plot_opex_fit_with_aleatoric_noise(
         lower_opex_grid_bil = mean_opex_grid_bil + z_low * std_opex_grid_bil
         upper_opex_grid_bil = mean_opex_grid_bil + z_up * std_opex_grid_bil
     else:
-        q_var = tfd.Normal(loc=model.q_var_opex_loc, scale=model.q_var_opex_scale)
-        q_base = tfd.Normal(loc=model.q_base_opex_loc, scale=model.q_base_opex_scale)
+        q_var = tfd.Normal(loc=model.opex_module.q_var_opex_loc, scale=model.opex_module.q_var_opex_scale)
+        q_base = tfd.Normal(loc=model.opex_module.q_base_opex_loc, scale=model.opex_module.q_base_opex_scale)
         var_samples = q_var.sample(n_samples)
         base_samples = q_base.sample(n_samples)
         var_samples = tf.reshape(var_samples, (-1, 1))
@@ -274,7 +274,7 @@ def plot_opex_fit_with_aleatoric_noise(
     plt.tight_layout()
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     tag = "gaussian_ci" if use_gaussian_ci else "monte_carlo"
-    plot_path = _get_training_results_path(f"opex_vs_sales_fit_{timestamp}_{tag}.png")
+    plot_path = get_training_results_path(f"opex_vs_sales_fit_{timestamp}_{tag}.png")
     plt.savefig(plot_path, dpi=150)
     if show_plot:
         plt.show()
@@ -472,7 +472,7 @@ def plot_historical_and_forecast(
     )
     plt.tight_layout()
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    plot_path = _get_training_results_path(f"all_elements_forecast_{timestamp}.png")
+    plot_path = get_training_results_path(f"all_elements_forecast_{timestamp}.png")
     plt.savefig(plot_path, dpi=150, bbox_inches="tight")
     print(f"\nPlot saved: {plot_path}")
     if show_plot:

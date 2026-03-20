@@ -25,7 +25,7 @@ import tensorflow as tf
 from dotenv import load_dotenv
 
 from financial_forecast.clients.azure_llm_client import AzureLLMClient
-from financial_forecast.data.historical_data import get_apple_historical_data
+from financial_forecast.data.aapl.financial_statements import get_financial_statements
 
 load_dotenv()
 
@@ -416,7 +416,7 @@ def load_historical_balance_sheet() -> Dict[str, tf.Tensor]:
         Mapping of element keys (plus ``"years"``) to TensorFlow tensors
         containing the historical Apple balance-sheet data.
     """
-    data = get_apple_historical_data()
+    data = get_financial_statements()
     mapped = {
         "inventory": data["inventory"],
         "nca": data["nca"],

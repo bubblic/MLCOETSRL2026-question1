@@ -15,7 +15,7 @@ from financial_forecast.models.llm_forecaster import (
     plot_forecast_elements,
     run_llm_balance_sheet_forecast,
 )
-from financial_forecast.data.historical_data import get_apple_historical_data
+from financial_forecast.data.aapl.financial_statements import get_financial_statements
 
 
 @pytest.fixture
@@ -93,7 +93,7 @@ def test_load_historical_balance_sheet_mapping(llm_bs_module, monkeypatch):
         "stock_buyback": tf.constant([19.0]),
         "years": tf.constant([2024]),
     }
-    monkeypatch.setattr(llm_bs_module, "get_apple_historical_data", lambda: fake)
+    monkeypatch.setattr(llm_bs_module, "get_financial_statements", lambda: fake)
     mapped = llm_bs_module.load_historical_balance_sheet()
     assert mapped["investment_in_market_securities"][0] == 5.0
     assert mapped["years"][0] == 2024

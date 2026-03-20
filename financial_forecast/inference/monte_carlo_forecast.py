@@ -275,16 +275,17 @@ def run_monte_carlo_forecast(
     # Pre-sample all stochastic values in eager mode before graph entry.
     # var_opex / base_opex: sampled once per trajectory (constant across years).
     # noise: sampled independently per year per sample.
+    opex = model.opex_module
     q_var = tfp.distributions.Normal(
-        loc=model.q_var_opex_loc, scale=model.q_var_opex_scale
+        loc=opex.q_var_opex_loc, scale=opex.q_var_opex_scale
     )
     q_base = tfp.distributions.Normal(
-        loc=model.q_base_opex_loc, scale=model.q_base_opex_scale
+        loc=opex.q_base_opex_loc, scale=opex.q_base_opex_scale
     )
     var_opex_samples = q_var.sample([n_samples])
     base_opex_samples = q_base.sample([n_samples])
     noise_all = tfp.distributions.Normal(
-        tf.constant(0.0, dtype=tf.float64), model.noise_sigma
+        tf.constant(0.0, dtype=tf.float64), opex.noise_sigma
     ).sample([n_years, n_samples])
 
     # Batch initial state: [n_samples, 14]

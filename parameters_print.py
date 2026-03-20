@@ -2,7 +2,7 @@ path = "trained_parameters_dont_include_tax_anomalies.npz"
 import os
 import numpy as np  # Only used for loading parameters
 import tensorflow as tf
-from financial_forecast.data.historical_data import get_apple_historical_data
+from financial_forecast.data.aapl.financial_statements import get_financial_statements
 
 
 def sigmoid(x):
@@ -13,7 +13,7 @@ if not os.path.exists(path):
     raise FileNotFoundError(f"Parameter file not found: {path}")
 data = np.load(path)  # np.load for .npz file I/O
 
-historical_data = get_apple_historical_data()
+historical_data = get_financial_statements()
 historical_sales = historical_data["sales"]
 
 asset_growth = data["asset_growth"]

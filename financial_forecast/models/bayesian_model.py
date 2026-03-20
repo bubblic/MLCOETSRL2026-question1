@@ -22,6 +22,8 @@ import tensorflow as tf
 import tensorflow_probability as tfp
 
 from financial_forecast.models.base import BaseFinancialModel
+from financial_forecast.models.opex import BayesianOpEx
+from financial_forecast.models.tax import SimpleTax, TaxWithAnomalies
 from financial_forecast.serialization.parameter_io import (
     save_parameters as _save_parameters,
     load_parameters as _load_parameters,
@@ -64,25 +66,48 @@ class BayesianFinancialModel(BaseFinancialModel):
     (Softplus for non-negative, Sigmoid for [0,1]-bounded, Chain for
     lower-bounded).
 
-    Args:
-        base_year: The fiscal year corresponding to t=0 in the time index.
+    Attributes:
+        base_year: The fiscal year corresponding to ``t = 0`` in all
+            logit-linear time-trend parameters.  Set by the pipeline
+            from the historical data's ``"years"`` field.
     """
 
-    def __init__(self, base_year=2018, name=None):
+    def __init__(self, tax_anomalies=None, name=None):
         """Create a new Bayesian financial model.
 
-        Sets ``amount_scale`` and ``base_year`` before calling the parent
-        constructor, which in turn invokes :meth:`_initialize_parameters`
-        to create all three parameter layers.
+        Calls the parent constructor, which invokes
+        :meth:`_initialize_parameters` to create all three parameter
+        layers.  ``base_year`` and ``amount_scale`` are set later by
+        the pipeline from the loaded data.
 
         Args:
-            base_year: The fiscal year corresponding to ``t = 0`` in all
-                logit-linear time-trend parameters.  Defaults to 2018.
+            tax_anomalies: Optional 1-D tensor of one-time tax payment
+                amounts in USD.  If ``None``, uses :class:`SimpleTax`;
+                otherwise :class:`TaxWithAnomalies`.
             name: Optional name for the underlying ``tf.Module``.
         """
-        self.amount_scale = 1.0e11
-        self.base_year = base_year
+        self.amount_scale = None
+        self.base_year = None
         super().__init__(name=name)  # calls _initialize_parameters()
+
+        if tax_anomalies is not None:
+            self.tax_module = TaxWithAnomalies(tax_anomalies)
+        else:
+            self.tax_module = SimpleTax()
+
+    def set_forecast_drivers(self, years, amount_scale, scaled_sales):
+        """Configure data-derived model settings.
+
+        Called by the pipeline after computing ``amount_scale``.
+
+        Args:
+            years: 1-D tensor of fiscal year labels.
+            amount_scale: USD-to-scaled-units conversion factor.
+            scaled_sales: 1-D tensor of historical sales (already scaled).
+        """
+        self.base_year = int(years[0])
+        self.amount_scale = amount_scale
+        self.opex_module.set_forecast_drivers(scaled_sales, amount_scale)
 
     # ------------------------------------------------------------------
     # Abstract method implementation (required by BaseFinancialModel)
@@ -163,12 +188,6 @@ class BayesianFinancialModel(BaseFinancialModel):
         self.cash_alpha = tf.Variable(-0.05, dtype=tf.float64, name="cash_alpha")
         self.cash_beta = tf.Variable(0.0, dtype=tf.float64, name="cash_beta")
 
-        self.income_tax_pct = tfp.util.TransformedVariable(
-            initial_value=0.147,
-            bijector=tfb.Sigmoid(),
-            dtype=tf.float64,
-            name="tax_pct",
-        )  # %IT
         # --- Dividend Smoothing (Lintner Model) ---
         # D_t = α * (PayoutRatio * NI_t) + (1 - α) * D_{t-1}
         # α=1.0 → pure payout ratio (no smoothing), α=0.0 → constant dividends
@@ -202,48 +221,8 @@ class BayesianFinancialModel(BaseFinancialModel):
             -0.05, dtype=tf.float64, name="cost_ratio_beta"
         )
 
-        # ============== LAYER 2: BAYESIAN OPEX PARAMETERS (VI) ===============
-        # We learn a distribution (Normal) defined by a Mean (loc) and
-        # StdDev (scale) for both variable OpEx % and baseline OpEx.
-        # OpEx = (base_opex * cum_inflation) + (var_opex * centered_sales) + noise
-
-        # 1. Variable OpEx %
-        self.q_var_opex_loc = tf.Variable(0.0, dtype=tf.float64, name="q_var_opex_loc")
-        self.q_var_opex_scale = tfp.util.TransformedVariable(
-            initial_value=1.0,
-            bijector=tfb.Softplus(),  # Ensures scale is always positive
-            dtype=tf.float64,
-            name="q_var_opex_scale",
-        )
-
-        # 2. Baseline OpEx
-        self.q_base_opex_loc = tf.Variable(
-            0.0,
-            dtype=tf.float64,
-            name="q_base_opex_loc",
-        )
-        self.q_base_opex_scale = tfp.util.TransformedVariable(
-            initial_value=1.0,
-            bijector=tfb.Softplus(),
-            dtype=tf.float64,
-            name="q_base_opex_scale",
-        )
-
-        # 3. Aleatoric Uncertainty (The inherent noise in the OpEx data)
-        self.noise_sigma = tfp.util.TransformedVariable(
-            initial_value=1.0,
-            bijector=tfb.Softplus(),
-            dtype=tf.float64,
-            name="noise_sigma",
-        )
-
-        # 4. Sales Offset (for centering sales data during OpEx training)
-        self.sales_offset = tf.Variable(
-            0.0,
-            dtype=tf.float64,
-            name="sales_offset",
-            trainable=False,  # Not trained, just stored for reference
-        )
+        # ============== LAYER 2: BAYESIAN OPEX (VI) ============================
+        self.opex_module = BayesianOpEx()
 
         # =============== LAYER 3: STRUCTURAL PARAMETERS =======================
         # These are trained with gradient descent on state-transition losses,
@@ -296,37 +275,6 @@ class BayesianFinancialModel(BaseFinancialModel):
         self.ef_beta = tf.Variable(0.0, dtype=tf.float64, name="ef_beta")
 
     # ------------------------------------------------------------------
-    # Bayesian sampling (Bayesian-specific, not in base)
-    # ------------------------------------------------------------------
-
-    def sample_opex_params(self):
-        """Sample OpEx parameters from the variational posterior.
-
-        Returns:
-            Tuple ``(var_opex_sample, base_opex_sample)`` of scalar tensors.
-        """
-        q_var_dist = tfd.Normal(loc=self.q_var_opex_loc, scale=self.q_var_opex_scale)
-        q_base_dist = tfd.Normal(loc=self.q_base_opex_loc, scale=self.q_base_opex_scale)
-        return q_var_dist.sample(), q_base_dist.sample()
-
-    def get_opex_kl_divergence(self):
-        """Compute KL(posterior || prior) for the OpEx parameters.
-
-        Returns:
-            Scalar tensor with the summed KL divergence.
-        """
-        prior_var = tfd.Normal(loc=tf.constant(0.0, dtype=tf.float64), scale=1.0e10)
-        prior_base = tfd.Normal(
-            loc=tf.constant(0.0, dtype=tf.float64),
-            scale=1.0e10,
-        )
-        q_var = tfd.Normal(loc=self.q_var_opex_loc, scale=self.q_var_opex_scale)
-        q_base = tfd.Normal(loc=self.q_base_opex_loc, scale=self.q_base_opex_scale)
-        return tfd.kl_divergence(q_var, prior_var) + tfd.kl_divergence(
-            q_base, prior_base
-        )
-
-    # ------------------------------------------------------------------
     # Serialization (delegates to serialization module)
     # ------------------------------------------------------------------
 
@@ -369,8 +317,7 @@ class BayesianFinancialModel(BaseFinancialModel):
 
         Args:
             state: Dict at *t-1* with balance-sheet entries.
-            inputs: Dict with ``sales_t``, ``year``, ``cum_inflation``,
-                and optional ``tax_onetime_payment``.
+            inputs: Dict with ``sales_t``, ``year``, ``cum_inflation``.
             use_mean_opex: Use posterior mean (no sampling/noise).
             sampled_var_opex: Pre-sampled variable OpEx percentage.
             sampled_base_opex: Pre-sampled baseline OpEx.
@@ -387,20 +334,18 @@ class BayesianFinancialModel(BaseFinancialModel):
 
         # Prepare per-sample inputs (n_samples=1)
         sales_t = tf.reshape(inputs["sales_t"], [1])
-        tax_onetime = tf.reshape(
-            tf.cast(inputs.get("tax_onetime_payment", 0.0), tf.float64), [1]
-        )
 
+        opex = self.opex_module
         if use_mean_opex:
-            var_opex = tf.reshape(self.q_var_opex_loc, [1])
-            base_opex = tf.reshape(self.q_base_opex_loc, [1])
+            var_opex = tf.reshape(opex.q_var_opex_loc, [1])
+            base_opex = tf.reshape(opex.q_base_opex_loc, [1])
             noise = tf.zeros([1], dtype=tf.float64)
         else:
             var_opex = tf.reshape(
                 (
                     sampled_var_opex
                     if sampled_var_opex is not None
-                    else self.q_var_opex_loc
+                    else opex.q_var_opex_loc
                 ),
                 [1],
             )
@@ -408,11 +353,11 @@ class BayesianFinancialModel(BaseFinancialModel):
                 (
                     sampled_base_opex
                     if sampled_base_opex is not None
-                    else self.q_base_opex_loc
+                    else opex.q_base_opex_loc
                 ),
                 [1],
             )
-            noise = tfd.Normal(_ZERO, self.noise_sigma).sample([1])
+            noise = tfd.Normal(_ZERO, opex.noise_sigma).sample([1])
 
         _, diagnostics = self.forecast_step_compiled(
             state_tensor,
@@ -422,7 +367,6 @@ class BayesianFinancialModel(BaseFinancialModel):
             var_opex,
             base_opex,
             noise,
-            tax_onetime,
         )
 
         return {key: diagnostics[0, i] for i, key in enumerate(DIAGNOSTIC_KEYS)}
@@ -436,13 +380,12 @@ class BayesianFinancialModel(BaseFinancialModel):
         var_opex,
         base_opex,
         noise,
-        tax_onetime_payment=None,
     ):
-        """Batched single-period forecast — single source of truth.
+        """Batched single-period forecast -- single source of truth.
 
-        All financial arithmetic lives here.  Called directly by the compiled
-        Monte Carlo loop and wrapped by :meth:`forecast_step` for dict-based
-        callers.
+        Orchestrates the four-stage Pareja Cash Budget construction,
+        mirroring the base class decomposition but with Bayesian
+        parameters and time-varying logit-linear trends.
 
         Args:
             state: ``[n_samples, 14]`` recurrent state tensor.
@@ -452,38 +395,45 @@ class BayesianFinancialModel(BaseFinancialModel):
             var_opex: ``[n_samples]`` pre-sampled variable OpEx percentage.
             base_opex: ``[n_samples]`` pre-sampled baseline OpEx.
             noise: ``[n_samples]`` pre-sampled aleatoric noise.
-            tax_onetime_payment: Optional ``[n_samples]`` one-time tax
-                adjustment.  Defaults to zero.
 
         Returns:
             Tuple ``(new_state, diagnostics)`` where *new_state* has shape
             ``[n_samples, 14]`` and *diagnostics* has shape
             ``[n_samples, 27]``.
         """
-
-        zero = tf.constant(0.0, dtype=tf.float64)
         time_index = year - tf.constant(float(self.base_year), dtype=tf.float64)
 
-        # --- Unpack recurrent state (t-1) ---
+        assets = self._evolve_assets_compiled(state, sales_t, time_index)
+        income = self._calculate_income_compiled(
+            state,
+            assets,
+            sales_t,
+            cum_inflation,
+            var_opex,
+            base_opex,
+            noise,
+        )
+        financing = self._manage_liquidity_compiled(
+            state,
+            assets,
+            income,
+            sales_t,
+            time_index,
+        )
+        return self._assemble_state_compiled(state, assets, income, financing)
+
+    # ------------------------------------------------------------------
+    # Compiled forecast sub-stages
+    # ------------------------------------------------------------------
+
+    def _evolve_assets_compiled(self, state, sales_t, time_index):
+        """Evolve asset accounts and compute payout decisions from prior state."""
         nca_prev = state[:, R_NCA]
-        adv_pp_prev = state[:, R_ADV_PP]
-        ar_prev = state[:, R_AR]
         inv_prev = state[:, R_INV]
-        cash_prev = state[:, R_CASH]
-        ims_prev = state[:, R_IMS]
-        ap_prev = state[:, R_AP]
-        adv_ps_prev = state[:, R_ADV_PS]
-        eff_st_debt_prev = state[:, R_EFF_ST_DEBT]
-        cur_lt_debt_prev = state[:, R_CUR_LT_DEBT]
-        ncl_prev = state[:, R_NCL]
-        equity_prev = state[:, R_EQUITY]
         ni_prev = state[:, R_NET_INCOME]
         div_prev_actual = state[:, R_DIVIDENDS]
 
-        # --- 1. Asset Evolution ---
         depreciation = nca_prev * self.depreciation_rate
-
-        # Stock buyback: fixed baseline + multiple of depreciation
         stock_buyback = self.sb_baseline + self.sb_ratio * depreciation
 
         # Lintner dividend smoothing: D_t = alpha*(PR*NI_{t-1}) + (1-alpha)*D_{t-1}
@@ -519,68 +469,125 @@ class BayesianFinancialModel(BaseFinancialModel):
         cash_curr = total_liquidity_curr * cash_pct
         ims_curr = total_liquidity_curr - cash_curr
 
-        # --- 2. Income Statement ---
-        # COGS = Inv_prev + Purchases - Inv_curr = Sales * CR_t  (by construction)
-        cogs = inv_prev + purchases_t - inv_curr
+        return {
+            "depreciation": depreciation,
+            "capex": capex,
+            "nca_curr": nca_curr,
+            "ar_curr": ar_curr,
+            "inv_curr": inv_curr,
+            "purchases_t": purchases_t,
+            "adv_pp_curr": adv_pp_curr,
+            "total_liquidity_curr": total_liquidity_curr,
+            "cash_curr": cash_curr,
+            "ims_curr": ims_curr,
+            "dividends_prev": dividends_prev,
+            "stock_buyback_base": stock_buyback,
+        }
 
-        sales_t_centered = sales_t - self.sales_offset
-        opex = (base_opex * cum_inflation) + (sales_t_centered * var_opex) + noise
+    def _calculate_income_compiled(
+        self,
+        state,
+        assets,
+        sales_t,
+        cum_inflation,
+        var_opex,
+        base_opex,
+        noise,
+    ):
+        """Compute income statement from asset evolution results."""
+        inv_prev = state[:, R_INV]
+        eff_st_debt_prev = state[:, R_EFF_ST_DEBT]
+        cur_lt_debt_prev = state[:, R_CUR_LT_DEBT]
+        ncl_prev = state[:, R_NCL]
+        ims_prev = state[:, R_IMS]
+
+        cogs = inv_prev + assets["purchases_t"] - assets["inv_curr"]
+        opex = self.opex_module.compute(
+            sales_t, cum_inflation, var_opex, base_opex, noise
+        )
         ebitda = sales_t - cogs - opex
 
-        # Debt servicing based on PREVIOUS debt levels (avoids circularity)
         principal_lt = cur_lt_debt_prev
         interest_lt = self.avg_long_term_interest_pct * (ncl_prev + cur_lt_debt_prev)
         principal_st = eff_st_debt_prev
         interest_st = self.avg_short_term_interest_pct * principal_st
 
         ms_return = ims_prev * self.market_securities_return_pct
-        ebt = ebitda - depreciation - (interest_st + interest_lt) + ms_return
-        tax_onetime = (
-            tax_onetime_payment
-            if tax_onetime_payment is not None
-            else tf.zeros_like(sales_t)
-        )
-        tax = ebt * self.income_tax_pct + tax_onetime
+        ebt = ebitda - assets["depreciation"] - (interest_st + interest_lt) + ms_return
+        tax = self.tax_module.compute(ebt)
         ni_curr = ebt - tax
 
-        # --- 3. Liquidity Budget ---
-        # Five-module structure: operating, investing, external, financing, owners
+        return {
+            "cogs": cogs,
+            "opex": opex,
+            "ms_return": ms_return,
+            "tax": tax,
+            "ni_curr": ni_curr,
+            "interest_st": interest_st,
+            "interest_lt": interest_lt,
+            "principal_st": principal_st,
+            "principal_lt": principal_lt,
+        }
 
-        # 3.1 Operating NLB: cash inflows from sales vs outflows for purchases/opex/tax
+    def _manage_liquidity_compiled(self, state, assets, income, sales_t, time_index):
+        """
+        Use Cash Budget to compute liquidity budget and financing decisions.
+
+        Five-module structure: operating, investing, external, financing, owners
+        """
+        zero = tf.constant(0.0, dtype=tf.float64)
+        ar_prev = state[:, R_AR]
+        ap_prev = state[:, R_AP]
+        adv_pp_prev = state[:, R_ADV_PP]
+        adv_ps_prev = state[:, R_ADV_PS]
+        cash_prev = state[:, R_CASH]
+        ims_prev = state[:, R_IMS]
+
+        # 1. Operating NLB: cash inflows from sales vs outflows for purchases/opex/tax
         sales_curr = sales_t * (1 - self.account_receivables_pct) - adv_ps_prev
         adv_ps_curr = sales_t * self.advance_payments_sales_pct
         inflows = sales_curr + ar_prev + adv_ps_curr
 
-        purchases_curr = purchases_t * (1 - self.account_payables_pct) - adv_pp_prev
-        outflows = purchases_curr + ap_prev + adv_pp_curr + opex + tax
+        purchases_curr = (
+            assets["purchases_t"] * (1 - self.account_payables_pct) - adv_pp_prev
+        )
+        outflows = (
+            purchases_curr
+            + ap_prev
+            + assets["adv_pp_curr"]
+            + income["opex"]
+            + income["tax"]
+        )
         operating_nlb = inflows - outflows
 
-        # 3.2 Capital expenditure outflow
-        capex_nlb = -capex
+        # 2. Capital expenditure outflow
+        capex_nlb = -assets["capex"]
 
-        # 3.3 Return on market securities
-        external_investment_nlb = ms_return
-
-        # 3.4 Financing: ST debt is policy-driven (logit-linear % of sales),
+        # 3. Return on market securities
+        external_investment_nlb = income["ms_return"]
+        # 4. Financing: ST debt is policy-driven (logit-linear % of sales),
         # not deficit-driven — reflects corporate treasury/revolving credit policy
         st_debt_pct = tf.sigmoid(self.st_debt_alpha + self.st_debt_beta * time_index)
         eff_st_debt_curr = sales_t * st_debt_pct
 
         liquidity_deficit_st = (
-            total_liquidity_curr
+            assets["total_liquidity_curr"]
             - (cash_prev + ims_prev)
             - operating_nlb
-            + principal_st
-            + interest_st
+            + income["principal_st"]
+            + income["interest_st"]
         )
+
+        dividends_prev = assets["dividends_prev"]
+        stock_buyback = assets["stock_buyback_base"]
 
         liquidity_deficit_lt = (
             liquidity_deficit_st
             - eff_st_debt_curr
             - external_investment_nlb
             - capex_nlb
-            + principal_lt
-            + interest_lt
+            + income["principal_lt"]
+            + income["interest_lt"]
             + dividends_prev
             + stock_buyback
         )
@@ -599,13 +606,12 @@ class BayesianFinancialModel(BaseFinancialModel):
         financing_nlb = (
             eff_st_debt_curr
             + new_lt_loan
-            - principal_st
-            - principal_lt
-            - interest_st
-            - interest_lt
+            - income["principal_st"]
+            - income["principal_lt"]
+            - income["interest_st"]
+            - income["interest_lt"]
         )
-
-        # 3.5 Transaction with owners: equity issuance minus payouts
+        # 5. Transaction with owners: equity issuance minus payouts
         transaction_with_owners_nlb = equity_financing - dividends_prev - stock_buyback
         total_nlb = (
             operating_nlb
@@ -614,49 +620,74 @@ class BayesianFinancialModel(BaseFinancialModel):
             + external_investment_nlb
             + transaction_with_owners_nlb
         )
-        liquidity_check = (cash_prev + ims_prev) + total_nlb - total_liquidity_curr
+        liquidity_check = (
+            (cash_prev + ims_prev) + total_nlb - assets["total_liquidity_curr"]
+        )
 
-        # --- 4. Liabilities Evolution ---
-        ap_curr = purchases_t * self.account_payables_pct
-        total_lt_liabilities = new_lt_loan + ncl_prev
+        return {
+            "adv_ps_curr": adv_ps_curr,
+            "eff_st_debt_curr": eff_st_debt_curr,
+            "new_lt_loan": new_lt_loan,
+            "equity_financing": equity_financing,
+            "dividends_prev": dividends_prev,
+            "stock_buyback": stock_buyback,
+            "liquidity_deficit_st": liquidity_deficit_st,
+            "liquidity_check": liquidity_check,
+        }
+
+    def _assemble_state_compiled(self, state, assets, income, financing):
+        """Evolve liabilities, check balance sheet, and pack output tensors."""
+        ncl_prev = state[:, R_NCL]
+        equity_prev = state[:, R_EQUITY]
+
+        ap_curr = assets["purchases_t"] * self.account_payables_pct
+        total_lt_liabilities = financing["new_lt_loan"] + ncl_prev
         ncl_curr = total_lt_liabilities * (1 - 1 / self.avg_maturity_years)
         cur_lt_debt_curr = total_lt_liabilities / self.avg_maturity_years
 
         equity_curr = (
-            equity_prev + equity_financing + ni_curr - dividends_prev - stock_buyback
+            equity_prev
+            + financing["equity_financing"]
+            + income["ni_curr"]
+            - financing["dividends_prev"]
+            - financing["stock_buyback"]
         )
 
-        # --- 5. Total Assets & Balance Sheet Check ---
+        # --- Total Assets & Balance Sheet Check ---
         total_assets = (
-            nca_curr + adv_pp_curr + ar_curr + inv_curr + cash_curr + ims_curr
+            assets["nca_curr"]
+            + assets["adv_pp_curr"]
+            + assets["ar_curr"]
+            + assets["inv_curr"]
+            + assets["cash_curr"]
+            + assets["ims_curr"]
         )
         total_liab_equity = (
             ap_curr
-            + adv_ps_curr
-            + eff_st_debt_curr
+            + financing["adv_ps_curr"]
+            + financing["eff_st_debt_curr"]
             + cur_lt_debt_curr
             + ncl_curr
             + equity_curr
         )
         check = total_assets - total_liab_equity
 
-        # --- Pack outputs ---
         new_state = tf.stack(
             [
-                nca_curr,
-                adv_pp_curr,
-                ar_curr,
-                inv_curr,
-                cash_curr,
-                ims_curr,
+                assets["nca_curr"],
+                assets["adv_pp_curr"],
+                assets["ar_curr"],
+                assets["inv_curr"],
+                assets["cash_curr"],
+                assets["ims_curr"],
                 ap_curr,
-                adv_ps_curr,
-                eff_st_debt_curr,
+                financing["adv_ps_curr"],
+                financing["eff_st_debt_curr"],
                 cur_lt_debt_curr,
                 ncl_curr,
                 equity_curr,
-                ni_curr,
-                dividends_prev,
+                income["ni_curr"],
+                financing["dividends_prev"],
             ],
             axis=1,
         )
@@ -664,31 +695,31 @@ class BayesianFinancialModel(BaseFinancialModel):
         diagnostics = tf.stack(
             [
                 total_assets,
-                nca_curr,
-                adv_pp_curr,
-                ar_curr,
-                inv_curr,
-                cash_curr,
-                ims_curr,
+                assets["nca_curr"],
+                assets["adv_pp_curr"],
+                assets["ar_curr"],
+                assets["inv_curr"],
+                assets["cash_curr"],
+                assets["ims_curr"],
                 ap_curr,
-                adv_ps_curr,
-                eff_st_debt_curr,
+                financing["adv_ps_curr"],
+                financing["eff_st_debt_curr"],
                 cur_lt_debt_curr,
                 ncl_curr,
                 equity_curr,
-                ni_curr,
-                depreciation,
-                cogs,
-                opex,
-                tax,
-                ms_return,
-                interest_lt + interest_st,
-                dividends_prev,
-                stock_buyback,
-                new_lt_loan,
-                equity_financing,
-                liquidity_deficit_st,
-                liquidity_check,
+                income["ni_curr"],
+                assets["depreciation"],
+                income["cogs"],
+                income["opex"],
+                income["tax"],
+                income["ms_return"],
+                income["interest_lt"] + income["interest_st"],
+                financing["dividends_prev"],
+                financing["stock_buyback"],
+                financing["new_lt_loan"],
+                financing["equity_financing"],
+                financing["liquidity_deficit_st"],
+                financing["liquidity_check"],
                 check,
             ],
             axis=1,

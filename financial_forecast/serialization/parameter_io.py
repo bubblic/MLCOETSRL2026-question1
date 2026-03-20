@@ -35,7 +35,7 @@ def save_parameters(model, path: str) -> None:
         "tl_baseline": float(model.tl_baseline.numpy()),
         "cash_alpha": float(model.cash_alpha.numpy()),
         "cash_beta": float(model.cash_beta.numpy()),
-        "income_tax_pct": float(model.income_tax_pct.numpy()),
+        "income_tax_pct": float(model.tax_module.income_tax_pct.numpy()),
         "dividend_payout_ratio_pct": float(model.dividend_payout_ratio_pct.numpy()),
         "dividend_adjustment_speed": float(model.dividend_adjustment_speed.numpy()),
         "sb_baseline": float(model.sb_baseline.numpy()),
@@ -45,12 +45,12 @@ def save_parameters(model, path: str) -> None:
         "st_debt_alpha": float(model.st_debt_alpha.numpy()),
         "st_debt_beta": float(model.st_debt_beta.numpy()),
         # Bayesian OpEx parameters
-        "q_var_opex_loc": float(model.q_var_opex_loc.numpy()),
-        "q_var_opex_scale": float(model.q_var_opex_scale.numpy()),
-        "q_base_opex_loc": float(model.q_base_opex_loc.numpy()),
-        "q_base_opex_scale": float(model.q_base_opex_scale.numpy()),
-        "noise_sigma": float(model.noise_sigma.numpy()),
-        "sales_offset": float(model.sales_offset.numpy()),
+        "q_var_opex_loc": float(model.opex_module.q_var_opex_loc.numpy()),
+        "q_var_opex_scale": float(model.opex_module.q_var_opex_scale.numpy()),
+        "q_base_opex_loc": float(model.opex_module.q_base_opex_loc.numpy()),
+        "q_base_opex_scale": float(model.opex_module.q_base_opex_scale.numpy()),
+        "noise_sigma": float(model.opex_module.noise_sigma.numpy()),
+        "sales_offset": float(model.opex_module.sales_offset.numpy()),
         # Structural parameters
         "avg_short_term_interest_pct": float(
             model.avg_short_term_interest_pct.numpy()
@@ -66,6 +66,7 @@ def save_parameters(model, path: str) -> None:
         "ef_beta": float(model.ef_beta.numpy()),
         # Metadata
         "base_year": model.base_year,
+        "amount_scale": model.amount_scale,
     }
     np.savez(path, **params)
 
@@ -105,7 +106,7 @@ def load_parameters(model, path: str) -> None:
     model.tl_baseline.assign(data.get("tl_baseline", 0.0))
     model.cash_alpha.assign(data["cash_alpha"])
     model.cash_beta.assign(data["cash_beta"])
-    model.income_tax_pct.assign(data["income_tax_pct"])
+    model.tax_module.income_tax_pct.assign(data["income_tax_pct"])
     model.dividend_payout_ratio_pct.assign(data["dividend_payout_ratio_pct"])
     model.dividend_adjustment_speed.assign(
         data.get("dividend_adjustment_speed", 1.0)
@@ -118,12 +119,13 @@ def load_parameters(model, path: str) -> None:
     model.st_debt_beta.assign(data.get("st_debt_beta", 0.0))
 
     # Bayesian OpEx parameters
-    model.q_var_opex_loc.assign(data["q_var_opex_loc"])
-    model.q_var_opex_scale.assign(data["q_var_opex_scale"])
-    model.q_base_opex_loc.assign(data["q_base_opex_loc"])
-    model.q_base_opex_scale.assign(data["q_base_opex_scale"])
-    model.noise_sigma.assign(data["noise_sigma"])
-    model.sales_offset.assign(data["sales_offset"])
+    opex = model.opex_module
+    opex.q_var_opex_loc.assign(data["q_var_opex_loc"])
+    opex.q_var_opex_scale.assign(data["q_var_opex_scale"])
+    opex.q_base_opex_loc.assign(data["q_base_opex_loc"])
+    opex.q_base_opex_scale.assign(data["q_base_opex_scale"])
+    opex.noise_sigma.assign(data["noise_sigma"])
+    opex.sales_offset.assign(data["sales_offset"])
 
     # Structural parameters
     model.avg_short_term_interest_pct.assign(data["avg_short_term_interest_pct"])
@@ -136,3 +138,5 @@ def load_parameters(model, path: str) -> None:
     # Metadata
     if "base_year" in data:
         model.base_year = int(data["base_year"])
+    if "amount_scale" in data:
+        model.amount_scale = float(data["amount_scale"])

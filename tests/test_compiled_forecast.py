@@ -10,7 +10,7 @@ Verifies:
 import pytest
 import tensorflow as tf
 
-from financial_forecast.inference.forecast import run_monte_carlo_forecast
+from financial_forecast.inference.monte_carlo_forecast import run_monte_carlo_forecast
 from financial_forecast.inference.state_index import (
     initial_state_to_batched,
     DIAGNOSTIC_KEYS,
@@ -21,7 +21,10 @@ from financial_forecast.models.bayesian_model import BayesianFinancialModel
 @pytest.fixture
 def model():
     tf.random.set_seed(42)
-    return BayesianFinancialModel(base_year=2018)
+    m = BayesianFinancialModel()
+    m.base_year = 2018
+    m.amount_scale = 1.0
+    return m
 
 
 @pytest.fixture
@@ -65,8 +68,8 @@ def test_deterministic_equivalence(model, mock_state):
 
     # --- Compiled path ---
     batched_state = initial_state_to_batched(mock_state, 1)
-    var_opex = tf.reshape(model.q_var_opex_loc, [1])
-    base_opex = tf.reshape(model.q_base_opex_loc, [1])
+    var_opex = tf.reshape(model.opex_module.q_var_opex_loc, [1])
+    base_opex = tf.reshape(model.opex_module.q_base_opex_loc, [1])
 
     compiled_diags = []
     for step in range(n_years):

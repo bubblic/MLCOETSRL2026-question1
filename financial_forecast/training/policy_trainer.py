@@ -68,7 +68,6 @@ class PolicyTrainer(BaseTrainer):
         historical_opex,
         historical_tax,
         historical_eff_st_debt,
-        historical_tax_onetime_payments=None,
         historical_inflation=None,
         historical_years=None,
         learning_rate=0.001,
@@ -109,8 +108,6 @@ class PolicyTrainer(BaseTrainer):
             historical_tax: 1-D array-like of tax payments.
             historical_eff_st_debt: 1-D array-like of effective short-term
                 debt.
-            historical_tax_onetime_payments: Optional 1-D array-like of
-                one-time tax payments.
             historical_inflation: Optional 1-D array-like of annual inflation
                 rates.
             historical_years: Optional 1-D array-like of fiscal years.
@@ -144,33 +141,12 @@ class PolicyTrainer(BaseTrainer):
         bb_tensor = _as_float64_tensor(historical_stock_buyback)
         opex_tensor = _as_float64_tensor(historical_opex)
         tax_tensor = _as_float64_tensor(historical_tax)
-        if historical_tax_onetime_payments is None:
-            tax_onetime_tensor = tf.zeros_like(tax_tensor)
-        else:
-            tax_onetime_tensor = _as_float64_tensor(historical_tax_onetime_payments)
         eff_st_debt_tensor = _as_float64_tensor(historical_eff_st_debt)
 
         if historical_inflation is None:
             historical_inflation = tf.zeros_like(sales_tensor)
         inf_tensor = _as_float64_tensor(historical_inflation)
         cum_inf_tensor = tf.math.cumprod(1 + inf_tensor)
-
-        # --- Calculate and store sales offset for OpEx training ---
-        sales_offset_value = tf.reduce_mean(sales_tensor)
-        model.sales_offset.assign(sales_offset_value)
-        sales_tensor_centered = sales_tensor - sales_offset_value
-
-        print(f"Sales offset for OpEx training: {sales_offset_value.numpy():.4e}")
-        print(
-            f"Sales range before centering: "
-            f"[{tf.reduce_min(sales_tensor).numpy():.4e}, "
-            f"{tf.reduce_max(sales_tensor).numpy():.4e}]"
-        )
-        print(
-            f"Sales range after centering: "
-            f"[{tf.reduce_min(sales_tensor_centered).numpy():.4e}, "
-            f"{tf.reduce_max(sales_tensor_centered).numpy():.4e}]"
-        )
 
         # --- Cost Ratio Training Data ---
         cost_ratio_hist = cogs_tensor / sales_tensor
@@ -252,7 +228,7 @@ class PolicyTrainer(BaseTrainer):
             model.tl_baseline,
             model.cash_alpha,
             model.cash_beta,
-            model.income_tax_pct.trainable_variables[0],
+            *model.tax_module.trainable_variables,
             model.dividend_payout_ratio_pct.trainable_variables[0],
             model.dividend_adjustment_speed.trainable_variables[0],
             model.sb_baseline,
@@ -261,11 +237,7 @@ class PolicyTrainer(BaseTrainer):
             model.st_debt_beta,
             model.cost_ratio_alpha,
             model.cost_ratio_beta,
-            model.q_var_opex_loc,
-            model.q_var_opex_scale.trainable_variables[0],
-            model.q_base_opex_loc,
-            model.q_base_opex_scale.trainable_variables[0],
-            model.noise_sigma.trainable_variables[0],
+            *model.opex_module.trainable_variables,
         ]
 
         vi_history = {
@@ -298,9 +270,7 @@ class PolicyTrainer(BaseTrainer):
         }
 
         # Cast prior strength to float64 tensor for graph-mode compatibility
-        prior_strength_am = tf.constant(
-            prior_strength_asset_maintain, dtype=tf.float64
-        )
+        prior_strength_am = tf.constant(prior_strength_asset_maintain, dtype=tf.float64)
         _zero = tf.constant(0.0, dtype=tf.float64)
         _one = tf.constant(1.0, dtype=tf.float64)
 
@@ -383,12 +353,8 @@ class PolicyTrainer(BaseTrainer):
                         / scale_cash
                     )
                 )
-                tax_pred_total = (
-                    ni_tensor / (_one / model.income_tax_pct - _one)
-                    + tax_onetime_tensor
-                )
-                loss_tax = tf.reduce_mean(
-                    tf.square((tax_tensor - tax_pred_total) / scale_tax)
+                loss_tax = model.tax_module.loss(
+                    tax_tensor, ni_tensor, scale_tax,
                 )
                 div_target = ni_prev_aligned * model.dividend_payout_ratio_pct
                 div_pred = (
@@ -418,20 +384,13 @@ class PolicyTrainer(BaseTrainer):
                     )
                 )
 
-                # Bayesian OpEx Loss (ELBO = NLL + KL)
-                var_opex_sample, base_opex_sample = model.sample_opex_params()
-                pred_opex_raw = (base_opex_sample * cum_inf_tensor) + (
-                    var_opex_sample * sales_tensor_centered
+                # OpEx Loss (could be simple MSE or Bayesian with ELBO = NLL + KL)
+                loss_opex = model.opex_module.loss(
+                    opex_tensor,
+                    sales_tensor,
+                    cum_inf_tensor,
+                    scale_opex,
                 )
-                residuals = (opex_tensor - pred_opex_raw) / scale_opex
-                likelihood_dist = tfd.Normal(
-                    loc=_zero, scale=(model.noise_sigma / scale_opex)
-                )
-                neg_log_likelihood = -tf.reduce_sum(
-                    likelihood_dist.log_prob(residuals)
-                )
-                kl = model.get_opex_kl_divergence()
-                loss_opex_bayes = (neg_log_likelihood + kl) / num_opex_obs
 
                 # Quadratic prior on asset_maintain centered at 1.0
                 prior_loss_am = prior_strength_am * tf.square(
@@ -439,10 +398,22 @@ class PolicyTrainer(BaseTrainer):
                 )
 
                 total_loss = (
-                    loss_growth + loss_depr + loss_adv_ps + loss_adv_pp
-                    + loss_ar + loss_ap + loss_inv + loss_tl + loss_cash
-                    + loss_tax + loss_div + loss_bb + loss_cost_ratio
-                    + loss_eff_st_debt + loss_opex_bayes + prior_loss_am
+                    loss_growth
+                    + loss_depr
+                    + loss_adv_ps
+                    + loss_adv_pp
+                    + loss_ar
+                    + loss_ap
+                    + loss_inv
+                    + loss_tl
+                    + loss_cash
+                    + loss_tax
+                    + loss_div
+                    + loss_bb
+                    + loss_cost_ratio
+                    + loss_eff_st_debt
+                    + loss_opex
+                    + prior_loss_am
                 )
 
             grads = tape.gradient(total_loss, vars_to_train)
@@ -450,12 +421,27 @@ class PolicyTrainer(BaseTrainer):
 
             # Return all losses as a single stacked tensor for efficient
             # GPU-to-CPU transfer during logging.
-            return tf.stack([
-                total_loss, loss_growth, loss_depr, loss_adv_ps, loss_adv_pp,
-                loss_ar, loss_ap, loss_inv, loss_tl, loss_cash, loss_tax,
-                loss_div, loss_bb, loss_cost_ratio, loss_eff_st_debt,
-                loss_opex_bayes, prior_loss_am,
-            ])
+            return tf.stack(
+                [
+                    total_loss,
+                    loss_growth,
+                    loss_depr,
+                    loss_adv_ps,
+                    loss_adv_pp,
+                    loss_ar,
+                    loss_ap,
+                    loss_inv,
+                    loss_tl,
+                    loss_cash,
+                    loss_tax,
+                    loss_div,
+                    loss_bb,
+                    loss_cost_ratio,
+                    loss_eff_st_debt,
+                    loss_opex,
+                    prior_loss_am,
+                ]
+            )
 
         # Index mapping for the stacked loss tensor
         _L_TOTAL, _L_GROWTH, _L_DEPR = 0, 1, 2
@@ -471,11 +457,19 @@ class PolicyTrainer(BaseTrainer):
 
                 vi_history["epochs"].append(i)
                 vi_history["loss_vi"].append(v[_L_OPEX_VI])
-                vi_history["q_var_opex_loc"].append(model.q_var_opex_loc.numpy())
-                vi_history["q_var_opex_scale"].append(model.q_var_opex_scale.numpy())
-                vi_history["q_base_opex_loc"].append(model.q_base_opex_loc.numpy())
-                vi_history["q_base_opex_scale"].append(model.q_base_opex_scale.numpy())
-                vi_history["noise_sigma"].append(model.noise_sigma.numpy())
+                vi_history["q_var_opex_loc"].append(
+                    model.opex_module.q_var_opex_loc.numpy()
+                )
+                vi_history["q_var_opex_scale"].append(
+                    model.opex_module.q_var_opex_scale.numpy()
+                )
+                vi_history["q_base_opex_loc"].append(
+                    model.opex_module.q_base_opex_loc.numpy()
+                )
+                vi_history["q_base_opex_scale"].append(
+                    model.opex_module.q_base_opex_scale.numpy()
+                )
+                vi_history["noise_sigma"].append(model.opex_module.noise_sigma.numpy())
 
                 simple_history["epochs"].append(i)
                 simple_history["loss_total"].append(v[_L_TOTAL])
@@ -498,7 +492,7 @@ class PolicyTrainer(BaseTrainer):
                 print(
                     f"Epoch {i}: Loss={v[_L_TOTAL]:.4e} | "
                     f"OpEx VI Loss={v[_L_OPEX_VI]:.4e} | "
-                    f"OpEx Noise={(model.noise_sigma.numpy() * model.amount_scale):.2e} | "
+                    f"OpEx Noise={(model.opex_module.noise_sigma.numpy() * model.amount_scale):.2e} | "
                     f"AM={model.asset_maintain.numpy():.4f} "
                     f"AG={model.asset_growth.numpy():.6f} "
                     f"Prior_AM={v[_L_PRIOR_AM]:.4e}"
@@ -537,7 +531,7 @@ class PolicyTrainer(BaseTrainer):
             f"%Cash at t={n_years-1}: "
             f"{tf.sigmoid(model.cash_alpha + model.cash_beta * (n_years-1)).numpy():.4f}"
         )
-        print(f"Final %IT: {model.income_tax_pct.numpy():.5f}")
+        print(f"Final %IT: {model.tax_module.income_tax_pct.numpy():.5f}")
         print(f"Final %PR: {model.dividend_payout_ratio_pct.numpy():.5f}")
         print(f"Final DivAdjSpeed: {model.dividend_adjustment_speed.numpy():.5f}")
         print(
@@ -567,20 +561,7 @@ class PolicyTrainer(BaseTrainer):
             f"CR at t={n_years-1}: "
             f"{tf.sigmoid(model.cost_ratio_alpha + model.cost_ratio_beta * (n_years-1)).numpy():.4f}"
         )
-        print(
-            f"Bayesian OpEx Variable %: "
-            f"Mean={model.q_var_opex_loc.numpy():.4f}, "
-            f"Std={model.q_var_opex_scale.numpy():.4f}"
-        )
-        print(
-            f"Bayesian OpEx Baseline (USD):   "
-            f"Mean={(model.q_base_opex_loc.numpy() * model.amount_scale):.2e}, "
-            f"Std={(model.q_base_opex_scale.numpy() * model.amount_scale):.2e}"
-        )
-        print(
-            f"OpEx aleatoric uncertainty (USD): "
-            f"{(model.noise_sigma.numpy() * model.amount_scale):.2e}"
-        )
+        model.opex_module.print_summary()
         print("-" * 50)
 
         # --- Diagnostic Plots ---

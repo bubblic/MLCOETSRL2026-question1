@@ -8,7 +8,7 @@ All monetary values are in USD. Fiscal years are Apple's fiscal years
 import tensorflow as tf
 
 
-def get_apple_historical_data():
+def get_financial_statements():
     """Return Apple's historical financial data as a dictionary of TensorFlow tensors.
 
     Returns:
@@ -25,8 +25,6 @@ def get_apple_historical_data():
             opex                 – operating expenses
             net_income           – net income
             tax                  – income tax provision
-            tax_onetime_payments – one-time tax anomaly amounts in dollars (null -> 0)
-
         Balance Sheet:
             inventory_plus_one – inventory with one extra leading year (9 values)
             inventory          – inventory aligned to fiscal years (8 values)
@@ -48,9 +46,6 @@ def get_apple_historical_data():
 
         Derived:
             purchases       – cogs + delta(inventory)
-
-        Macro:
-            inflation       – annual CPI inflation rates
 
         Note:
             Fields may contain float('nan') for years where a value is unavailable.
@@ -133,21 +128,6 @@ def get_apple_historical_data():
             16741000000,
             29749000000,
             20719000000,
-        ],
-        dtype=tf.float64,
-    )
-    # Extracted from extracted_text/apple_YYYY.tax-anomalies-contingencies.llm.json.
-    # Source values are in billions; null values are mapped to 0.0.
-    tax_onetime_payments = tf.constant(
-        [
-            1.5e9,  # 2018
-            0.0,  # 2019 (null)
-            -0.582e9,  # 2020
-            0.0,  # 2021 (null)
-            0.0,  # 2022 (null)
-            0.0,  # 2023 (null)
-            10.2e9,  # 2024
-            0.0,  # 2025 (null)
         ],
         dtype=tf.float64,
     )
@@ -354,11 +334,6 @@ def get_apple_historical_data():
     cost_of_revenue = cogs + depreciation
 
     # --- Macro ---
-    inflation = tf.constant(
-        [0.024, 0.018, 0.012, 0.047, 0.08, 0.041, 0.029, 0.027],
-        dtype=tf.float64,
-    )
-
     return {
         "years": years,
         # Income Statement
@@ -369,7 +344,6 @@ def get_apple_historical_data():
         "opex": opex,
         "net_income": net_income,
         "tax": tax,
-        "tax_onetime_payments": tax_onetime_payments,
         "interest_payment": interest_expense,
         "ms_return": ms_investment_return,
         # Balance Sheet
@@ -391,6 +365,4 @@ def get_apple_historical_data():
         "stock_buyback": stock_buyback,
         # Derived
         "purchases": purchases,
-        # Macro
-        "inflation": inflation,
     }
