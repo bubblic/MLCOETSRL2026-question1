@@ -1,12 +1,19 @@
 """Bayesian OpEx module with variational inference.
 
 Encapsulates the six OpEx-related parameters, posterior sampling,
-KL divergence, and the ELBO loss function.  Designed to be composed
-into a financial model as ``self.opex_module = BayesianOpEx()``.
+KL divergence, the ELBO loss function, and fit visualization.
+Designed to be composed into a financial model as
+``self.opex_module = BayesianOpEx()``.
 """
 
+from datetime import datetime
+from typing import Optional
+
+import matplotlib.pyplot as plt
 import tensorflow as tf
 import tensorflow_probability as tfp
+
+from financial_forecast.training.io_utils import get_training_results_path
 
 tfd = tfp.distributions
 tfb = tfp.bijectors
@@ -64,17 +71,32 @@ class BayesianOpEx(tf.Module):
         )
         self.amount_scale = 1.0  # overridden by set_forecast_drivers
 
-    def set_forecast_drivers(self, scaled_sales, amount_scale):
-        """Set data-derived quantities needed for training and inference.
+        # Populated by set_forecast_drivers
+        self._historical_sales_scaled = None
+        self._historical_opex_scaled = None
+        self._historical_inflation = None
+
+        # Populated by prepare_mc
+        self._mc_var_opex = None
+        self._mc_base_opex = None
+        self._mc_noise = None
+
+    def prepare_for_training(self, amount_scale, scaled_sales, scaled_opex, inflation):
+        """Set data-derived quantities needed for training, inference, and plotting.
 
         Args:
             scaled_sales: 1-D tensor of historical sales (already scaled).
+            scaled_opex: 1-D tensor of historical OpEx (already scaled).
+            inflation: 1-D tensor of annual inflation rates (or zeros).
             amount_scale: USD-to-scaled-units conversion factor.
         """
         self.amount_scale = amount_scale
         self.sales_offset.assign(tf.reduce_mean(scaled_sales))
+        self._historical_sales_scaled = scaled_sales
+        self._historical_opex_scaled = scaled_opex
+        self._historical_inflation = inflation
 
-    def compute(self, sales_t, cum_inflation, var_opex, base_opex, noise):
+    def _compute(self, sales_t, cum_inflation, var_opex, base_opex, noise):
         """Compute OpEx given pre-sampled parameters.
 
         Args:
@@ -99,6 +121,84 @@ class BayesianOpEx(tf.Module):
         q_var = tfd.Normal(loc=self.q_var_opex_loc, scale=self.q_var_opex_scale)
         q_base = tfd.Normal(loc=self.q_base_opex_loc, scale=self.q_base_opex_scale)
         return q_var.sample(), q_base.sample()
+
+    def predict(self, sales_t, cum_inflation, use_mean=False):
+        """Sample parameters and compute OpEx in one call.
+
+        Convenience method for the dict-based ``forecast_step`` wrapper.
+
+        Args:
+            sales_t: ``[n_samples]`` sales tensor.
+            cum_inflation: Scalar cumulative inflation factor.
+            use_mean: If ``True``, use posterior means with zero noise.
+
+        Returns:
+            ``[n_samples]`` OpEx tensor.
+        """
+        n = sales_t.shape[0] or 1
+        var_opex, base_opex, noise = self._get_step_params(n, use_mean=use_mean)
+        return self._compute(sales_t, cum_inflation, var_opex, base_opex, noise)
+
+    def prepare_mc(self, n_samples, n_years):
+        """Pre-sample all stochastic values for a Monte Carlo forecast.
+
+        Stores the samples internally.  The loop body then calls
+        :meth:`compute_mc_step` to get the OpEx for each year.
+
+        Args:
+            n_samples: Number of MC trajectories.
+            n_years: Number of forecast years.
+        """
+        q_var = tfd.Normal(loc=self.q_var_opex_loc, scale=self.q_var_opex_scale)
+        q_base = tfd.Normal(loc=self.q_base_opex_loc, scale=self.q_base_opex_scale)
+        self._mc_var_opex = q_var.sample([n_samples])
+        self._mc_base_opex = q_base.sample([n_samples])
+        self._mc_noise = tfd.Normal(_ZERO, self.noise_sigma).sample(
+            [n_years, n_samples]
+        )
+
+    def compute_mc_step(self, sales_t, cum_inflation, step):
+        """Compute OpEx for one MC forecast step using pre-sampled values.
+
+        Args:
+            sales_t: ``[n_samples]`` sales tensor.
+            cum_inflation: Scalar cumulative inflation factor.
+            step: Integer step index (indexes into pre-sampled noise).
+
+        Returns:
+            ``[n_samples]`` OpEx tensor.
+        """
+        return self._compute(
+            sales_t,
+            cum_inflation,
+            self._mc_var_opex,
+            self._mc_base_opex,
+            self._mc_noise[step],
+        )
+
+    def _get_step_params(self, n_samples, use_mean=False):
+        """Return ``(var_opex, base_opex, noise)`` ready for a forecast step.
+
+        Args:
+            n_samples: Batch size (1 for dict-based forecast, N for MC).
+            use_mean: If ``True``, return posterior means with zero noise.
+                If ``False``, sample from the posterior and add noise.
+
+        Returns:
+            Tuple ``(var_opex, base_opex, noise)`` each of shape
+            ``[n_samples]``.
+        """
+        if use_mean:
+            var_opex = tf.fill([n_samples], tf.cast(self.q_var_opex_loc, tf.float64))
+            base_opex = tf.fill([n_samples], tf.cast(self.q_base_opex_loc, tf.float64))
+            noise = tf.zeros([n_samples], dtype=tf.float64)
+        else:
+            q_var = tfd.Normal(loc=self.q_var_opex_loc, scale=self.q_var_opex_scale)
+            q_base = tfd.Normal(loc=self.q_base_opex_loc, scale=self.q_base_opex_scale)
+            var_opex = q_var.sample([n_samples])
+            base_opex = q_base.sample([n_samples])
+            noise = tfd.Normal(_ZERO, self.noise_sigma).sample([n_samples])
+        return var_opex, base_opex, noise
 
     def kl_divergence(self):
         """Compute KL(posterior || prior) for both OpEx parameters.
@@ -158,3 +258,257 @@ class BayesianOpEx(tf.Module):
             f"OpEx aleatoric uncertainty (USD): "
             f"{(self.noise_sigma.numpy() * s):.2e}"
         )
+
+    def plot_fit(
+        self,
+        n_samples: int = 2000,
+        lower_q: float = 5.0,
+        upper_q: float = 95.0,
+        show_plot: bool = False,
+        use_gaussian_ci: bool = False,
+    ) -> None:
+        """Plot historical OpEx against the model fit with predictive uncertainty.
+
+        Uses historical data stored by :meth:`set_forecast_drivers`.
+        Generates two figures: OpEx vs Year and OpEx vs Sales, each showing
+        the posterior predictive mean and confidence/prediction intervals.
+
+        Args:
+            n_samples: Number of posterior predictive samples when
+                *use_gaussian_ci* is ``False``.
+            lower_q: Lower quantile for the prediction band (percent).
+            upper_q: Upper quantile for the prediction band (percent).
+            show_plot: Whether to call ``plt.show()`` after saving.
+            use_gaussian_ci: If ``True``, compute analytical Gaussian intervals
+                instead of Monte Carlo samples.
+        """
+        historical_sales_scaled = self._historical_sales_scaled
+        historical_opex_scaled = self._historical_opex_scaled
+        historical_inflation = self._historical_inflation
+        historical_years = tf.cast(
+            tf.range(1, len(historical_sales_scaled) + 1),
+            dtype=tf.float64,
+        )
+        cum_inf = tf.math.cumprod(1 + historical_inflation)
+
+        mean_var_opex = self.q_var_opex_loc.numpy()
+        mean_base_opex = self.q_base_opex_loc.numpy()
+        sigma_opex = self.noise_sigma.numpy()
+        sales_offset = self.sales_offset.numpy()
+        amount_scale = self.amount_scale
+
+        # Center sales using the offset from training
+        sales_centered = historical_sales_scaled - sales_offset
+        mean_opex_bil = (mean_base_opex * cum_inf) + (mean_var_opex * sales_centered)
+
+        if use_gaussian_ci:
+            var_var = float(self.q_var_opex_scale.numpy()) ** 2
+            var_base = float(self.q_base_opex_scale.numpy()) ** 2
+            var_noise = float(sigma_opex) ** 2
+            cum_inf_tf = tf.cast(cum_inf, dtype=tf.float64)
+            sales_tf = tf.cast(sales_centered, dtype=tf.float64)
+            std_opex_bil = tf.sqrt(
+                (cum_inf_tf**2) * var_base + (sales_tf**2) * var_var + var_noise
+            )
+            z_low = float(tfd.Normal(0.0, 1.0).quantile(lower_q / 100.0))
+            z_up = float(tfd.Normal(0.0, 1.0).quantile(upper_q / 100.0))
+            lower_opex_bil = mean_opex_bil + z_low * std_opex_bil
+            upper_opex_bil = mean_opex_bil + z_up * std_opex_bil
+        else:
+            q_var = tfd.Normal(loc=self.q_var_opex_loc, scale=self.q_var_opex_scale)
+            q_base = tfd.Normal(loc=self.q_base_opex_loc, scale=self.q_base_opex_scale)
+            var_samples = tf.reshape(q_var.sample(n_samples), (-1, 1))
+            base_samples = tf.reshape(q_base.sample(n_samples), (-1, 1))
+            sales = tf.reshape(
+                tf.convert_to_tensor(sales_centered, dtype=tf.float64), (1, -1)
+            )
+            cum_inf_t = tf.reshape(
+                tf.convert_to_tensor(cum_inf, dtype=tf.float64), (1, -1)
+            )
+            noise = tf.random.normal(
+                shape=(n_samples, len(historical_sales_scaled)),
+                mean=0.0,
+                stddev=sigma_opex,
+                dtype=tf.float64,
+            )
+            opex_samples = (base_samples * cum_inf_t) + (var_samples * sales) + noise
+            lower_opex_bil = tfp.stats.percentile(opex_samples, lower_q, axis=0)
+            upper_opex_bil = tfp.stats.percentile(opex_samples, upper_q, axis=0)
+
+        mean_opex_usd = mean_opex_bil * amount_scale
+        upper_opex_usd = upper_opex_bil * amount_scale
+        lower_opex_usd = lower_opex_bil * amount_scale
+        opex_hist_usd = historical_opex_scaled * amount_scale
+        sales_hist_usd = historical_sales_scaled * amount_scale
+
+        # --- Figure 1: OpEx vs Year ---
+        plt.figure(figsize=(10, 5))
+        plt.plot(
+            historical_years,
+            opex_hist_usd,
+            "o-",
+            label="Historical OpEx",
+            color="black",
+        )
+        plt.plot(
+            historical_years,
+            mean_opex_usd,
+            "o-",
+            label="Mean OpEx (learned)",
+            color="tab:blue",
+        )
+        plt.plot(
+            historical_years,
+            lower_opex_usd,
+            "--",
+            label=f"Posterior predictive {lower_q:.0f}%",
+            color="tab:blue",
+            alpha=0.8,
+        )
+        plt.plot(
+            historical_years,
+            upper_opex_usd,
+            "--",
+            label=f"Posterior predictive {upper_q:.0f}%",
+            color="tab:blue",
+            alpha=0.8,
+        )
+        plt.title("OpEx vs Year with Learned Probabilistic Linear Regression")
+        plt.xlabel("Year")
+        plt.ylabel("OpEx (USD)")
+        plt.grid(True, alpha=0.3)
+        plt.legend()
+        plt.tight_layout()
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        tag = "gaussian_ci" if use_gaussian_ci else "monte_carlo"
+        plt.savefig(
+            get_training_results_path(f"opex_probabilistic_fit_{timestamp}_{tag}.png"),
+            dpi=150,
+        )
+        if show_plot:
+            plt.show()
+        else:
+            plt.close()
+
+        # --- Figure 2: OpEx vs Sales ---
+        x_min = float(tf.reduce_min(sales_hist_usd))
+        x_max = float(tf.reduce_max(sales_hist_usd))
+        x_span = x_max - x_min if x_max > x_min else max(abs(x_max), 1.0)
+        x_pad = 0.5 * x_span
+        x_left, x_right = x_min - x_pad, x_max + x_pad
+
+        sales_grid_usd = tf.linspace(
+            tf.constant(x_left, dtype=tf.float64),
+            tf.constant(x_right, dtype=tf.float64),
+            200,
+        )
+        sales_grid_bil = sales_grid_usd / amount_scale
+        sales_grid_centered = sales_grid_bil - sales_offset
+        cum_inf_mean = float(tf.reduce_mean(cum_inf))
+        mean_opex_grid_bil = (mean_base_opex * cum_inf_mean) + (
+            mean_var_opex * sales_grid_centered
+        )
+        mean_opex_grid_usd = mean_opex_grid_bil * amount_scale
+
+        if use_gaussian_ci:
+            var_var = float(self.q_var_opex_scale.numpy()) ** 2
+            var_base = float(self.q_base_opex_scale.numpy()) ** 2
+            var_noise = float(sigma_opex) ** 2
+            std_grid = tf.sqrt(
+                (cum_inf_mean**2) * var_base
+                + (sales_grid_centered**2) * var_var
+                + var_noise
+            )
+            z_low = float(tfd.Normal(0.0, 1.0).quantile(lower_q / 100.0))
+            z_up = float(tfd.Normal(0.0, 1.0).quantile(upper_q / 100.0))
+            lower_grid_bil = mean_opex_grid_bil + z_low * std_grid
+            upper_grid_bil = mean_opex_grid_bil + z_up * std_grid
+        else:
+            q_var = tfd.Normal(loc=self.q_var_opex_loc, scale=self.q_var_opex_scale)
+            q_base = tfd.Normal(loc=self.q_base_opex_loc, scale=self.q_base_opex_scale)
+            var_samples = tf.reshape(q_var.sample(n_samples), (-1, 1))
+            base_samples = tf.reshape(q_base.sample(n_samples), (-1, 1))
+            sales_grid_t = tf.reshape(
+                tf.convert_to_tensor(sales_grid_centered, dtype=tf.float64), (1, -1)
+            )
+            cum_inf_grid_t = tf.reshape(
+                tf.fill(
+                    sales_grid_bil.shape, tf.constant(cum_inf_mean, dtype=tf.float64)
+                ),
+                (1, -1),
+            )
+            noise_grid = tf.random.normal(
+                shape=(n_samples, len(sales_grid_bil)),
+                mean=0.0,
+                stddev=sigma_opex,
+                dtype=tf.float64,
+            )
+            opex_grid_samples = (
+                (base_samples * cum_inf_grid_t)
+                + (var_samples * sales_grid_t)
+                + noise_grid
+            )
+            lower_grid_bil = tfp.stats.percentile(opex_grid_samples, lower_q, axis=0)
+            upper_grid_bil = tfp.stats.percentile(opex_grid_samples, upper_q, axis=0)
+
+        lower_grid_usd = lower_grid_bil * amount_scale
+        upper_grid_usd = upper_grid_bil * amount_scale
+
+        plt.figure(figsize=(10, 5))
+        plt.scatter(
+            sales_hist_usd,
+            opex_hist_usd,
+            label="Historical OpEx",
+            color="black",
+            zorder=3,
+        )
+        plt.scatter(
+            sales_hist_usd,
+            mean_opex_usd,
+            label="Mean OpEx per data point (learned)",
+            color="tab:blue",
+            marker="x",
+            s=80,
+            zorder=4,
+        )
+        plt.plot(
+            sales_grid_usd,
+            mean_opex_grid_usd,
+            "-",
+            label="Mean OpEx trend (avg. inflation)",
+            color="tab:blue",
+            alpha=0.5,
+        )
+        plt.plot(
+            sales_grid_usd,
+            lower_grid_usd,
+            "--",
+            label=f"Posterior predictive {lower_q:.0f}%",
+            color="tab:blue",
+            alpha=0.8,
+        )
+        plt.plot(
+            sales_grid_usd,
+            upper_grid_usd,
+            "--",
+            label=f"Posterior predictive {upper_q:.0f}%",
+            color="tab:blue",
+            alpha=0.8,
+        )
+        plt.xlim(x_left, x_right)
+        plt.title("OpEx vs Sales with Learned Probabilistic Linear Regression")
+        plt.xlabel("Sales (USD)")
+        plt.ylabel("OpEx (USD)")
+        plt.grid(True, alpha=0.3)
+        plt.legend()
+        plt.tight_layout()
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        tag = "gaussian_ci" if use_gaussian_ci else "monte_carlo"
+        plt.savefig(
+            get_training_results_path(f"opex_vs_sales_fit_{timestamp}_{tag}.png"),
+            dpi=150,
+        )
+        if show_plot:
+            plt.show()
+        else:
+            plt.close()

@@ -1,14 +1,16 @@
-"""Run the Bayesian financial model training and forecast pipeline.
+"""Run the financial model training and forecast pipeline
++ Bayesian OpEx model
++ tax anomalies information.
 
-Wires together BayesianFinancialModel + PolicyTrainer + StructuralTrainer
+Wires together TrainableFinancialModel + PolicyTrainer + StructuralTrainer
 and runs the full pipeline (train, Monte Carlo forecast, plot).
 
 Usage:
-    python run_bayesian_forecast.py
+    python run_trainable_model_forecast_w_bayesian_opex_taxanomaly.py
 """
 
 from financial_forecast.data.loader import HistoricalDataLoader
-from financial_forecast.models.bayesian_model import BayesianFinancialModel
+from financial_forecast.models.trainable_financial_model import TrainableFinancialModel
 from financial_forecast.training.policy_trainer import PolicyTrainer
 from financial_forecast.training.structural_trainer import StructuralTrainer
 from financial_forecast.training.pipeline import ForecastPipeline
@@ -18,7 +20,7 @@ if __name__ == "__main__":
         "aapl", include_inflation=True, include_tax_onetime=True
     )
 
-    model = BayesianFinancialModel(tax_anomalies=historical_data.tax_onetime_payments)
+    model = TrainableFinancialModel(tax_anomalies=historical_data.tax_onetime_payments)
 
     ForecastPipeline(
         model=model,
@@ -33,3 +35,7 @@ if __name__ == "__main__":
         parameters_save_path="new_trained_parameters.npz",
         use_trained_parameters=False,
     ).run()
+
+    # Plot OpEx fit diagnostics (Bayesian-specific)
+    model.opex_module.plot_fit()
+    model.opex_module.plot_fit(use_gaussian_ci=True)

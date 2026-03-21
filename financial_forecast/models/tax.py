@@ -8,7 +8,7 @@ Provides two implementations:
 
 Usage in entry point::
 
-    model = BayesianFinancialModel()
+    model = TrainableFinancialModel()
 
     # Without anomalies (default):
     # model.tax_module is already SimpleTax

@@ -15,13 +15,13 @@ from financial_forecast.inference.state_index import (
     initial_state_to_batched,
     DIAGNOSTIC_KEYS,
 )
-from financial_forecast.models.bayesian_model import BayesianFinancialModel
+from financial_forecast.models.trainable_financial_model import TrainableFinancialModel
 
 
 @pytest.fixture
 def model():
     tf.random.set_seed(42)
-    m = BayesianFinancialModel()
+    m = TrainableFinancialModel()
     m.base_year = 2018
     m.amount_scale = 1.0
     return m
@@ -68,18 +68,17 @@ def test_deterministic_equivalence(model, mock_state):
 
     # --- Compiled path ---
     batched_state = initial_state_to_batched(mock_state, 1)
-    var_opex = tf.reshape(model.opex_module.q_var_opex_loc, [1])
-    base_opex = tf.reshape(model.opex_module.q_base_opex_loc, [1])
 
     compiled_diags = []
     for step in range(n_years):
         sales_t = tf.constant([sales_vals[step]], dtype=tf.float64)
-        noise = tf.zeros([1], dtype=tf.float64)
+        cum_inf = tf.constant(cum_inf_vals[step], dtype=tf.float64)
+        opex = model.opex_module.predict(sales_t, cum_inf, use_mean=True)
         batched_state, diagnostics = model.forecast_step_compiled(
-            batched_state, sales_t,
+            batched_state,
+            sales_t,
             tf.constant(year_vals[step], dtype=tf.float64),
-            tf.constant(cum_inf_vals[step], dtype=tf.float64),
-            var_opex, base_opex, noise,
+            opex,
         )
         compiled_diags.append(diagnostics)
 
@@ -89,19 +88,25 @@ def test_deterministic_equivalence(model, mock_state):
         cd = compiled_diags[step]
         for i, key in enumerate(DIAGNOSTIC_KEYS):
             if key == "total_assets":
-                dict_val = float(sum(
-                    dr[k] for k in [
-                        "nca", "advance_payments_purchases",
-                        "accounts_receivable", "inventory",
-                        "cash", "investment_in_market_securities",
-                    ]
-                ))
+                dict_val = float(
+                    sum(
+                        dr[k]
+                        for k in [
+                            "nca",
+                            "advance_payments_purchases",
+                            "accounts_receivable",
+                            "inventory",
+                            "cash",
+                            "investment_in_market_securities",
+                        ]
+                    )
+                )
             else:
                 dict_val = float(dr[key])
             compiled_val = float(cd[0, i])
-            assert abs(dict_val - compiled_val) < 1e-10, (
-                f"Step {step}, {key}: dict={dict_val}, compiled={compiled_val}"
-            )
+            assert (
+                abs(dict_val - compiled_val) < 1e-10
+            ), f"Step {step}, {key}: dict={dict_val}, compiled={compiled_val}"
 
 
 def test_compiled_shapes_and_dtypes(model, mock_state):
@@ -112,7 +117,12 @@ def test_compiled_shapes_and_dtypes(model, mock_state):
     years = tf.cast(tf.range(2019, 2019 + n_years), tf.float64)
 
     trajectories = run_monte_carlo_forecast(
-        model, mock_state, sales, cum_inf, years, n_samples=n_samples,
+        model,
+        mock_state,
+        sales,
+        cum_inf,
+        years,
+        n_samples=n_samples,
     )
 
     for key, arr in trajectories.items():
@@ -128,7 +138,12 @@ def test_compiled_finiteness(model, mock_state):
     years = tf.cast(tf.range(2019, 2019 + n_years), tf.float64)
 
     trajectories = run_monte_carlo_forecast(
-        model, mock_state, sales, cum_inf, years, n_samples=n_samples,
+        model,
+        mock_state,
+        sales,
+        cum_inf,
+        years,
+        n_samples=n_samples,
     )
 
     for key, arr in trajectories.items():
@@ -143,7 +158,12 @@ def test_compiled_balance_sheet_identity(model, mock_state):
     years = tf.cast(tf.range(2019, 2019 + n_years), tf.float64)
 
     trajectories = run_monte_carlo_forecast(
-        model, mock_state, sales, cum_inf, years, n_samples=n_samples,
+        model,
+        mock_state,
+        sales,
+        cum_inf,
+        years,
+        n_samples=n_samples,
     )
 
     total_assets = trajectories["total_assets"]

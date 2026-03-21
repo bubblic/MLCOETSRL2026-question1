@@ -81,7 +81,7 @@ class StructuralTrainer(BaseTrainer):
         against the actual observations.
 
         Args:
-            model: ``BayesianFinancialModel`` whose structural parameters
+            model: ``TrainableFinancialModel`` whose structural parameters
                 are updated in-place.
             historical_sales: 1-D array-like of annual sales figures.
             historical_nca: 1-D array-like of annual non-current assets.

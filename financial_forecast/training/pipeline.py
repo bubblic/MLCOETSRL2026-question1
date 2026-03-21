@@ -18,7 +18,7 @@ Example::
 
     data = HistoricalDataLoader("aapl", include_inflation=True)
     ForecastPipeline(
-        model=BayesianFinancialModel(),
+        model=TrainableFinancialModel(),
         trainers=[PolicyTrainer(), StructuralTrainer()],
         financial_statements=data.financial_statements,
         inflation=data.inflation,
@@ -30,10 +30,7 @@ from typing import Dict, List, Mapping, Optional, Sequence
 import tensorflow as tf
 
 from financial_forecast.inference.monte_carlo_forecast import run_monte_carlo_forecast
-from financial_forecast.inference.plotting import (
-    plot_historical_and_forecast,
-    plot_opex_fit_with_aleatoric_noise,
-)
+from financial_forecast.inference.plotting import plot_historical_and_forecast
 from financial_forecast.training.base_trainer import BaseTrainer
 
 
@@ -169,7 +166,7 @@ class ForecastPipeline:
 
     Args:
         model: A trained or untrained financial model (e.g.
-            :class:`BayesianFinancialModel`).
+            :class:`TrainableFinancialModel`).
         trainers: Ordered list of :class:`BaseTrainer` instances.  Each
             trainer's :meth:`train` is called in sequence during the
             training phase.
@@ -230,7 +227,6 @@ class ForecastPipeline:
         """Execute the full pipeline: prepare, train, forecast, plot."""
         self._prepare_data()
         self._train_or_load()
-        self._plot_opex_fit()
         trajectories = self._run_monte_carlo_forecast()
         historical_fit, fit_years = self._compute_historical_fit()
         self._plot_results(trajectories, historical_fit, fit_years)
@@ -266,15 +262,21 @@ class ForecastPipeline:
 
         # Scale to billions for training stability
         mean_sales = float(tf.reduce_mean(d["sales"]))
-        scale = 10 ** int(
-            tf.math.floor(tf.math.log(mean_sales) / tf.math.log(10.0))
-        )
+        scale = 10 ** int(tf.math.floor(tf.math.log(mean_sales) / tf.math.log(10.0)))
         for key in _REQUIRED_KEYS | _SUPPLEMENTAL_KEYS:
             self._s[key] = d[key] / scale
 
         # Configure model with data-derived settings
-        self.model.set_forecast_drivers(
-            self._raw["years"], scale, self._s["sales"],
+        self.model.prepare_for_training(
+            self._raw["years"],
+            scale,
+        )
+
+        self.model.opex_module.prepare_for_training(
+            scale,
+            self._s["sales"],
+            self._s["opex"],
+            self._d["inflation"],
         )
 
         # Let the tax module scale its stored data (if any)
@@ -391,20 +393,6 @@ class ForecastPipeline:
             loss_scale_mode="std",
         )
         model.save_parameters(self.parameters_save_path)
-
-    def _plot_opex_fit(self) -> None:
-        """Plot OpEx fit with aleatoric noise (Gaussian CI and Monte Carlo)."""
-        year_indices = tf.cast(tf.range(1, len(self._s["opex"]) + 1), dtype=tf.float64)
-        for use_gaussian_ci in (True, False):
-            plot_opex_fit_with_aleatoric_noise(
-                self.model,
-                year_indices,
-                self._s["sales"],
-                self._s["opex"],
-                self._d["inflation"],
-                show_plot=False,
-                use_gaussian_ci=use_gaussian_ci,
-            )
 
     def _run_monte_carlo_forecast(self) -> Dict[str, tf.Tensor]:
         """Build initial state and run Monte Carlo simulation.

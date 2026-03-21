@@ -10,14 +10,14 @@ This suite focuses on:
 
 
 Run the script by:
-python -m pytest -q tests/test_bayesian_model.py
+python -m pytest -q tests/test_trainable_financial_model.py
 """
 
 import pytest
 import tensorflow as tf
 
 from financial_forecast.inference.monte_carlo_forecast import run_monte_carlo_forecast
-from financial_forecast.models.bayesian_model import BayesianFinancialModel
+from financial_forecast.models.trainable_financial_model import TrainableFinancialModel
 from financial_forecast.training.policy_trainer import PolicyTrainer
 from financial_forecast.training.structural_trainer import StructuralTrainer
 
@@ -26,7 +26,7 @@ from financial_forecast.training.structural_trainer import StructuralTrainer
 def model():
     """Yield a fresh model instance with deterministic random seeds."""
     tf.random.set_seed(7)
-    m = BayesianFinancialModel()
+    m = TrainableFinancialModel()
     m.base_year = 2018
     m.amount_scale = 1.0
     return m

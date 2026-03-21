@@ -85,7 +85,7 @@ class PolicyTrainer(BaseTrainer):
         heterogeneous magnitudes.
 
         Args:
-            model: ``BayesianFinancialModel`` whose parameters are updated
+            model: ``TrainableFinancialModel`` whose parameters are updated
                 in-place.
             historical_sales: 1-D array-like of annual sales figures.
             historical_purchases: 1-D array-like of annual purchase figures.
@@ -205,7 +205,6 @@ class PolicyTrainer(BaseTrainer):
                 f"Unsupported loss_scale_mode='{loss_scale_mode}'. "
                 "Use 'std' or 'none'."
             )
-        num_opex_obs = tf.cast(tf.size(opex_tensor), tf.float64)
 
         optimizer = tf.optimizers.Adam(learning_rate=learning_rate)
         print(f"Training on {len(historical_sales)} years of historical data...")
@@ -354,7 +353,9 @@ class PolicyTrainer(BaseTrainer):
                     )
                 )
                 loss_tax = model.tax_module.loss(
-                    tax_tensor, ni_tensor, scale_tax,
+                    tax_tensor,
+                    ni_tensor,
+                    scale_tax,
                 )
                 div_target = ni_prev_aligned * model.dividend_payout_ratio_pct
                 div_pred = (

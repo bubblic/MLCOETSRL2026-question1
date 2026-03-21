@@ -256,7 +256,7 @@ def run_monte_carlo_forecast(
     before entering the compiled graph.
 
     Args:
-        model: Trained :class:`BayesianFinancialModel`.
+        model: Trained :class:`TrainableFinancialModel`.
         initial_state: Balance-sheet state dict at the forecast start.
         sales_forecast: 1-D tensor of forecasted sales (scaled).
         cum_inf_forecast: 1-D tensor of cumulative inflation factors.
@@ -272,21 +272,8 @@ def run_monte_carlo_forecast(
 
     n_years = len(sales_forecast)
 
-    # Pre-sample all stochastic values in eager mode before graph entry.
-    # var_opex / base_opex: sampled once per trajectory (constant across years).
-    # noise: sampled independently per year per sample.
-    opex = model.opex_module
-    q_var = tfp.distributions.Normal(
-        loc=opex.q_var_opex_loc, scale=opex.q_var_opex_scale
-    )
-    q_base = tfp.distributions.Normal(
-        loc=opex.q_base_opex_loc, scale=opex.q_base_opex_scale
-    )
-    var_opex_samples = q_var.sample([n_samples])
-    base_opex_samples = q_base.sample([n_samples])
-    noise_all = tfp.distributions.Normal(
-        tf.constant(0.0, dtype=tf.float64), opex.noise_sigma
-    ).sample([n_years, n_samples])
+    # Pre-sample all stochastic OpEx values in eager mode before graph entry.
+    model.opex_module.prepare_mc(n_samples, n_years)
 
     # Batch initial state: [n_samples, 14]
     state0 = initial_state_to_batched(initial_state, n_samples)
@@ -297,15 +284,7 @@ def run_monte_carlo_forecast(
     years_arr = tf.cast(forecast_years, tf.float64)
 
     @tf.function
-    def _run_loop(
-        state0,
-        sales_arr,
-        cum_inf_arr,
-        years_arr,
-        var_opex_samples,
-        base_opex_samples,
-        noise_all,
-    ):
+    def _run_loop(state0, sales_arr, cum_inf_arr, years_arr):
         n_steps = tf.shape(sales_arr)[0]
         diag_ta = tf.TensorArray(
             dtype=tf.float64,
@@ -315,14 +294,16 @@ def run_monte_carlo_forecast(
 
         def body(step, state, diag_ta):
             sales_t = tf.ones_like(state[:, 0]) * sales_arr[step]
+            opex = model.opex_module.compute_mc_step(
+                sales_t,
+                cum_inf_arr[step],
+                step,
+            )
             new_state, diagnostics = model.forecast_step_compiled(
                 state,
                 sales_t,
                 years_arr[step],
-                cum_inf_arr[step],
-                var_opex_samples,
-                base_opex_samples,
-                noise_all[step],
+                opex,
             )
             diag_ta = diag_ta.write(step, diagnostics)
             return step + 1, new_state, diag_ta
@@ -338,15 +319,7 @@ def run_monte_carlo_forecast(
         return diag_ta.stack()
 
     # Execute compiled loop: [n_years, n_samples, N_DIAGNOSTIC]
-    all_diag = _run_loop(
-        state0,
-        sales_arr,
-        cum_inf_arr,
-        years_arr,
-        var_opex_samples,
-        base_opex_samples,
-        noise_all,
-    )
+    all_diag = _run_loop(state0, sales_arr, cum_inf_arr, years_arr)
 
     # Transpose to [n_samples, n_years, N_DIAGNOSTIC] and unpack
     all_diag = tf.transpose(all_diag, perm=[1, 0, 2])

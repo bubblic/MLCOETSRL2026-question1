@@ -1,7 +1,7 @@
 """Integer indices for packed recurrent-state and diagnostic tensors.
 
 These constants are the single source of truth for the tensor layout used by
-:meth:`BayesianFinancialModel.forecast_step_compiled` and
+:meth:`TrainableFinancialModel.forecast_step_compiled` and
 :func:`run_monte_carlo_forecast`.
 """
 

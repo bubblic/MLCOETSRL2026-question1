@@ -47,15 +47,10 @@ from financial_forecast.inference.state_index import (
     DIAGNOSTIC_KEYS,
 )
 
-tfd = tfp.distributions
 tfb = tfp.bijectors
 
-# Graph-mode-safe zero constant.  Bare Python ``0.0`` defaults to float32
-# inside ``@tf.function``, which causes dtype mismatches with float64 tensors.
-_ZERO = tf.constant(0.0, dtype=tf.float64)
 
-
-class BayesianFinancialModel(BaseFinancialModel):
+class TrainableFinancialModel(BaseFinancialModel):
     """Bayesian financial model using variational inference for OpEx estimation.
 
     Combines deterministic policy parameters with Bayesian variational
@@ -95,7 +90,7 @@ class BayesianFinancialModel(BaseFinancialModel):
         else:
             self.tax_module = SimpleTax()
 
-    def set_forecast_drivers(self, years, amount_scale, scaled_sales):
+    def prepare_for_training(self, years, amount_scale):
         """Configure data-derived model settings.
 
         Called by the pipeline after computing ``amount_scale``.
@@ -104,10 +99,11 @@ class BayesianFinancialModel(BaseFinancialModel):
             years: 1-D tensor of fiscal year labels.
             amount_scale: USD-to-scaled-units conversion factor.
             scaled_sales: 1-D tensor of historical sales (already scaled).
+            scaled_opex: 1-D tensor of historical OpEx (already scaled).
+            inflation: 1-D tensor of annual inflation rates (or zeros).
         """
         self.base_year = int(years[0])
         self.amount_scale = amount_scale
-        self.opex_module.set_forecast_drivers(scaled_sales, amount_scale)
 
     # ------------------------------------------------------------------
     # Abstract method implementation (required by BaseFinancialModel)
@@ -307,8 +303,6 @@ class BayesianFinancialModel(BaseFinancialModel):
         state,
         inputs,
         use_mean_opex=False,
-        sampled_var_opex=None,
-        sampled_base_opex=None,
     ):
         """Advance the financial state by one period (graph-compiled).
 
@@ -317,56 +311,28 @@ class BayesianFinancialModel(BaseFinancialModel):
 
         Args:
             state: Dict at *t-1* with balance-sheet entries.
-            inputs: Dict with ``sales_t``, ``year``, ``cum_inflation``.
+            inputs: Dict with ``sales_t``, ``year``.
             use_mean_opex: Use posterior mean (no sampling/noise).
-            sampled_var_opex: Pre-sampled variable OpEx percentage.
-            sampled_base_opex: Pre-sampled baseline OpEx.
 
         Returns:
             Dict mapping output keys to scalar tensors for period *t*.
         """
-
-        # Convert dict state -> [1, 14] tensor
         state_tensor = tf.expand_dims(
             tf.stack([tf.cast(state[k], tf.float64) for k in RECURRENT_KEYS]),
             0,
         )
-
-        # Prepare per-sample inputs (n_samples=1)
         sales_t = tf.reshape(inputs["sales_t"], [1])
-
-        opex = self.opex_module
-        if use_mean_opex:
-            var_opex = tf.reshape(opex.q_var_opex_loc, [1])
-            base_opex = tf.reshape(opex.q_base_opex_loc, [1])
-            noise = tf.zeros([1], dtype=tf.float64)
-        else:
-            var_opex = tf.reshape(
-                (
-                    sampled_var_opex
-                    if sampled_var_opex is not None
-                    else opex.q_var_opex_loc
-                ),
-                [1],
-            )
-            base_opex = tf.reshape(
-                (
-                    sampled_base_opex
-                    if sampled_base_opex is not None
-                    else opex.q_base_opex_loc
-                ),
-                [1],
-            )
-            noise = tfd.Normal(_ZERO, opex.noise_sigma).sample([1])
+        opex = self.opex_module.predict(
+            sales_t,
+            inputs["cum_inflation"],
+            use_mean=use_mean_opex,
+        )
 
         _, diagnostics = self.forecast_step_compiled(
             state_tensor,
             sales_t,
             inputs["year"],
-            inputs["cum_inflation"],
-            var_opex,
-            base_opex,
-            noise,
+            opex,
         )
 
         return {key: diagnostics[0, i] for i, key in enumerate(DIAGNOSTIC_KEYS)}
@@ -376,25 +342,19 @@ class BayesianFinancialModel(BaseFinancialModel):
         state,
         sales_t,
         year,
-        cum_inflation,
-        var_opex,
-        base_opex,
-        noise,
+        opex,
     ):
         """Batched single-period forecast -- single source of truth.
 
         Orchestrates the four-stage Pareja Cash Budget construction,
-        mirroring the base class decomposition but with Bayesian
+        mirroring the base class decomposition but with trainable
         parameters and time-varying logit-linear trends.
 
         Args:
             state: ``[n_samples, 14]`` recurrent state tensor.
             sales_t: ``[n_samples]`` sales for this period.
             year: Scalar float64 calendar year.
-            cum_inflation: Scalar float64 cumulative inflation factor.
-            var_opex: ``[n_samples]`` pre-sampled variable OpEx percentage.
-            base_opex: ``[n_samples]`` pre-sampled baseline OpEx.
-            noise: ``[n_samples]`` pre-sampled aleatoric noise.
+            opex: ``[n_samples]`` pre-computed operating expenses.
 
         Returns:
             Tuple ``(new_state, diagnostics)`` where *new_state* has shape
@@ -408,10 +368,7 @@ class BayesianFinancialModel(BaseFinancialModel):
             state,
             assets,
             sales_t,
-            cum_inflation,
-            var_opex,
-            base_opex,
-            noise,
+            opex,
         )
         financing = self._manage_liquidity_compiled(
             state,
@@ -484,16 +441,7 @@ class BayesianFinancialModel(BaseFinancialModel):
             "stock_buyback_base": stock_buyback,
         }
 
-    def _calculate_income_compiled(
-        self,
-        state,
-        assets,
-        sales_t,
-        cum_inflation,
-        var_opex,
-        base_opex,
-        noise,
-    ):
+    def _calculate_income_compiled(self, state, assets, sales_t, opex):
         """Compute income statement from asset evolution results."""
         inv_prev = state[:, R_INV]
         eff_st_debt_prev = state[:, R_EFF_ST_DEBT]
@@ -502,9 +450,6 @@ class BayesianFinancialModel(BaseFinancialModel):
         ims_prev = state[:, R_IMS]
 
         cogs = inv_prev + assets["purchases_t"] - assets["inv_curr"]
-        opex = self.opex_module.compute(
-            sales_t, cum_inflation, var_opex, base_opex, noise
-        )
         ebitda = sales_t - cogs - opex
 
         principal_lt = cur_lt_debt_prev
@@ -726,7 +671,3 @@ class BayesianFinancialModel(BaseFinancialModel):
         )
 
         return new_state, diagnostics
-
-
-# Backward-compatible alias
-TrainableFinancialModel = BayesianFinancialModel
