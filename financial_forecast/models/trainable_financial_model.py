@@ -22,7 +22,6 @@ import tensorflow as tf
 import tensorflow_probability as tfp
 
 from financial_forecast.models.base import BaseFinancialModel
-from financial_forecast.models.opex import BayesianOpEx
 from financial_forecast.models.tax import SimpleTax, TaxWithAnomalies
 from financial_forecast.serialization.parameter_io import (
     save_parameters as _save_parameters,
@@ -67,15 +66,12 @@ class TrainableFinancialModel(BaseFinancialModel):
             from the historical data's ``"years"`` field.
     """
 
-    def __init__(self, tax_anomalies=None, name=None):
-        """Create a new Bayesian financial model.
-
-        Calls the parent constructor, which invokes
-        :meth:`_initialize_parameters` to create all three parameter
-        layers.  ``base_year`` and ``amount_scale`` are set later by
-        the pipeline from the loaded data.
+    def __init__(self, opex_module, tax_anomalies=None, name=None):
+        """Create a new trainable financial model.
 
         Args:
+            opex_module: OpEx module instance (``SimpleOpEx`` or
+                ``BayesianOpEx``).
             tax_anomalies: Optional 1-D tensor of one-time tax payment
                 amounts in USD.  If ``None``, uses :class:`SimpleTax`;
                 otherwise :class:`TaxWithAnomalies`.
@@ -83,12 +79,15 @@ class TrainableFinancialModel(BaseFinancialModel):
         """
         self.amount_scale = None
         self.base_year = None
-        super().__init__(name=name)  # calls _initialize_parameters()
-
+        self.opex_module = opex_module
         if tax_anomalies is not None:
             self.tax_module = TaxWithAnomalies(tax_anomalies)
         else:
             self.tax_module = SimpleTax()
+
+        super().__init__(
+            name=name
+        )  # calls _initialize_parameters() for the rest of parameters
 
     def prepare_for_training(self, years, amount_scale):
         """Configure data-derived model settings.
@@ -217,10 +216,7 @@ class TrainableFinancialModel(BaseFinancialModel):
             -0.05, dtype=tf.float64, name="cost_ratio_beta"
         )
 
-        # ============== LAYER 2: BAYESIAN OPEX (VI) ============================
-        self.opex_module = BayesianOpEx()
-
-        # =============== LAYER 3: STRUCTURAL PARAMETERS =======================
+        # =============== LAYER 2: STRUCTURAL PARAMETERS =======================
         # These are trained with gradient descent on state-transition losses,
         # using the trained policy parameters from Layer 1 as fixed inputs.
         # Non-negative params use Softplus, [0,1]-bounded use Sigmoid,
@@ -311,7 +307,7 @@ class TrainableFinancialModel(BaseFinancialModel):
 
         Args:
             state: Dict at *t-1* with balance-sheet entries.
-            inputs: Dict with ``sales_t``, ``year``.
+            inputs: Dict with ``sales_t``, ``year``, ``cum_inflation``.
             use_mean_opex: Use posterior mean (no sampling/noise).
 
         Returns:
@@ -369,6 +365,7 @@ class TrainableFinancialModel(BaseFinancialModel):
             assets,
             sales_t,
             opex,
+            year,
         )
         financing = self._manage_liquidity_compiled(
             state,
@@ -441,7 +438,7 @@ class TrainableFinancialModel(BaseFinancialModel):
             "stock_buyback_base": stock_buyback,
         }
 
-    def _calculate_income_compiled(self, state, assets, sales_t, opex):
+    def _calculate_income_compiled(self, state, assets, sales_t, opex, year):
         """Compute income statement from asset evolution results."""
         inv_prev = state[:, R_INV]
         eff_st_debt_prev = state[:, R_EFF_ST_DEBT]
@@ -459,7 +456,7 @@ class TrainableFinancialModel(BaseFinancialModel):
 
         ms_return = ims_prev * self.market_securities_return_pct
         ebt = ebitda - assets["depreciation"] - (interest_st + interest_lt) + ms_return
-        tax = self.tax_module.compute(ebt)
+        tax = self.tax_module.compute(ebt, year=year)
         ni_curr = ebt - tax
 
         return {

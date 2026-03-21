@@ -3,18 +3,16 @@
 Provides two implementations:
 
 - ``SimpleTax``: ``tax = ebt * rate`` -- no anomaly adjustment.
-- ``TaxWithAnomalies``: extends ``SimpleTax`` with anomaly-aware
-  ``loss()`` that accounts for one-time payments during training.
+- ``TaxWithAnomalies``: extends ``SimpleTax``; ``compute()`` adds
+  one-time payments when the forecast year has a known anomaly.
 
 Usage in entry point::
 
-    model = TrainableFinancialModel()
-
-    # Without anomalies (default):
-    # model.tax_module is already SimpleTax
-
-    # With anomalies:
-    model.tax_module = TaxWithAnomalies(get_tax_onetime_payments())
+    data = HistoricalDataLoader("aapl", include_tax_onetime=True)
+    model = TrainableFinancialModel(
+        opex_module=BayesianOpEx(),
+        tax_anomalies=data.tax_onetime_payments,  # {2018: 1.5e9, ...}
+    )
 """
 
 import tensorflow as tf
@@ -35,11 +33,20 @@ class SimpleTax(tf.Module):
             name="tax_pct",
         )
 
-    def compute(self, ebt):
-        """Compute income tax."""
+    def compute(self, ebt, year=None):
+        """Compute income tax.
+
+        Args:
+            ebt: Earnings before tax tensor.
+            year: Optional calendar year (int or scalar tensor).
+                Ignored by SimpleTax.
+
+        Returns:
+            Tax tensor.
+        """
         return ebt * self.income_tax_pct
 
-    def prepare_for_training(self, amount_scale):
+    def prepare_for_training(self, amount_scale, years=None):
         """Called by the pipeline before training. No-op for SimpleTax."""
 
     def loss(self, observed_tax, net_income, loss_scale):
@@ -54,41 +61,110 @@ class SimpleTax(tf.Module):
 
 
 class TaxWithAnomalies(SimpleTax):
-    """Extends SimpleTax with anomaly-aware training loss.
+    """Extends SimpleTax with one-time tax anomaly support.
 
-    ``compute()`` is inherited -- produces systematic tax only.
-    ``loss()`` additionally accounts for stored one-time payments so
-    the tax rate is not distorted by anomaly years.
+    ``compute(ebt, year)`` looks up the calendar year in the stored
+    anomaly dict.  If a one-time payment exists for that year, it is
+    added to the systematic ``ebt * tax_pct``.  For future years (or
+    years without anomalies), only the systematic component is returned.
+
+    ``loss()`` accounts for one-time payments during training so the
+    tax rate parameter is not distorted by anomaly years.
 
     Args:
-        tax_onetime_usd: 1-D tensor of one-time tax amounts in USD,
-            aligned to the full historical years.
+        tax_onetime_by_year: Dict mapping fiscal year (int) to one-time
+            tax amount in USD.
     """
 
-    def __init__(self, tax_onetime_usd, initial_tax_pct=0.147,
+    def __init__(self, tax_onetime_by_year, initial_tax_pct=0.147,
                  name="tax_with_anomalies"):
         super().__init__(initial_tax_pct=initial_tax_pct, name=name)
-        self._onetime_usd = tax_onetime_usd
-        self._onetime_scaled = None
+        self._onetime_by_year = tax_onetime_by_year  # {year: usd_amount}
+        self._onetime_scaled_by_year = None
+        self._training_adjustments = None
+        # Graph-mode lookup: dense tensor + base year offset
+        self._lookup_tensor = None
+        self._lookup_base_year = None
 
-    def prepare_for_training(self, amount_scale):
-        """Scale stored onetime data for training.
+    def prepare_for_training(self, amount_scale, years=None):
+        """Scale stored onetime data and build training adjustment tensor.
 
-        Called by the pipeline after ``amount_scale`` is computed.
-        The full array is stored; ``loss()`` slices to match the
-        training window dynamically.
+        Args:
+            amount_scale: USD-to-scaled-units conversion factor.
+            years: Optional 1-D tensor of training year labels.  If
+                provided, builds a pre-computed adjustment tensor for
+                use inside ``@tf.function`` compiled training.
         """
-        self._onetime_scaled = self._onetime_usd / amount_scale
+        self._onetime_scaled_by_year = {
+            yr: amt / amount_scale
+            for yr, amt in self._onetime_by_year.items()
+        }
+        # Build dense lookup tensor for graph-mode compute()
+        all_years = sorted(self._onetime_by_year.keys())
+        if years is not None:
+            # Include both anomaly years and training years
+            all_years = sorted(set(all_years) | {int(y) for y in years.numpy()})
+        if all_years:
+            self._lookup_base_year = min(all_years)
+            span = max(all_years) - self._lookup_base_year + 1
+            lookup = [0.0] * span
+            for yr, amt in self._onetime_scaled_by_year.items():
+                lookup[yr - self._lookup_base_year] = amt
+            self._lookup_tensor = tf.constant(lookup, dtype=tf.float64)
+        # Pre-compute training adjustment vector
+        if years is not None:
+            self._training_adjustments = tf.constant(
+                [self._onetime_scaled_by_year.get(int(yr), 0.0) for yr in years.numpy()],
+                dtype=tf.float64,
+            )
+        else:
+            self._training_adjustments = None
+
+    def compute(self, ebt, year=None):
+        """Compute income tax, adding one-time anomaly if year has one.
+
+        Args:
+            ebt: Earnings before tax tensor.
+            year: Calendar year (int, float, or scalar tensor).
+                If the year has a stored anomaly, it is added.
+                If ``None`` or not in the anomaly dict, systematic only.
+
+        Returns:
+            Tax tensor.
+        """
+        tax = ebt * self.income_tax_pct
+        if year is not None and self._lookup_tensor is not None:
+            idx = tf.cast(year, tf.int32) - self._lookup_base_year
+            n = tf.shape(self._lookup_tensor)[0]
+            # Clamp index to valid range so tf.gather doesn't crash,
+            # then zero out the result for out-of-range years.
+            safe_idx = tf.clip_by_value(idx, 0, n - 1)
+            in_range = tf.logical_and(idx >= 0, idx < n)
+            adjustment = tf.where(
+                in_range,
+                tf.gather(self._lookup_tensor, safe_idx),
+                tf.constant(0.0, dtype=tf.float64),
+            )
+            tax = tax + adjustment
+        return tax
 
     def loss(self, observed_tax, net_income, loss_scale):
         """Compute MSE loss including one-time payments.
 
-        Derives predicted tax from net income:
-        ``tax_pred = NI / (1/tax_pct - 1) + onetime``.
+        Uses the pre-computed adjustment tensor built by
+        ``prepare_for_training``.
+
+        Args:
+            observed_tax: 1-D tensor of historical tax (scaled).
+            net_income: 1-D tensor of historical net income (scaled).
+            loss_scale: Normalization factor.
+
+        Returns:
+            Scalar MSE loss tensor.
         """
         _one = tf.constant(1.0, dtype=tf.float64)
         tax_pred = net_income / (_one / self.income_tax_pct - _one)
-        if self._onetime_scaled is not None:
+        if self._training_adjustments is not None:
             n = tf.shape(net_income)[0]
-            tax_pred = tax_pred + self._onetime_scaled[:n]
+            tax_pred = tax_pred + self._training_adjustments[:n]
         return tf.reduce_mean(tf.square((observed_tax - tax_pred) / loss_scale))

@@ -127,6 +127,9 @@ def plot_simple_policy_diagnostics(
         ("loss_bb", "%BB"),
         ("loss_eff_st_debt", "%EffSTDebt"),
     ]
+    if model.opex_module.is_stochastic != True:
+        ratio_losses.append(("loss_opex", "OpEx"))
+
     for key, label in ratio_losses:
         axs[1].plot(epochs_hist, simple_history[key], label=label)
     axs[1].set_ylabel("Loss (MSE)")

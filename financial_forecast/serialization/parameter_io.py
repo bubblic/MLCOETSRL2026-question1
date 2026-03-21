@@ -44,13 +44,25 @@ def save_parameters(model, path: str) -> None:
         "cost_ratio_beta": float(model.cost_ratio_beta.numpy()),
         "st_debt_alpha": float(model.st_debt_alpha.numpy()),
         "st_debt_beta": float(model.st_debt_beta.numpy()),
-        # Bayesian OpEx parameters
-        "q_var_opex_loc": float(model.opex_module.q_var_opex_loc.numpy()),
-        "q_var_opex_scale": float(model.opex_module.q_var_opex_scale.numpy()),
-        "q_base_opex_loc": float(model.opex_module.q_base_opex_loc.numpy()),
-        "q_base_opex_scale": float(model.opex_module.q_base_opex_scale.numpy()),
-        "noise_sigma": float(model.opex_module.noise_sigma.numpy()),
-        "sales_offset": float(model.opex_module.sales_offset.numpy()),
+        # OpEx parameters (type-dependent)
+        "opex_is_stochastic": model.opex_module.is_stochastic,
+    }
+    opex = model.opex_module
+    if opex.is_stochastic:
+        params.update({
+            "q_var_opex_loc": float(opex.q_var_opex_loc.numpy()),
+            "q_var_opex_scale": float(opex.q_var_opex_scale.numpy()),
+            "q_base_opex_loc": float(opex.q_base_opex_loc.numpy()),
+            "q_base_opex_scale": float(opex.q_base_opex_scale.numpy()),
+            "noise_sigma": float(opex.noise_sigma.numpy()),
+            "sales_offset": float(opex.sales_offset.numpy()),
+        })
+    else:
+        params.update({
+            "variable_opex_pct": float(opex.variable_opex_pct.numpy()),
+            "baseline_opex": float(opex.baseline_opex.numpy()),
+        })
+    params.update({
         # Structural parameters
         "avg_short_term_interest_pct": float(
             model.avg_short_term_interest_pct.numpy()
@@ -67,7 +79,7 @@ def save_parameters(model, path: str) -> None:
         # Metadata
         "base_year": model.base_year,
         "amount_scale": model.amount_scale,
-    }
+    })
     np.savez(path, **params)
 
 
@@ -118,14 +130,18 @@ def load_parameters(model, path: str) -> None:
     model.st_debt_alpha.assign(data.get("st_debt_alpha", -1.59))
     model.st_debt_beta.assign(data.get("st_debt_beta", 0.0))
 
-    # Bayesian OpEx parameters
+    # OpEx parameters (type-dependent)
     opex = model.opex_module
-    opex.q_var_opex_loc.assign(data["q_var_opex_loc"])
-    opex.q_var_opex_scale.assign(data["q_var_opex_scale"])
-    opex.q_base_opex_loc.assign(data["q_base_opex_loc"])
-    opex.q_base_opex_scale.assign(data["q_base_opex_scale"])
-    opex.noise_sigma.assign(data["noise_sigma"])
-    opex.sales_offset.assign(data["sales_offset"])
+    if opex.is_stochastic:
+        opex.q_var_opex_loc.assign(data["q_var_opex_loc"])
+        opex.q_var_opex_scale.assign(data["q_var_opex_scale"])
+        opex.q_base_opex_loc.assign(data["q_base_opex_loc"])
+        opex.q_base_opex_scale.assign(data["q_base_opex_scale"])
+        opex.noise_sigma.assign(data["noise_sigma"])
+        opex.sales_offset.assign(data["sales_offset"])
+    else:
+        opex.variable_opex_pct.assign(data.get("variable_opex_pct", 0.0))
+        opex.baseline_opex.assign(data.get("baseline_opex", 0.0))
 
     # Structural parameters
     model.avg_short_term_interest_pct.assign(data["avg_short_term_interest_pct"])

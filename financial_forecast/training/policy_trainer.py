@@ -20,7 +20,6 @@ import tensorflow_probability as tfp
 
 from financial_forecast.training.base_trainer import BaseTrainer
 from financial_forecast.training.diagnostics import (
-    plot_vi_diagnostics,
     plot_simple_policy_diagnostics,
 )
 
@@ -72,7 +71,6 @@ class PolicyTrainer(BaseTrainer):
         historical_years=None,
         learning_rate=0.001,
         epochs=None,
-        plot_vi=True,
         plot_every=1000,
         show_plot=False,
         prior_strength_asset_maintain=1.0,
@@ -113,7 +111,6 @@ class PolicyTrainer(BaseTrainer):
             historical_years: Optional 1-D array-like of fiscal years.
             learning_rate: Adam optimizer learning rate.
             epochs: Number of training iterations.
-            plot_vi: Whether to save diagnostic plots.
             plot_every: Logging and history recording interval.
             show_plot: Whether to display plots interactively.
             prior_strength_asset_maintain: Strength of the quadratic prior
@@ -239,15 +236,6 @@ class PolicyTrainer(BaseTrainer):
             *model.opex_module.trainable_variables,
         ]
 
-        vi_history = {
-            "epochs": [],
-            "loss_vi": [],
-            "q_var_opex_loc": [],
-            "q_var_opex_scale": [],
-            "q_base_opex_loc": [],
-            "q_base_opex_scale": [],
-            "noise_sigma": [],
-        }
         simple_history = {
             "epochs": [],
             "loss_total": [],
@@ -265,6 +253,7 @@ class PolicyTrainer(BaseTrainer):
             "loss_bb": [],
             "loss_cost_ratio": [],
             "loss_eff_st_debt": [],
+            "loss_opex": [],
             "loss_prior_am": [],
         }
 
@@ -448,7 +437,7 @@ class PolicyTrainer(BaseTrainer):
         _L_TOTAL, _L_GROWTH, _L_DEPR = 0, 1, 2
         _L_ADV_PS, _L_ADV_PP, _L_AR, _L_AP, _L_INV = 3, 4, 5, 6, 7
         _L_TL, _L_CASH, _L_TAX, _L_DIV, _L_BB = 8, 9, 10, 11, 12
-        _L_CR, _L_EFF_ST, _L_OPEX_VI, _L_PRIOR_AM = 13, 14, 15, 16
+        _L_CR, _L_EFF_ST, _L_OPEX, _L_PRIOR_AM = 13, 14, 15, 16
 
         for i in range(epochs):
             loss_stack = _compiled_train_step()
@@ -456,21 +445,10 @@ class PolicyTrainer(BaseTrainer):
             if i % plot_every == 0:
                 v = loss_stack.numpy()
 
-                vi_history["epochs"].append(i)
-                vi_history["loss_vi"].append(v[_L_OPEX_VI])
-                vi_history["q_var_opex_loc"].append(
-                    model.opex_module.q_var_opex_loc.numpy()
-                )
-                vi_history["q_var_opex_scale"].append(
-                    model.opex_module.q_var_opex_scale.numpy()
-                )
-                vi_history["q_base_opex_loc"].append(
-                    model.opex_module.q_base_opex_loc.numpy()
-                )
-                vi_history["q_base_opex_scale"].append(
-                    model.opex_module.q_base_opex_scale.numpy()
-                )
-                vi_history["noise_sigma"].append(model.opex_module.noise_sigma.numpy())
+                if model.opex_module.is_stochastic == True:
+                    model.opex_module.record_step(i, v[_L_OPEX])
+                else:
+                    simple_history["loss_opex"].append(v[_L_OPEX])
 
                 simple_history["epochs"].append(i)
                 simple_history["loss_total"].append(v[_L_TOTAL])
@@ -490,10 +468,15 @@ class PolicyTrainer(BaseTrainer):
                 simple_history["loss_eff_st_debt"].append(v[_L_EFF_ST])
                 simple_history["loss_prior_am"].append(v[_L_PRIOR_AM])
 
+                noise_str = (
+                    f"OpEx Noise={(model.opex_module.noise_sigma.numpy() * model.amount_scale):.2e} | "
+                    if model.opex_module.is_stochastic
+                    else ""
+                )
                 print(
                     f"Epoch {i}: Loss={v[_L_TOTAL]:.4e} | "
-                    f"OpEx VI Loss={v[_L_OPEX_VI]:.4e} | "
-                    f"OpEx Noise={(model.opex_module.noise_sigma.numpy() * model.amount_scale):.2e} | "
+                    f"OpEx Loss={v[_L_OPEX]:.4e} | "
+                    f"{noise_str}"
                     f"AM={model.asset_maintain.numpy():.4f} "
                     f"AG={model.asset_growth.numpy():.6f} "
                     f"Prior_AM={v[_L_PRIOR_AM]:.4e}"
@@ -566,14 +549,13 @@ class PolicyTrainer(BaseTrainer):
         print("-" * 50)
 
         # --- Diagnostic Plots ---
-        if plot_vi:
-            plot_vi_diagnostics(vi_history, model.amount_scale, show_plot)
-            plot_simple_policy_diagnostics(
-                simple_history,
-                model,
-                time_indices,
-                logit_cr_hist,
-                historical_years,
-                n_years,
-                show_plot,
-            )
+        plot_simple_policy_diagnostics(
+            simple_history,
+            model,
+            time_indices,
+            logit_cr_hist,
+            historical_years,
+            n_years,
+            show_plot,
+        )
+        model.opex_module.plot_diagnostics(show_plot)

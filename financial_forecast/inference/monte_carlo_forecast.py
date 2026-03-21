@@ -268,6 +268,10 @@ def run_monte_carlo_forecast(
         ``[n_samples, n_years]``.
     """
 
+    # Deterministic OpEx doesn't benefit from multiple MC samples
+    if not model.opex_module.is_stochastic:
+        n_samples = 1
+
     print(f"\n--- Running Compiled Monte Carlo Forecast ({n_samples} samples) ---")
 
     n_years = len(sales_forecast)

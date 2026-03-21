@@ -1,11 +1,16 @@
-"""Bayesian OpEx module with variational inference.
+"""OpEx modules: deterministic and Bayesian.
 
-Encapsulates the six OpEx-related parameters, posterior sampling,
-KL divergence, the ELBO loss function, and fit visualization.
+Provides an abstract base class and two implementations:
+
+- ``OpExModule``: abstract interface all OpEx modules must satisfy.
+- ``SimpleOpEx``: deterministic linear OpEx (no uncertainty).
+- ``BayesianOpEx``: variational inference with aleatoric noise.
+
 Designed to be composed into a financial model as
-``self.opex_module = BayesianOpEx()``.
+``self.opex_module = SimpleOpEx()`` or ``BayesianOpEx()``.
 """
 
+from abc import abstractmethod
 from datetime import datetime
 from typing import Optional
 
@@ -21,15 +26,156 @@ tfb = tfp.bijectors
 _ZERO = tf.constant(0.0, dtype=tf.float64)
 
 
-class BayesianOpEx(tf.Module):
+class OpExModule(tf.Module):
+    """Abstract base class for operating expense modules.
+
+    Defines the interface that the model, trainers, and forecast
+    engine depend on.  Subclasses choose the formula and whether
+    the module is stochastic.
+    """
+
+    is_stochastic: bool = False
+
+    @abstractmethod
+    def predict(self, sales_t, cum_inflation, use_mean=False):
+        """Compute OpEx for a single forecast step.
+
+        Args:
+            sales_t: ``[n_samples]`` sales tensor.
+            cum_inflation: Scalar cumulative inflation factor.
+            use_mean: If ``True``, suppress any stochastic sampling.
+
+        Returns:
+            ``[n_samples]`` OpEx tensor.
+        """
+
+    @abstractmethod
+    def prepare_mc(self, n_samples, n_years):
+        """Pre-sample stochastic values for Monte Carlo forecast."""
+
+    @abstractmethod
+    def compute_mc_step(self, sales_t, cum_inflation, step):
+        """Compute OpEx for one MC forecast step.
+
+        Args:
+            sales_t: ``[n_samples]`` sales tensor.
+            cum_inflation: Scalar cumulative inflation factor.
+            step: Integer year index into pre-sampled values.
+
+        Returns:
+            ``[n_samples]`` OpEx tensor.
+        """
+
+    @abstractmethod
+    def loss(self, observed_opex, sales, cum_inflation, loss_scale):
+        """Compute the training loss for OpEx.
+
+        Args:
+            observed_opex: 1-D tensor of historical OpEx (scaled).
+            sales: 1-D tensor of historical sales (scaled).
+            cum_inflation: 1-D tensor of cumulative inflation factors.
+            loss_scale: Normalization factor.
+
+        Returns:
+            Scalar loss tensor.
+        """
+
+    @abstractmethod
+    def prepare_for_training(self, amount_scale, scaled_sales, scaled_opex,
+                              inflation):
+        """Store data-derived quantities for training and plotting."""
+
+    @abstractmethod
+    def record_step(self, epoch, loss):
+        """Record training state for diagnostics."""
+
+    @abstractmethod
+    def plot_diagnostics(self, show_plot=False):
+        """Plot training diagnostics (no-op if nothing to plot)."""
+
+    @abstractmethod
+    def print_summary(self):
+        """Print learned parameter summary."""
+
+
+class SimpleOpEx(OpExModule):
+    """Deterministic linear OpEx model.
+
+    OpEx = baseline_opex * cum_inflation + sales * variable_opex_pct
+
+    No uncertainty, no sampling.  Training uses simple MSE loss.
+    """
+
+    is_stochastic = False
+
+    def __init__(self, name="simple_opex"):
+        super().__init__(name=name)
+        self.variable_opex_pct = tf.Variable(
+            0.0, dtype=tf.float64, name="variable_opex_pct",
+        )
+        self.baseline_opex = tf.Variable(
+            0.0, dtype=tf.float64, name="baseline_opex",
+        )
+        self.amount_scale = 1.0
+        self._historical_sales_scaled = None
+        self._historical_opex_scaled = None
+        self._historical_inflation = None
+        self._training_history = {"epochs": [], "loss": []}
+
+    def prepare_for_training(self, amount_scale, scaled_sales, scaled_opex, inflation):
+        """Store data-derived quantities."""
+        self.amount_scale = amount_scale
+        self._historical_sales_scaled = scaled_sales
+        self._historical_opex_scaled = scaled_opex
+        self._historical_inflation = inflation
+
+    def predict(self, sales_t, cum_inflation, use_mean=False):
+        """Compute OpEx deterministically. ``use_mean`` is ignored."""
+        return self.baseline_opex * cum_inflation + sales_t * self.variable_opex_pct
+
+    def prepare_mc(self, n_samples, n_years):
+        """No-op — deterministic model has no stochastic values."""
+
+    def compute_mc_step(self, sales_t, cum_inflation, step):
+        """Compute OpEx deterministically (same for all samples)."""
+        return self.predict(sales_t, cum_inflation)
+
+    def loss(self, observed_opex, sales, cum_inflation, loss_scale):
+        """MSE loss for deterministic OpEx."""
+        pred = self.baseline_opex * cum_inflation + sales * self.variable_opex_pct
+        return tf.reduce_mean(tf.square((observed_opex - pred) / loss_scale))
+
+    def record_step(self, epoch, loss):
+        """Record training state for diagnostics."""
+        self._training_history["epochs"].append(epoch)
+        self._training_history["loss"].append(loss)
+
+    def plot_diagnostics(self, show_plot=False):
+        """No-op for deterministic OpEx — nothing to plot."""
+
+    def print_summary(self) -> None:
+        """Print learned OpEx parameters."""
+        s = self.amount_scale
+        print(
+            f"OpEx Variable %: {self.variable_opex_pct.numpy():.4f}"
+        )
+        print(
+            f"OpEx Baseline (USD): {(self.baseline_opex.numpy() * s):.2e}"
+        )
+
+
+class BayesianOpEx(OpExModule):
     """Operating expenses modeled with variational inference.
 
     OpEx = (base_opex * cum_inflation) + (var_opex * centered_sales) + noise
 
     Parameters are learned via a Normal variational posterior with wide
-    priors.  The ELBO (Evidence Lower BOund)-based ``loss`` method computes the full training objective
-    so the trainer does not need to know about KL divergence or sampling.
+    priors.  The ELBO-based ``loss`` method computes the full training
+    objective so the trainer does not need to know about KL divergence
+    or sampling.
     """
+
+    is_stochastic = True
 
     def __init__(self, name="bayesian_opex"):
         super().__init__(name=name)
@@ -80,6 +226,17 @@ class BayesianOpEx(tf.Module):
         self._mc_var_opex = None
         self._mc_base_opex = None
         self._mc_noise = None
+
+        # Training history (populated by record_step)
+        self._training_history = {
+            "epochs": [],
+            "loss": [],
+            "q_var_opex_loc": [],
+            "q_var_opex_scale": [],
+            "q_base_opex_loc": [],
+            "q_base_opex_scale": [],
+            "noise_sigma": [],
+        }
 
     def prepare_for_training(self, amount_scale, scaled_sales, scaled_opex, inflation):
         """Set data-derived quantities needed for training, inference, and plotting.
@@ -240,6 +397,32 @@ class BayesianOpEx(tf.Module):
         kl = self.kl_divergence()
         n_obs = tf.cast(tf.shape(observed_opex)[0], tf.float64)
         return (nll + kl) / n_obs
+
+    def record_step(self, epoch, loss):
+        """Record training state for VI diagnostics."""
+        h = self._training_history
+        h["epochs"].append(epoch)
+        h["loss"].append(loss)
+        h["q_var_opex_loc"].append(self.q_var_opex_loc.numpy())
+        h["q_var_opex_scale"].append(self.q_var_opex_scale.numpy())
+        h["q_base_opex_loc"].append(self.q_base_opex_loc.numpy())
+        h["q_base_opex_scale"].append(self.q_base_opex_scale.numpy())
+        h["noise_sigma"].append(self.noise_sigma.numpy())
+
+    def plot_diagnostics(self, show_plot=False):
+        """Plot VI parameter convergence over training epochs."""
+        from financial_forecast.training.diagnostics import plot_vi_diagnostics
+        # Remap to the format expected by the existing plot function
+        vi_history = {
+            "epochs": self._training_history["epochs"],
+            "loss_vi": self._training_history["loss"],
+            "q_var_opex_loc": self._training_history["q_var_opex_loc"],
+            "q_var_opex_scale": self._training_history["q_var_opex_scale"],
+            "q_base_opex_loc": self._training_history["q_base_opex_loc"],
+            "q_base_opex_scale": self._training_history["q_base_opex_scale"],
+            "noise_sigma": self._training_history["noise_sigma"],
+        }
+        plot_vi_diagnostics(vi_history, self.amount_scale, show_plot)
 
     def print_summary(self) -> None:
         """Print learned OpEx parameter summary."""

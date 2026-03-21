@@ -18,7 +18,7 @@ Example::
 
     data = HistoricalDataLoader("aapl", include_inflation=True)
     ForecastPipeline(
-        model=TrainableFinancialModel(),
+        model=TrainableFinancialModel(opex_module=BayesianOpEx()),
         trainers=[PolicyTrainer(), StructuralTrainer()],
         financial_statements=data.financial_statements,
         inflation=data.inflation,
@@ -279,8 +279,13 @@ class ForecastPipeline:
             self._d["inflation"],
         )
 
-        # Let the tax module scale its stored data (if any)
-        self.model.tax_module.prepare_for_training(scale)
+        # Let the tax module scale its stored data and build year-keyed adjustments
+        t = len(d["sales"]) - self.test_years
+        training_years = tf.cast(
+            tf.range(self.model.base_year, self.model.base_year + t),
+            dtype=tf.float64,
+        )
+        self.model.tax_module.prepare_for_training(scale, training_years)
 
         # Build forecast drivers (auto-generate if not supplied)
         if self._sales_forecast_usd is None:

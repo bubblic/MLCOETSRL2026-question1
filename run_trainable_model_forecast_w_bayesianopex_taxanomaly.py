@@ -11,6 +11,7 @@ Usage:
 
 from financial_forecast.data.loader import HistoricalDataLoader
 from financial_forecast.models.trainable_financial_model import TrainableFinancialModel
+from financial_forecast.models.opex import BayesianOpEx
 from financial_forecast.training.policy_trainer import PolicyTrainer
 from financial_forecast.training.structural_trainer import StructuralTrainer
 from financial_forecast.training.pipeline import ForecastPipeline
@@ -20,7 +21,10 @@ if __name__ == "__main__":
         "aapl", include_inflation=True, include_tax_onetime=True
     )
 
-    model = TrainableFinancialModel(tax_anomalies=historical_data.tax_onetime_payments)
+    model = TrainableFinancialModel(
+        opex_module=BayesianOpEx(),
+        tax_anomalies=historical_data.tax_onetime_payments,
+    )
 
     ForecastPipeline(
         model=model,
@@ -32,7 +36,7 @@ if __name__ == "__main__":
         sales_forecast_usd=None,  # default: use linear extrapolation of the historical average annual delta
         inflation_forecast=None,  # default: 3% inflation
         monte_carlo_samples=1000,
-        parameters_save_path="new_trained_parameters.npz",
+        parameters_save_path="trained_parameters_bayesianopex_taxanomalies.npz",
         use_trained_parameters=False,
     ).run()
 

@@ -1,4 +1,4 @@
-"""Pytest suite for the trainable financial model pipeline.
+"""Tests for TrainableFinancialModel with BayesianOpEx.
 
 This suite focuses on:
 - Accounting identity integrity in single-step forecasting.
@@ -10,14 +10,19 @@ This suite focuses on:
 
 
 Run the script by:
-python -m pytest -q tests/test_trainable_financial_model.py
+python -m pytest -q tests/test_trainable_financial_model_bayesianopex.py
 """
 
 import pytest
 import tensorflow as tf
 
 from financial_forecast.inference.monte_carlo_forecast import run_monte_carlo_forecast
+from financial_forecast.inference.state_index import (
+    initial_state_to_batched,
+    DIAGNOSTIC_KEYS,
+)
 from financial_forecast.models.trainable_financial_model import TrainableFinancialModel
+from financial_forecast.models.opex import BayesianOpEx
 from financial_forecast.training.policy_trainer import PolicyTrainer
 from financial_forecast.training.structural_trainer import StructuralTrainer
 
@@ -26,7 +31,7 @@ from financial_forecast.training.structural_trainer import StructuralTrainer
 def model():
     """Yield a fresh model instance with deterministic random seeds."""
     tf.random.set_seed(7)
-    m = TrainableFinancialModel()
+    m = TrainableFinancialModel(opex_module=BayesianOpEx())
     m.base_year = 2018
     m.amount_scale = 1.0
     return m
@@ -260,7 +265,6 @@ def test_training_step_execution(
         historical_inflation=d["inflation"],
         historical_years=d["years"],
         epochs=2,
-        plot_vi=False,
         plot_every=1,
         show_plot=False,
     )
@@ -493,3 +497,130 @@ def test_save_load_nonexistent_path_raises(model):
     """Loading from a nonexistent path should raise an error."""
     with pytest.raises(Exception):
         model.load_parameters("nonexistent_path_abc123.npz")
+
+
+def test_deterministic_equivalence(model, mock_forecast_state):
+    """Dict-based and compiled paths must agree with mean OpEx and zero noise."""
+    n_years = 3
+    sales_vals = [1.20, 1.25, 1.30]
+    year_vals = [2023.0, 2024.0, 2025.0]
+    cum_inf_vals = [1.04, 1.07, 1.10]
+
+    # --- Dict-based path ---
+    dict_results = []
+    state = mock_forecast_state.copy()
+    for step in range(n_years):
+        inputs = {
+            "sales_t": tf.constant(sales_vals[step], dtype=tf.float64),
+            "year": tf.constant(year_vals[step], dtype=tf.float64),
+            "cum_inflation": tf.constant(cum_inf_vals[step], dtype=tf.float64),
+        }
+        state = model.forecast_step(state, inputs, use_mean_opex=True)
+        dict_results.append(state)
+
+    # --- Compiled path ---
+    batched_state = initial_state_to_batched(mock_forecast_state, 1)
+
+    compiled_diags = []
+    for step in range(n_years):
+        sales_t = tf.constant([sales_vals[step]], dtype=tf.float64)
+        cum_inf = tf.constant(cum_inf_vals[step], dtype=tf.float64)
+        opex = model.opex_module.predict(sales_t, cum_inf, use_mean=True)
+        batched_state, diagnostics = model.forecast_step_compiled(
+            batched_state, sales_t,
+            tf.constant(year_vals[step], dtype=tf.float64), opex,
+        )
+        compiled_diags.append(diagnostics)
+
+    # --- Compare ---
+    for step in range(n_years):
+        dr = dict_results[step]
+        cd = compiled_diags[step]
+        for i, key in enumerate(DIAGNOSTIC_KEYS):
+            if key == "total_assets":
+                dict_val = float(sum(
+                    dr[k] for k in [
+                        "nca", "advance_payments_purchases",
+                        "accounts_receivable", "inventory",
+                        "cash", "investment_in_market_securities",
+                    ]
+                ))
+            else:
+                dict_val = float(dr[key])
+            compiled_val = float(cd[0, i])
+            assert abs(dict_val - compiled_val) < 1e-10, (
+                f"Step {step}, {key}: dict={dict_val}, compiled={compiled_val}"
+            )
+
+
+def test_monte_carlo_with_tax_anomalies(mock_forecast_state):
+    """MC forecast with TaxWithAnomalies must work for future years beyond anomaly data."""
+    tf.random.set_seed(42)
+    # Create model with tax anomalies keyed by historical years
+    tax_data = {2018: 1.5e9, 2020: -0.5e9, 2022: 5.0e9}
+    m = TrainableFinancialModel(
+        opex_module=BayesianOpEx(), tax_anomalies=tax_data,
+    )
+    m.base_year = 2018
+    m.amount_scale = 1.0
+    # prepare_for_training must be called to build the lookup tensor
+    training_years = tf.constant([2018, 2019, 2020, 2021, 2022], dtype=tf.float64)
+    m.tax_module.prepare_for_training(m.amount_scale, training_years)
+
+    # Forecast into future years BEYOND the anomaly data range
+    n_years = 10
+    sales_forecast = tf.fill([n_years], tf.constant(1.20, dtype=tf.float64))
+    cum_inf_forecast = tf.cast(
+        tf.math.cumprod(1.0 + tf.fill([n_years], 0.02)), tf.float64,
+    )
+    # Forecast starts at 2023 — all years are beyond the anomaly dict
+    forecast_years = tf.cast(tf.range(2023, 2023 + n_years), tf.float64)
+
+    trajectories = run_monte_carlo_forecast(
+        model=m,
+        initial_state=mock_forecast_state,
+        sales_forecast=sales_forecast,
+        cum_inf_forecast=cum_inf_forecast,
+        forecast_years=forecast_years,
+        n_samples=3,
+    )
+
+    for key, arr in trajectories.items():
+        assert tf.reduce_all(tf.math.is_finite(arr)), (
+            f"{key} has non-finite values in MC forecast with tax anomalies"
+        )
+
+
+def test_tax_anomaly_affects_historical_forecast(mock_forecast_state):
+    """Forecast step for a year WITH an anomaly should differ from one WITHOUT."""
+    tf.random.set_seed(42)
+    tax_data = {2020: 5.0e9}
+    m = TrainableFinancialModel(
+        opex_module=BayesianOpEx(), tax_anomalies=tax_data,
+    )
+    m.base_year = 2018
+    m.amount_scale = 1e11
+    training_years = tf.constant([2018, 2019, 2020, 2021], dtype=tf.float64)
+    m.tax_module.prepare_for_training(m.amount_scale, training_years)
+
+    inputs = {
+        "sales_t": tf.constant(1.20, dtype=tf.float64),
+        "cum_inflation": tf.constant(1.04, dtype=tf.float64),
+    }
+
+    # Year with anomaly
+    inputs_2020 = {**inputs, "year": tf.constant(2020.0, dtype=tf.float64)}
+    result_2020 = m.forecast_step(mock_forecast_state, inputs_2020, use_mean_opex=True)
+
+    # Year without anomaly (same sales/inflation)
+    inputs_2021 = {**inputs, "year": tf.constant(2021.0, dtype=tf.float64)}
+    result_2021 = m.forecast_step(mock_forecast_state, inputs_2021, use_mean_opex=True)
+
+    tax_2020 = float(result_2020["tax"])
+    tax_2021 = float(result_2021["tax"])
+
+    # 2020 should have higher tax due to the $5B anomaly
+    assert tax_2020 > tax_2021, (
+        f"Tax in anomaly year 2020 ({tax_2020}) should exceed "
+        f"non-anomaly year 2021 ({tax_2021})"
+    )

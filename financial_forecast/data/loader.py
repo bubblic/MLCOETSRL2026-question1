@@ -12,7 +12,8 @@ Usage::
     data = HistoricalDataLoader("aapl", include_inflation=True,
                                 include_tax_onetime=True)
 
-    model = TrainableFinancialModel(tax_anomalies=data.tax_onetime_payments)
+    model = TrainableFinancialModel(opex_module=BayesianOpEx(),
+                                    tax_anomalies=data.tax_onetime_payments)
     ForecastPipeline(model=model, data=data, ...).run()
 
 To add a new company, create ``financial_forecast/data/<ticker>/`` with:
