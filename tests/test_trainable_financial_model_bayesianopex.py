@@ -16,7 +16,6 @@ python -m pytest -q tests/test_trainable_financial_model_bayesianopex.py
 import pytest
 import tensorflow as tf
 
-from financial_forecast.inference.monte_carlo_forecast import run_monte_carlo_forecast
 from financial_forecast.inference.state_index import (
     initial_state_to_batched,
     DIAGNOSTIC_KEYS,
@@ -330,8 +329,8 @@ def test_monte_carlo_stability(model, mock_forecast_state):
     cum_inf_forecast = tf.cast(tf.math.cumprod(1.0 + inflation_forecast), tf.float64)
     forecast_years = tf.cast(tf.range(2019, 2019 + n_years), tf.float64)
 
-    trajectories = run_monte_carlo_forecast(
-        model=model,
+    trajectories = model.trajectory_simulator.run(
+        model,
         initial_state=mock_forecast_state,
         sales_forecast=sales_forecast,
         cum_inf_forecast=cum_inf_forecast,
@@ -444,8 +443,8 @@ def test_monte_carlo_trajectory_shapes(model, mock_forecast_state):
     cum_inf_forecast = tf.cast(tf.math.cumprod(1.0 + inflation_forecast), tf.float64)
     forecast_years = tf.cast(tf.range(2019, 2019 + n_years), tf.float64)
 
-    trajectories = run_monte_carlo_forecast(
-        model=model,
+    trajectories = model.trajectory_simulator.run(
+        model,
         initial_state=mock_forecast_state,
         sales_forecast=sales_forecast,
         cum_inf_forecast=cum_inf_forecast,
@@ -470,8 +469,8 @@ def test_monte_carlo_trajectory_dtypes(model, mock_forecast_state):
     cum_inf_forecast = tf.cast(tf.math.cumprod(1.0 + inflation_forecast), tf.float64)
     forecast_years = tf.cast(tf.range(2019, 2019 + n_years), tf.float64)
 
-    trajectories = run_monte_carlo_forecast(
-        model=model,
+    trajectories = model.trajectory_simulator.run(
+        model,
         initial_state=mock_forecast_state,
         sales_forecast=sales_forecast,
         cum_inf_forecast=cum_inf_forecast,
@@ -588,8 +587,8 @@ def test_monte_carlo_with_tax_anomalies(mock_forecast_state):
     # Forecast starts at 2023 — all years are beyond the anomaly dict
     forecast_years = tf.cast(tf.range(2023, 2023 + n_years), tf.float64)
 
-    trajectories = run_monte_carlo_forecast(
-        model=m,
+    trajectories = m.trajectory_simulator.run(
+        m,
         initial_state=mock_forecast_state,
         sales_forecast=sales_forecast,
         cum_inf_forecast=cum_inf_forecast,

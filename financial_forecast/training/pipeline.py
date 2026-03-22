@@ -29,7 +29,6 @@ from typing import Dict, List, Mapping, Optional, Sequence
 
 import tensorflow as tf
 
-from financial_forecast.inference.monte_carlo_forecast import run_monte_carlo_forecast
 from financial_forecast.inference.plotting import plot_historical_and_forecast
 from financial_forecast.training.base_trainer import BaseTrainer
 
@@ -460,7 +459,7 @@ class ForecastPipeline:
         self._forecast_years = forecast_years
         self._sales_forecast_scaled = sales_forecast
 
-        return run_monte_carlo_forecast(
+        return model.trajectory_simulator.run(
             model,
             state,
             sales_forecast,

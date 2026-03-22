@@ -14,7 +14,6 @@ Run:
 import pytest
 import tensorflow as tf
 
-from financial_forecast.inference.monte_carlo_forecast import run_monte_carlo_forecast
 from financial_forecast.models.trainable_financial_model import TrainableFinancialModel
 from financial_forecast.models.opex import SimpleOpEx
 from financial_forecast.training.policy_trainer import PolicyTrainer
@@ -187,7 +186,7 @@ def test_mc_forecast_auto_reduces_samples(model, mock_state):
     cum_inf = tf.cast(tf.math.cumprod(1.0 + tf.fill([n_years], 0.02)), tf.float64)
     years = tf.cast(tf.range(2019, 2019 + n_years), tf.float64)
 
-    trajectories = run_monte_carlo_forecast(
+    trajectories = model.trajectory_simulator.run(
         model,
         mock_state,
         sales,

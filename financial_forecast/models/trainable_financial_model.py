@@ -21,6 +21,10 @@ from financial_forecast.serialization.parameter_io import (
     load_parameters as _load_parameters,
 )
 from financial_forecast.inference.state_index import RECURRENT_KEYS, DIAGNOSTIC_KEYS
+from financial_forecast.inference.trajectory_simulator import (
+    MonteCarloSimulator,
+    DeterministicSimulator,
+)
 
 
 class TrainableFinancialModel(BaseFinancialModel):
@@ -57,6 +61,11 @@ class TrainableFinancialModel(BaseFinancialModel):
         self.balance_sheet = BalanceSheetModel()
         self.income_statement = IncomeStatementModel()
         self.cash_budget = CashBudgetModel()
+        self.trajectory_simulator = (
+            MonteCarloSimulator()
+            if opex_module.is_stochastic
+            else DeterministicSimulator()
+        )
         if tax_anomalies is not None:
             self.tax_module = TaxWithAnomalies(tax_anomalies)
         else:
