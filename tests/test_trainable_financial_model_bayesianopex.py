@@ -183,17 +183,19 @@ def test_save_load_parameters(model, tmp_path):
     """Saving and reloading should restore original parameter values exactly."""
     save_path = tmp_path / "params_test.npz"
 
-    original_asset_growth = float(model.asset_growth.numpy())
+    original_asset_growth = float(model.balance_sheet.asset_growth.numpy())
     model.save_parameters(str(save_path))
 
     # Change parameter after save to verify that load performs a true restore.
-    model.asset_growth.assign(
+    model.balance_sheet.asset_growth.assign(
         tf.constant(original_asset_growth + 0.5, dtype=tf.float64)
     )
-    assert float(model.asset_growth.numpy()) != pytest.approx(original_asset_growth)
+    assert float(model.balance_sheet.asset_growth.numpy()) != pytest.approx(
+        original_asset_growth
+    )
 
     model.load_parameters(str(save_path))
-    assert float(model.asset_growth.numpy()) == pytest.approx(
+    assert float(model.balance_sheet.asset_growth.numpy()) == pytest.approx(
         original_asset_growth, rel=0.0, abs=1e-12
     )
 
@@ -201,35 +203,35 @@ def test_save_load_parameters(model, tmp_path):
 def test_parameter_bounds(model):
     """Transformed variables should respect their economic constraints."""
     softplus_params = [
-        model.asset_growth,
-        model.asset_maintain,
-        model.depreciation_rate,
-        model.advance_payments_sales_pct,
-        model.advance_payments_purchases_pct,
-        model.account_receivables_pct,
-        model.account_payables_pct,
-        model.inventory_pct,
+        model.balance_sheet.asset_growth,
+        model.balance_sheet.asset_maintain,
+        model.balance_sheet.depreciation_rate,
+        model.balance_sheet.advance_payments_sales_pct,
+        model.balance_sheet.advance_payments_purchases_pct,
+        model.balance_sheet.account_receivables_pct,
+        model.balance_sheet.account_payables_pct,
+        model.balance_sheet.inventory_pct,
         model.opex_module.q_var_opex_scale,
         model.opex_module.q_base_opex_scale,
         model.opex_module.noise_sigma,
-        model.avg_short_term_interest_pct,
-        model.avg_long_term_interest_pct,
-        model.market_securities_return_pct,
+        model.income_statement.avg_short_term_interest_pct,
+        model.income_statement.avg_long_term_interest_pct,
+        model.income_statement.market_securities_return_pct,
     ]
     for param in softplus_params:
         assert float(param.numpy()) >= 0.0
 
     sigmoid_params = [
         model.tax_module.income_tax_pct,
-        model.dividend_payout_ratio_pct,
-        model.dividend_adjustment_speed,
+        model.balance_sheet.dividend_payout_ratio_pct,
+        model.balance_sheet.dividend_adjustment_speed,
     ]
     for param in sigmoid_params:
         value = float(param.numpy())
         assert 0.0 <= value <= 1.0
 
     # Shift(1.001) + Softplus bijector imposes a strict lower bound > 1.001.
-    assert float(model.avg_maturity_years.numpy()) > 1.001
+    assert float(model.cash_budget.avg_maturity_years.numpy()) > 1.001
 
 
 def test_training_step_execution(
@@ -300,12 +302,12 @@ def test_training_step_execution(
     )
 
     critical_params = [
-        model.asset_growth,
-        model.depreciation_rate,
+        model.balance_sheet.asset_growth,
+        model.balance_sheet.depreciation_rate,
         model.tax_module.income_tax_pct,
-        model.avg_short_term_interest_pct,
-        model.avg_long_term_interest_pct,
-        model.avg_maturity_years,
+        model.income_statement.avg_short_term_interest_pct,
+        model.income_statement.avg_long_term_interest_pct,
+        model.cash_budget.avg_maturity_years,
     ]
     for param in critical_params:
         assert tf.math.is_finite(tf.cast(param, tf.float64))
@@ -527,8 +529,10 @@ def test_deterministic_equivalence(model, mock_forecast_state):
         cum_inf = tf.constant(cum_inf_vals[step], dtype=tf.float64)
         opex = model.opex_module.predict(sales_t, cum_inf, use_mean=True)
         batched_state, diagnostics = model.forecast_step_compiled(
-            batched_state, sales_t,
-            tf.constant(year_vals[step], dtype=tf.float64), opex,
+            batched_state,
+            sales_t,
+            tf.constant(year_vals[step], dtype=tf.float64),
+            opex,
         )
         compiled_diags.append(diagnostics)
 
@@ -538,19 +542,25 @@ def test_deterministic_equivalence(model, mock_forecast_state):
         cd = compiled_diags[step]
         for i, key in enumerate(DIAGNOSTIC_KEYS):
             if key == "total_assets":
-                dict_val = float(sum(
-                    dr[k] for k in [
-                        "nca", "advance_payments_purchases",
-                        "accounts_receivable", "inventory",
-                        "cash", "investment_in_market_securities",
-                    ]
-                ))
+                dict_val = float(
+                    sum(
+                        dr[k]
+                        for k in [
+                            "nca",
+                            "advance_payments_purchases",
+                            "accounts_receivable",
+                            "inventory",
+                            "cash",
+                            "investment_in_market_securities",
+                        ]
+                    )
+                )
             else:
                 dict_val = float(dr[key])
             compiled_val = float(cd[0, i])
-            assert abs(dict_val - compiled_val) < 1e-10, (
-                f"Step {step}, {key}: dict={dict_val}, compiled={compiled_val}"
-            )
+            assert (
+                abs(dict_val - compiled_val) < 1e-10
+            ), f"Step {step}, {key}: dict={dict_val}, compiled={compiled_val}"
 
 
 def test_monte_carlo_with_tax_anomalies(mock_forecast_state):
@@ -559,7 +569,8 @@ def test_monte_carlo_with_tax_anomalies(mock_forecast_state):
     # Create model with tax anomalies keyed by historical years
     tax_data = {2018: 1.5e9, 2020: -0.5e9, 2022: 5.0e9}
     m = TrainableFinancialModel(
-        opex_module=BayesianOpEx(), tax_anomalies=tax_data,
+        opex_module=BayesianOpEx(),
+        tax_anomalies=tax_data,
     )
     m.base_year = 2018
     m.amount_scale = 1.0
@@ -571,7 +582,8 @@ def test_monte_carlo_with_tax_anomalies(mock_forecast_state):
     n_years = 10
     sales_forecast = tf.fill([n_years], tf.constant(1.20, dtype=tf.float64))
     cum_inf_forecast = tf.cast(
-        tf.math.cumprod(1.0 + tf.fill([n_years], 0.02)), tf.float64,
+        tf.math.cumprod(1.0 + tf.fill([n_years], 0.02)),
+        tf.float64,
     )
     # Forecast starts at 2023 — all years are beyond the anomaly dict
     forecast_years = tf.cast(tf.range(2023, 2023 + n_years), tf.float64)
@@ -586,9 +598,9 @@ def test_monte_carlo_with_tax_anomalies(mock_forecast_state):
     )
 
     for key, arr in trajectories.items():
-        assert tf.reduce_all(tf.math.is_finite(arr)), (
-            f"{key} has non-finite values in MC forecast with tax anomalies"
-        )
+        assert tf.reduce_all(
+            tf.math.is_finite(arr)
+        ), f"{key} has non-finite values in MC forecast with tax anomalies"
 
 
 def test_tax_anomaly_affects_historical_forecast(mock_forecast_state):
@@ -596,7 +608,8 @@ def test_tax_anomaly_affects_historical_forecast(mock_forecast_state):
     tf.random.set_seed(42)
     tax_data = {2020: 5.0e9}
     m = TrainableFinancialModel(
-        opex_module=BayesianOpEx(), tax_anomalies=tax_data,
+        opex_module=BayesianOpEx(),
+        tax_anomalies=tax_data,
     )
     m.base_year = 2018
     m.amount_scale = 1e11

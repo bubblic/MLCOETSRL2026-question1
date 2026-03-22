@@ -176,12 +176,12 @@ class StructuralTrainer(BaseTrainer):
             )
 
         vars_to_train = [
-            model.avg_short_term_interest_pct.trainable_variables[0],
-            model.avg_long_term_interest_pct.trainable_variables[0],
-            model.avg_maturity_years.trainable_variables[0],
-            model.market_securities_return_pct.trainable_variables[0],
-            model.ef_alpha,
-            model.ef_beta,
+            model.income_statement.avg_short_term_interest_pct.trainable_variables[0],
+            model.income_statement.avg_long_term_interest_pct.trainable_variables[0],
+            model.cash_budget.avg_maturity_years.trainable_variables[0],
+            model.income_statement.market_securities_return_pct.trainable_variables[0],
+            model.cash_budget.ef_alpha,
+            model.cash_budget.ef_beta,
         ]
 
         structural_history = {
@@ -283,13 +283,17 @@ class StructuralTrainer(BaseTrainer):
                         / scale_interest
                     )
                     loss_ms_return = tf.square(
-                        (state_pred["ms_return"] - ms_return_t[t + 1])
-                        / scale_ms_return
+                        (state_pred["ms_return"] - ms_return_t[t + 1]) / scale_ms_return
                     )
 
                     total_loss += (
-                        loss_ni + loss_eff_st + loss_curr_lt + loss_ncl
-                        + loss_equity + loss_interest + loss_ms_return
+                        loss_ni
+                        + loss_eff_st
+                        + loss_curr_lt
+                        + loss_ncl
+                        + loss_equity
+                        + loss_interest
+                        + loss_ms_return
                     )
                     total_loss_ni += loss_ni
                     total_loss_curr_lt += loss_curr_lt
@@ -301,16 +305,21 @@ class StructuralTrainer(BaseTrainer):
             grads = tape.gradient(total_loss, vars_to_train)
             if clip_norm is not None:
                 grads = [
-                    None if g is None else tf.clip_by_norm(g, clip_norm)
-                    for g in grads
+                    None if g is None else tf.clip_by_norm(g, clip_norm) for g in grads
                 ]
             optimizer.apply_gradients(zip(grads, vars_to_train))
 
-            return tf.stack([
-                total_loss, total_loss_ni, total_loss_interest,
-                total_loss_ms_return, total_loss_curr_lt,
-                total_loss_ncl, total_loss_equity,
-            ])
+            return tf.stack(
+                [
+                    total_loss,
+                    total_loss_ni,
+                    total_loss_interest,
+                    total_loss_ms_return,
+                    total_loss_curr_lt,
+                    total_loss_ncl,
+                    total_loss_equity,
+                ]
+            )
 
         # Index mapping for the stacked loss tensor
         _L_TOTAL, _L_NI, _L_INT, _L_MSR, _L_CLT, _L_NCL, _L_EQ = range(7)
@@ -333,19 +342,25 @@ class StructuralTrainer(BaseTrainer):
                 print(f"Epoch {i}: Structural Loss={loss_stack[_L_TOTAL].numpy():.4e}")
 
         print("Structural Training Complete.")
-        print(f"Final %AvgSTInt: {model.avg_short_term_interest_pct.numpy():.5f}")
-        print(f"Final %AvgLTInt: {model.avg_long_term_interest_pct.numpy():.5f}")
-        print(f"Final AvgM: {model.avg_maturity_years.numpy():.5f}")
-        print(f"Final %MSReturn: {model.market_securities_return_pct.numpy():.5f}")
         print(
-            f"Equity Financing % (logit-linear): "
-            f"alpha={model.ef_alpha.numpy():.4f}, "
-            f"beta={model.ef_beta.numpy():.6f}"
+            f"Final %AvgSTInt: {model.income_statement.avg_short_term_interest_pct.numpy():.5f}"
         )
         print(
-            f"  => %EF at t=0: {tf.sigmoid(model.ef_alpha).numpy():.4f}, "
+            f"Final %AvgLTInt: {model.income_statement.avg_long_term_interest_pct.numpy():.5f}"
+        )
+        print(f"Final AvgM: {model.cash_budget.avg_maturity_years.numpy():.5f}")
+        print(
+            f"Final %MSReturn: {model.income_statement.market_securities_return_pct.numpy():.5f}"
+        )
+        print(
+            f"Equity Financing % (logit-linear): "
+            f"alpha={model.cash_budget.ef_alpha.numpy():.4f}, "
+            f"beta={model.cash_budget.ef_beta.numpy():.6f}"
+        )
+        print(
+            f"  => %EF at t=0: {tf.sigmoid(model.cash_budget.ef_alpha).numpy():.4f}, "
             f"%EF at t={num_transitions}: "
-            f"{tf.sigmoid(model.ef_alpha + model.ef_beta * num_transitions).numpy():.4f}"
+            f"{tf.sigmoid(model.cash_budget.ef_alpha + model.cash_budget.ef_beta * num_transitions).numpy():.4f}"
         )
         print("-" * 50)
 

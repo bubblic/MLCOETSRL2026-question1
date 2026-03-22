@@ -211,28 +211,28 @@ class PolicyTrainer(BaseTrainer):
         # bijector on read (e.g. Softplus for non-negative).  We train the
         # underlying unconstrained variable via .trainable_variables[0].
         vars_to_train = [
-            model.asset_growth.trainable_variables[0],
-            model.asset_maintain.trainable_variables[0],
-            model.depreciation_rate.trainable_variables[0],
-            model.advance_payments_sales_pct.trainable_variables[0],
-            model.advance_payments_purchases_pct.trainable_variables[0],
-            model.account_receivables_pct.trainable_variables[0],
-            model.account_payables_pct.trainable_variables[0],
-            model.inventory_pct.trainable_variables[0],
-            model.tl_alpha,
-            model.tl_beta,
-            model.tl_baseline,
-            model.cash_alpha,
-            model.cash_beta,
+            model.balance_sheet.asset_growth.trainable_variables[0],
+            model.balance_sheet.asset_maintain.trainable_variables[0],
+            model.balance_sheet.depreciation_rate.trainable_variables[0],
+            model.balance_sheet.advance_payments_sales_pct.trainable_variables[0],
+            model.balance_sheet.advance_payments_purchases_pct.trainable_variables[0],
+            model.balance_sheet.account_receivables_pct.trainable_variables[0],
+            model.balance_sheet.account_payables_pct.trainable_variables[0],
+            model.balance_sheet.inventory_pct.trainable_variables[0],
+            model.balance_sheet.tl_alpha,
+            model.balance_sheet.tl_beta,
+            model.balance_sheet.tl_baseline,
+            model.balance_sheet.cash_alpha,
+            model.balance_sheet.cash_beta,
             *model.tax_module.trainable_variables,
-            model.dividend_payout_ratio_pct.trainable_variables[0],
-            model.dividend_adjustment_speed.trainable_variables[0],
-            model.sb_baseline,
-            model.sb_ratio,
-            model.st_debt_alpha,
-            model.st_debt_beta,
-            model.cost_ratio_alpha,
-            model.cost_ratio_beta,
+            model.balance_sheet.dividend_payout_ratio_pct.trainable_variables[0],
+            model.balance_sheet.dividend_adjustment_speed.trainable_variables[0],
+            model.balance_sheet.sb_baseline,
+            model.balance_sheet.sb_ratio,
+            model.cash_budget.st_debt_alpha,
+            model.cash_budget.st_debt_beta,
+            model.balance_sheet.cost_ratio_alpha,
+            model.balance_sheet.cost_ratio_beta,
             *model.opex_module.trainable_variables,
         ]
 
@@ -276,8 +276,9 @@ class PolicyTrainer(BaseTrainer):
                         (
                             delta_nca_true
                             - (
-                                (model.asset_maintain - _one) * depr_true
-                                + sales_aligned_growth * model.asset_growth
+                                (model.balance_sheet.asset_maintain - _one) * depr_true
+                                + sales_aligned_growth
+                                * model.balance_sheet.asset_growth
                             )
                         )
                         / scale_growth
@@ -285,13 +286,20 @@ class PolicyTrainer(BaseTrainer):
                 )
                 loss_depr = tf.reduce_mean(
                     tf.square(
-                        (depr_true - nca_prev_aligned * model.depreciation_rate)
+                        (
+                            depr_true
+                            - nca_prev_aligned * model.balance_sheet.depreciation_rate
+                        )
                         / scale_depr
                     )
                 )
                 loss_adv_ps = tf.reduce_mean(
                     tf.square(
-                        (adv_ps_true - sales_tensor * model.advance_payments_sales_pct)
+                        (
+                            adv_ps_true
+                            - sales_tensor
+                            * model.balance_sheet.advance_payments_sales_pct
+                        )
                         / scale_adv_ps
                     )
                 )
@@ -300,40 +308,57 @@ class PolicyTrainer(BaseTrainer):
                         (
                             adv_pp_true
                             - purchases_aligned_adv_pp
-                            * model.advance_payments_purchases_pct
+                            * model.balance_sheet.advance_payments_purchases_pct
                         )
                         / scale_adv_pp
                     )
                 )
                 loss_ar = tf.reduce_mean(
                     tf.square(
-                        (ar_tensor - sales_tensor * model.account_receivables_pct)
+                        (
+                            ar_tensor
+                            - sales_tensor * model.balance_sheet.account_receivables_pct
+                        )
                         / scale_ar
                     )
                 )
                 loss_ap = tf.reduce_mean(
                     tf.square(
-                        (ap_tensor - purchases_tensor * model.account_payables_pct)
+                        (
+                            ap_tensor
+                            - purchases_tensor
+                            * model.balance_sheet.account_payables_pct
+                        )
                         / scale_ap
                     )
                 )
                 loss_inv = tf.reduce_mean(
                     tf.square(
-                        (inv_tensor - sales_tensor * model.inventory_pct) / scale_inv
+                        (inv_tensor - sales_tensor * model.balance_sheet.inventory_pct)
+                        / scale_inv
                     )
                 )
-                tl_pct_t_logit = model.tl_alpha + model.tl_beta * time_indices
+                tl_pct_t_logit = (
+                    model.balance_sheet.tl_alpha
+                    + model.balance_sheet.tl_beta * time_indices
+                )
                 tl_pct_t = tf.sigmoid(tl_pct_t_logit)
                 loss_tl = tf.reduce_mean(
                     tf.square(
                         (
                             (cash_tensor + ims_tensor)
-                            - (model.tl_baseline + sales_tensor * tl_pct_t)
+                            - (
+                                model.balance_sheet.tl_baseline
+                                + sales_tensor * tl_pct_t
+                            )
                         )
                         / scale_tl
                     )
                 )
-                cash_pct_t_logit = model.cash_alpha + model.cash_beta * time_indices
+                cash_pct_t_logit = (
+                    model.balance_sheet.cash_alpha
+                    + model.balance_sheet.cash_beta * time_indices
+                )
                 cash_pct_t = tf.sigmoid(cash_pct_t_logit)
                 loss_cash = tf.reduce_mean(
                     tf.square(
@@ -346,18 +371,25 @@ class PolicyTrainer(BaseTrainer):
                     ni_tensor,
                     scale_tax,
                 )
-                div_target = ni_prev_aligned * model.dividend_payout_ratio_pct
+                div_target = (
+                    ni_prev_aligned * model.balance_sheet.dividend_payout_ratio_pct
+                )
                 div_pred = (
-                    model.dividend_adjustment_speed * div_target
-                    + (_one - model.dividend_adjustment_speed) * div_prev_aligned
+                    model.balance_sheet.dividend_adjustment_speed * div_target
+                    + (_one - model.balance_sheet.dividend_adjustment_speed)
+                    * div_prev_aligned
                 )
                 loss_div = tf.reduce_mean(tf.square((div_true - div_pred) / scale_div))
-                bb_pred = model.sb_baseline + model.sb_ratio * depr_tensor
+                bb_pred = (
+                    model.balance_sheet.sb_baseline
+                    + model.balance_sheet.sb_ratio * depr_tensor
+                )
                 loss_bb = tf.reduce_mean(tf.square((bb_tensor - bb_pred) / scale_bb))
 
                 # Cost Ratio (Logit-Linear)
                 logit_cr_pred = (
-                    model.cost_ratio_alpha + model.cost_ratio_beta * time_indices
+                    model.balance_sheet.cost_ratio_alpha
+                    + model.balance_sheet.cost_ratio_beta * time_indices
                 )
                 loss_cost_ratio = tf.reduce_mean(
                     tf.square((logit_cr_hist - logit_cr_pred) / scale_cost_ratio)
@@ -365,7 +397,8 @@ class PolicyTrainer(BaseTrainer):
 
                 # ST Debt (Logit-Linear)
                 st_debt_pct_pred = tf.sigmoid(
-                    model.st_debt_alpha + model.st_debt_beta * time_indices
+                    model.cash_budget.st_debt_alpha
+                    + model.cash_budget.st_debt_beta * time_indices
                 )
                 loss_eff_st_debt = tf.reduce_mean(
                     tf.square(
@@ -384,7 +417,7 @@ class PolicyTrainer(BaseTrainer):
 
                 # Quadratic prior on asset_maintain centered at 1.0
                 prior_loss_am = prior_strength_am * tf.square(
-                    model.asset_maintain - _one
+                    model.balance_sheet.asset_maintain - _one
                 )
 
                 total_loss = (
@@ -477,73 +510,79 @@ class PolicyTrainer(BaseTrainer):
                     f"Epoch {i}: Loss={v[_L_TOTAL]:.4e} | "
                     f"OpEx Loss={v[_L_OPEX]:.4e} | "
                     f"{noise_str}"
-                    f"AM={model.asset_maintain.numpy():.4f} "
-                    f"AG={model.asset_growth.numpy():.6f} "
+                    f"AM={model.balance_sheet.asset_maintain.numpy():.4f} "
+                    f"AG={model.balance_sheet.asset_growth.numpy():.6f} "
                     f"Prior_AM={v[_L_PRIOR_AM]:.4e}"
                 )
 
         # --- Print final parameter values ---
         print("-" * 50)
         print("Training Complete.")
-        print(f"Final %AG: {model.asset_growth.numpy():.5f}")
-        print(f"Final %AM: {model.asset_maintain.numpy():.5f}")
-        print(f"Final %Depr: {model.depreciation_rate.numpy():.5f}")
-        print(f"Final %AdvPS: {model.advance_payments_sales_pct.numpy():.5f}")
-        print(f"Final %AdvPP: {model.advance_payments_purchases_pct.numpy():.5f}")
-        print(f"Final %AR: {model.account_receivables_pct.numpy():.5f}")
-        print(f"Final %AP: {model.account_payables_pct.numpy():.5f}")
-        print(f"Final %Inv: {model.inventory_pct.numpy():.5f}")
+        print(f"Final %AG: {model.balance_sheet.asset_growth.numpy():.5f}")
+        print(f"Final %AM: {model.balance_sheet.asset_maintain.numpy():.5f}")
+        print(f"Final %Depr: {model.balance_sheet.depreciation_rate.numpy():.5f}")
+        print(
+            f"Final %AdvPS: {model.balance_sheet.advance_payments_sales_pct.numpy():.5f}"
+        )
+        print(
+            f"Final %AdvPP: {model.balance_sheet.advance_payments_purchases_pct.numpy():.5f}"
+        )
+        print(f"Final %AR: {model.balance_sheet.account_receivables_pct.numpy():.5f}")
+        print(f"Final %AP: {model.balance_sheet.account_payables_pct.numpy():.5f}")
+        print(f"Final %Inv: {model.balance_sheet.inventory_pct.numpy():.5f}")
         n_years = len(historical_sales)
         print(
             f"Total Liquidity (baseline + logit-linear): "
-            f"baseline={model.tl_baseline.numpy():.4f}, "
-            f"alpha={model.tl_alpha.numpy():.4f}, "
-            f"beta={model.tl_beta.numpy():.6f}"
+            f"baseline={model.balance_sheet.tl_baseline.numpy():.4f}, "
+            f"alpha={model.balance_sheet.tl_alpha.numpy():.4f}, "
+            f"beta={model.balance_sheet.tl_beta.numpy():.6f}"
         )
         print(
-            f"  => %TL at t=0: {tf.sigmoid(model.tl_alpha).numpy():.4f}, "
+            f"  => %TL at t=0: {tf.sigmoid(model.balance_sheet.tl_alpha).numpy():.4f}, "
             f"%TL at t={n_years-1}: "
-            f"{tf.sigmoid(model.tl_alpha + model.tl_beta * (n_years-1)).numpy():.4f}"
+            f"{tf.sigmoid(model.balance_sheet.tl_alpha + model.balance_sheet.tl_beta * (n_years-1)).numpy():.4f}"
         )
         print(
             f"Cash % of Liquidity (logit-linear): "
-            f"alpha={model.cash_alpha.numpy():.4f}, "
-            f"beta={model.cash_beta.numpy():.6f}"
+            f"alpha={model.balance_sheet.cash_alpha.numpy():.4f}, "
+            f"beta={model.balance_sheet.cash_beta.numpy():.6f}"
         )
         print(
-            f"  => %Cash at t=0: {tf.sigmoid(model.cash_alpha).numpy():.4f}, "
+            f"  => %Cash at t=0: {tf.sigmoid(model.balance_sheet.cash_alpha).numpy():.4f}, "
             f"%Cash at t={n_years-1}: "
-            f"{tf.sigmoid(model.cash_alpha + model.cash_beta * (n_years-1)).numpy():.4f}"
+            f"{tf.sigmoid(model.balance_sheet.cash_alpha + model.balance_sheet.cash_beta * (n_years-1)).numpy():.4f}"
         )
         print(f"Final %IT: {model.tax_module.income_tax_pct.numpy():.5f}")
-        print(f"Final %PR: {model.dividend_payout_ratio_pct.numpy():.5f}")
-        print(f"Final DivAdjSpeed: {model.dividend_adjustment_speed.numpy():.5f}")
+        print(f"Final %PR: {model.balance_sheet.dividend_payout_ratio_pct.numpy():.5f}")
+        print(
+            f"Final DivAdjSpeed: {model.balance_sheet.dividend_adjustment_speed.numpy():.5f}"
+        )
         print(
             f"Stock Buyback (baseline + ratio*depr): "
-            f"baseline={model.sb_baseline.numpy():.4f}, "
-            f"ratio={model.sb_ratio.numpy():.6f}"
+            f"baseline={model.balance_sheet.sb_baseline.numpy():.4f}, "
+            f"ratio={model.balance_sheet.sb_ratio.numpy():.6f}"
         )
         print(
             f"Effective ST Debt % of Sales (logit-linear): "
-            f"alpha={model.st_debt_alpha.numpy():.4f}, "
-            f"beta={model.st_debt_beta.numpy():.6f}"
+            f"alpha={model.cash_budget.st_debt_alpha.numpy():.4f}, "
+            f"beta={model.cash_budget.st_debt_beta.numpy():.6f}"
         )
         print(
             f"  => %EffSTDebt at t=0: "
-            f"{tf.sigmoid(model.st_debt_alpha).numpy():.4f}, "
+            f"{tf.sigmoid(model.cash_budget.st_debt_alpha).numpy():.4f}, "
             f"%EffSTDebt at t={n_years-1}: "
-            f"{tf.sigmoid(model.st_debt_alpha + model.st_debt_beta * (n_years-1)).numpy():.4f}"
+            f"{tf.sigmoid(model.cash_budget.st_debt_alpha + model.cash_budget.st_debt_beta * (n_years-1)).numpy():.4f}"
         )
         print(
             f"Cost Ratio (logit-linear): "
-            f"alpha={model.cost_ratio_alpha.numpy():.4f}, "
-            f"beta={model.cost_ratio_beta.numpy():.4f}"
+            f"alpha={model.balance_sheet.cost_ratio_alpha.numpy():.4f}, "
+            f"beta={model.balance_sheet.cost_ratio_beta.numpy():.4f}"
         )
         print(
             f"  => CR at t=0: "
-            f"{tf.sigmoid(model.cost_ratio_alpha).numpy():.4f}, "
+            f"{tf.sigmoid(model.balance_sheet.cost_ratio_alpha).numpy():.4f}, "
             f"CR at t={n_years-1}: "
-            f"{tf.sigmoid(model.cost_ratio_alpha + model.cost_ratio_beta * (n_years-1)).numpy():.4f}"
+            f"{tf.sigmoid(model.balance_sheet.cost_ratio_alpha + model.balance_sheet.cost_ratio_beta * (n_years-1)).numpy():.4f}"
         )
         model.opex_module.print_summary()
         print("-" * 50)
