@@ -16,6 +16,7 @@ import tensorflow as tf
 
 from financial_forecast.models.trainable_financial_model import TrainableFinancialModel
 from financial_forecast.models.opex import SimpleOpEx
+from financial_forecast.inference.trajectory_simulator import DeterministicSimulator
 from financial_forecast.training.policy_trainer import PolicyTrainer
 from financial_forecast.training.structural_trainer import StructuralTrainer
 
@@ -23,7 +24,10 @@ from financial_forecast.training.structural_trainer import StructuralTrainer
 @pytest.fixture
 def model():
     tf.random.set_seed(7)
-    m = TrainableFinancialModel(opex_module=SimpleOpEx())
+    m = TrainableFinancialModel(
+        opex_module=SimpleOpEx(),
+        trajectory_simulator=DeterministicSimulator(),
+    )
     m.base_year = 2018
     m.amount_scale = 1.0
     return m
@@ -192,7 +196,6 @@ def test_mc_forecast_auto_reduces_samples(model, mock_state):
         sales,
         cum_inf,
         years,
-        n_samples=1000,
     )
 
     # Should have been auto-reduced to 1 sample

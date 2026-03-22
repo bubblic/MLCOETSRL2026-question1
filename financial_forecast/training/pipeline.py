@@ -176,7 +176,6 @@ class ForecastPipeline:
         forecast_years: Number of years to forecast.  Defaults to 10.
         test_years: Number of historical years held out for testing.
             Defaults to 1.
-        monte_carlo_samples: Number of Monte Carlo simulation paths.
         sales_forecast_usd: Optional explicit sales forecast (USD).  If
             ``None``, auto-generated from historical trend.
         inflation_forecast: Optional explicit inflation forecast.  If
@@ -194,7 +193,6 @@ class ForecastPipeline:
         inflation: Optional[tf.Tensor] = None,
         forecast_years: int = 10,
         test_years: int = 1,
-        monte_carlo_samples: int = 1000,
         sales_forecast_usd: Optional[tf.Tensor] = None,
         inflation_forecast: Optional[tf.Tensor] = None,
         parameters_save_path: str = "trained_parameters.npz",
@@ -204,7 +202,6 @@ class ForecastPipeline:
         self.trainers = trainers
         self.forecast_years = forecast_years
         self.test_years = test_years
-        self.monte_carlo_samples = monte_carlo_samples
         self.parameters_save_path = parameters_save_path
         self.use_trained_parameters = use_trained_parameters
         self._inflation = inflation
@@ -465,7 +462,6 @@ class ForecastPipeline:
             sales_forecast,
             cum_inf_forecast,
             forecast_years,
-            n_samples=self.monte_carlo_samples,
         )
 
     def _compute_historical_fit(self):

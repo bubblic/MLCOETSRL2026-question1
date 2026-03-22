@@ -10,6 +10,7 @@ Usage:
 from financial_forecast.data.loader import HistoricalDataLoader
 from financial_forecast.models.trainable_financial_model import TrainableFinancialModel
 from financial_forecast.models.opex import SimpleOpEx
+from financial_forecast.inference.trajectory_simulator import DeterministicSimulator
 from financial_forecast.training.policy_trainer import PolicyTrainer
 from financial_forecast.training.structural_trainer import StructuralTrainer
 from financial_forecast.training.pipeline import ForecastPipeline
@@ -17,7 +18,10 @@ from financial_forecast.training.pipeline import ForecastPipeline
 if __name__ == "__main__":
     historical_data = HistoricalDataLoader("aapl", include_inflation=True)
 
-    model = TrainableFinancialModel(opex_module=SimpleOpEx())
+    model = TrainableFinancialModel(
+        opex_module=SimpleOpEx(),
+        trajectory_simulator=DeterministicSimulator(),
+    )
 
     ForecastPipeline(
         model=model,

@@ -44,12 +44,20 @@ class TrainableFinancialModel(BaseFinancialModel):
             from the historical data's ``"years"`` field.
     """
 
-    def __init__(self, opex_module, tax_anomalies=None, name=None):
+    def __init__(
+        self,
+        opex_module,
+        trajectory_simulator,
+        tax_anomalies=None,
+        name=None,
+    ):
         """Create a new trainable financial model.
 
         Args:
             opex_module: OpEx module instance (``SimpleOpEx`` or
                 ``BayesianOpEx``).
+            simulator: Trajectory simulator instance
+                (``DeterministicSimulator`` or ``MonteCarloSimulator``).
             tax_anomalies: Optional 1-D tensor of one-time tax payment
                 amounts in USD.  If ``None``, uses :class:`SimpleTax`;
                 otherwise :class:`TaxWithAnomalies`.
@@ -61,11 +69,7 @@ class TrainableFinancialModel(BaseFinancialModel):
         self.balance_sheet = BalanceSheetModel()
         self.income_statement = IncomeStatementModel()
         self.cash_budget = CashBudgetModel()
-        self.trajectory_simulator = (
-            MonteCarloSimulator()
-            if opex_module.is_stochastic
-            else DeterministicSimulator()
-        )
+        self.trajectory_simulator = trajectory_simulator
         if tax_anomalies is not None:
             self.tax_module = TaxWithAnomalies(tax_anomalies)
         else:

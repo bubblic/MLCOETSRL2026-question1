@@ -38,7 +38,6 @@ class TrajectorySimulator(ABC):
         sales_forecast: tf.Tensor,
         cum_inf_forecast: tf.Tensor,
         forecast_years: tf.Tensor,
-        n_samples: int = 1000,
     ) -> Dict[str, tf.Tensor]:
         """Run the forecast and return trajectory tensors.
 
@@ -48,7 +47,6 @@ class TrajectorySimulator(ABC):
             sales_forecast: 1-D tensor of forecasted sales (scaled).
             cum_inf_forecast: 1-D tensor of cumulative inflation factors.
             forecast_years: 1-D tensor of calendar years.
-            n_samples: Requested number of simulation paths.
 
         Returns:
             Dict mapping metric names to ``[n_samples, n_years]`` tensors.
@@ -247,7 +245,6 @@ class DeterministicSimulator(TrajectorySimulator):
         sales_forecast,
         cum_inf_forecast,
         forecast_years,
-        n_samples=1,
     ):
         print("\n--- Running Single-Point Forecast (deterministic) ---")
 
@@ -315,7 +312,13 @@ class MonteCarloSimulator(TrajectorySimulator):
 
     Uses ``tf.while_loop`` compiled via ``@tf.function``.
     All stochastic values are pre-sampled in eager mode.
+
+    Args:
+        n_samples: Number of Monte Carlo simulation paths.
     """
+
+    def __init__(self, n_samples=1000):
+        self.n_samples = n_samples
 
     def run(
         self,
@@ -324,8 +327,8 @@ class MonteCarloSimulator(TrajectorySimulator):
         sales_forecast,
         cum_inf_forecast,
         forecast_years,
-        n_samples=1000,
     ):
+        n_samples = self.n_samples
         print(f"\n--- Running Monte Carlo Forecast ({n_samples} samples) ---")
 
         n_years = len(sales_forecast)

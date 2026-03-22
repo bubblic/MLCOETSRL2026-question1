@@ -22,6 +22,7 @@ from financial_forecast.inference.state_index import (
 )
 from financial_forecast.models.trainable_financial_model import TrainableFinancialModel
 from financial_forecast.models.opex import BayesianOpEx
+from financial_forecast.inference.trajectory_simulator import MonteCarloSimulator
 from financial_forecast.training.policy_trainer import PolicyTrainer
 from financial_forecast.training.structural_trainer import StructuralTrainer
 
@@ -30,7 +31,10 @@ from financial_forecast.training.structural_trainer import StructuralTrainer
 def model():
     """Yield a fresh model instance with deterministic random seeds."""
     tf.random.set_seed(7)
-    m = TrainableFinancialModel(opex_module=BayesianOpEx())
+    m = TrainableFinancialModel(
+        opex_module=BayesianOpEx(),
+        trajectory_simulator=MonteCarloSimulator(n_samples=2),
+    )
     m.base_year = 2018
     m.amount_scale = 1.0
     return m
@@ -335,7 +339,6 @@ def test_monte_carlo_stability(model, mock_forecast_state):
         sales_forecast=sales_forecast,
         cum_inf_forecast=cum_inf_forecast,
         forecast_years=forecast_years,
-        n_samples=2,
     )
 
     # Explicitly assert requested key trajectories.
@@ -437,7 +440,7 @@ def test_gradient_flows_through_forecast_step(
 def test_monte_carlo_trajectory_shapes(model, mock_forecast_state):
     """Monte Carlo trajectories should have shape (n_samples, n_years)."""
     n_years = 5
-    n_samples = 3
+    n_samples = model.trajectory_simulator.n_samples  # from fixture
     sales_forecast = tf.fill([n_years], tf.constant(1.20, dtype=tf.float64))
     inflation_forecast = tf.fill([n_years], tf.constant(0.02, dtype=tf.float64))
     cum_inf_forecast = tf.cast(tf.math.cumprod(1.0 + inflation_forecast), tf.float64)
@@ -449,7 +452,6 @@ def test_monte_carlo_trajectory_shapes(model, mock_forecast_state):
         sales_forecast=sales_forecast,
         cum_inf_forecast=cum_inf_forecast,
         forecast_years=forecast_years,
-        n_samples=n_samples,
     )
 
     for key, arr in trajectories.items():
@@ -475,7 +477,6 @@ def test_monte_carlo_trajectory_dtypes(model, mock_forecast_state):
         sales_forecast=sales_forecast,
         cum_inf_forecast=cum_inf_forecast,
         forecast_years=forecast_years,
-        n_samples=2,
     )
 
     for key, arr in trajectories.items():
@@ -569,6 +570,7 @@ def test_monte_carlo_with_tax_anomalies(mock_forecast_state):
     tax_data = {2018: 1.5e9, 2020: -0.5e9, 2022: 5.0e9}
     m = TrainableFinancialModel(
         opex_module=BayesianOpEx(),
+        trajectory_simulator=MonteCarloSimulator(n_samples=3),
         tax_anomalies=tax_data,
     )
     m.base_year = 2018
@@ -593,7 +595,6 @@ def test_monte_carlo_with_tax_anomalies(mock_forecast_state):
         sales_forecast=sales_forecast,
         cum_inf_forecast=cum_inf_forecast,
         forecast_years=forecast_years,
-        n_samples=3,
     )
 
     for key, arr in trajectories.items():
@@ -608,6 +609,7 @@ def test_tax_anomaly_affects_historical_forecast(mock_forecast_state):
     tax_data = {2020: 5.0e9}
     m = TrainableFinancialModel(
         opex_module=BayesianOpEx(),
+        trajectory_simulator=MonteCarloSimulator(n_samples=2),
         tax_anomalies=tax_data,
     )
     m.base_year = 2018
