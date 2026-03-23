@@ -22,6 +22,13 @@ from financial_forecast.inference.state_index import (
 )
 from financial_forecast.models.trainable_financial_model import TrainableFinancialModel
 from financial_forecast.models.opex import BayesianOpEx
+from financial_forecast.models.liquidity import TrendLiquidityPolicy
+from financial_forecast.models.dividends import LintnerDividendPolicy
+from financial_forecast.models.buyback import BaselineBuybackPolicy
+from financial_forecast.models.purchases import TrendCostRatioPolicy
+from financial_forecast.models.debt import TrendDebtPolicy
+from financial_forecast.models.capex import CapexPolicy
+from financial_forecast.models.working_capital import WorkingCapitalPolicy
 from financial_forecast.inference.trajectory_simulator import MonteCarloSimulator
 from financial_forecast.training.policy_trainer import PolicyTrainer
 from financial_forecast.training.structural_trainer import StructuralTrainer
@@ -34,6 +41,13 @@ def model():
     m = TrainableFinancialModel(
         opex_module=BayesianOpEx(),
         trajectory_simulator=MonteCarloSimulator(n_samples=2),
+        capex_policy=CapexPolicy(),
+        working_capital=WorkingCapitalPolicy(),
+        liquidity_policy=TrendLiquidityPolicy(),
+        dividend_policy=LintnerDividendPolicy(),
+        buyback_policy=BaselineBuybackPolicy(),
+        purchases_policy=TrendCostRatioPolicy(),
+        debt_policy=TrendDebtPolicy(),
     )
     m.base_year = 2018
     m.amount_scale = 1.0
@@ -186,19 +200,19 @@ def test_save_load_parameters(model, tmp_path):
     """Saving and reloading should restore original parameter values exactly."""
     save_path = tmp_path / "params_test.npz"
 
-    original_asset_growth = float(model.balance_sheet.asset_growth.numpy())
+    original_asset_growth = float(model.balance_sheet.capex_policy.asset_growth.numpy())
     model.save_parameters(str(save_path))
 
     # Change parameter after save to verify that load performs a true restore.
-    model.balance_sheet.asset_growth.assign(
+    model.balance_sheet.capex_policy.asset_growth.assign(
         tf.constant(original_asset_growth + 0.5, dtype=tf.float64)
     )
-    assert float(model.balance_sheet.asset_growth.numpy()) != pytest.approx(
+    assert float(model.balance_sheet.capex_policy.asset_growth.numpy()) != pytest.approx(
         original_asset_growth
     )
 
     model.load_parameters(str(save_path))
-    assert float(model.balance_sheet.asset_growth.numpy()) == pytest.approx(
+    assert float(model.balance_sheet.capex_policy.asset_growth.numpy()) == pytest.approx(
         original_asset_growth, rel=0.0, abs=1e-12
     )
 
@@ -206,14 +220,14 @@ def test_save_load_parameters(model, tmp_path):
 def test_parameter_bounds(model):
     """Transformed variables should respect their economic constraints."""
     softplus_params = [
-        model.balance_sheet.asset_growth,
-        model.balance_sheet.asset_maintain,
-        model.balance_sheet.depreciation_rate,
-        model.balance_sheet.advance_payments_sales_pct,
-        model.balance_sheet.advance_payments_purchases_pct,
-        model.balance_sheet.account_receivables_pct,
-        model.balance_sheet.account_payables_pct,
-        model.balance_sheet.inventory_pct,
+        model.balance_sheet.capex_policy.asset_growth,
+        model.balance_sheet.capex_policy.asset_maintain,
+        model.balance_sheet.capex_policy.depreciation_rate,
+        model.balance_sheet.working_capital.advance_payments_sales_pct,
+        model.balance_sheet.working_capital.advance_payments_purchases_pct,
+        model.balance_sheet.working_capital.account_receivables_pct,
+        model.balance_sheet.working_capital.account_payables_pct,
+        model.balance_sheet.working_capital.inventory_pct,
         model.opex_module.q_var_opex_scale,
         model.opex_module.q_base_opex_scale,
         model.opex_module.noise_sigma,
@@ -226,15 +240,15 @@ def test_parameter_bounds(model):
 
     sigmoid_params = [
         model.tax_module.income_tax_pct,
-        model.balance_sheet.dividend_payout_ratio_pct,
-        model.balance_sheet.dividend_adjustment_speed,
+        model.balance_sheet.dividend_policy.dividend_payout_ratio_pct,
+        model.balance_sheet.dividend_policy.dividend_adjustment_speed,
     ]
     for param in sigmoid_params:
         value = float(param.numpy())
         assert 0.0 <= value <= 1.0
 
     # Shift(1.001) + Softplus bijector imposes a strict lower bound > 1.001.
-    assert float(model.cash_budget.avg_maturity_years.numpy()) > 1.001
+    assert float(model.cash_budget.debt_policy.avg_maturity_years.numpy()) > 1.001
 
 
 def test_training_step_execution(
@@ -305,12 +319,12 @@ def test_training_step_execution(
     )
 
     critical_params = [
-        model.balance_sheet.asset_growth,
-        model.balance_sheet.depreciation_rate,
+        model.balance_sheet.capex_policy.asset_growth,
+        model.balance_sheet.capex_policy.depreciation_rate,
         model.tax_module.income_tax_pct,
         model.income_statement.avg_short_term_interest_pct,
         model.income_statement.avg_long_term_interest_pct,
-        model.cash_budget.avg_maturity_years,
+        model.cash_budget.debt_policy.avg_maturity_years,
     ]
     for param in critical_params:
         assert tf.math.is_finite(tf.cast(param, tf.float64))
@@ -571,6 +585,13 @@ def test_monte_carlo_with_tax_anomalies(mock_forecast_state):
     m = TrainableFinancialModel(
         opex_module=BayesianOpEx(),
         trajectory_simulator=MonteCarloSimulator(n_samples=3),
+        capex_policy=CapexPolicy(),
+        working_capital=WorkingCapitalPolicy(),
+        liquidity_policy=TrendLiquidityPolicy(),
+        dividend_policy=LintnerDividendPolicy(),
+        buyback_policy=BaselineBuybackPolicy(),
+        purchases_policy=TrendCostRatioPolicy(),
+        debt_policy=TrendDebtPolicy(),
         tax_anomalies=tax_data,
     )
     m.base_year = 2018
@@ -610,6 +631,13 @@ def test_tax_anomaly_affects_historical_forecast(mock_forecast_state):
     m = TrainableFinancialModel(
         opex_module=BayesianOpEx(),
         trajectory_simulator=MonteCarloSimulator(n_samples=2),
+        capex_policy=CapexPolicy(),
+        working_capital=WorkingCapitalPolicy(),
+        liquidity_policy=TrendLiquidityPolicy(),
+        dividend_policy=LintnerDividendPolicy(),
+        buyback_policy=BaselineBuybackPolicy(),
+        purchases_policy=TrendCostRatioPolicy(),
+        debt_policy=TrendDebtPolicy(),
         tax_anomalies=tax_data,
     )
     m.base_year = 2018

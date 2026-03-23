@@ -59,6 +59,10 @@ class SimpleTax(tf.Module):
         tax_pred = net_income / (_one / self.income_tax_pct - _one)
         return tf.reduce_mean(tf.square((observed_tax - tax_pred) / loss_scale))
 
+    def print_summary(self):
+        """Print learned parameters."""
+        print(f"Final %IT: {self.income_tax_pct.numpy():.5f}")
+
 
 class TaxWithAnomalies(SimpleTax):
     """Extends SimpleTax with one-time tax anomaly support.

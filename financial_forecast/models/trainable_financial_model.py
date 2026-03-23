@@ -48,27 +48,52 @@ class TrainableFinancialModel(BaseFinancialModel):
         self,
         opex_module,
         trajectory_simulator,
+        capex_policy,
+        working_capital,
+        liquidity_policy,
+        dividend_policy,
+        buyback_policy,
+        purchases_policy,
+        debt_policy,
         tax_anomalies=None,
         name=None,
     ):
         """Create a new trainable financial model.
 
         Args:
-            opex_module: OpEx module instance (``SimpleOpEx`` or
-                ``BayesianOpEx``).
-            simulator: Trajectory simulator instance
+            opex_module: OpEx module (``SimpleOpEx`` or ``BayesianOpEx``).
+            trajectory_simulator: Trajectory simulator
                 (``DeterministicSimulator`` or ``MonteCarloSimulator``).
-            tax_anomalies: Optional 1-D tensor of one-time tax payment
-                amounts in USD.  If ``None``, uses :class:`SimpleTax`;
-                otherwise :class:`TaxWithAnomalies`.
+            capex_policy: Capital expenditure policy (``CapexPolicy``).
+            working_capital: Working capital ratios
+                (``WorkingCapitalPolicy``).
+            liquidity_policy: Liquidity allocation
+                (``SimpleLiquidityPolicy`` or ``TrendLiquidityPolicy``).
+            dividend_policy: Dividend policy
+                (``SimpleDividendPolicy`` or ``LintnerDividendPolicy``).
+            buyback_policy: Buyback policy
+                (``SimpleBuybackPolicy`` or ``BaselineBuybackPolicy``).
+            purchases_policy: Purchases/cost ratio
+                (``StaticCostRatioPolicy`` or ``TrendCostRatioPolicy``).
+            debt_policy: Debt financing policy
+                (``SimpleDebtPolicy`` or ``TrendDebtPolicy``).
+            tax_anomalies: Optional dict of one-time tax amounts by year.
+                If ``None``, uses ``SimpleTax``.
             name: Optional name for the underlying ``tf.Module``.
         """
         self.amount_scale = None
         self.base_year = None
         self.opex_module = opex_module
-        self.balance_sheet = BalanceSheetModel()
+        self.balance_sheet = BalanceSheetModel(
+            capex_policy=capex_policy,
+            working_capital=working_capital,
+            liquidity_policy=liquidity_policy,
+            dividend_policy=dividend_policy,
+            buyback_policy=buyback_policy,
+            purchases_policy=purchases_policy,
+        )
         self.income_statement = IncomeStatementModel()
-        self.cash_budget = CashBudgetModel()
+        self.cash_budget = CashBudgetModel(debt_policy=debt_policy)
         self.trajectory_simulator = trajectory_simulator
         if tax_anomalies is not None:
             self.tax_module = TaxWithAnomalies(tax_anomalies)

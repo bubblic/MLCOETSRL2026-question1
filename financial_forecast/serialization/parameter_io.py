@@ -1,179 +1,57 @@
-"""Save and load Bayesian financial model parameters to/from .npz files.
-
-All serialization logic is concentrated here so the model class stays
-focused on forecasting.  The functions operate on any object that exposes
-the expected parameter attributes (duck-typed), keeping the dependency
-one-directional: ``serialization → models/base``, never upward.
-"""
+"""Save and load model parameters to/from .npz files."""
 
 import os
 
 import numpy as np
 
 
-def save_parameters(model, path: str) -> None:
-    """Serialize every learnable parameter to a NumPy ``.npz`` archive.
+def _save_module_params(params, module, prefix=""):
+    """Save all trainable variables from a tf.Module."""
+    for var in module.trainable_variables:
+        key = prefix + var.name.split(":")[0].replace("/", "_")
+        params[key] = float(var.numpy())
+    # Also save non-trainable variables that are needed
+    for var in module.variables:
+        if not var.trainable:
+            key = prefix + var.name.split(":")[0].replace("/", "_")
+            params[key] = float(var.numpy())
 
-    Args:
-        model: A trained model instance whose attributes will be read.
-        path: Filesystem path for the output ``.npz`` file.
-    """
-    params = {
-        # Policy parameters
-        "asset_growth": float(model.balance_sheet.asset_growth.numpy()),
-        "asset_maintain": float(model.balance_sheet.asset_maintain.numpy()),
-        "depreciation_rate": float(model.balance_sheet.depreciation_rate.numpy()),
-        "advance_payments_sales_pct": float(
-            model.balance_sheet.advance_payments_sales_pct.numpy()
-        ),
-        "advance_payments_purchases_pct": float(
-            model.balance_sheet.advance_payments_purchases_pct.numpy()
-        ),
-        "account_receivables_pct": float(
-            model.balance_sheet.account_receivables_pct.numpy()
-        ),
-        "account_payables_pct": float(model.balance_sheet.account_payables_pct.numpy()),
-        "inventory_pct": float(model.balance_sheet.inventory_pct.numpy()),
-        "tl_alpha": float(model.balance_sheet.tl_alpha.numpy()),
-        "tl_beta": float(model.balance_sheet.tl_beta.numpy()),
-        "tl_baseline": float(model.balance_sheet.tl_baseline.numpy()),
-        "cash_alpha": float(model.balance_sheet.cash_alpha.numpy()),
-        "cash_beta": float(model.balance_sheet.cash_beta.numpy()),
-        "income_tax_pct": float(model.tax_module.income_tax_pct.numpy()),
-        "dividend_payout_ratio_pct": float(
-            model.balance_sheet.dividend_payout_ratio_pct.numpy()
-        ),
-        "dividend_adjustment_speed": float(
-            model.balance_sheet.dividend_adjustment_speed.numpy()
-        ),
-        "sb_baseline": float(model.balance_sheet.sb_baseline.numpy()),
-        "sb_ratio": float(model.balance_sheet.sb_ratio.numpy()),
-        "cost_ratio_alpha": float(model.balance_sheet.cost_ratio_alpha.numpy()),
-        "cost_ratio_beta": float(model.balance_sheet.cost_ratio_beta.numpy()),
-        "st_debt_alpha": float(model.cash_budget.st_debt_alpha.numpy()),
-        "st_debt_beta": float(model.cash_budget.st_debt_beta.numpy()),
-        # OpEx parameters (type-dependent)
-        "opex_is_stochastic": model.opex_module.is_stochastic,
-    }
-    opex = model.opex_module
-    if opex.is_stochastic:
-        params.update(
-            {
-                "q_var_opex_loc": float(opex.q_var_opex_loc.numpy()),
-                "q_var_opex_scale": float(opex.q_var_opex_scale.numpy()),
-                "q_base_opex_loc": float(opex.q_base_opex_loc.numpy()),
-                "q_base_opex_scale": float(opex.q_base_opex_scale.numpy()),
-                "noise_sigma": float(opex.noise_sigma.numpy()),
-                "sales_offset": float(opex.sales_offset.numpy()),
-            }
-        )
-    else:
-        params.update(
-            {
-                "variable_opex_pct": float(opex.variable_opex_pct.numpy()),
-                "baseline_opex": float(opex.baseline_opex.numpy()),
-            }
-        )
-    params.update(
-        {
-            # Structural parameters
-            "avg_short_term_interest_pct": float(
-                model.income_statement.avg_short_term_interest_pct.numpy()
-            ),
-            "avg_long_term_interest_pct": float(
-                model.income_statement.avg_long_term_interest_pct.numpy()
-            ),
-            "avg_maturity_years": float(model.cash_budget.avg_maturity_years.numpy()),
-            "market_securities_return_pct": float(
-                model.income_statement.market_securities_return_pct.numpy()
-            ),
-            "ef_alpha": float(model.cash_budget.ef_alpha.numpy()),
-            "ef_beta": float(model.cash_budget.ef_beta.numpy()),
-            # Metadata
-            "base_year": model.base_year,
-            "amount_scale": model.amount_scale,
-        }
-    )
+
+def save_parameters(model, path: str) -> None:
+    """Serialize every learnable parameter to a NumPy ``.npz`` archive."""
+    params = {}
+
+    # Save all submodule params via tf.Module variable tracking
+    for var in model.trainable_variables:
+        key = var.name.split(":")[0]
+        params[key] = float(var.numpy())
+
+    # Non-trainable variables (like sales_offset)
+    for var in model.variables:
+        if not var.trainable:
+            key = var.name.split(":")[0]
+            params[key] = float(var.numpy())
+
+    # Metadata
+    params["base_year"] = model.base_year
+    params["amount_scale"] = model.amount_scale
+
     np.savez(path, **params)
 
 
 def load_parameters(model, path: str) -> None:
-    """Restore model parameters from a previously saved ``.npz`` archive.
-
-    Missing keys are assigned sensible defaults for backward compatibility
-    with older parameter files.
-
-    Args:
-        model: A model instance whose attributes will be updated in-place.
-        path: Filesystem path to the ``.npz`` parameter file.
-
-    Raises:
-        FileNotFoundError: If *path* does not exist.
-    """
+    """Restore model parameters from a previously saved ``.npz`` archive."""
     if not os.path.exists(path):
         raise FileNotFoundError(f"Parameter file not found: {path}")
-    data = np.load(path)
+    data = np.load(path, allow_pickle=True)
 
-    # Policy parameters (Layer 1)
-    model.balance_sheet.asset_growth.assign(data["asset_growth"])
-    model.balance_sheet.asset_maintain.assign(data["asset_maintain"])
-    model.balance_sheet.depreciation_rate.assign(data["depreciation_rate"])
-    model.balance_sheet.advance_payments_sales_pct.assign(
-        data["advance_payments_sales_pct"]
-    )
-    model.balance_sheet.advance_payments_purchases_pct.assign(
-        data["advance_payments_purchases_pct"]
-    )
-    model.balance_sheet.account_receivables_pct.assign(data["account_receivables_pct"])
-    model.balance_sheet.account_payables_pct.assign(data["account_payables_pct"])
-    model.balance_sheet.inventory_pct.assign(data["inventory_pct"])
-    model.balance_sheet.tl_alpha.assign(data["tl_alpha"])
-    model.balance_sheet.tl_beta.assign(data["tl_beta"])
-    # .get() with defaults provides backward compat with older parameter files
-    # that predate these parameters.
-    model.balance_sheet.tl_baseline.assign(data.get("tl_baseline", 0.0))
-    model.balance_sheet.cash_alpha.assign(data["cash_alpha"])
-    model.balance_sheet.cash_beta.assign(data["cash_beta"])
-    model.tax_module.income_tax_pct.assign(data["income_tax_pct"])
-    model.balance_sheet.dividend_payout_ratio_pct.assign(
-        data["dividend_payout_ratio_pct"]
-    )
-    model.balance_sheet.dividend_adjustment_speed.assign(
-        data.get("dividend_adjustment_speed", 1.0)
-    )
-    model.balance_sheet.sb_baseline.assign(data.get("sb_baseline", 0.0))
-    model.balance_sheet.sb_ratio.assign(data.get("sb_ratio", 1.0))
-    model.balance_sheet.cost_ratio_alpha.assign(data["cost_ratio_alpha"])
-    model.balance_sheet.cost_ratio_beta.assign(data["cost_ratio_beta"])
-    model.cash_budget.st_debt_alpha.assign(data.get("st_debt_alpha", -1.59))
-    model.cash_budget.st_debt_beta.assign(data.get("st_debt_beta", 0.0))
-
-    # OpEx parameters (type-dependent)
-    opex = model.opex_module
-    if opex.is_stochastic:
-        opex.q_var_opex_loc.assign(data["q_var_opex_loc"])
-        opex.q_var_opex_scale.assign(data["q_var_opex_scale"])
-        opex.q_base_opex_loc.assign(data["q_base_opex_loc"])
-        opex.q_base_opex_scale.assign(data["q_base_opex_scale"])
-        opex.noise_sigma.assign(data["noise_sigma"])
-        opex.sales_offset.assign(data["sales_offset"])
-    else:
-        opex.variable_opex_pct.assign(data.get("variable_opex_pct", 0.0))
-        opex.baseline_opex.assign(data.get("baseline_opex", 0.0))
-
-    # Structural parameters
-    model.income_statement.avg_short_term_interest_pct.assign(
-        data["avg_short_term_interest_pct"]
-    )
-    model.income_statement.avg_long_term_interest_pct.assign(
-        data["avg_long_term_interest_pct"]
-    )
-    model.cash_budget.avg_maturity_years.assign(data["avg_maturity_years"])
-    model.income_statement.market_securities_return_pct.assign(
-        data["market_securities_return_pct"]
-    )
-    model.cash_budget.ef_alpha.assign(data["ef_alpha"])
-    model.cash_budget.ef_beta.assign(data["ef_beta"])
+    # Load all variables by name matching
+    all_vars = {v.name.split(":")[0]: v for v in model.variables}
+    for key in data.files:
+        if key in ("base_year", "amount_scale"):
+            continue
+        if key in all_vars:
+            all_vars[key].assign(float(data[key]))
 
     # Metadata
     if "base_year" in data:

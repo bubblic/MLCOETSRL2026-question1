@@ -1,30 +1,41 @@
-"""Run the financial model training and forecast pipeline
-+ Bayesian OpEx model
-+ tax anomalies information.
-
-Wires together TrainableFinancialModel + PolicyTrainer + StructuralTrainer
-and runs the full pipeline (train, Monte Carlo forecast, plot).
+"""Run the financial model with BayesianOpEx + tax anomalies + all advanced policies.
 
 Usage:
-    python run_trainable_model_forecast_w_bayesian_opex_taxanomaly.py
+    python run_trainable_model_forecast_w_bayesianopex_taxanomaly.py
 """
 
 from financial_forecast.data.loader import HistoricalDataLoader
 from financial_forecast.models.trainable_financial_model import TrainableFinancialModel
 from financial_forecast.models.opex import BayesianOpEx
 from financial_forecast.inference.trajectory_simulator import MonteCarloSimulator
+from financial_forecast.models.liquidity import TrendLiquidityPolicy
+from financial_forecast.models.dividends import LintnerDividendPolicy
+from financial_forecast.models.buyback import BaselineBuybackPolicy
+from financial_forecast.models.purchases import TrendCostRatioPolicy
+from financial_forecast.models.debt import TrendDebtPolicy
+from financial_forecast.models.capex import CapexPolicy
+from financial_forecast.models.working_capital import WorkingCapitalPolicy
 from financial_forecast.training.policy_trainer import PolicyTrainer
 from financial_forecast.training.structural_trainer import StructuralTrainer
 from financial_forecast.training.pipeline import ForecastPipeline
 
 if __name__ == "__main__":
     historical_data = HistoricalDataLoader(
-        "aapl", include_inflation=True, include_tax_onetime=True
+        "aapl",
+        include_inflation=True,
+        include_tax_onetime=True,
     )
 
     model = TrainableFinancialModel(
         opex_module=BayesianOpEx(),
         trajectory_simulator=MonteCarloSimulator(n_samples=1000),
+        capex_policy=CapexPolicy(),
+        working_capital=WorkingCapitalPolicy(),
+        liquidity_policy=TrendLiquidityPolicy(),
+        dividend_policy=LintnerDividendPolicy(),
+        buyback_policy=BaselineBuybackPolicy(),
+        purchases_policy=TrendCostRatioPolicy(),
+        debt_policy=TrendDebtPolicy(),
         tax_anomalies=historical_data.tax_onetime_payments,
     )
 

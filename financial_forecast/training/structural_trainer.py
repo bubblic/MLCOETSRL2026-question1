@@ -176,12 +176,8 @@ class StructuralTrainer(BaseTrainer):
             )
 
         vars_to_train = [
-            model.income_statement.avg_short_term_interest_pct.trainable_variables[0],
-            model.income_statement.avg_long_term_interest_pct.trainable_variables[0],
-            model.cash_budget.avg_maturity_years.trainable_variables[0],
-            model.income_statement.market_securities_return_pct.trainable_variables[0],
-            model.cash_budget.ef_alpha,
-            model.cash_budget.ef_beta,
+            *model.income_statement.trainable_variables,
+            *model.cash_budget.debt_policy.structural_trainable_variables,
         ]
 
         structural_history = {
@@ -342,26 +338,8 @@ class StructuralTrainer(BaseTrainer):
                 print(f"Epoch {i}: Structural Loss={loss_stack[_L_TOTAL].numpy():.4e}")
 
         print("Structural Training Complete.")
-        print(
-            f"Final %AvgSTInt: {model.income_statement.avg_short_term_interest_pct.numpy():.5f}"
-        )
-        print(
-            f"Final %AvgLTInt: {model.income_statement.avg_long_term_interest_pct.numpy():.5f}"
-        )
-        print(f"Final AvgM: {model.cash_budget.avg_maturity_years.numpy():.5f}")
-        print(
-            f"Final %MSReturn: {model.income_statement.market_securities_return_pct.numpy():.5f}"
-        )
-        print(
-            f"Equity Financing % (logit-linear): "
-            f"alpha={model.cash_budget.ef_alpha.numpy():.4f}, "
-            f"beta={model.cash_budget.ef_beta.numpy():.6f}"
-        )
-        print(
-            f"  => %EF at t=0: {tf.sigmoid(model.cash_budget.ef_alpha).numpy():.4f}, "
-            f"%EF at t={num_transitions}: "
-            f"{tf.sigmoid(model.cash_budget.ef_alpha + model.cash_budget.ef_beta * num_transitions).numpy():.4f}"
-        )
+        model.income_statement.print_summary()
+        model.cash_budget.debt_policy.print_summary(num_transitions + 1)
         print("-" * 50)
 
         plot_structural_diagnostics(structural_history, show_plot)

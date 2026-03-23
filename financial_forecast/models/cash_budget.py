@@ -1,66 +1,34 @@
-"""Cash budget model — liquidity management and financing decisions.
+"""Cash budget model -- liquidity management and financing decisions.
 
 Implements the five-module Pareja (2009) cash budget: operating,
 investing, external, financing, and owner transactions.
+Delegates debt financing decisions to a pluggable ``DebtPolicy``.
 """
 
 import tensorflow as tf
-import tensorflow_probability as tfp
 
 from financial_forecast.inference.state_index import (
     R_AR, R_AP, R_ADV_PP, R_ADV_PS, R_CASH, R_IMS, R_NCL, R_EQUITY,
 )
 
-tfb = tfp.bijectors
-
 
 class CashBudgetModel(tf.Module):
     """Computes the cash budget and financing decisions.
 
-    Owns short-term debt policy, equity financing mix, and debt
-    maturity parameters.
+    Delegates ST/LT debt and equity financing to a pluggable
+    ``DebtPolicy`` module.
+
+    Args:
+        debt_policy: ``SimpleDebtPolicy`` or ``TrendDebtPolicy``.
     """
 
-    def __init__(self, name="cash_budget"):
+    def __init__(self, debt_policy, name="cash_budget"):
         super().__init__(name=name)
-
-        # --- Short-term debt policy (logit-linear trend) ---
-        self.st_debt_alpha = tf.Variable(
-            -1.59, dtype=tf.float64, name="st_debt_alpha",
-        )
-        self.st_debt_beta = tf.Variable(
-            0.0, dtype=tf.float64, name="st_debt_beta",
-        )
-
-        # --- Equity financing mix (logit-linear trend) ---
-        self.ef_alpha = tf.Variable(-1.73, dtype=tf.float64, name="ef_alpha")
-        self.ef_beta = tf.Variable(0.0, dtype=tf.float64, name="ef_beta")
-
-        # --- Debt maturity ---
-        self.avg_maturity_years = tfp.util.TransformedVariable(
-            initial_value=3.0,
-            bijector=tfb.Chain(
-                [tfb.Shift(tf.constant(1.001, dtype=tf.float64)), tfb.Softplus()]
-            ),
-            dtype=tf.float64, name="avg_maturity_years",
-        )
+        self.debt_policy = debt_policy
 
     def manage_liquidity(self, state, assets, income, sales_t, time_index,
                           balance_sheet):
-        """Compute cash budget and financing decisions.
-
-        Args:
-            state: ``[n_samples, 14]`` recurrent state tensor.
-            assets: Dict from ``BalanceSheetModel.evolve_assets()``.
-            income: Dict from ``IncomeStatementModel.calculate_income()``.
-            sales_t: ``[n_samples]`` sales.
-            time_index: Scalar ``year - base_year``.
-            balance_sheet: ``BalanceSheetModel`` instance (for cross-cutting
-                working capital ratios).
-
-        Returns:
-            Dict with financing decisions.
-        """
+        """Compute cash budget and financing decisions."""
         zero = tf.constant(0.0, dtype=tf.float64)
         ar_prev = state[:, R_AR]
         ap_prev = state[:, R_AP]
@@ -70,14 +38,15 @@ class CashBudgetModel(tf.Module):
         ims_prev = state[:, R_IMS]
 
         # 1. Operating NLB
+        wc = balance_sheet.working_capital
         sales_curr = (
-            sales_t * (1 - balance_sheet.account_receivables_pct) - adv_ps_prev
+            sales_t * (1 - wc.account_receivables_pct) - adv_ps_prev
         )
-        adv_ps_curr = sales_t * balance_sheet.advance_payments_sales_pct
+        adv_ps_curr = sales_t * wc.advance_payments_sales_pct
         inflows = sales_curr + ar_prev + adv_ps_curr
 
         purchases_curr = (
-            assets["purchases_t"] * (1 - balance_sheet.account_payables_pct)
+            assets["purchases_t"] * (1 - wc.account_payables_pct)
             - adv_pp_prev
         )
         outflows = (
@@ -92,18 +61,18 @@ class CashBudgetModel(tf.Module):
         # 3. Return on market securities
         external_investment_nlb = income["ms_return"]
 
-        # 4. Financing: ST debt is policy-driven
-        st_debt_pct = tf.sigmoid(
-            self.st_debt_alpha + self.st_debt_beta * time_index
-        )
-        eff_st_debt_curr = sales_t * st_debt_pct
-
+        # ST liquidity gap
         liquidity_deficit_st = (
             assets["total_liquidity_curr"]
             - (cash_prev + ims_prev)
             - operating_nlb
             + income["principal_st"]
             + income["interest_st"]
+        )
+
+        # 4. Debt policy determines ST debt
+        eff_st_debt_curr = self.debt_policy.compute_st_debt(
+            sales_t, time_index, liquidity_deficit_st,
         )
 
         dividends_prev = assets["dividends_prev"]
@@ -121,10 +90,10 @@ class CashBudgetModel(tf.Module):
         )
         long_term_financing = tf.maximum(zero, liquidity_deficit_lt)
 
-        # Equity-financing mix
-        ef_pct = tf.sigmoid(self.ef_alpha + self.ef_beta * time_index)
-        new_lt_loan = long_term_financing * (1 - ef_pct)
-        equity_financing = long_term_financing * ef_pct
+        # Debt policy determines LT financing mix
+        new_lt_loan, equity_financing = self.debt_policy.compute_financing_mix(
+            long_term_financing, time_index,
+        )
 
         excess_cash_buyback = tf.maximum(zero, -liquidity_deficit_lt)
         stock_buyback = stock_buyback + excess_cash_buyback
@@ -159,26 +128,16 @@ class CashBudgetModel(tf.Module):
 
     def assemble_state(self, state, assets, income, financing,
                         balance_sheet):
-        """Evolve liabilities, check balance sheet, pack output tensors.
-
-        Args:
-            state: ``[n_samples, 14]`` recurrent state tensor.
-            assets: Dict from ``BalanceSheetModel``.
-            income: Dict from ``IncomeStatementModel``.
-            financing: Dict from ``self.manage_liquidity()``.
-            balance_sheet: ``BalanceSheetModel`` instance.
-
-        Returns:
-            Tuple ``(new_state, diagnostics)`` as ``[n_samples, 14]``
-            and ``[n_samples, 27]``.
-        """
+        """Evolve liabilities, check balance sheet, pack output tensors."""
         ncl_prev = state[:, R_NCL]
         equity_prev = state[:, R_EQUITY]
 
-        ap_curr = assets["purchases_t"] * balance_sheet.account_payables_pct
-        total_lt_liabilities = financing["new_lt_loan"] + ncl_prev
-        ncl_curr = total_lt_liabilities * (1 - 1 / self.avg_maturity_years)
-        cur_lt_debt_curr = total_lt_liabilities / self.avg_maturity_years
+        ap_curr = assets["purchases_t"] * balance_sheet.working_capital.account_payables_pct
+
+        # Debt policy evolves LT liabilities
+        ncl_curr, cur_lt_debt_curr = self.debt_policy.evolve_lt_liabilities(
+            financing["new_lt_loan"], ncl_prev,
+        )
 
         equity_curr = (
             equity_prev + financing["equity_financing"] + income["ni_curr"]

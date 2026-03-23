@@ -81,3 +81,9 @@ class IncomeStatementModel(tf.Module):
             "principal_st": principal_st,
             "principal_lt": principal_lt,
         }
+
+    def print_summary(self):
+        """Print learned parameters."""
+        print(f"Final %AvgSTInt: {self.avg_short_term_interest_pct.numpy():.5f}")
+        print(f"Final %AvgLTInt: {self.avg_long_term_interest_pct.numpy():.5f}")
+        print(f"Final %MSReturn: {self.market_securities_return_pct.numpy():.5f}")
