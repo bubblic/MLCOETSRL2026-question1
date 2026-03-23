@@ -8,26 +8,47 @@ Delegates debt financing decisions to a pluggable ``DebtPolicy``.
 import tensorflow as tf
 
 from financial_forecast.inference.state_index import (
-    R_AR, R_AP, R_ADV_PP, R_ADV_PS, R_CASH, R_IMS, R_NCL, R_EQUITY,
+    R_AR,
+    R_AP,
+    R_ADV_PP,
+    R_ADV_PS,
+    R_CASH,
+    R_IMS,
+    R_NCL,
+    R_EQUITY,
+    R_NET_INCOME,
+    R_DIVIDENDS,
 )
 
 
 class CashBudgetModel(tf.Module):
-    """Computes the cash budget and financing decisions.
+    """Computes the cash budget, financing, and owner transaction decisions.
 
-    Delegates ST/LT debt and equity financing to a pluggable
-    ``DebtPolicy`` module.
+    Delegates ST/LT debt to a pluggable ``DebtPolicy``, dividends to a
+    ``DividendPolicy``, and buybacks to a ``BuybackPolicy``.
 
     Args:
         debt_policy: ``SimpleDebtPolicy`` or ``TrendDebtPolicy``.
+        dividend_policy: ``SimpleDividendPolicy`` or ``LintnerDividendPolicy``.
+        buyback_policy: ``SimpleBuybackPolicy`` or ``BaselineBuybackPolicy``.
     """
 
-    def __init__(self, debt_policy, name="cash_budget"):
+    def __init__(
+        self, debt_policy, dividend_policy, buyback_policy, name="cash_budget"
+    ):
         super().__init__(name=name)
         self.debt_policy = debt_policy
+        self.dividend_policy = dividend_policy
+        self.buyback_policy = buyback_policy
 
-    def manage_liquidity(self, state, assets, income, sales_t, time_index,
-                          balance_sheet):
+    def manage_liquidity(
+        self,
+        state,
+        assets,
+        income,
+        sales_t,
+        time_index,
+    ):
         """Compute cash budget and financing decisions."""
         zero = tf.constant(0.0, dtype=tf.float64)
         ar_prev = state[:, R_AR]
@@ -38,20 +59,17 @@ class CashBudgetModel(tf.Module):
         ims_prev = state[:, R_IMS]
 
         # 1. Operating NLB
-        wc = balance_sheet.working_capital
-        sales_curr = (
-            sales_t * (1 - wc.account_receivables_pct) - adv_ps_prev
-        )
-        adv_ps_curr = sales_t * wc.advance_payments_sales_pct
+        sales_curr = sales_t - assets["ar_curr"] - adv_ps_prev
+        adv_ps_curr = assets["adv_ps_curr"]
         inflows = sales_curr + ar_prev + adv_ps_curr
 
-        purchases_curr = (
-            assets["purchases_t"] * (1 - wc.account_payables_pct)
-            - adv_pp_prev
-        )
+        purchases_curr = assets["purchases_t"] - assets["ap_curr"] - adv_pp_prev
         outflows = (
-            purchases_curr + ap_prev + assets["adv_pp_curr"]
-            + income["opex"] + income["tax"]
+            purchases_curr
+            + ap_prev
+            + assets["adv_pp_curr"]
+            + income["opex"]
+            + income["tax"]
         )
         operating_nlb = inflows - outflows
 
@@ -72,11 +90,16 @@ class CashBudgetModel(tf.Module):
 
         # 4. Debt policy determines ST debt
         eff_st_debt_curr = self.debt_policy.compute_st_debt(
-            sales_t, time_index, liquidity_deficit_st,
+            sales_t,
+            time_index,
+            liquidity_deficit_st,
         )
 
-        dividends_prev = assets["dividends_prev"]
-        stock_buyback = assets["stock_buyback_base"]
+        # 5. Transaction with owners
+        ni_prev = state[:, R_NET_INCOME]
+        div_paid_lastyr = state[:, R_DIVIDENDS]
+        dividends_paid_thisyr = self.dividend_policy.compute(ni_prev, div_paid_lastyr)
+        stock_buyback = self.buyback_policy.compute(assets["depreciation"])
 
         liquidity_deficit_lt = (
             liquidity_deficit_st
@@ -85,31 +108,41 @@ class CashBudgetModel(tf.Module):
             - capex_nlb
             + income["principal_lt"]
             + income["interest_lt"]
-            + dividends_prev
+            + dividends_paid_thisyr
             + stock_buyback
         )
         long_term_financing = tf.maximum(zero, liquidity_deficit_lt)
 
         # Debt policy determines LT financing mix
         new_lt_loan, equity_financing = self.debt_policy.compute_financing_mix(
-            long_term_financing, time_index,
+            long_term_financing,
+            time_index,
         )
 
+        # For sales-driven ST loan amount, there could be more borrowing than deficit.
+        # Instead of parking the excess cash in liquidity (which is also policy-driven
+        # with a target), use it to buy back more stocks
         excess_cash_buyback = tf.maximum(zero, -liquidity_deficit_lt)
         stock_buyback = stock_buyback + excess_cash_buyback
 
         financing_nlb = (
-            eff_st_debt_curr + new_lt_loan
-            - income["principal_st"] - income["principal_lt"]
-            - income["interest_st"] - income["interest_lt"]
+            eff_st_debt_curr
+            + new_lt_loan
+            - income["principal_st"]
+            - income["principal_lt"]
+            - income["interest_st"]
+            - income["interest_lt"]
         )
         # 5. Transaction with owners
         transaction_with_owners_nlb = (
-            equity_financing - dividends_prev - stock_buyback
+            equity_financing - dividends_paid_thisyr - stock_buyback
         )
         total_nlb = (
-            operating_nlb + capex_nlb + financing_nlb
-            + external_investment_nlb + transaction_with_owners_nlb
+            operating_nlb
+            + capex_nlb
+            + financing_nlb
+            + external_investment_nlb
+            + transaction_with_owners_nlb
         )
         liquidity_check = (
             (cash_prev + ims_prev) + total_nlb - assets["total_liquidity_curr"]
@@ -120,85 +153,102 @@ class CashBudgetModel(tf.Module):
             "eff_st_debt_curr": eff_st_debt_curr,
             "new_lt_loan": new_lt_loan,
             "equity_financing": equity_financing,
-            "dividends_prev": dividends_prev,
+            "dividends_curr": dividends_paid_thisyr,
             "stock_buyback": stock_buyback,
             "liquidity_deficit_st": liquidity_deficit_st,
             "liquidity_check": liquidity_check,
         }
 
-    def assemble_state(self, state, assets, income, financing,
-                        balance_sheet):
+    def assemble_state(self, state, assets, income, financing):
         """Evolve liabilities, check balance sheet, pack output tensors."""
         ncl_prev = state[:, R_NCL]
         equity_prev = state[:, R_EQUITY]
 
-        ap_curr = assets["purchases_t"] * balance_sheet.working_capital.account_payables_pct
+        ap_curr = assets["ap_curr"]
 
         # Debt policy evolves LT liabilities
         ncl_curr, cur_lt_debt_curr = self.debt_policy.evolve_lt_liabilities(
-            financing["new_lt_loan"], ncl_prev,
+            financing["new_lt_loan"],
+            ncl_prev,
         )
 
         equity_curr = (
-            equity_prev + financing["equity_financing"] + income["ni_curr"]
-            - financing["dividends_prev"] - financing["stock_buyback"]
+            equity_prev
+            + financing["equity_financing"]
+            + income["ni_curr"]
+            - financing["dividends_curr"]
+            - financing["stock_buyback"]
         )
 
         total_assets = (
-            assets["nca_curr"] + assets["adv_pp_curr"] + assets["ar_curr"]
-            + assets["inv_curr"] + assets["cash_curr"] + assets["ims_curr"]
+            assets["nca_curr"]
+            + assets["adv_pp_curr"]
+            + assets["ar_curr"]
+            + assets["inv_curr"]
+            + assets["cash_curr"]
+            + assets["ims_curr"]
         )
         total_liab_equity = (
-            ap_curr + financing["adv_ps_curr"] + financing["eff_st_debt_curr"]
-            + cur_lt_debt_curr + ncl_curr + equity_curr
+            ap_curr
+            + financing["adv_ps_curr"]
+            + financing["eff_st_debt_curr"]
+            + cur_lt_debt_curr
+            + ncl_curr
+            + equity_curr
         )
         check = total_assets - total_liab_equity
 
-        new_state = tf.stack([
-            assets["nca_curr"],
-            assets["adv_pp_curr"],
-            assets["ar_curr"],
-            assets["inv_curr"],
-            assets["cash_curr"],
-            assets["ims_curr"],
-            ap_curr,
-            financing["adv_ps_curr"],
-            financing["eff_st_debt_curr"],
-            cur_lt_debt_curr,
-            ncl_curr,
-            equity_curr,
-            income["ni_curr"],
-            financing["dividends_prev"],
-        ], axis=1)
+        new_state = tf.stack(
+            [
+                assets["nca_curr"],
+                assets["adv_pp_curr"],
+                assets["ar_curr"],
+                assets["inv_curr"],
+                assets["cash_curr"],
+                assets["ims_curr"],
+                ap_curr,
+                financing["adv_ps_curr"],
+                financing["eff_st_debt_curr"],
+                cur_lt_debt_curr,
+                ncl_curr,
+                equity_curr,
+                income["ni_curr"],
+                financing["dividends_curr"],
+            ],
+            axis=1,
+        )
 
-        diagnostics = tf.stack([
-            total_assets,
-            assets["nca_curr"],
-            assets["adv_pp_curr"],
-            assets["ar_curr"],
-            assets["inv_curr"],
-            assets["cash_curr"],
-            assets["ims_curr"],
-            ap_curr,
-            financing["adv_ps_curr"],
-            financing["eff_st_debt_curr"],
-            cur_lt_debt_curr,
-            ncl_curr,
-            equity_curr,
-            income["ni_curr"],
-            assets["depreciation"],
-            income["cogs"],
-            income["opex"],
-            income["tax"],
-            income["ms_return"],
-            income["interest_lt"] + income["interest_st"],
-            financing["dividends_prev"],
-            financing["stock_buyback"],
-            financing["new_lt_loan"],
-            financing["equity_financing"],
-            financing["liquidity_deficit_st"],
-            financing["liquidity_check"],
-            check,
-        ], axis=1)
+        diagnostics = tf.stack(
+            [
+                total_assets,
+                assets["nca_curr"],
+                assets["adv_pp_curr"],
+                assets["ar_curr"],
+                assets["inv_curr"],
+                assets["cash_curr"],
+                assets["ims_curr"],
+                ap_curr,
+                financing["adv_ps_curr"],
+                financing["eff_st_debt_curr"],
+                cur_lt_debt_curr,
+                ncl_curr,
+                equity_curr,
+                income["ni_curr"],
+                assets["depreciation"],
+                income["cogs"],
+                income["opex"],
+                income["tax"],
+                income["ms_return"],
+                income["interest_lt"] + income["interest_st"],
+                financing["dividends_curr"],
+                financing["stock_buyback"],
+                financing["new_lt_loan"],
+                financing["equity_financing"],
+                financing["liquidity_deficit_st"],
+                financing["liquidity_check"],
+                check,
+            ],
+            axis=1,
+        )
 
         return new_state, diagnostics

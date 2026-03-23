@@ -88,12 +88,14 @@ class TrainableFinancialModel(BaseFinancialModel):
             capex_policy=capex_policy,
             working_capital=working_capital,
             liquidity_policy=liquidity_policy,
-            dividend_policy=dividend_policy,
-            buyback_policy=buyback_policy,
             purchases_policy=purchases_policy,
         )
         self.income_statement = IncomeStatementModel()
-        self.cash_budget = CashBudgetModel(debt_policy=debt_policy)
+        self.cash_budget = CashBudgetModel(
+            debt_policy=debt_policy,
+            dividend_policy=dividend_policy,
+            buyback_policy=buyback_policy,
+        )
         self.trajectory_simulator = trajectory_simulator
         if tax_anomalies is not None:
             self.tax_module = TaxWithAnomalies(tax_anomalies)
@@ -225,12 +227,10 @@ class TrainableFinancialModel(BaseFinancialModel):
             income,
             sales_t,
             time_index,
-            self.balance_sheet,
         )
         return self.cash_budget.assemble_state(
             state,
             assets,
             income,
             financing,
-            self.balance_sheet,
         )

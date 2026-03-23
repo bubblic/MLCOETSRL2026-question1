@@ -246,13 +246,15 @@ class PolicyTrainer(BaseTrainer):
         def _compiled_train_step():
             with tf.GradientTape() as tape:
                 # Deterministic Losses (MSE on historical ratio targets)
-                loss_growth, loss_depr, prior_loss_am = model.balance_sheet.capex_policy.loss(
-                    delta_nca_true,
-                    depr_true,
-                    sales_aligned_growth,
-                    nca_prev_aligned,
-                    scale_growth,
-                    scale_depr,
+                loss_growth, loss_depr, prior_loss_am = (
+                    model.balance_sheet.capex_policy.loss(
+                        delta_nca_true,
+                        depr_true,
+                        sales_aligned_growth,
+                        nca_prev_aligned,
+                        scale_growth,
+                        scale_depr,
+                    )
                 )
                 loss_adv_ps, loss_adv_pp, loss_ar, loss_ap, loss_inv = (
                     model.balance_sheet.working_capital.loss(
@@ -283,13 +285,13 @@ class PolicyTrainer(BaseTrainer):
                     ni_tensor,
                     scale_tax,
                 )
-                loss_div = model.balance_sheet.dividend_policy.loss(
+                loss_div = model.cash_budget.dividend_policy.loss(
                     ni_prev_aligned,
                     div_true,
                     div_prev_aligned,
                     scale_div,
                 )
-                loss_bb = model.balance_sheet.buyback_policy.loss(
+                loss_bb = model.cash_budget.buyback_policy.loss(
                     bb_tensor,
                     depr_tensor,
                     scale_bb,
@@ -423,8 +425,8 @@ class PolicyTrainer(BaseTrainer):
         n_years = len(historical_sales)
         model.balance_sheet.liquidity_policy.print_summary(n_years)
         model.tax_module.print_summary()
-        model.balance_sheet.dividend_policy.print_summary()
-        model.balance_sheet.buyback_policy.print_summary()
+        model.cash_budget.dividend_policy.print_summary()
+        model.cash_budget.buyback_policy.print_summary()
         model.cash_budget.debt_policy.print_summary(n_years)
         model.balance_sheet.purchases_policy.print_summary(n_years)
         model.opex_module.print_summary()

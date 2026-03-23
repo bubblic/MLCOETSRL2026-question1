@@ -22,29 +22,80 @@ class WorkingCapitalPolicy(tf.Module):
     def __init__(self, name="working_capital"):
         super().__init__(name=name)
         self.advance_payments_sales_pct = tfp.util.TransformedVariable(
-            initial_value=0.0206, bijector=tfb.Softplus(),
-            dtype=tf.float64, name="adv_ps",
+            initial_value=0.0206,
+            bijector=tfb.Softplus(),
+            dtype=tf.float64,
+            name="adv_ps",
         )
         self.advance_payments_purchases_pct = tfp.util.TransformedVariable(
-            initial_value=0.0735, bijector=tfb.Softplus(),
-            dtype=tf.float64, name="adv_pp",
+            initial_value=0.0735,
+            bijector=tfb.Softplus(),
+            dtype=tf.float64,
+            name="adv_pp",
         )
         self.account_receivables_pct = tfp.util.TransformedVariable(
-            initial_value=0.1591, bijector=tfb.Softplus(),
-            dtype=tf.float64, name="ar_pct",
+            initial_value=0.1591,
+            bijector=tfb.Softplus(),
+            dtype=tf.float64,
+            name="ar_pct",
         )
         self.account_payables_pct = tfp.util.TransformedVariable(
-            initial_value=0.3501, bijector=tfb.Softplus(),
-            dtype=tf.float64, name="ap_pct",
+            initial_value=0.3501,
+            bijector=tfb.Softplus(),
+            dtype=tf.float64,
+            name="ap_pct",
         )
         self.inventory_pct = tfp.util.TransformedVariable(
-            initial_value=0.0165, bijector=tfb.Softplus(),
-            dtype=tf.float64, name="inv_pct",
+            initial_value=0.0165,
+            bijector=tfb.Softplus(),
+            dtype=tf.float64,
+            name="inv_pct",
         )
 
-    def loss(self, sales, purchases, adv_ps_actual, adv_pp_actual,
-             ar_actual, ap_actual, inv_actual,
-             scale_adv_ps, scale_adv_pp, scale_ar, scale_ap, scale_inv):
+    def compute_sales_based(self, sales_t):
+        """Compute working capital accounts driven by sales.
+
+        Args:
+            sales_t: ``[n_samples]`` current-period sales.
+
+        Returns:
+            Tuple ``(ar_curr, inv_curr, adv_ps_curr)``.
+        """
+        return (
+            sales_t * self.account_receivables_pct,
+            sales_t * self.inventory_pct,
+            sales_t * self.advance_payments_sales_pct,
+        )
+
+    def compute_purchases_based(self, purchases_t):
+        """Compute working capital accounts driven by purchases.
+
+        Args:
+            purchases_t: ``[n_samples]`` current-period purchases.
+
+        Returns:
+            Tuple ``(ap_curr, adv_pp_curr)``.
+        """
+        return (
+            purchases_t * self.account_payables_pct,
+            purchases_t * self.advance_payments_purchases_pct,
+        )
+
+    def loss(
+        self,
+        sales,
+        purchases,
+        adv_ps_actual,
+        adv_pp_actual,
+        ar_actual,
+        ap_actual,
+        inv_actual,
+        scale_adv_ps,
+        scale_adv_pp,
+        scale_ar,
+        scale_ap,
+        scale_inv,
+    ):
         """MSE losses for all five working capital ratios.
 
         Returns:
@@ -52,8 +103,7 @@ class WorkingCapitalPolicy(tf.Module):
         """
         loss_adv_ps = tf.reduce_mean(
             tf.square(
-                (adv_ps_actual - sales * self.advance_payments_sales_pct)
-                / scale_adv_ps
+                (adv_ps_actual - sales * self.advance_payments_sales_pct) / scale_adv_ps
             )
         )
         loss_adv_pp = tf.reduce_mean(
@@ -63,22 +113,13 @@ class WorkingCapitalPolicy(tf.Module):
             )
         )
         loss_ar = tf.reduce_mean(
-            tf.square(
-                (ar_actual - sales * self.account_receivables_pct)
-                / scale_ar
-            )
+            tf.square((ar_actual - sales * self.account_receivables_pct) / scale_ar)
         )
         loss_ap = tf.reduce_mean(
-            tf.square(
-                (ap_actual - purchases * self.account_payables_pct)
-                / scale_ap
-            )
+            tf.square((ap_actual - purchases * self.account_payables_pct) / scale_ap)
         )
         loss_inv = tf.reduce_mean(
-            tf.square(
-                (inv_actual - sales * self.inventory_pct)
-                / scale_inv
-            )
+            tf.square((inv_actual - sales * self.inventory_pct) / scale_inv)
         )
         return loss_adv_ps, loss_adv_pp, loss_ar, loss_ap, loss_inv
 

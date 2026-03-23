@@ -207,14 +207,14 @@ def test_save_load_parameters(model, tmp_path):
     model.balance_sheet.capex_policy.asset_growth.assign(
         tf.constant(original_asset_growth + 0.5, dtype=tf.float64)
     )
-    assert float(model.balance_sheet.capex_policy.asset_growth.numpy()) != pytest.approx(
-        original_asset_growth
-    )
+    assert float(
+        model.balance_sheet.capex_policy.asset_growth.numpy()
+    ) != pytest.approx(original_asset_growth)
 
     model.load_parameters(str(save_path))
-    assert float(model.balance_sheet.capex_policy.asset_growth.numpy()) == pytest.approx(
-        original_asset_growth, rel=0.0, abs=1e-12
-    )
+    assert float(
+        model.balance_sheet.capex_policy.asset_growth.numpy()
+    ) == pytest.approx(original_asset_growth, rel=0.0, abs=1e-12)
 
 
 def test_parameter_bounds(model):
@@ -240,8 +240,8 @@ def test_parameter_bounds(model):
 
     sigmoid_params = [
         model.tax_module.income_tax_pct,
-        model.balance_sheet.dividend_policy.dividend_payout_ratio_pct,
-        model.balance_sheet.dividend_policy.dividend_adjustment_speed,
+        model.cash_budget.dividend_policy.dividend_payout_ratio_pct,
+        model.cash_budget.dividend_policy.dividend_adjustment_speed,
     ]
     for param in sigmoid_params:
         value = float(param.numpy())
