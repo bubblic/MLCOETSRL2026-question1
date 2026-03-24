@@ -272,7 +272,7 @@ class PolicyTrainer(BaseTrainer):
                         scale_inv,
                     )
                 )
-                loss_tl, loss_cash = model.balance_sheet.liquidity_policy.loss(
+                loss_tl, loss_cash = model.cash_budget.liquidity_policy.loss(
                     sales_tensor,
                     cash_tensor,
                     ims_tensor,
@@ -423,7 +423,7 @@ class PolicyTrainer(BaseTrainer):
         model.balance_sheet.capex_policy.print_summary()
         model.balance_sheet.working_capital.print_summary()
         n_years = len(historical_sales)
-        model.balance_sheet.liquidity_policy.print_summary(n_years)
+        model.cash_budget.liquidity_policy.print_summary(n_years)
         model.tax_module.print_summary()
         model.cash_budget.dividend_policy.print_summary()
         model.cash_budget.buyback_policy.print_summary()

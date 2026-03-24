@@ -28,25 +28,60 @@ class LiquidityPolicy(tf.Module):
         """
 
 
+class CashTargetPolicy(LiquidityPolicy):
+    """Cash target only: cash = sales * pct. IMS is residual (not a target).
+
+    compute() returns None for ims_target so that excess cash after all flows is
+    invested in market securities instead of being used for additional stock buybacks.
+    """
+
+    def __init__(self, name="cash_target"):
+        super().__init__(name=name)
+        self.cash_target_pct = tfp.util.TransformedVariable(
+            initial_value=0.08,
+            bijector=tfb.Softplus(),
+            dtype=tf.float64,
+            name="cash_target_pct",
+        )
+
+    def compute(self, sales_t, time_index):
+        cash_target = sales_t * self.cash_target_pct
+        return cash_target, cash_target, None
+
+    def loss(self, sales, cash, ims, time_indices, scale_tl, scale_cash):
+        """MSE loss on cash target only; IMS has no target."""
+        loss_cash = tf.reduce_mean(
+            tf.square((cash - sales * self.cash_target_pct) / scale_cash)
+        )
+        return loss_cash, tf.constant(0.0, dtype=tf.float64)
+
+    def print_summary(self, n_years):
+        print(f"Cash Target %: {self.cash_target_pct.numpy():.5f}")
+
+
 class SimpleLiquidityPolicy(LiquidityPolicy):
     """Static percentage liquidity: total_liq = sales * pct."""
 
     def __init__(self, name="simple_liquidity"):
         super().__init__(name=name)
         self.total_liquidity_pct = tfp.util.TransformedVariable(
-            initial_value=0.16, bijector=tfb.Softplus(),
-            dtype=tf.float64, name="total_liquidity_pct",
+            initial_value=0.16,
+            bijector=tfb.Softplus(),
+            dtype=tf.float64,
+            name="total_liquidity_pct",
         )
         self.cash_pct_of_liquidity = tfp.util.TransformedVariable(
-            initial_value=0.487, bijector=tfb.Sigmoid(),
-            dtype=tf.float64, name="cash_pct_of_liquidity",
+            initial_value=0.487,
+            bijector=tfb.Sigmoid(),
+            dtype=tf.float64,
+            name="cash_pct_of_liquidity",
         )
 
     def compute(self, sales_t, time_index):
-        total_liq = sales_t * self.total_liquidity_pct
-        cash = total_liq * self.cash_pct_of_liquidity
-        ims = total_liq - cash
-        return total_liq, cash, ims
+        total_liq_target = sales_t * self.total_liquidity_pct
+        cash_target = total_liq_target * self.cash_pct_of_liquidity
+        ims_target = total_liq_target - cash_target
+        return total_liq_target, cash_target, ims_target
 
     def print_summary(self, n_years):
         """Print learned liquidity parameters."""
@@ -82,15 +117,16 @@ class TrendLiquidityPolicy(LiquidityPolicy):
 
     def compute(self, sales_t, time_index):
         tl_pct = tf.sigmoid(self.tl_alpha + self.tl_beta * time_index)
-        total_liq = self.tl_baseline + sales_t * tl_pct
+        total_liq_target = self.tl_baseline + sales_t * tl_pct
         cash_pct = tf.sigmoid(self.cash_alpha + self.cash_beta * time_index)
-        cash = total_liq * cash_pct
-        ims = total_liq - cash
-        return total_liq, cash, ims
+        cash_target = total_liq_target * cash_pct
+        ims_target = total_liq_target - cash_target
+        return total_liq_target, cash_target, ims_target
 
     def print_summary(self, n_years):
         """Print learned liquidity parameters."""
         import tensorflow as tf
+
         print(
             f"Total Liquidity (baseline + logit-linear): "
             f"baseline={self.tl_baseline.numpy():.4f}, "
@@ -118,9 +154,7 @@ class TrendLiquidityPolicy(LiquidityPolicy):
         total_liq = cash + ims
         tl_pct_t = tf.sigmoid(self.tl_alpha + self.tl_beta * time_indices)
         loss_tl = tf.reduce_mean(
-            tf.square(
-                (total_liq - (self.tl_baseline + sales * tl_pct_t)) / scale_tl
-            )
+            tf.square((total_liq - (self.tl_baseline + sales * tl_pct_t)) / scale_tl)
         )
         cash_pct_t = tf.sigmoid(self.cash_alpha + self.cash_beta * time_indices)
         loss_cash = tf.reduce_mean(

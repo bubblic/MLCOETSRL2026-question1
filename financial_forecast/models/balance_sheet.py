@@ -1,6 +1,6 @@
 """Balance sheet model -- asset evolution and working capital.
 
-Composes pluggable capex, working capital, liquidity, and purchases modules.
+Composes pluggable capex, working capital, and purchases modules.
 """
 
 import tensorflow as tf
@@ -16,12 +16,11 @@ class BalanceSheetModel(tf.Module):
 
     Delegates asset growth/depreciation to :class:`CapexPolicy`,
     working capital ratios to :class:`WorkingCapitalPolicy`, and
-    liquidity and purchases to pluggable sub-modules.
+    purchases to a pluggable sub-module.
 
     Args:
         capex_policy: Capital expenditure policy module.
         working_capital: Working capital ratio module.
-        liquidity_policy: Liquidity allocation module.
         purchases_policy: Purchases/cost ratio module.
     """
 
@@ -29,7 +28,6 @@ class BalanceSheetModel(tf.Module):
         self,
         capex_policy,
         working_capital,
-        liquidity_policy,
         purchases_policy,
         name="balance_sheet",
     ):
@@ -37,7 +35,6 @@ class BalanceSheetModel(tf.Module):
 
         self.capex_policy = capex_policy
         self.working_capital = working_capital
-        self.liquidity_policy = liquidity_policy
         self.purchases_policy = purchases_policy
 
     def evolve_assets(self, state, sales_t, time_index):
@@ -70,10 +67,6 @@ class BalanceSheetModel(tf.Module):
         )
         ap_curr, adv_pp_curr = self.working_capital.compute_purchases_based(purchases_t)
 
-        total_liquidity_curr, cash_curr, ims_curr = self.liquidity_policy.compute(
-            sales_t, time_index
-        )
-
         return {
             "depreciation": depreciation,
             "capex": capex,
@@ -84,7 +77,4 @@ class BalanceSheetModel(tf.Module):
             "purchases_t": purchases_t,
             "ap_curr": ap_curr,
             "adv_pp_curr": adv_pp_curr,
-            "total_liquidity_curr": total_liquidity_curr,
-            "cash_curr": cash_curr,
-            "ims_curr": ims_curr,
         }

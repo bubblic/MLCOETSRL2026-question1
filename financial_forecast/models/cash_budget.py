@@ -24,19 +24,29 @@ from financial_forecast.inference.state_index import (
 class CashBudgetModel(tf.Module):
     """Computes the cash budget, financing, and owner transaction decisions.
 
-    Delegates ST/LT debt to a pluggable ``DebtPolicy``, dividends to a
-    ``DividendPolicy``, and buybacks to a ``BuybackPolicy``.
+    Delegates liquidity to a ``LiquidityPolicy``, ST/LT debt to a
+    ``DebtPolicy``, dividends to a ``DividendPolicy``, and buybacks
+    to a ``BuybackPolicy``.
 
     Args:
+        liquidity_policy: ``SimpleLiquidityPolicy``, ``TrendLiquidityPolicy``,
+            or ``CashTargetPolicy``. If ims_target == None, excess cash after
+            all flows is invested in market securities instead of additional buybacks.
         debt_policy: ``SimpleDebtPolicy`` or ``TrendDebtPolicy``.
         dividend_policy: ``SimpleDividendPolicy`` or ``LintnerDividendPolicy``.
         buyback_policy: ``SimpleBuybackPolicy`` or ``BaselineBuybackPolicy``.
     """
 
     def __init__(
-        self, debt_policy, dividend_policy, buyback_policy, name="cash_budget"
+        self,
+        liquidity_policy,
+        debt_policy,
+        dividend_policy,
+        buyback_policy,
+        name="cash_budget",
     ):
         super().__init__(name=name)
+        self.liquidity_policy = liquidity_policy
         self.debt_policy = debt_policy
         self.dividend_policy = dividend_policy
         self.buyback_policy = buyback_policy
@@ -79,9 +89,15 @@ class CashBudgetModel(tf.Module):
         # 3. Return on market securities
         external_investment_nlb = income["ms_return"]
 
+        # Liquidity target
+        total_liquidity_target, cash_target, ims_target = self.liquidity_policy.compute(
+            sales_t,
+            time_index,
+        )
+
         # ST liquidity gap
         liquidity_deficit_st = (
-            assets["total_liquidity_curr"]
+            total_liquidity_target
             - (cash_prev + ims_prev)
             - operating_nlb
             + income["principal_st"]
@@ -119,11 +135,10 @@ class CashBudgetModel(tf.Module):
             time_index,
         )
 
-        # For sales-driven ST loan amount, there could be more borrowing than deficit.
-        # Instead of parking the excess cash in liquidity (which is also policy-driven
-        # with a target), use it to buy back more stocks
-        excess_cash_buyback = tf.maximum(zero, -liquidity_deficit_lt)
-        stock_buyback = stock_buyback + excess_cash_buyback
+        if ims_target is not None:
+            # Excess cash from over-borrowing → additional stock buybacks
+            excess_cash_buyback = tf.maximum(zero, -liquidity_deficit_lt)
+            stock_buyback = stock_buyback + excess_cash_buyback
 
         financing_nlb = (
             eff_st_debt_curr
@@ -133,7 +148,6 @@ class CashBudgetModel(tf.Module):
             - income["interest_st"]
             - income["interest_lt"]
         )
-        # 5. Transaction with owners
         transaction_with_owners_nlb = (
             equity_financing - dividends_paid_thisyr - stock_buyback
         )
@@ -144,9 +158,18 @@ class CashBudgetModel(tf.Module):
             + external_investment_nlb
             + transaction_with_owners_nlb
         )
-        liquidity_check = (
-            (cash_prev + ims_prev) + total_nlb - assets["total_liquidity_curr"]
-        )
+
+        # Compute final cash and IMS
+        cash_curr = cash_target
+        # For liquidity policy that only defines cash target, the investment in market securities is from any excess cash beyond cash target.
+        if ims_target is None:
+            # IMS absorbs excess cash after meeting the cash target
+            ending_liquidity = (cash_prev + ims_prev) + total_nlb
+            ims_curr = tf.maximum(zero, ending_liquidity - cash_curr)
+        else:
+            ims_curr = ims_target
+
+        liquidity_check = (cash_prev + ims_prev) + total_nlb - cash_curr - ims_curr
 
         return {
             "adv_ps_curr": adv_ps_curr,
@@ -157,6 +180,8 @@ class CashBudgetModel(tf.Module):
             "stock_buyback": stock_buyback,
             "liquidity_deficit_st": liquidity_deficit_st,
             "liquidity_check": liquidity_check,
+            "cash_curr": cash_curr,
+            "ims_curr": ims_curr,
         }
 
     def assemble_state(self, state, assets, income, financing):
@@ -185,8 +210,8 @@ class CashBudgetModel(tf.Module):
             + assets["adv_pp_curr"]
             + assets["ar_curr"]
             + assets["inv_curr"]
-            + assets["cash_curr"]
-            + assets["ims_curr"]
+            + financing["cash_curr"]
+            + financing["ims_curr"]
         )
         total_liab_equity = (
             ap_curr
@@ -204,8 +229,8 @@ class CashBudgetModel(tf.Module):
                 assets["adv_pp_curr"],
                 assets["ar_curr"],
                 assets["inv_curr"],
-                assets["cash_curr"],
-                assets["ims_curr"],
+                financing["cash_curr"],
+                financing["ims_curr"],
                 ap_curr,
                 financing["adv_ps_curr"],
                 financing["eff_st_debt_curr"],
@@ -225,8 +250,8 @@ class CashBudgetModel(tf.Module):
                 assets["adv_pp_curr"],
                 assets["ar_curr"],
                 assets["inv_curr"],
-                assets["cash_curr"],
-                assets["ims_curr"],
+                financing["cash_curr"],
+                financing["ims_curr"],
                 ap_curr,
                 financing["adv_ps_curr"],
                 financing["eff_st_debt_curr"],

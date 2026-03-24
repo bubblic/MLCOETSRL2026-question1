@@ -87,11 +87,11 @@ class TrainableFinancialModel(BaseFinancialModel):
         self.balance_sheet = BalanceSheetModel(
             capex_policy=capex_policy,
             working_capital=working_capital,
-            liquidity_policy=liquidity_policy,
             purchases_policy=purchases_policy,
         )
         self.income_statement = IncomeStatementModel()
         self.cash_budget = CashBudgetModel(
+            liquidity_policy=liquidity_policy,
             debt_policy=debt_policy,
             dividend_policy=dividend_policy,
             buyback_policy=buyback_policy,
