@@ -50,6 +50,11 @@ class DebtPolicy(tf.Module):
 
     @property
     @abstractmethod
+    def policy_trainable_variables(self):
+        """Variables optimized during policy training (ST debt trends)."""
+
+    @property
+    @abstractmethod
     def structural_trainable_variables(self):
         """Variables optimized during structural training (interest/debt phase)."""
 
@@ -90,6 +95,10 @@ class SimpleDebtPolicy(DebtPolicy):
         ncl_curr = total * (1 - 1 / self.avg_maturity_years)
         cur_lt_debt_curr = total / self.avg_maturity_years
         return ncl_curr, cur_lt_debt_curr
+
+    @property
+    def policy_trainable_variables(self):
+        return []
 
     @property
     def structural_trainable_variables(self):
@@ -142,6 +151,10 @@ class TrendDebtPolicy(DebtPolicy):
         ncl_curr = total * (1 - 1 / self.avg_maturity_years)
         cur_lt_debt_curr = total / self.avg_maturity_years
         return ncl_curr, cur_lt_debt_curr
+
+    @property
+    def policy_trainable_variables(self):
+        return [self.st_debt_alpha, self.st_debt_beta]
 
     @property
     def structural_trainable_variables(self):

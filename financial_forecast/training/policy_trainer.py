@@ -210,7 +210,10 @@ class PolicyTrainer(BaseTrainer):
         vars_to_train = [
             *model.balance_sheet.trainable_variables,
             *model.tax_module.trainable_variables,
-            *model.cash_budget.debt_policy.trainable_variables,
+            *model.cash_budget.liquidity_policy.trainable_variables,
+            *model.cash_budget.debt_policy.policy_trainable_variables,
+            *model.cash_budget.dividend_policy.trainable_variables,
+            *model.cash_budget.buyback_policy.trainable_variables,
             *model.opex_module.trainable_variables,
         ]
 
