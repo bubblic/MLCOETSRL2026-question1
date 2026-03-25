@@ -160,7 +160,7 @@ def plot_simple_policy_diagnostics(
         cr_x = tf.cast(tf.range(n_years), dtype=tf.float64)
         axs[3].set_xlabel("Time Index")
     pp = model.balance_sheet.purchases_policy
-    if hasattr(pp, 'cost_ratio_alpha'):
+    if hasattr(pp, "cost_ratio_alpha"):
         final_logit_cr_pred = pp.cost_ratio_alpha + pp.cost_ratio_beta * time_indices
     else:
         final_logit_cr_pred = tf.zeros_like(time_indices)

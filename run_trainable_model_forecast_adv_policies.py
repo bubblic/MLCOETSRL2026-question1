@@ -21,8 +21,13 @@ from financial_forecast.models.working_capital import WorkingCapitalPolicy
 from financial_forecast.training.policy_trainer import PolicyTrainer
 from financial_forecast.training.structural_trainer import StructuralTrainer
 from financial_forecast.training.pipeline import ForecastPipeline
+import tensorflow as tf
+
 
 if __name__ == "__main__":
+
+    tf.random.set_seed(42)
+
     historical_data = HistoricalDataLoader(
         "aapl",
         include_inflation=True,
