@@ -268,15 +268,15 @@ class ForecastPipeline:
             scale,
         )
 
-        self.model.opex_module.prepare_for_training(
-            scale,
-            self._s["sales"],
-            self._s["opex"],
-            self._d["inflation"],
-        )
-
         # Let the tax module scale its stored data and build year-keyed adjustments
         t = len(d["sales"]) - self.test_years
+
+        self.model.opex_module.prepare_for_training(
+            scale,
+            self._s["sales"][:t],
+            self._s["opex"][:t],
+            self._d["inflation"][:t],
+        )
         training_years = tf.cast(
             tf.range(self.model.base_year, self.model.base_year + t),
             dtype=tf.float64,
