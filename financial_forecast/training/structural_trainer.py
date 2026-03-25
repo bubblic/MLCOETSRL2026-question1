@@ -339,7 +339,7 @@ class StructuralTrainer(BaseTrainer):
 
         print("Structural Training Complete.")
         model.income_statement.print_summary()
-        model.cash_budget.debt_policy.print_summary(num_transitions + 1)
+        model.cash_budget.debt_policy.print_structural_summary(num_transitions + 1)
         print("-" * 50)
 
         plot_structural_diagnostics(structural_history, show_plot)

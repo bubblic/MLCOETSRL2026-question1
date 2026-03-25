@@ -59,8 +59,12 @@ class DebtPolicy(tf.Module):
         """Variables optimized during structural training (interest/debt phase)."""
 
     @abstractmethod
-    def print_summary(self, n_years):
-        """Print learned parameters."""
+    def print_policy_summary(self, n_years):
+        """Print policy-phase parameters."""
+
+    @abstractmethod
+    def print_structural_summary(self, n_years):
+        """Print structural-phase parameters."""
 
 
 class SimpleDebtPolicy(DebtPolicy):
@@ -108,7 +112,10 @@ class SimpleDebtPolicy(DebtPolicy):
         """No ST debt loss for deficit-driven policy."""
         return tf.constant(0.0, dtype=tf.float64)
 
-    def print_summary(self, n_years):
+    def print_policy_summary(self, n_years):
+        pass
+
+    def print_structural_summary(self, n_years):
         print(f"Equity Financing %: {self.equity_financing_pct.numpy():.5f}")
         print(f"Avg Maturity Years: {self.avg_maturity_years.numpy():.4f}")
 
@@ -173,7 +180,7 @@ class TrendDebtPolicy(DebtPolicy):
             tf.square((eff_st_debt - sales * st_debt_pct_pred) / scale)
         )
 
-    def print_summary(self, n_years):
+    def print_policy_summary(self, n_years):
         import tensorflow as tf
         print(
             f"Effective ST Debt % of Sales (logit-linear): "
@@ -186,6 +193,9 @@ class TrendDebtPolicy(DebtPolicy):
             f"%EffSTDebt at t={n_years-1}: "
             f"{tf.sigmoid(self.st_debt_alpha + self.st_debt_beta * (n_years-1)).numpy():.4f}"
         )
+
+    def print_structural_summary(self, n_years):
+        import tensorflow as tf
         print(
             f"Equity Financing (logit-linear): "
             f"alpha={self.ef_alpha.numpy():.4f}, "

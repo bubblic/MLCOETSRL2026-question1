@@ -430,7 +430,7 @@ class PolicyTrainer(BaseTrainer):
         model.tax_module.print_summary()
         model.cash_budget.dividend_policy.print_summary()
         model.cash_budget.buyback_policy.print_summary()
-        model.cash_budget.debt_policy.print_summary(n_years)
+        model.cash_budget.debt_policy.print_policy_summary(n_years)
         model.balance_sheet.purchases_policy.print_summary(n_years)
         model.opex_module.print_summary()
         print("-" * 50)
