@@ -311,7 +311,7 @@ class BayesianOpEx(OpExModule):
         var_opex, base_opex, noise = self._get_step_params(n, use_mean=use_mean)
         return self._compute(sales_t, cum_inflation, var_opex, base_opex, noise)
 
-    def prepare_mc(self, n_samples, n_years):
+    def prepare_mc(self, n_samples, n_years, start_year):
         """Pre-sample all stochastic values for a Monte Carlo forecast.
 
         Stores the samples internally.  The loop body then calls
@@ -320,7 +320,9 @@ class BayesianOpEx(OpExModule):
         Args:
             n_samples: Number of MC trajectories.
             n_years: Number of forecast years.
+            start_year: Calendar year of the first forecast step.
         """
+        self._mc_start_year = tf.constant(start_year, dtype=tf.float64)
         q_var = tfd.Normal(loc=self.q_var_opex_loc, scale=self.q_var_opex_scale)
         q_base = tfd.Normal(loc=self.q_base_opex_loc, scale=self.q_base_opex_scale)
         self._mc_var_opex = q_var.sample([n_samples])
@@ -329,17 +331,18 @@ class BayesianOpEx(OpExModule):
             [n_years, n_samples]
         )
 
-    def compute_mc_step(self, sales_t, cum_inflation, step):
+    def compute_mc_step(self, sales_t, cum_inflation, year):
         """Compute OpEx for one MC forecast step using pre-sampled values.
 
         Args:
             sales_t: ``[n_samples]`` sales tensor.
             cum_inflation: Scalar cumulative inflation factor.
-            step: Integer step index (indexes into pre-sampled noise).
+            year: Scalar float64 calendar year (used to index noise).
 
         Returns:
             ``[n_samples]`` OpEx tensor.
         """
+        step = tf.cast(year - self._mc_start_year, tf.int32)
         return self._compute(
             sales_t,
             cum_inflation,

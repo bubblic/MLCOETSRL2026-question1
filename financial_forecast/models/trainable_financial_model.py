@@ -24,18 +24,33 @@ class TrainableFinancialModel(BaseFinancialModel):
     parameter fitting and ``.npz`` save/load.
     """
 
-    def prepare_for_training(self, years, amount_scale):
-        """Configure data-derived model settings.
+    def prepare(
+        self,
+        financial_statements,
+        inflation=None,
+        test_years=1,
+    ):
+        """Prepare model and configure sub-modules for training.
 
-        Convenience method called by legacy code.  Prefer
-        :meth:`prepare` for new code.
-
-        Args:
-            years: 1-D tensor of fiscal year labels.
-            amount_scale: USD-to-scaled-units conversion factor.
+        Extends :meth:`BaseFinancialModel.prepare` by also calling
+        ``prepare_for_training`` on the OpEx and tax modules.
         """
-        self.base_year = int(years[0])
-        self.amount_scale = amount_scale
+        super().prepare(financial_statements, inflation, test_years)
+
+        s = self._s
+        d = self._d
+        t = len(s["sales"]) - self._test_years
+        train_years = tf.cast(
+            tf.range(self.base_year, self.base_year + t),
+            dtype=tf.float64,
+        )
+        self.opex_module.prepare_for_training(
+            self.amount_scale,
+            s["sales"][:t],
+            s["opex"][:t],
+            d["inflation"][:t],
+        )
+        self.tax_module.prepare_for_training(self.amount_scale, train_years)
 
     # ------------------------------------------------------------------
     # Training

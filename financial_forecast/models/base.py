@@ -84,13 +84,12 @@ class BaseFinancialModel(tf.Module):
     ):
         self.amount_scale = None
         self.base_year = None
-        self.opex_module = opex_module
         self.balance_sheet = BalanceSheetModel(
             capex_policy=capex_policy,
             working_capital=working_capital,
             purchases_policy=purchases_policy,
         )
-        self.income_statement = IncomeStatementModel()
+        self.income_statement = IncomeStatementModel(opex_module=opex_module)
         self.cash_budget = CashBudgetModel(
             liquidity_policy=liquidity_policy,
             debt_policy=debt_policy,
@@ -107,13 +106,14 @@ class BaseFinancialModel(tf.Module):
         self._d: Dict[str, tf.Tensor] = {}
         self._s: Dict[str, tf.Tensor] = {}
         self._initial_state: Optional[Dict[str, tf.Tensor]] = None
-        self._sales_forecast: Optional[tf.Tensor] = None
-        self._cum_inf_forecast: Optional[tf.Tensor] = None
-        self._forecast_years: Optional[tf.Tensor] = None
-        self._sales_forecast_usd: Optional[tf.Tensor] = None
-        self._test_years: int = 1
+        self._test_years: int = 0
 
         super().__init__(name=name)
+
+    @property
+    def opex_module(self):
+        """Convenience accessor for the OpEx module owned by the income statement."""
+        return self.income_statement.opex_module
 
     # ------------------------------------------------------------------
     # Data preparation
@@ -123,26 +123,14 @@ class BaseFinancialModel(tf.Module):
         self,
         financial_statements: Mapping[str, tf.Tensor],
         inflation: Optional[tf.Tensor] = None,
-        forecast_years: int = 10,
-        test_years: int = 1,
-        sales_forecast_usd: Optional[tf.Tensor] = None,
-        inflation_forecast: Optional[tf.Tensor] = None,
+        test_years: int = 0,
     ) -> None:
-        """Ingest historical data and prepare forecast inputs.
-
-        Validates, scales, configures sub-modules, and builds the initial
-        state and forecast drivers that :class:`ForecastPipeline` needs
-        to run trajectories.
+        """Ingest historical data, configure sub-modules, build initial state.
 
         Args:
             financial_statements: Historical financial series in USD.
             inflation: Optional 1-D annual inflation rates.
-            forecast_years: Number of years to forecast.
             test_years: Historical years held out for testing.
-            sales_forecast_usd: Explicit sales forecast (USD), or ``None``
-                to auto-generate from historical trend.
-            inflation_forecast: Explicit inflation forecast, or ``None``
-                to auto-generate.
         """
         raw = dict(financial_statements)
         self._test_years = test_years
@@ -179,60 +167,8 @@ class BaseFinancialModel(tf.Module):
         self.base_year = int(raw["years"][0])
         self.amount_scale = scale
 
-        t = n_hist - test_years
-        self.opex_module.prepare_for_training(
-            scale,
-            self._s["sales"][:t],
-            self._s["opex"][:t],
-            d["inflation"][:t],
-        )
-        training_years = tf.cast(
-            tf.range(self.base_year, self.base_year + t),
-            dtype=tf.float64,
-        )
-        self.tax_module.prepare_for_training(scale, training_years)
-
-        # Forecast drivers
-        if sales_forecast_usd is None:
-            sales = raw["sales"]
-            avg_growth = tf.reduce_mean(sales[1:] - sales[:-1])
-            sales_forecast_usd = tf.constant(
-                [float(sales[-1] + avg_growth * i) for i in range(forecast_years)],
-                dtype=tf.float64,
-            )
-        sales_forecast_usd = tf.constant(sales_forecast_usd, dtype=tf.float64)
-        self._sales_forecast_usd = sales_forecast_usd
-        self._sales_forecast = sales_forecast_usd / scale
-
-        n_fc = int(tf.size(self._sales_forecast))
-        last_hist_year = self.base_year + n_hist - 1
-        self._forecast_years = tf.cast(
-            tf.range(last_hist_year, last_hist_year + n_fc),
-            dtype=tf.float64,
-        )
-
-        if inflation_forecast is None:
-            inf = d["inflation"]
-            if tf.reduce_all(inf == 0.0):
-                inflation_forecast = tf.zeros([n_fc], dtype=tf.float64)
-            else:
-                inflation_forecast = tf.concat(
-                    [
-                        inf[-1:],
-                        tf.fill([n_fc - 1], tf.constant(0.03, dtype=tf.float64)),
-                    ],
-                    axis=0,
-                )
-        inf_fc = tf.constant(inflation_forecast, dtype=tf.float64)
-        if inflation is None:
-            inf_fc = tf.zeros_like(inf_fc)
-
-        cum_inf_hist = tf.math.cumprod(1 + d["inflation"])
-        last_cum_inf = cum_inf_hist[-2]
-        self._cum_inf_forecast = last_cum_inf * tf.math.cumprod(1 + inf_fc)
-
-        # Initial state (second-to-last historical year)
-        self._initial_state = self._build_state_from_index(-2)
+        # Initial state: the year just before the test window
+        self._initial_state = self._build_state_from_index(-(test_years + 1))
 
         # Initialize parameters from historical averages
         self._init_parameters_from_data()
@@ -282,7 +218,12 @@ class BaseFinancialModel(tf.Module):
     # ------------------------------------------------------------------
 
     @tf.function
-    def forecast_step(self, state, inputs, use_mean_opex=False):
+    def forecast_step(
+        self,
+        state,
+        inputs,
+        use_mean_opex=True,
+    ):
         """Advance the financial state by one period (graph-compiled).
 
         Args:
@@ -298,27 +239,31 @@ class BaseFinancialModel(tf.Module):
             0,
         )
         sales_t = tf.reshape(inputs["sales_t"], [1])
-        opex = self.opex_module.predict(
-            sales_t,
-            inputs["cum_inflation"],
-            use_mean=use_mean_opex,
-        )
         _, diagnostics = self.forecast_step_compiled(
             state_tensor,
             sales_t,
             inputs["year"],
-            opex,
+            inputs["cum_inflation"],
+            use_mean_opex,
         )
         return {key: diagnostics[0, i] for i, key in enumerate(DIAGNOSTIC_KEYS)}
 
-    def forecast_step_compiled(self, state, sales_t, year, opex):
+    def forecast_step_compiled(
+        self,
+        state,
+        sales_t,
+        year,
+        cum_inflation,
+        use_mean_opex=True,
+    ):
         """Batched single-period forecast -- single source of truth.
 
         Args:
             state: ``[n_samples, 14]`` recurrent state tensor.
             sales_t: ``[n_samples]`` sales for this period.
             year: Scalar float64 calendar year.
-            opex: ``[n_samples]`` pre-computed operating expenses.
+            cum_inflation: Scalar cumulative inflation factor.
+            use_mean_opex: If ``True``, use deterministic/mean OpEx.
 
         Returns:
             Tuple ``(new_state, diagnostics)``.
@@ -332,9 +277,10 @@ class BaseFinancialModel(tf.Module):
             state,
             assets,
             sales_t,
-            opex,
+            cum_inflation,
             self.tax_module,
             year,
+            use_mean_opex,
         )
         financing = self.cash_budget.manage_liquidity(
             state,

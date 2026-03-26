@@ -1,7 +1,7 @@
-"""Income statement model — COGS, interest, tax, and net income.
+"""Income statement model — COGS, OpEx, interest, tax, and net income.
 
-Owns interest rate and market securities return parameters.
-OpEx and tax are injected as external modules.
+Owns the OpEx module, interest rate parameters, and market securities
+return.  Tax is injected at call time.
 """
 
 import tensorflow as tf
@@ -21,12 +21,14 @@ tfb = tfp.bijectors
 class IncomeStatementModel(tf.Module):
     """Computes the income statement from asset evolution results.
 
-    Owns interest rate and market securities return parameters.
-    Tax computation is delegated to the tax module passed at call time.
+    Owns the OpEx module, interest rate, and market securities return
+    parameters.  Tax computation is delegated to the tax module passed
+    at call time.
     """
 
-    def __init__(self, name="income_statement"):
+    def __init__(self, opex_module, name="income_statement"):
         super().__init__(name=name)
+        self.opex_module = opex_module
 
         self.avg_short_term_interest_pct = tfp.util.TransformedVariable(
             initial_value=0.1,
@@ -60,16 +62,27 @@ class IncomeStatementModel(tf.Module):
             )
         )
 
-    def calculate_income(self, state, assets, sales_t, opex, tax_module, year):
+    def calculate_income(
+        self,
+        state,
+        assets,
+        sales_t,
+        cum_inflation,
+        tax_module,
+        year,
+        use_mean_opex=True,
+    ):
         """Compute income statement.
 
         Args:
             state: ``[n_samples, 14]`` recurrent state tensor.
             assets: Dict from ``BalanceSheetModel.evolve_assets()``.
             sales_t: ``[n_samples]`` sales.
-            opex: ``[n_samples]`` pre-computed operating expenses.
+            cum_inflation: Scalar cumulative inflation factor.
             tax_module: Tax module with ``compute(ebt, year)`` method.
-            year: Scalar calendar year for tax anomaly lookup.
+            year: Scalar calendar year.
+            use_mean_opex: If ``True``, use deterministic/mean OpEx.
+                If ``False``, use pre-sampled MC values.
 
         Returns:
             Dict with income statement items.
@@ -79,6 +92,20 @@ class IncomeStatementModel(tf.Module):
         cur_lt_debt_prev = state[:, R_CUR_LT_DEBT]
         ncl_prev = state[:, R_NCL]
         ims_prev = state[:, R_IMS]
+
+        # OpEx — computed by the owned module
+        if use_mean_opex:
+            opex = self.opex_module.predict(
+                sales_t,
+                cum_inflation,
+                use_mean=True,
+            )
+        else:
+            opex = self.opex_module.compute_mc_step(
+                sales_t,
+                cum_inflation,
+                year,
+            )
 
         cogs = inv_prev + assets["purchases_t"] - assets["inv_curr"]
         ebitda = sales_t - cogs - opex
@@ -107,6 +134,6 @@ class IncomeStatementModel(tf.Module):
 
     def print_summary(self):
         """Print learned parameters."""
-        print(f"Final %AvgSTInt: {self.avg_short_term_interest_pct.numpy():.5f}")
-        print(f"Final %AvgLTInt: {self.avg_long_term_interest_pct.numpy():.5f}")
-        print(f"Final %MSReturn: {self.market_securities_return_pct.numpy():.5f}")
+        print(f"Final %AvgSTInt: " f"{self.avg_short_term_interest_pct.numpy():.5f}")
+        print(f"Final %AvgLTInt: " f"{self.avg_long_term_interest_pct.numpy():.5f}")
+        print(f"Final %MSReturn: " f"{self.market_securities_return_pct.numpy():.5f}")

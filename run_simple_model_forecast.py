@@ -23,6 +23,10 @@ from financial_forecast.models.debt import SimpleDebtPolicy
 from financial_forecast.models.capex import CapexPolicy
 from financial_forecast.models.working_capital import WorkingCapitalPolicy
 from financial_forecast.training.pipeline import ForecastPipeline
+from financial_forecast.inference.forecast_driver_models import (
+    LinearSalesForecast,
+    ConstantInflationForecast,
+)
 
 
 if __name__ == "__main__":
@@ -46,7 +50,16 @@ if __name__ == "__main__":
     model.prepare(
         financial_statements=data.financial_statements,
         inflation=data.inflation,
-        forecast_years=10,
     )
 
-    ForecastPipeline(model).run()
+    ForecastPipeline(
+        model,
+        sales_forecast=LinearSalesForecast(
+            data.financial_statements["sales"],
+            forecast_years=10,
+        ),
+        inflation_forecast=ConstantInflationForecast(
+            data.inflation,
+            forecast_years=10,
+        ),
+    ).run()

@@ -18,6 +18,10 @@ from financial_forecast.models.working_capital import WorkingCapitalPolicy
 from financial_forecast.training.policy_trainer import PolicyTrainer
 from financial_forecast.training.structural_trainer import StructuralTrainer
 from financial_forecast.training.pipeline import ForecastPipeline
+from financial_forecast.inference.forecast_driver_models import (
+    LinearSalesForecast,
+    ConstantInflationForecast,
+)
 import tensorflow as tf
 
 
@@ -45,7 +49,6 @@ if __name__ == "__main__":
     model.prepare(
         financial_statements=data.financial_statements,
         inflation=data.inflation,
-        forecast_years=10,
         test_years=1,
     )
 
@@ -54,7 +57,17 @@ if __name__ == "__main__":
         parameters_save_path="trained_parameters_adv_policies_w_bayesianopex.npz",
     )
 
-    ForecastPipeline(model).run()
+    ForecastPipeline(
+        model,
+        sales_forecast=LinearSalesForecast(
+            data.financial_statements["sales"],
+            forecast_years=10,
+        ),
+        inflation_forecast=ConstantInflationForecast(
+            data.inflation,
+            forecast_years=10,
+        ),
+    ).run()
 
     # Plot OpEx fit diagnostics (Bayesian-specific)
     model.opex_module.plot_fit()

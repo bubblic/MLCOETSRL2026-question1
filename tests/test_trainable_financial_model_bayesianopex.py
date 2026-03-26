@@ -541,12 +541,12 @@ def test_deterministic_equivalence(model, mock_forecast_state):
     for step in range(n_years):
         sales_t = tf.constant([sales_vals[step]], dtype=tf.float64)
         cum_inf = tf.constant(cum_inf_vals[step], dtype=tf.float64)
-        opex = model.opex_module.predict(sales_t, cum_inf, use_mean=True)
         batched_state, diagnostics = model.forecast_step_compiled(
             batched_state,
             sales_t,
             tf.constant(year_vals[step], dtype=tf.float64),
-            opex,
+            cum_inf,
+            use_mean_opex=True,
         )
         compiled_diags.append(diagnostics)
 

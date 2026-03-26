@@ -201,14 +201,11 @@ def test_prepare_sets_model_state():
         "ms_return": tf.constant([5e8] * n, dtype=tf.float64),
     }
 
-    m.prepare(fs, forecast_years=3)
+    m.prepare(fs)
 
     assert m.base_year == 2018
     assert m.amount_scale is not None
     assert m._initial_state is not None
-    assert m._sales_forecast is not None
-    assert m._forecast_years is not None
-    assert len(m._sales_forecast) == 3
 
 
 def test_model_is_not_trainable(model):

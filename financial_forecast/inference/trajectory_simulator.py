@@ -70,28 +70,44 @@ class TrajectorySimulator(ABC):
                 f"{lower_usd:<15.2e} | {upper_usd:<15.2e}"
             )
 
-    def _print_forecast_report(self, trajectories, amount_scale,
-                                forecast_years, n_samples):
+    def _print_forecast_report(
+        self, trajectories, amount_scale, forecast_years, n_samples
+    ):
         """Print summary tables and balance sheet for forecast trajectories."""
         s = self._summarize_trajectories
         s("Net Income", trajectories["net_income"], amount_scale)
         s("Total Assets", trajectories["total_assets"], amount_scale)
         s("Assets: Non-current Assets", trajectories["nca"], amount_scale)
-        s("Assets: Advance Payments (Purchases)",
-          trajectories["advance_payments_purchases"], amount_scale)
-        s("Assets: Accounts Receivable",
-          trajectories["accounts_receivable"], amount_scale)
+        s(
+            "Assets: Advance Payments (Purchases)",
+            trajectories["advance_payments_purchases"],
+            amount_scale,
+        )
+        s(
+            "Assets: Accounts Receivable",
+            trajectories["accounts_receivable"],
+            amount_scale,
+        )
         s("Assets: Inventory", trajectories["inventory"], amount_scale)
         s("Assets: Cash", trajectories["cash"], amount_scale)
-        s("Assets: Investment in Market Securities",
-          trajectories["investment_in_market_securities"], amount_scale)
+        s(
+            "Assets: Investment in Market Securities",
+            trajectories["investment_in_market_securities"],
+            amount_scale,
+        )
         s("Effective ST Debt", trajectories["effective_st_debt"], amount_scale)
-        s("Non-current Liabilities",
-          trajectories["non_current_liabilities"], amount_scale)
+        s(
+            "Non-current Liabilities",
+            trajectories["non_current_liabilities"],
+            amount_scale,
+        )
         s("Equity", trajectories["equity"], amount_scale)
         s("Accounts Payable", trajectories["accounts_payable"], amount_scale)
-        s("Advance Payments (Sales)",
-          trajectories["advance_payments_sales"], amount_scale)
+        s(
+            "Advance Payments (Sales)",
+            trajectories["advance_payments_sales"],
+            amount_scale,
+        )
         s("Depreciation", trajectories["depreciation"], amount_scale)
         s("COGS", trajectories["cogs"], amount_scale)
         s("OpEx", trajectories["opex"], amount_scale)
@@ -100,8 +116,7 @@ class TrajectorySimulator(ABC):
         s("Interest Payment", trajectories["interest_payment"], amount_scale)
         s("Dividends", trajectories["dividends"], amount_scale)
         s("Stock Buyback", trajectories["stock_buyback"], amount_scale)
-        s("Current Portion of LT debt",
-          trajectories["current_lt_debt"], amount_scale)
+        s("Current Portion of LT debt", trajectories["current_lt_debt"], amount_scale)
         s("New Long-Term Loan", trajectories["new_long_term_loan"], amount_scale)
         s("Equity Financing", trajectories["equity_financing"], amount_scale)
 
@@ -118,38 +133,48 @@ class TrajectorySimulator(ABC):
         mean_equity = tf.reduce_mean(trajectories["equity"], axis=0)
         mean_total_liab_equity = mean_total_liabilities + mean_equity
         mean_check = mean_total_assets - mean_total_liab_equity
-        year_labels = [
-            f"FY{int(forecast_years[idx])}" for idx in range(n_years)
-        ]
+        year_labels = [f"FY{int(forecast_years[idx])}" for idx in range(n_years)]
 
         rows = [
             ("ASSETS", None),
-            ("  Non-Current Assets",
-             tf.reduce_mean(trajectories["nca"], axis=0)),
-            ("  Adv Payments (Purch)",
-             tf.reduce_mean(trajectories["advance_payments_purchases"], axis=0)),
-            ("  Accounts Receivable",
-             tf.reduce_mean(trajectories["accounts_receivable"], axis=0)),
-            ("  Inventory",
-             tf.reduce_mean(trajectories["inventory"], axis=0)),
+            ("  Non-Current Assets", tf.reduce_mean(trajectories["nca"], axis=0)),
+            (
+                "  Adv Payments (Purch)",
+                tf.reduce_mean(trajectories["advance_payments_purchases"], axis=0),
+            ),
+            (
+                "  Accounts Receivable",
+                tf.reduce_mean(trajectories["accounts_receivable"], axis=0),
+            ),
+            ("  Inventory", tf.reduce_mean(trajectories["inventory"], axis=0)),
             ("  Cash", tf.reduce_mean(trajectories["cash"], axis=0)),
-            ("  Invest in Mkt Sec",
-             tf.reduce_mean(
-                 trajectories["investment_in_market_securities"], axis=0)),
+            (
+                "  Invest in Mkt Sec",
+                tf.reduce_mean(trajectories["investment_in_market_securities"], axis=0),
+            ),
             ("TOTAL ASSETS", mean_total_assets),
             ("", None),
             ("LIABILITIES", None),
-            ("  Accounts Payable",
-             tf.reduce_mean(trajectories["accounts_payable"], axis=0)),
-            ("  Adv Payments (Sales)",
-             tf.reduce_mean(trajectories["advance_payments_sales"], axis=0)),
-            ("  Effective ST Debt",
-             tf.reduce_mean(trajectories["effective_st_debt"], axis=0)),
-            ("  Current LT Debt",
-             tf.reduce_mean(trajectories["current_lt_debt"], axis=0)),
-            ("  Non-Current Liabilities",
-             tf.reduce_mean(
-                 trajectories["non_current_liabilities"], axis=0)),
+            (
+                "  Accounts Payable",
+                tf.reduce_mean(trajectories["accounts_payable"], axis=0),
+            ),
+            (
+                "  Adv Payments (Sales)",
+                tf.reduce_mean(trajectories["advance_payments_sales"], axis=0),
+            ),
+            (
+                "  Effective ST Debt",
+                tf.reduce_mean(trajectories["effective_st_debt"], axis=0),
+            ),
+            (
+                "  Current LT Debt",
+                tf.reduce_mean(trajectories["current_lt_debt"], axis=0),
+            ),
+            (
+                "  Non-Current Liabilities",
+                tf.reduce_mean(trajectories["non_current_liabilities"], axis=0),
+            ),
             ("TOTAL LIABILITIES", mean_total_liabilities),
             ("", None),
             ("EQUITY", mean_equity),
@@ -157,8 +182,7 @@ class TrajectorySimulator(ABC):
             ("TOTAL LIAB + EQUITY", mean_total_liab_equity),
             ("", None),
             ("INCOME STATEMENT", None),
-            ("  Net Income",
-             tf.reduce_mean(trajectories["net_income"], axis=0)),
+            ("  Net Income", tf.reduce_mean(trajectories["net_income"], axis=0)),
             ("", None),
             ("CHECK: Assets-(L+E)", mean_check),
         ]
@@ -169,10 +193,7 @@ class TrajectorySimulator(ABC):
             f"{label:>{col_width}}" for label in year_labels
         )
         print("\n" + "=" * len(header))
-        print(
-            "FORECAST BALANCE SHEET "
-            "\u2014 Mean across Monte Carlo samples (USD)"
-        )
+        print("FORECAST BALANCE SHEET " "\u2014 Mean across Monte Carlo samples (USD)")
         print("=" * len(header))
         print(header)
         print("-" * len(header))
@@ -187,14 +208,8 @@ class TrajectorySimulator(ABC):
         print("-" * len(header))
 
         max_abs_check = float(tf.reduce_max(tf.abs(mean_check * scale)))
-        print(
-            "\nBalance Sheet Identity Check "
-            "(Assets = Liabilities + Equity):"
-        )
-        print(
-            "  Max absolute mismatch across years (mean): "
-            f"${max_abs_check:,.2f}"
-        )
+        print("\nBalance Sheet Identity Check " "(Assets = Liabilities + Equity):")
+        print("  Max absolute mismatch across years (mean): " f"${max_abs_check:,.2f}")
         if max_abs_check < 1.0:
             print("  PASS: Balance sheet identity holds (mismatch < $1).")
         elif max_abs_check < 1000.0:
@@ -234,7 +249,6 @@ class TrajectorySimulator(ABC):
 class DeterministicSimulator(TrajectorySimulator):
     """Single deterministic trajectory — no sampling.
 
-    Used when ``opex_module.is_stochastic`` is ``False``.
     Runs one trajectory with mean OpEx parameters.
     """
 
@@ -248,10 +262,7 @@ class DeterministicSimulator(TrajectorySimulator):
     ):
         print("\n--- Running Single-Point Forecast (deterministic) ---")
 
-        n_years = len(sales_forecast)
-        model.opex_module.prepare_mc(1, n_years)
         state0 = initial_state_to_batched(initial_state, 1)
-
         sales_arr = tf.cast(sales_forecast, tf.float64)
         cum_inf_arr = tf.cast(cum_inf_forecast, tf.float64)
         years_arr = tf.cast(forecast_years, tf.float64)
@@ -267,16 +278,12 @@ class DeterministicSimulator(TrajectorySimulator):
 
             def body(step, state, diag_ta):
                 sales_t = tf.ones_like(state[:, 0]) * sales_arr[step]
-                opex = model.opex_module.predict(
-                    sales_t,
-                    cum_inf_arr[step],
-                    use_mean=True,
-                )
                 new_state, diagnostics = model.forecast_step_compiled(
                     state,
                     sales_t,
                     years_arr[step],
-                    opex,
+                    cum_inf_arr[step],
+                    use_mean_opex=True,
                 )
                 diag_ta = diag_ta.write(step, diagnostics)
                 return step + 1, new_state, diag_ta
@@ -332,7 +339,8 @@ class MonteCarloSimulator(TrajectorySimulator):
         print(f"\n--- Running Monte Carlo Forecast ({n_samples} samples) ---")
 
         n_years = len(sales_forecast)
-        model.opex_module.prepare_mc(n_samples, n_years)
+        start_year = float(forecast_years[0])
+        model.opex_module.prepare_mc(n_samples, n_years, start_year)
         state0 = initial_state_to_batched(initial_state, n_samples)
 
         sales_arr = tf.cast(sales_forecast, tf.float64)
@@ -350,16 +358,12 @@ class MonteCarloSimulator(TrajectorySimulator):
 
             def body(step, state, diag_ta):
                 sales_t = tf.ones_like(state[:, 0]) * sales_arr[step]
-                opex = model.opex_module.compute_mc_step(
-                    sales_t,
-                    cum_inf_arr[step],
-                    step,
-                )
                 new_state, diagnostics = model.forecast_step_compiled(
                     state,
                     sales_t,
                     years_arr[step],
-                    opex,
+                    cum_inf_arr[step],
+                    use_mean_opex=False,
                 )
                 diag_ta = diag_ta.write(step, diagnostics)
                 return step + 1, new_state, diag_ta
@@ -388,5 +392,3 @@ class MonteCarloSimulator(TrajectorySimulator):
             n_samples,
         )
         return trajectories
-
-
