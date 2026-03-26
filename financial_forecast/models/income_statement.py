@@ -8,7 +8,11 @@ import tensorflow as tf
 import tensorflow_probability as tfp
 
 from financial_forecast.inference.state_index import (
-    R_INV, R_EFF_ST_DEBT, R_CUR_LT_DEBT, R_NCL, R_IMS,
+    R_INV,
+    R_EFF_ST_DEBT,
+    R_CUR_LT_DEBT,
+    R_NCL,
+    R_IMS,
 )
 
 tfb = tfp.bijectors
@@ -25,16 +29,35 @@ class IncomeStatementModel(tf.Module):
         super().__init__(name=name)
 
         self.avg_short_term_interest_pct = tfp.util.TransformedVariable(
-            initial_value=0.6, bijector=tfb.Softplus(),
-            dtype=tf.float64, name="avg_short_term_interest_pct",
+            initial_value=0.1,
+            bijector=tfb.Softplus(),
+            dtype=tf.float64,
+            name="avg_short_term_interest_pct",
         )
         self.avg_long_term_interest_pct = tfp.util.TransformedVariable(
-            initial_value=0.06, bijector=tfb.Softplus(),
-            dtype=tf.float64, name="avg_long_term_interest_pct",
+            initial_value=0.06,
+            bijector=tfb.Softplus(),
+            dtype=tf.float64,
+            name="avg_long_term_interest_pct",
         )
         self.market_securities_return_pct = tfp.util.TransformedVariable(
-            initial_value=0.05, bijector=tfb.Softplus(),
-            dtype=tf.float64, name="market_securities_return_pct",
+            initial_value=0.05,
+            bijector=tfb.Softplus(),
+            dtype=tf.float64,
+            name="market_securities_return_pct",
+        )
+
+    def init_from_data(self, s):
+        """Initialize interest/return rates from historical averages."""
+        _f64 = lambda v: tf.constant(v, dtype=tf.float64)
+        _EPS = 1e-12
+        self.market_securities_return_pct.assign(
+            _f64(
+                max(
+                    _EPS,
+                    float(tf.reduce_mean(s["ms_return"] / tf.maximum(s["ims"], _EPS))),
+                )
+            )
         )
 
     def calculate_income(self, state, assets, sales_t, opex, tax_module, year):

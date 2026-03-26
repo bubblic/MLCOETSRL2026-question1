@@ -59,6 +59,10 @@ class DebtPolicy(tf.Module):
         """Variables optimized during structural training (interest/debt phase)."""
 
     @abstractmethod
+    def init_from_data(self, s):
+        """Initialize parameters from historical averages."""
+
+    @abstractmethod
     def print_policy_summary(self, n_years):
         """Print policy-phase parameters."""
 
@@ -73,20 +77,33 @@ class SimpleDebtPolicy(DebtPolicy):
     def __init__(self, name="simple_debt"):
         super().__init__(name=name)
         self.equity_financing_pct = tfp.util.TransformedVariable(
-            initial_value=0.15, bijector=tfb.Sigmoid(),
-            dtype=tf.float64, name="equity_financing_pct",
+            initial_value=0.15,
+            bijector=tfb.Sigmoid(),
+            dtype=tf.float64,
+            name="equity_financing_pct",
         )
         self.avg_maturity_years = tfp.util.TransformedVariable(
             initial_value=3.0,
             bijector=tfb.Chain(
                 [tfb.Shift(tf.constant(1.001, dtype=tf.float64)), tfb.Softplus()]
             ),
-            dtype=tf.float64, name="avg_maturity_years",
+            dtype=tf.float64,
+            name="avg_maturity_years",
         )
+
+    def init_from_data(self, s):
+        _f64 = lambda v: tf.constant(v, dtype=tf.float64)
+        _EPS = 1e-12
+        total_lt = s["non_current_liabilities"] + s["current_lt_debt"]
+        avg_mat = float(
+            tf.reduce_mean(total_lt / tf.maximum(s["current_lt_debt"], _EPS))
+        )
+        self.avg_maturity_years.assign(_f64(max(1.5, min(avg_mat, 30.0))))
 
     def compute_st_debt(self, sales_t, time_index, liquidity_deficit_st):
         return tf.maximum(
-            tf.constant(0.0, dtype=tf.float64), liquidity_deficit_st,
+            tf.constant(0.0, dtype=tf.float64),
+            liquidity_deficit_st,
         )
 
     def compute_financing_mix(self, long_term_financing, time_index):
@@ -126,10 +143,14 @@ class TrendDebtPolicy(DebtPolicy):
     def __init__(self, name="trend_debt"):
         super().__init__(name=name)
         self.st_debt_alpha = tf.Variable(
-            -1.59, dtype=tf.float64, name="st_debt_alpha",
+            -1.59,
+            dtype=tf.float64,
+            name="st_debt_alpha",
         )
         self.st_debt_beta = tf.Variable(
-            0.0, dtype=tf.float64, name="st_debt_beta",
+            0.0,
+            dtype=tf.float64,
+            name="st_debt_beta",
         )
         self.ef_alpha = tf.Variable(-1.73, dtype=tf.float64, name="ef_alpha")
         self.ef_beta = tf.Variable(0.0, dtype=tf.float64, name="ef_beta")
@@ -138,13 +159,31 @@ class TrendDebtPolicy(DebtPolicy):
             bijector=tfb.Chain(
                 [tfb.Shift(tf.constant(1.001, dtype=tf.float64)), tfb.Softplus()]
             ),
-            dtype=tf.float64, name="avg_maturity_years",
+            dtype=tf.float64,
+            name="avg_maturity_years",
         )
 
-    def compute_st_debt(self, sales_t, time_index, liquidity_deficit_st):
-        st_debt_pct = tf.sigmoid(
-            self.st_debt_alpha + self.st_debt_beta * time_index
+    def init_from_data(self, s):
+        _f64 = lambda v: tf.constant(v, dtype=tf.float64)
+        _EPS = 1e-12
+        import math
+
+        # ST debt as % of sales → logit
+        st_ratio = float(
+            tf.reduce_mean(s["effective_st_debt"] / tf.maximum(s["sales"], _EPS))
         )
+        st_ratio = min(1 - _EPS, max(_EPS, st_ratio))
+        self.st_debt_alpha.assign(math.log(st_ratio / (1 - st_ratio)))
+        self.st_debt_beta.assign(0.0)
+        # avg maturity
+        total_lt = s["non_current_liabilities"] + s["current_lt_debt"]
+        avg_mat = float(
+            tf.reduce_mean(total_lt / tf.maximum(s["current_lt_debt"], _EPS))
+        )
+        self.avg_maturity_years.assign(_f64(max(1.5, min(avg_mat, 30.0))))
+
+    def compute_st_debt(self, sales_t, time_index, liquidity_deficit_st):
+        st_debt_pct = tf.sigmoid(self.st_debt_alpha + self.st_debt_beta * time_index)
         return sales_t * st_debt_pct
 
     def compute_financing_mix(self, long_term_financing, time_index):
@@ -182,6 +221,7 @@ class TrendDebtPolicy(DebtPolicy):
 
     def print_policy_summary(self, n_years):
         import tensorflow as tf
+
         print(
             f"Effective ST Debt % of Sales (logit-linear): "
             f"alpha={self.st_debt_alpha.numpy():.4f}, "
@@ -196,6 +236,7 @@ class TrendDebtPolicy(DebtPolicy):
 
     def print_structural_summary(self, n_years):
         import tensorflow as tf
+
         print(
             f"Equity Financing (logit-linear): "
             f"alpha={self.ef_alpha.numpy():.4f}, "

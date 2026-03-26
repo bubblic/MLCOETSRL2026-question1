@@ -34,6 +34,10 @@ class PurchasesPolicy(tf.Module):
         """Compute MSE loss for cost ratio."""
 
     @abstractmethod
+    def init_from_data(self, s):
+        """Initialize parameters from historical averages."""
+
+    @abstractmethod
     def print_summary(self, n_years):
         """Print learned parameters."""
 
@@ -44,9 +48,17 @@ class StaticCostRatioPolicy(PurchasesPolicy):
     def __init__(self, name="static_cost_ratio"):
         super().__init__(name=name)
         self.cost_ratio = tfp.util.TransformedVariable(
-            initial_value=0.55, bijector=tfb.Sigmoid(),
-            dtype=tf.float64, name="cost_ratio",
+            initial_value=0.55,
+            bijector=tfb.Sigmoid(),
+            dtype=tf.float64,
+            name="cost_ratio",
         )
+
+    def init_from_data(self, s):
+        _f64 = lambda v: tf.constant(v, dtype=tf.float64)
+        _EPS = 1e-12
+        ratio = float(tf.reduce_mean(s["cogs"] / tf.maximum(s["sales"], _EPS)))
+        self.cost_ratio.assign(_f64(min(1 - _EPS, max(_EPS, ratio))))
 
     def compute(self, sales_t, inv_curr, inv_prev, time_index):
         return sales_t * self.cost_ratio + (inv_curr - inv_prev)
@@ -66,11 +78,24 @@ class TrendCostRatioPolicy(PurchasesPolicy):
     def __init__(self, name="trend_cost_ratio"):
         super().__init__(name=name)
         self.cost_ratio_alpha = tf.Variable(
-            0.35, dtype=tf.float64, name="cost_ratio_alpha",
+            0.35,
+            dtype=tf.float64,
+            name="cost_ratio_alpha",
         )
         self.cost_ratio_beta = tf.Variable(
-            -0.05, dtype=tf.float64, name="cost_ratio_beta",
+            -0.05,
+            dtype=tf.float64,
+            name="cost_ratio_beta",
         )
+
+    def init_from_data(self, s):
+        _EPS = 1e-12
+        ratio = float(tf.reduce_mean(s["cogs"] / tf.maximum(s["sales"], _EPS)))
+        ratio = min(1 - _EPS, max(_EPS, ratio))
+        import math
+
+        self.cost_ratio_alpha.assign(math.log(ratio / (1 - ratio)))
+        self.cost_ratio_beta.assign(0.0)
 
     def compute(self, sales_t, inv_curr, inv_prev, time_index):
         cost_ratio_t = tf.sigmoid(
@@ -79,14 +104,13 @@ class TrendCostRatioPolicy(PurchasesPolicy):
         return sales_t * cost_ratio_t + (inv_curr - inv_prev)
 
     def loss(self, sales, cogs, inventory, time_indices, scale):
-        logit_cr_hist = tf.math.log(
-            (cogs / sales) / (1.0 - cogs / sales)
-        )
+        logit_cr_hist = tf.math.log((cogs / sales) / (1.0 - cogs / sales))
         logit_cr_pred = self.cost_ratio_alpha + self.cost_ratio_beta * time_indices
         return tf.reduce_mean(tf.square((logit_cr_hist - logit_cr_pred) / scale))
 
     def print_summary(self, n_years):
         import tensorflow as tf
+
         print(
             f"Cost Ratio (logit-linear): "
             f"alpha={self.cost_ratio_alpha.numpy():.4f}, "

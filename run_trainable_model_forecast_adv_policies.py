@@ -28,7 +28,7 @@ if __name__ == "__main__":
 
     tf.random.set_seed(42)
 
-    historical_data = HistoricalDataLoader(
+    data = HistoricalDataLoader(
         "aapl",
         include_inflation=True,
     )
@@ -45,15 +45,16 @@ if __name__ == "__main__":
         debt_policy=TrendDebtPolicy(),
     )
 
-    ForecastPipeline(
-        model=model,
+    model.prepare(
+        financial_statements=data.financial_statements,
+        inflation=data.inflation,
+        forecast_years=10,
+        test_years=1,
+    )
+
+    model.train(
         trainers=[PolicyTrainer(epochs=25000), StructuralTrainer(epochs=20000)],
-        financial_statements=historical_data.financial_statements,
-        inflation=historical_data.inflation,
-        test_years=1,  # hold out last N years for testing
-        forecast_years=10,  # includes test_years
-        sales_forecast_usd=None,  # default: use linear extrapolation of the historical average annual delta
-        inflation_forecast=None,  # default: 3% inflation
         parameters_save_path="trained_parameters_adv_policies.npz",
-        use_trained_parameters=False,
-    ).run()
+    )
+
+    ForecastPipeline(model).run()

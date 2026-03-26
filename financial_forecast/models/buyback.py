@@ -31,6 +31,10 @@ class BuybackPolicy(tf.Module):
         """Compute MSE loss for buybacks."""
 
     @abstractmethod
+    def init_from_data(self, s):
+        """Initialize parameters from historical averages."""
+
+    @abstractmethod
     def print_summary(self):
         """Print learned parameters."""
 
@@ -41,8 +45,26 @@ class SimpleBuybackPolicy(BuybackPolicy):
     def __init__(self, name="simple_buyback"):
         super().__init__(name=name)
         self.stock_buyback_pct = tfp.util.TransformedVariable(
-            initial_value=7.5, bijector=tfb.Softplus(),
-            dtype=tf.float64, name="stock_buyback_pct",
+            initial_value=7.5,
+            bijector=tfb.Softplus(),
+            dtype=tf.float64,
+            name="stock_buyback_pct",
+        )
+
+    def init_from_data(self, s):
+        _f64 = lambda v: tf.constant(v, dtype=tf.float64)
+        _EPS = 1e-12
+        self.stock_buyback_pct.assign(
+            _f64(
+                max(
+                    _EPS,
+                    float(
+                        tf.reduce_mean(
+                            s["stock_buyback"] / tf.maximum(s["depreciation"], _EPS)
+                        )
+                    ),
+                )
+            )
         )
 
     def compute(self, depreciation):
@@ -63,6 +85,15 @@ class BaselineBuybackPolicy(BuybackPolicy):
         super().__init__(name=name)
         self.sb_baseline = tf.Variable(0.0, dtype=tf.float64, name="sb_baseline")
         self.sb_ratio = tf.Variable(1.0, dtype=tf.float64, name="sb_ratio")
+
+    def init_from_data(self, s):
+        _EPS = 1e-12
+        self.sb_ratio.assign(
+            float(
+                tf.reduce_mean(s["stock_buyback"] / tf.maximum(s["depreciation"], _EPS))
+            )
+        )
+        self.sb_baseline.assign(0.0)
 
     def compute(self, depreciation):
         return self.sb_baseline + self.sb_ratio * depreciation

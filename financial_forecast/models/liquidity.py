@@ -16,6 +16,10 @@ class LiquidityPolicy(tf.Module):
     """Abstract base class for liquidity allocation."""
 
     @abstractmethod
+    def init_from_data(self, s):
+        """Initialize parameters from historical averages."""
+
+    @abstractmethod
     def compute(self, sales_t, time_index):
         """Compute total liquidity, cash, and IMS.
 
@@ -42,6 +46,18 @@ class CashTargetPolicy(LiquidityPolicy):
             bijector=tfb.Softplus(),
             dtype=tf.float64,
             name="cash_target_pct",
+        )
+
+    def init_from_data(self, s):
+        _f64 = lambda v: tf.constant(v, dtype=tf.float64)
+        _EPS = 1e-12
+        self.cash_target_pct.assign(
+            _f64(
+                max(
+                    _EPS,
+                    float(tf.reduce_mean(s["cash"] / tf.maximum(s["sales"], _EPS))),
+                )
+            )
         )
 
     def compute(self, sales_t, time_index):
@@ -75,6 +91,30 @@ class SimpleLiquidityPolicy(LiquidityPolicy):
             bijector=tfb.Sigmoid(),
             dtype=tf.float64,
             name="cash_pct_of_liquidity",
+        )
+
+    def init_from_data(self, s):
+        _f64 = lambda v: tf.constant(v, dtype=tf.float64)
+        _EPS = 1e-12
+        total_liq = s["cash"] + s["ims"]
+        self.total_liquidity_pct.assign(
+            _f64(
+                max(
+                    _EPS,
+                    float(tf.reduce_mean(total_liq / tf.maximum(s["sales"], _EPS))),
+                )
+            )
+        )
+        self.cash_pct_of_liquidity.assign(
+            _f64(
+                min(
+                    1 - _EPS,
+                    max(
+                        _EPS,
+                        float(tf.reduce_mean(s["cash"] / tf.maximum(total_liq, _EPS))),
+                    ),
+                )
+            )
         )
 
     def compute(self, sales_t, time_index):
@@ -114,6 +154,22 @@ class TrendLiquidityPolicy(LiquidityPolicy):
         self.tl_baseline = tf.Variable(0.0, dtype=tf.float64, name="tl_baseline")
         self.cash_alpha = tf.Variable(-0.05, dtype=tf.float64, name="cash_alpha")
         self.cash_beta = tf.Variable(0.0, dtype=tf.float64, name="cash_beta")
+
+    def init_from_data(self, s):
+        _EPS = 1e-12
+        total_liq = s["cash"] + s["ims"]
+        tl_ratio = float(tf.reduce_mean(total_liq / tf.maximum(s["sales"], _EPS)))
+        tl_ratio = min(1 - _EPS, max(_EPS, tl_ratio))
+        cash_ratio = float(tf.reduce_mean(s["cash"] / tf.maximum(total_liq, _EPS)))
+        cash_ratio = min(1 - _EPS, max(_EPS, cash_ratio))
+        # sigmoid(alpha) = ratio → alpha = logit(ratio)
+        import math
+
+        self.tl_alpha.assign(math.log(tl_ratio / (1 - tl_ratio)))
+        self.tl_beta.assign(0.0)
+        self.tl_baseline.assign(0.0)
+        self.cash_alpha.assign(math.log(cash_ratio / (1 - cash_ratio)))
+        self.cash_beta.assign(0.0)
 
     def compute(self, sales_t, time_index):
         tl_pct = tf.sigmoid(self.tl_alpha + self.tl_beta * time_index)

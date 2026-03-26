@@ -1,14 +1,18 @@
-"""Run the financial model with all simple policies.
+"""Run a simple Pareja (2009) balance sheet forecast -- no training.
 
-Uses cash-target liquidity, simple dividends/buybacks, static cost ratio,
-deficit-driven debt, and deterministic OpEx.
+Demonstrates the Cash Budget construction by running a deterministic
+forward simulation with policy parameters set from historical averages.
+No gradient-based optimization is performed; this is a pure forward
+projection of the balance sheet using the Pareja framework equations.
 
 Usage:
-    python run_trainable_model_forecast_simple_policies.py
+    python run_simple_model_forecast.py
 """
 
+import tensorflow as tf
+
 from financial_forecast.data.loader import HistoricalDataLoader
-from financial_forecast.models.trainable_financial_model import TrainableFinancialModel
+from financial_forecast.models.base import BaseFinancialModel
 from financial_forecast.models.opex import SimpleOpEx
 from financial_forecast.inference.trajectory_simulator import DeterministicSimulator
 from financial_forecast.models.liquidity import CashTargetPolicy
@@ -18,22 +22,16 @@ from financial_forecast.models.purchases import StaticCostRatioPolicy
 from financial_forecast.models.debt import SimpleDebtPolicy
 from financial_forecast.models.capex import CapexPolicy
 from financial_forecast.models.working_capital import WorkingCapitalPolicy
-from financial_forecast.training.policy_trainer import PolicyTrainer
-from financial_forecast.training.structural_trainer import StructuralTrainer
 from financial_forecast.training.pipeline import ForecastPipeline
-import tensorflow as tf
 
 
 if __name__ == "__main__":
 
     tf.random.set_seed(42)
 
-    data = HistoricalDataLoader(
-        "aapl",
-        include_inflation=True,
-    )
+    data = HistoricalDataLoader("aapl", include_inflation=True)
 
-    model = TrainableFinancialModel(
+    model = BaseFinancialModel(
         opex_module=SimpleOpEx(),
         trajectory_simulator=DeterministicSimulator(),
         capex_policy=CapexPolicy(),
@@ -49,12 +47,6 @@ if __name__ == "__main__":
         financial_statements=data.financial_statements,
         inflation=data.inflation,
         forecast_years=10,
-        test_years=1,
-    )
-
-    model.train(
-        trainers=[PolicyTrainer(epochs=25000), StructuralTrainer(epochs=20000)],
-        parameters_save_path="trained_parameters_simple_policies.npz",
     )
 
     ForecastPipeline(model).run()

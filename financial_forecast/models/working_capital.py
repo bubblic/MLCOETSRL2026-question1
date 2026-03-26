@@ -123,6 +123,47 @@ class WorkingCapitalPolicy(tf.Module):
         )
         return loss_adv_ps, loss_adv_pp, loss_ar, loss_ap, loss_inv
 
+    def init_from_data(self, s):
+        """Initialize ratios from historical averages."""
+        _f64 = lambda v: tf.constant(v, dtype=tf.float64)
+        _EPS = 1e-12
+        _mr = lambda num, den: max(
+            _EPS, float(tf.reduce_mean(num / tf.maximum(den, _EPS)))
+        )
+        self.advance_payments_sales_pct.assign(
+            _f64(
+                _mr(
+                    s["advance_payments_sales"],
+                    s["sales"],
+                )
+            )
+        )
+        self.advance_payments_purchases_pct.assign(
+            _f64(
+                _mr(
+                    s["advance_payments_purchases"],
+                    s["purchases"],
+                )
+            )
+        )
+        self.account_receivables_pct.assign(
+            _f64(
+                _mr(
+                    s["accounts_receivable"],
+                    s["sales"],
+                )
+            )
+        )
+        self.account_payables_pct.assign(
+            _f64(
+                _mr(
+                    s["accounts_payable"],
+                    s["purchases"],
+                )
+            )
+        )
+        self.inventory_pct.assign(_f64(_mr(s["inventory"], s["sales"])))
+
     def print_summary(self):
         """Print learned parameters."""
         print(f"Final %AdvPS: {self.advance_payments_sales_pct.numpy():.5f}")

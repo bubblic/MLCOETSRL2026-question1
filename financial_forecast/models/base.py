@@ -1,343 +1,351 @@
-"""Abstract base class for all financial forecasting models.
+"""Composable financial forecasting model — Pareja (2009) Cash Budget.
 
-Extracts the shared Pareja (2009) Cash Budget construction logic that is
-common to :class:`SimpleFinancialModel` and :class:`TrainableFinancialModel`.
-Concrete subclasses override ``_initialize_parameters`` to choose between
-fixed ``tf.constant`` values, trainable ``tf.Variable`` values, or Bayesian
-``TransformedVariable`` distributions.
+Provides :class:`BaseFinancialModel`, a concrete model that composes three
+financial statement modules with pluggable policy modules:
 
-Why TensorFlow instead of NumPy?
-    Using TensorFlow primitives (``tf.Tensor``, ``tf.Variable``) enables:
-    - **Automatic differentiation** via ``tf.GradientTape`` for training.
-    - **GPU acceleration** for large-scale Monte Carlo simulations.
-    - **Graph-mode optimization** via ``@tf.function`` for faster execution.
+- :class:`~financial_forecast.models.balance_sheet.BalanceSheetModel`
+- :class:`~financial_forecast.models.income_statement.IncomeStatementModel`
+- :class:`~financial_forecast.models.cash_budget.CashBudgetModel`
+
+All forecast logic lives here.  :class:`TrainableFinancialModel` extends
+this class with training and serialization support.
 """
 
 from __future__ import annotations
 
-from abc import ABC, abstractmethod
-from typing import Any, Dict, Union
+from typing import Dict, Mapping, Optional
 
 import tensorflow as tf
 
-from financial_forecast.types import EconomicInputs, FinancialState
+from financial_forecast.models.balance_sheet import BalanceSheetModel
+from financial_forecast.models.income_statement import IncomeStatementModel
+from financial_forecast.models.cash_budget import CashBudgetModel
+from financial_forecast.models.tax import SimpleTax, TaxWithAnomalies
+from financial_forecast.inference.state_index import RECURRENT_KEYS, DIAGNOSTIC_KEYS
 
 
-class BaseFinancialModel(tf.Module, ABC):
-    """Abstract base class for Pareja (2009) Cash Budget financial models.
+_REQUIRED_KEYS = {
+    "sales",
+    "purchases",
+    "cogs",
+    "nca",
+    "depreciation",
+    "advance_payments_purchases",
+    "accounts_receivable",
+    "accounts_payable",
+    "advance_payments_sales",
+    "cash",
+    "ims",
+    "inventory",
+    "current_liabilities",
+    "non_current_liabilities",
+    "equity",
+    "net_income",
+    "dividends",
+    "stock_buyback",
+    "opex",
+    "tax",
+    "current_lt_debt",
+    "interest_payment",
+    "ms_return",
+}
 
-    Subclasses must implement ``_initialize_parameters`` to set model
-    parameters as either constants, trainable variables, or distributions.
+_SUPPLEMENTAL_KEYS = {"effective_st_debt"}
 
-    The ``forecast_step`` method implements the full single-period forecast
-    pipeline: asset evolution, income statement, liquidity/financing, and
-    final state assembly with balance-sheet identity checks.
+
+class BaseFinancialModel(tf.Module):
+    """Composable Pareja (2009) Cash Budget financial model.
+
+    Accepts pluggable policy modules for CapEx, working capital, liquidity,
+    dividends, buybacks, purchases, debt, OpEx, and tax.  The
+    :meth:`forecast_step` and :meth:`forecast_step_compiled` methods
+    implement the full single-period forecast pipeline used by both
+    forward simulation and gradient-based training.
+
+    Attributes:
+        base_year: The fiscal year corresponding to ``t = 0`` in all
+            logit-linear time-trend parameters.
+        amount_scale: USD-to-scaled-units conversion factor.
     """
 
-    def __init__(self, name: str | None = None):
-        """Initialize the base model.
+    def __init__(
+        self,
+        opex_module,
+        trajectory_simulator,
+        capex_policy,
+        working_capital,
+        liquidity_policy,
+        dividend_policy,
+        buyback_policy,
+        purchases_policy,
+        debt_policy,
+        tax_anomalies=None,
+        name=None,
+    ):
+        self.amount_scale = None
+        self.base_year = None
+        self.opex_module = opex_module
+        self.balance_sheet = BalanceSheetModel(
+            capex_policy=capex_policy,
+            working_capital=working_capital,
+            purchases_policy=purchases_policy,
+        )
+        self.income_statement = IncomeStatementModel()
+        self.cash_budget = CashBudgetModel(
+            liquidity_policy=liquidity_policy,
+            debt_policy=debt_policy,
+            dividend_policy=dividend_policy,
+            buyback_policy=buyback_policy,
+        )
+        self.trajectory_simulator = trajectory_simulator
+        if tax_anomalies is not None:
+            self.tax_module = TaxWithAnomalies(tax_anomalies)
+        else:
+            self.tax_module = SimpleTax()
 
-        Args:
-            name: Optional name for the ``tf.Module``.
-        """
+        # Populated by prepare()
+        self._d: Dict[str, tf.Tensor] = {}
+        self._s: Dict[str, tf.Tensor] = {}
+        self._initial_state: Optional[Dict[str, tf.Tensor]] = None
+        self._sales_forecast: Optional[tf.Tensor] = None
+        self._cum_inf_forecast: Optional[tf.Tensor] = None
+        self._forecast_years: Optional[tf.Tensor] = None
+        self._sales_forecast_usd: Optional[tf.Tensor] = None
+        self._test_years: int = 1
+
         super().__init__(name=name)
-        self._initialize_parameters()
 
-    @abstractmethod
-    def _initialize_parameters(self) -> None:
-        """Initialize model parameters.
+    # ------------------------------------------------------------------
+    # Data preparation
+    # ------------------------------------------------------------------
 
-        Subclasses set attributes like ``self.asset_growth``,
-        ``self.depreciation_rate``, etc.  These may be ``tf.constant``
-        (deterministic), ``tf.Variable`` (trainable), or
-        ``tfp.util.TransformedVariable`` (Bayesian).
-        """
-
-    def forecast_step(
+    def prepare(
         self,
-        state: Union[FinancialState, Dict[str, Any]],
-        inputs: EconomicInputs,
-    ) -> FinancialState:
-        """Perform a single-period financial forecast.
+        financial_statements: Mapping[str, tf.Tensor],
+        inflation: Optional[tf.Tensor] = None,
+        forecast_years: int = 10,
+        test_years: int = 1,
+        sales_forecast_usd: Optional[tf.Tensor] = None,
+        inflation_forecast: Optional[tf.Tensor] = None,
+    ) -> None:
+        """Ingest historical data and prepare forecast inputs.
 
-        Implements the Pareja (2009) Cash Budget construction by:
-        1. Evolving asset accounts based on policy parameters.
-        2. Computing the income statement (COGS, OpEx, interest, tax).
-        3. Determining financing needs via the liquidity budget.
-        4. Assembling the final balance-sheet state with identity checks.
-
-        Args:
-            state: Previous period financial state (t-1).
-            inputs: Economic drivers for the current period (t).
-
-        Returns:
-            ``FinancialState`` for the predicted period.
-        """
-        if isinstance(state, dict):
-            state = FinancialState.from_dict(state)
-
-        assets = self._evolve_assets(state, inputs)
-        income = self._calculate_income_statement(state, inputs, assets)
-        financing = self._manage_liquidity_and_financing(state, inputs, assets, income)
-        return self._assemble_final_state(state, assets, income, financing, inputs)
-
-    def _evolve_assets(
-        self, state: FinancialState, inputs: EconomicInputs
-    ) -> Dict[str, Any]:
-        """Update asset accounts based on sales and growth policy.
+        Validates, scales, configures sub-modules, and builds the initial
+        state and forecast drivers that :class:`ForecastPipeline` needs
+        to run trajectories.
 
         Args:
-            state: Previous period financial state.
-            inputs: Current period economic inputs.
-
-        Returns:
-            Dictionary of updated asset values and intermediate quantities.
+            financial_statements: Historical financial series in USD.
+            inflation: Optional 1-D annual inflation rates.
+            forecast_years: Number of years to forecast.
+            test_years: Historical years held out for testing.
+            sales_forecast_usd: Explicit sales forecast (USD), or ``None``
+                to auto-generate from historical trend.
+            inflation_forecast: Explicit inflation forecast, or ``None``
+                to auto-generate.
         """
-        depr = state.nca * self.depreciation_rate
-        capex = depr + (inputs.sales_t * self.asset_growth)
-        nca_curr = state.nca - depr + capex
+        raw = dict(financial_statements)
+        self._test_years = test_years
 
-        adv_pp_curr = inputs.purchases_t_plus_1 * self.advance_payments_purchases_pct
-        ar_curr = inputs.sales_t * self.account_receivables_pct
-        inv_curr = inputs.sales_t * self.inventory_pct
+        # Validate
+        missing = sorted(_REQUIRED_KEYS.difference(raw.keys()))
+        if missing:
+            raise ValueError(
+                "financial_statements missing required keys: " + ", ".join(missing)
+            )
 
-        total_liq_curr = inputs.sales_t * self.total_liquidity_pct
-        cash_curr = total_liq_curr * self.cash_pct_of_liquidity
-        ims_curr = total_liq_curr * (1 - self.cash_pct_of_liquidity)
+        d = self._d
+        for k in _REQUIRED_KEYS:
+            d[k] = raw[k]
 
+        n_hist = len(d["sales"])
+        d["inflation"] = (
+            inflation if inflation is not None else tf.zeros(n_hist, dtype=tf.float64)
+        )
+        d["effective_st_debt"] = (
+            d["current_liabilities"]
+            - d["accounts_payable"]
+            - d["advance_payments_sales"]
+            - d["current_lt_debt"]
+        )
+
+        # Scale to billions
+        mean_sales = float(tf.reduce_mean(d["sales"]))
+        scale = 10 ** int(tf.math.floor(tf.math.log(mean_sales) / tf.math.log(10.0)))
+        for key in _REQUIRED_KEYS | _SUPPLEMENTAL_KEYS:
+            self._s[key] = d[key] / scale
+
+        # Configure model
+        self.base_year = int(raw["years"][0])
+        self.amount_scale = scale
+
+        t = n_hist - test_years
+        self.opex_module.prepare_for_training(
+            scale,
+            self._s["sales"][:t],
+            self._s["opex"][:t],
+            d["inflation"][:t],
+        )
+        training_years = tf.cast(
+            tf.range(self.base_year, self.base_year + t),
+            dtype=tf.float64,
+        )
+        self.tax_module.prepare_for_training(scale, training_years)
+
+        # Forecast drivers
+        if sales_forecast_usd is None:
+            sales = raw["sales"]
+            avg_growth = tf.reduce_mean(sales[1:] - sales[:-1])
+            sales_forecast_usd = tf.constant(
+                [float(sales[-1] + avg_growth * i) for i in range(forecast_years)],
+                dtype=tf.float64,
+            )
+        sales_forecast_usd = tf.constant(sales_forecast_usd, dtype=tf.float64)
+        self._sales_forecast_usd = sales_forecast_usd
+        self._sales_forecast = sales_forecast_usd / scale
+
+        n_fc = int(tf.size(self._sales_forecast))
+        last_hist_year = self.base_year + n_hist - 1
+        self._forecast_years = tf.cast(
+            tf.range(last_hist_year, last_hist_year + n_fc),
+            dtype=tf.float64,
+        )
+
+        if inflation_forecast is None:
+            inf = d["inflation"]
+            if tf.reduce_all(inf == 0.0):
+                inflation_forecast = tf.zeros([n_fc], dtype=tf.float64)
+            else:
+                inflation_forecast = tf.concat(
+                    [
+                        inf[-1:],
+                        tf.fill([n_fc - 1], tf.constant(0.03, dtype=tf.float64)),
+                    ],
+                    axis=0,
+                )
+        inf_fc = tf.constant(inflation_forecast, dtype=tf.float64)
+        if inflation is None:
+            inf_fc = tf.zeros_like(inf_fc)
+
+        cum_inf_hist = tf.math.cumprod(1 + d["inflation"])
+        last_cum_inf = cum_inf_hist[-2]
+        self._cum_inf_forecast = last_cum_inf * tf.math.cumprod(1 + inf_fc)
+
+        # Initial state (second-to-last historical year)
+        self._initial_state = self._build_state_from_index(-2)
+
+        # Initialize parameters from historical averages
+        self._init_parameters_from_data()
+
+    def _init_parameters_from_data(self) -> None:
+        """Initialize all policy parameters from historical averages.
+
+        Delegates to each sub-module's ``init_from_data(s)`` method.
+        For the simple model this provides the final parameter values;
+        for the trainable model these serve as better starting points
+        for gradient descent.
+        """
+        s = self._s
+        self.balance_sheet.capex_policy.init_from_data(s)
+        self.balance_sheet.working_capital.init_from_data(s)
+        self.balance_sheet.purchases_policy.init_from_data(s)
+        self.cash_budget.liquidity_policy.init_from_data(s)
+        self.cash_budget.dividend_policy.init_from_data(s)
+        self.cash_budget.buyback_policy.init_from_data(s)
+        self.cash_budget.debt_policy.init_from_data(s)
+        self.opex_module.init_from_data(s)
+        self.income_statement.init_from_data(s)
+
+    def _build_state_from_index(self, index: int) -> Dict[str, tf.Tensor]:
+        """Build a state dict from scaled historical data at *index*."""
+        s = self._s
+        f64 = lambda v: tf.constant(float(v), dtype=tf.float64)
         return {
-            "nca": nca_curr,
-            "depreciation": depr,
-            "capex": capex,
-            "advance_payments_purchases": adv_pp_curr,
-            "accounts_receivable": ar_curr,
-            "inventory": inv_curr,
-            "cash": cash_curr,
-            "investment_in_market_securities": ims_curr,
-            "total_liquidity": total_liq_curr,
+            "nca": f64(s["nca"][index]),
+            "advance_payments_purchases": f64(s["advance_payments_purchases"][index]),
+            "accounts_receivable": f64(s["accounts_receivable"][index]),
+            "inventory": f64(s["inventory"][index]),
+            "cash": f64(s["cash"][index]),
+            "investment_in_market_securities": f64(s["ims"][index]),
+            "accounts_payable": f64(s["accounts_payable"][index]),
+            "advance_payments_sales": f64(s["advance_payments_sales"][index]),
+            "effective_st_debt": f64(s["effective_st_debt"][index]),
+            "current_lt_debt": f64(s["current_lt_debt"][index]),
+            "non_current_liabilities": f64(s["non_current_liabilities"][index]),
+            "equity": f64(s["equity"][index]),
+            "net_income": f64(s["net_income"][index]),
+            "dividends": f64(s["dividends"][index]),
         }
 
-    def _calculate_income_statement(
-        self,
-        state: FinancialState,
-        inputs: EconomicInputs,
-        assets: Dict[str, Any],
-    ) -> Dict[str, Any]:
-        """Compute income statement components for the current period.
+    # ------------------------------------------------------------------
+    # Forecast (single-step evolution)
+    # ------------------------------------------------------------------
+
+    @tf.function
+    def forecast_step(self, state, inputs, use_mean_opex=False):
+        """Advance the financial state by one period (graph-compiled).
 
         Args:
-            state: Previous period financial state.
-            inputs: Current period economic inputs.
-            assets: Updated asset values from ``_evolve_assets``.
+            state: Dict at *t-1* with balance-sheet entries.
+            inputs: Dict with ``sales_t``, ``year``, ``cum_inflation``.
+            use_mean_opex: Use posterior mean (no sampling/noise).
 
         Returns:
-            Dictionary of income statement items.
+            Dict mapping output keys to scalar tensors for period *t*.
         """
-        cogs = state.inventory + inputs.purchases_t - assets["inventory"]
-        opex = (
-            self.baseline_opex * inputs.cum_inflation
-            + inputs.sales_t * self.variable_opex_pct
+        state_tensor = tf.expand_dims(
+            tf.stack([tf.cast(state[k], tf.float64) for k in RECURRENT_KEYS]),
+            0,
         )
-        ebitda = inputs.sales_t - cogs - opex
-
-        # Debt servicing based on PREVIOUS debt levels (avoids circularity)
-        prin_lt_due = state.non_current_liabilities / (self.avg_maturity_years - 1)
-        int_lt = (
-            self.avg_long_term_interest_pct
-            * state.non_current_liabilities
-            / (1 - 1 / self.avg_maturity_years)
+        sales_t = tf.reshape(inputs["sales_t"], [1])
+        opex = self.opex_module.predict(
+            sales_t,
+            inputs["cum_inflation"],
+            use_mean=use_mean_opex,
         )
-        prin_st_due = state.current_liabilities - prin_lt_due
-        int_st = self.avg_short_term_interest_pct * prin_st_due
-
-        ms_return = (
-            state.investment_in_market_securities * self.market_securities_return_pct
+        _, diagnostics = self.forecast_step_compiled(
+            state_tensor,
+            sales_t,
+            inputs["year"],
+            opex,
         )
+        return {key: diagnostics[0, i] for i, key in enumerate(DIAGNOSTIC_KEYS)}
 
-        ebt = ebitda - assets["depreciation"] - (int_st + int_lt) + ms_return
-        tax = ebt * self.income_tax_pct
-        ni_curr = ebt - tax
-
-        return {
-            "cogs": cogs,
-            "opex": opex,
-            "ebitda": ebitda,
-            "net_income": ni_curr,
-            "tax": tax,
-            "interest_total": int_st + int_lt,
-            "principal_st": prin_st_due,
-            "principal_lt": prin_lt_due,
-            "ms_return": ms_return,
-            "interest_st": int_st,
-            "interest_lt": int_lt,
-        }
-
-    def _manage_liquidity_and_financing(
-        self,
-        state: FinancialState,
-        inputs: EconomicInputs,
-        assets: Dict[str, Any],
-        income: Dict[str, Any],
-    ) -> Dict[str, Any]:
-        """Determine cash budget and new financing requirements.
-
-        Implements the five-module liquidity budget: operating, investing,
-        financing, owner transactions, and discretionary.
+    def forecast_step_compiled(self, state, sales_t, year, opex):
+        """Batched single-period forecast -- single source of truth.
 
         Args:
-            state: Previous period financial state.
-            inputs: Current period economic inputs.
-            assets: Updated asset values.
-            income: Income statement items.
+            state: ``[n_samples, 14]`` recurrent state tensor.
+            sales_t: ``[n_samples]`` sales for this period.
+            year: Scalar float64 calendar year.
+            opex: ``[n_samples]`` pre-computed operating expenses.
 
         Returns:
-            Dictionary of financing decisions.
+            Tuple ``(new_state, diagnostics)``.
         """
-        adv_sales_curr = inputs.sales_t_plus_1 * self.advance_payments_sales_pct
-        sales_cash_in = (
-            inputs.sales_t * (1 - self.account_receivables_pct)
-            - state.advance_payments_sales
-            + state.accounts_receivable
-            + adv_sales_curr
+        time_index = year - tf.constant(
+            float(self.base_year),
+            dtype=tf.float64,
         )
-
-        purch_cash_out = (
-            inputs.purchases_t * (1 - self.account_payables_pct)
-            - state.advance_payments_purchases
-            + state.accounts_payable
-            + assets["advance_payments_purchases"]
+        assets = self.balance_sheet.evolve_assets(state, sales_t, time_index)
+        income = self.income_statement.calculate_income(
+            state,
+            assets,
+            sales_t,
+            opex,
+            self.tax_module,
+            year,
         )
-        op_outflows = purch_cash_out + income["opex"] + income["tax"]
-        op_nlb = sales_cash_in - op_outflows
-
-        prev_total_liq = state.cash + state.investment_in_market_securities
-        liq_deficit_st = (
-            assets["total_liquidity"]
-            - prev_total_liq
-            - income["ms_return"]
-            - op_nlb
-            + income["principal_st"]
-            + income["interest_st"]
+        financing = self.cash_budget.manage_liquidity(
+            state,
+            assets,
+            income,
+            sales_t,
+            time_index,
         )
-        new_st_loan = tf.maximum(0.0, liq_deficit_st)
-
-        divs = state.net_income * self.dividend_payout_ratio_pct
-        bb = assets["depreciation"] * self.stock_buyback_pct
-
-        liq_deficit_lt = (
-            liq_deficit_st
-            - new_st_loan
-            + assets["capex"]
-            + income["principal_lt"]
-            + income["interest_lt"]
-            + divs
-            + bb
-        )
-
-        lt_fin_needed = tf.maximum(0.0, liq_deficit_lt)
-        equity_fin = lt_fin_needed * self.equity_financing_pct
-        new_lt_loan = lt_fin_needed * (1 - self.equity_financing_pct)
-
-        fin_nlb = (
-            new_st_loan
-            + new_lt_loan
-            - income["principal_st"]
-            - income["principal_lt"]
-            - income["interest_total"]
-        )
-        owners_nlb = equity_fin - divs - bb
-
-        total_nlb = (
-            op_nlb - assets["capex"] + fin_nlb + income["ms_return"] + owners_nlb
-        )
-
-        return {
-            "new_st_loan": new_st_loan,
-            "new_lt_loan": new_lt_loan,
-            "equity_financing": equity_fin,
-            "dividends": divs,
-            "buybacks": bb,
-            "advance_payments_sales": adv_sales_curr,
-            "total_nlb": total_nlb,
-        }
-
-    def _assemble_final_state(
-        self,
-        prev_state: FinancialState,
-        assets: Dict[str, Any],
-        income: Dict[str, Any],
-        financing: Dict[str, Any],
-        inputs: EconomicInputs,
-    ) -> FinancialState:
-        """Assemble the final balance-sheet state with identity checks.
-
-        Args:
-            prev_state: Previous period financial state.
-            assets: Updated asset values.
-            income: Income statement items.
-            financing: Financing decisions.
-            inputs: Current period economic inputs.
-
-        Returns:
-            New ``FinancialState`` with diagnostic check fields.
-        """
-        ap_curr = inputs.purchases_t * self.account_payables_pct
-
-        total_long_term_liabilities = (
-            financing["new_lt_loan"] + prev_state.non_current_liabilities
-        )
-
-        ncl_curr = total_long_term_liabilities * (1 - 1 / self.avg_maturity_years)
-        cl_curr = (
-            financing["new_st_loan"]
-            + total_long_term_liabilities / self.avg_maturity_years
-        )
-
-        equity_curr = (
-            prev_state.equity
-            + financing["equity_financing"]
-            + income["net_income"]
-            - financing["dividends"]
-            - financing["buybacks"]
-        )
-
-        # Balance sheet identity: Assets = Liabilities + Equity
-        total_assets = (
-            assets["nca"]
-            + assets["advance_payments_purchases"]
-            + assets["accounts_receivable"]
-            + assets["inventory"]
-            + assets["cash"]
-            + assets["investment_in_market_securities"]
-        )
-        total_liab_eq = (
-            ap_curr
-            + financing["advance_payments_sales"]
-            + cl_curr
-            + ncl_curr
-            + equity_curr
-        )
-
-        prev_total_liq = prev_state.cash + prev_state.investment_in_market_securities
-        liq_check = prev_total_liq + financing["total_nlb"] - assets["total_liquidity"]
-
-        return FinancialState(
-            nca=assets["nca"],
-            advance_payments_purchases=assets["advance_payments_purchases"],
-            accounts_receivable=assets["accounts_receivable"],
-            inventory=assets["inventory"],
-            cash=assets["cash"],
-            investment_in_market_securities=assets["investment_in_market_securities"],
-            accounts_payable=ap_curr,
-            advance_payments_sales=financing["advance_payments_sales"],
-            current_liabilities=cl_curr,
-            non_current_liabilities=ncl_curr,
-            equity=equity_curr,
-            net_income=income["net_income"],
-            liquidity_check=liq_check,
-            balance_sheet_check=total_assets - total_liab_eq,
-            st_loan_issued=financing["new_st_loan"],
-            lt_loan_issued=financing["new_lt_loan"],
-            st_principal_paid=income["principal_st"],
-            lt_principal_paid=income["principal_lt"],
+        return self.cash_budget.assemble_state(
+            state,
+            assets,
+            income,
+            financing,
         )

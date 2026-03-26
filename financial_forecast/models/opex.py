@@ -81,8 +81,11 @@ class OpExModule(tf.Module):
         """
 
     @abstractmethod
-    def prepare_for_training(self, amount_scale, scaled_sales, scaled_opex,
-                              inflation):
+    def init_from_data(self, s):
+        """Initialize parameters from historical averages."""
+
+    @abstractmethod
+    def prepare_for_training(self, amount_scale, scaled_sales, scaled_opex, inflation):
         """Store data-derived quantities for training and plotting."""
 
     @abstractmethod
@@ -111,16 +114,26 @@ class SimpleOpEx(OpExModule):
     def __init__(self, name="simple_opex"):
         super().__init__(name=name)
         self.variable_opex_pct = tf.Variable(
-            0.0, dtype=tf.float64, name="variable_opex_pct",
+            0.0,
+            dtype=tf.float64,
+            name="variable_opex_pct",
         )
         self.baseline_opex = tf.Variable(
-            0.0, dtype=tf.float64, name="baseline_opex",
+            0.0,
+            dtype=tf.float64,
+            name="baseline_opex",
         )
         self.amount_scale = 1.0
         self._historical_sales_scaled = None
         self._historical_opex_scaled = None
         self._historical_inflation = None
         self._training_history = {"epochs": [], "loss": []}
+
+    def init_from_data(self, s):
+        _EPS = 1e-12
+        self.variable_opex_pct.assign(
+            float(tf.reduce_mean(s["opex"] / tf.maximum(s["sales"], _EPS)))
+        )
 
     def prepare_for_training(self, amount_scale, scaled_sales, scaled_opex, inflation):
         """Store data-derived quantities."""
@@ -156,12 +169,8 @@ class SimpleOpEx(OpExModule):
     def print_summary(self) -> None:
         """Print learned OpEx parameters."""
         s = self.amount_scale
-        print(
-            f"OpEx Variable %: {self.variable_opex_pct.numpy():.4f}"
-        )
-        print(
-            f"OpEx Baseline (USD): {(self.baseline_opex.numpy() * s):.2e}"
-        )
+        print(f"OpEx Variable %: {self.variable_opex_pct.numpy():.4f}")
+        print(f"OpEx Baseline (USD): {(self.baseline_opex.numpy() * s):.2e}")
 
 
 class BayesianOpEx(OpExModule):
@@ -237,6 +246,12 @@ class BayesianOpEx(OpExModule):
             "q_base_opex_scale": [],
             "noise_sigma": [],
         }
+
+    def init_from_data(self, s):
+        _EPS = 1e-12
+        self.q_var_opex_loc.assign(
+            float(tf.reduce_mean(s["opex"] / tf.maximum(s["sales"], _EPS)))
+        )
 
     def prepare_for_training(self, amount_scale, scaled_sales, scaled_opex, inflation):
         """Set data-derived quantities needed for training, inference, and plotting.
@@ -412,6 +427,7 @@ class BayesianOpEx(OpExModule):
     def plot_diagnostics(self, show_plot=False):
         """Plot VI parameter convergence over training epochs."""
         from financial_forecast.training.diagnostics import plot_vi_diagnostics
+
         # Remap to the format expected by the existing plot function
         vi_history = {
             "epochs": self._training_history["epochs"],

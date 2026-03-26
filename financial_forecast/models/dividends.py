@@ -32,6 +32,10 @@ class DividendPolicy(tf.Module):
         """Compute MSE loss for dividends."""
 
     @abstractmethod
+    def init_from_data(self, s):
+        """Initialize parameters from historical averages."""
+
+    @abstractmethod
     def print_summary(self):
         """Print learned parameters."""
 
@@ -42,9 +46,19 @@ class SimpleDividendPolicy(DividendPolicy):
     def __init__(self, name="simple_dividend"):
         super().__init__(name=name)
         self.dividend_payout_ratio_pct = tfp.util.TransformedVariable(
-            initial_value=0.15, bijector=tfb.Sigmoid(),
-            dtype=tf.float64, name="div_pct",
+            initial_value=0.15,
+            bijector=tfb.Sigmoid(),
+            dtype=tf.float64,
+            name="div_pct",
         )
+
+    def init_from_data(self, s):
+        _f64 = lambda v: tf.constant(v, dtype=tf.float64)
+        _EPS = 1e-12
+        ratio = float(
+            tf.reduce_mean(s["dividends"] / tf.maximum(s["net_income"], _EPS))
+        )
+        self.dividend_payout_ratio_pct.assign(_f64(min(1 - _EPS, max(_EPS, ratio))))
 
     def compute(self, ni_prev, div_prev_actual):
         return ni_prev * self.dividend_payout_ratio_pct
@@ -66,13 +80,25 @@ class LintnerDividendPolicy(DividendPolicy):
     def __init__(self, name="lintner_dividend"):
         super().__init__(name=name)
         self.dividend_payout_ratio_pct = tfp.util.TransformedVariable(
-            initial_value=0.15, bijector=tfb.Sigmoid(),
-            dtype=tf.float64, name="div_pct",
+            initial_value=0.15,
+            bijector=tfb.Sigmoid(),
+            dtype=tf.float64,
+            name="div_pct",
         )
         self.dividend_adjustment_speed = tfp.util.TransformedVariable(
-            initial_value=0.01, bijector=tfb.Sigmoid(),
-            dtype=tf.float64, name="div_adj_speed",
+            initial_value=0.01,
+            bijector=tfb.Sigmoid(),
+            dtype=tf.float64,
+            name="div_adj_speed",
         )
+
+    def init_from_data(self, s):
+        _f64 = lambda v: tf.constant(v, dtype=tf.float64)
+        _EPS = 1e-12
+        ratio = float(
+            tf.reduce_mean(s["dividends"] / tf.maximum(s["net_income"], _EPS))
+        )
+        self.dividend_payout_ratio_pct.assign(_f64(min(1 - _EPS, max(_EPS, ratio))))
 
     def compute(self, ni_prev, div_prev_actual):
         dividend_target = ni_prev * self.dividend_payout_ratio_pct
@@ -92,6 +118,4 @@ class LintnerDividendPolicy(DividendPolicy):
 
     def print_summary(self):
         print(f"Final %PR: {self.dividend_payout_ratio_pct.numpy():.5f}")
-        print(
-            f"Final DivAdjSpeed: {self.dividend_adjustment_speed.numpy():.5f}"
-        )
+        print(f"Final DivAdjSpeed: {self.dividend_adjustment_speed.numpy():.5f}")

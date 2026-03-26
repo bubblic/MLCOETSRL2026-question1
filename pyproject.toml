@@ -22,9 +22,7 @@ dev = [
 ]
 
 [project.scripts]
-run-forecast = "scripts.run_forecast:main"
 run-extraction = "scripts.run_extraction:main"
-run-bayesian-forecast = "scripts.run_bayesian_forecast:main"
 
 [tool.setuptools.packages.find]
 include = ["financial_forecast*"]
