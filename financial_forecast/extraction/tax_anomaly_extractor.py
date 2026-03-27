@@ -13,6 +13,7 @@ from typing import Dict, List, Optional
 
 from financial_forecast.extraction.base_pdf_extractor import BasePdfExtractor
 from financial_forecast.clients.azure_llm_client import AzureLLMClient
+import time
 
 
 DEFAULT_SELECTION_QUERY = (
@@ -153,8 +154,9 @@ class TaxAnomalyExtractor(BasePdfExtractor):
                 break
             print(
                 f"  Retry {attempt + 1}/{max_retries}: "
-                f"current_tax_year was null"
+                f"current_tax_year was null, waiting 5s..."
             )
+            time.sleep(5)
 
         return {
             "current_tax_year": response.get("current_tax_year"),
