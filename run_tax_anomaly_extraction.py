@@ -18,6 +18,6 @@ if __name__ == "__main__":
     )
 
     extractor.run(
-        input_path="./annual_reports",
-        output_dir="extracted_text",
+        input_path="./annual_reports/for_tax_anomalies",
+        output_dir="extracted_text/tax_anomalies",
     )

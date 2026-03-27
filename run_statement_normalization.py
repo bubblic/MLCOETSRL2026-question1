@@ -13,7 +13,7 @@ from financial_forecast.extraction.statement_normalizer import StatementNormaliz
 if __name__ == "__main__":
 
     normalizer = StatementNormalizer(
-        input_dir="extracted_text",
+        input_dir="extracted_text/financial_statements",
         output_dir="deepseek_financial_statements",
     )
 

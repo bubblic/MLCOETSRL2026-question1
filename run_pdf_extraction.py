@@ -8,7 +8,9 @@ Usage:
     python run_pdf_extraction.py
 """
 
-from financial_forecast.extraction.financial_statement_extractor import FinancialStatementExtractor
+from financial_forecast.extraction.financial_statement_extractor import (
+    FinancialStatementExtractor,
+)
 from financial_forecast.clients.azure_llm_client import AzureLLMClient
 
 if __name__ == "__main__":
@@ -23,6 +25,6 @@ if __name__ == "__main__":
     )
 
     extractor.run(
-        input_dir="./annual_reports",
-        output_dir="extracted_text",
+        input_dir="./annual_reports/for_financial_statements",
+        output_dir="extracted_text/financial_statements",
     )
