@@ -5,14 +5,18 @@
     25,
     26,
     27,
+    28,
+    29,
+    40,
+    41,
     42,
     43,
     44
   ],
   "extraction": {
     "current_tax_year": 2025,
-    "tax_onetime_amount": null,
-    "tax_onetime_note": null,
+    "tax_onetime_amount": -0.486,
+    "tax_onetime_note": "Impact of the State Aid Decision, which resulted in a one-time income tax benefit (reduction in tax expense) of $486 million in 2025, as per the income tax rate reconciliation table. This is the net current-year effect following the ECJ's 2024 decision that required a $10.2 billion charge in 2024.",
     "amount_scale": 1000000000.0
   }
 }

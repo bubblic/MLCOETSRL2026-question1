@@ -16,8 +16,8 @@
   ],
   "extraction": {
     "current_tax_year": 2020,
-    "tax_onetime_amount": null,
-    "tax_onetime_note": "The effective tax rate for 2020 was lower compared to 2019 due primarily to a one-time adjustment of U.S. foreign tax credits in response to regulations issued by the U.S. Department of the Treasury in December 2019 in connection with the U.S. Tax Cuts and Jobs Act of 2017. However, the text does not provide a specific, quantifiable discrete charge or benefit amount for this adjustment.",
+    "tax_onetime_amount": -0.582,
+    "tax_onetime_note": "One-time adjustment of U.S. foreign tax credits in response to regulations issued by the U.S. Department of the Treasury in December 2019 in connection with the U.S. Tax Cuts and Jobs Act of 2017.",
     "amount_scale": 1000000000.0
   }
 }
