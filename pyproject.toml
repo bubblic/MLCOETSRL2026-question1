@@ -21,9 +21,6 @@ dev = [
     "pytest>=7.0",
 ]
 
-[project.scripts]
-run-extraction = "scripts.run_extraction:main"
-
 [tool.setuptools.packages.find]
 include = ["financial_forecast*"]
 

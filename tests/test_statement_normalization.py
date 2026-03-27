@@ -1,295 +1,206 @@
-"""Tests for extraction entrypoint and financial statement CLI logic.
+"""Tests for the extraction pipeline classes.
 
-These tests are intentionally mock-heavy so they validate control flow and
-argument handling without triggering real extraction workloads or network I/O.
+These tests validate class construction, argument handling, and control
+flow without triggering real LLM calls or network I/O.
 
-
-Run the script by:
-python -m pytest -q tests/test_statement_normalization.py
+Run:
+    python -m pytest -q tests/test_statement_normalization.py
 """
 
-import argparse
-import runpy
 from pathlib import Path
-from unittest.mock import Mock
+from unittest.mock import Mock, patch
 
 import pytest
 
-from financial_forecast.extraction import statement_cli
+from financial_forecast.extraction.financial_statement_extractor import (
+    FinancialStatementExtractor,
+)
+from financial_forecast.extraction.statement_normalizer import (
+    StatementNormalizer,
+)
+from financial_forecast.extraction.statement_ratios import (
+    RatioCalculator,
+    MedianRatioCalculator,
+)
+from financial_forecast.extraction.utils import (
+    safe_divide,
+    sum_if_all_present,
+)
 
 
-@pytest.fixture
-def valid_args(tmp_path):
-    """Return a reusable Namespace with valid defaults for CLI routines."""
-    normalized_input_dir = tmp_path / "normalized"
-    normalized_input_dir.mkdir(parents=True, exist_ok=True)
+# ---------------------------------------------------------------------------
+# FinancialStatementExtractor
+# ---------------------------------------------------------------------------
 
-    return argparse.Namespace(
-        input_dir=str(tmp_path / "extracted_text"),
-        output_dir=str(tmp_path / "deepseek_financial_statements"),
-        num_extraction_runs=1,
-        runs_output_dir=str(tmp_path / "deepseek_financial_statements_runs"),
-        no_append_runs=False,
-        temperature=0.0,
-        max_tokens=8000,
-        top_k=1,
-        message="gen-ai-response",
-        max_workers=3,
-        skip_extraction=False,
-        compute_ratios=True,
-        ratios_input_dir=str(normalized_input_dir),
-        ratios_output_file="financial_ratios.json",
-        ratios_aggregation="single",
-        run_values_output_file="extraction_run_values.json",
-        plot_distributions=False,
-        plots_dir="field_value_distributions",
-        hallucination_report=True,
-        hallucination_output_file="hallucination_rates.json",
-        hallucination_top_k=15,
+
+def test_extractor_stores_config():
+    """Constructor should store queries, client, and parameters."""
+    client = Mock()
+    extractor = FinancialStatementExtractor(
+        queries=["Balance Sheet"],
+        llm_client=client,
+        batch_size=50,
+        parameters={"temperature": 0.5},
+        max_workers=2,
     )
+    assert extractor.queries == ["Balance Sheet"]
+    assert extractor.llm_client is client
+    assert extractor.batch_size == 50
+    assert extractor.parameters == {"temperature": 0.5}
+    assert extractor.max_workers == 2
 
 
-@pytest.fixture
-def module_name():
-    """Entry module name for script-style execution checks."""
-    return "llm_extract_json_from_financial_statements"
-
-
-def test_entrypoint_main_reexport():
-    """Entrypoint should re-export CLI main for direct script invocation."""
-    from financial_forecast.extraction import statement_cli as new_cli
-
-    assert new_cli.main is statement_cli.main
-
-
-def test_entrypoint_script_execution_calls_main(monkeypatch):
-    """run_extraction entry point should delegate to statement_cli.main."""
-    mocked_main = Mock()
-    monkeypatch.setattr(statement_cli, "main", mocked_main)
-
-    # Verify the main function is callable (script execution involves
-    # argparse which conflicts with pytest's argv)
-    statement_cli.main()
-
-    mocked_main.assert_called_once_with()
-
-
-def test_validate_args_accepts_valid_inputs(valid_args):
-    """validate_args should not raise when key constraints are satisfied."""
-    statement_cli.validate_args(valid_args)
-
-
-def test_validate_args_rejects_invalid_num_runs(valid_args):
-    """num_extraction_runs must be >= 1."""
-    valid_args.num_extraction_runs = 0
-
-    with pytest.raises(ValueError, match="--num-extraction-runs must be >= 1"):
-        statement_cli.validate_args(valid_args)
-
-
-def test_validate_args_rejects_invalid_max_workers(valid_args):
-    """max_workers must be >= 1."""
-    valid_args.max_workers = 0
-
-    with pytest.raises(ValueError, match="--max-workers must be >= 1"):
-        statement_cli.validate_args(valid_args)
-
-
-def test_run_ratio_pipeline_returns_early_when_disabled(monkeypatch, valid_args):
-    """When ratio computation is disabled, no ratio helper should be called."""
-    valid_args.compute_ratios = False
-    mocked_median = Mock()
-    mocked_single = Mock()
-    monkeypatch.setattr(statement_cli, "compute_ratios_from_median_runs", mocked_median)
-    monkeypatch.setattr(
-        statement_cli, "compute_ratios_from_normalized_files", mocked_single
+def test_extractor_default_parameters():
+    """Default parameters should be set when not provided."""
+    extractor = FinancialStatementExtractor(
+        queries=[],
+        llm_client=Mock(),
     )
-
-    statement_cli.run_ratio_pipeline(valid_args)
-
-    mocked_median.assert_not_called()
-    mocked_single.assert_not_called()
+    assert extractor.parameters == {"temperature": 0, "top_k": 1}
+    assert extractor.batch_size == 100
+    assert extractor.max_workers == 9
 
 
-def test_run_ratio_pipeline_median_raises_without_run_dirs(monkeypatch, valid_args):
-    """Median aggregation requires at least one run directory."""
-    valid_args.ratios_aggregation = "median"
-    monkeypatch.setattr(statement_cli, "list_run_dirs", Mock(return_value=[]))
+def test_extractor_run_raises_on_missing_path():
+    """run() should raise FileNotFoundError for non-existent path."""
+    extractor = FinancialStatementExtractor(
+        queries=[],
+        llm_client=Mock(),
+    )
+    with pytest.raises(FileNotFoundError):
+        extractor.run("does_not_exist_at_all")
 
+
+def test_extractor_run_raises_on_empty_dir(tmp_path):
+    """run() should raise FileNotFoundError for directory with no PDFs."""
+    extractor = FinancialStatementExtractor(
+        queries=[],
+        llm_client=Mock(),
+    )
+    with pytest.raises(FileNotFoundError, match="No PDF files found"):
+        extractor.run(str(tmp_path))
+
+
+# ---------------------------------------------------------------------------
+# StatementNormalizer
+# ---------------------------------------------------------------------------
+
+
+def test_normalizer_stores_config():
+    """Constructor should store paths and parameters."""
+    normalizer = StatementNormalizer(
+        input_dir="in",
+        output_dir="out",
+        temperature=0.5,
+        max_tokens=4000,
+        top_k=3,
+        max_workers=2,
+    )
+    assert normalizer.input_dir == Path("in")
+    assert normalizer.output_dir == Path("out")
+    assert normalizer.parameters == {
+        "temperature": 0.5,
+        "max_tokens": 4000,
+        "top_k": 3,
+    }
+    assert normalizer.max_workers == 2
+
+
+def test_normalizer_run_raises_on_empty_dir(tmp_path):
+    """run() should raise ValueError when no *.llm.json files exist."""
+    normalizer = StatementNormalizer(
+        input_dir=str(tmp_path),
+        output_dir=str(tmp_path / "out"),
+    )
+    with pytest.raises(ValueError, match="No statement files found"):
+        normalizer.run()
+
+
+# ---------------------------------------------------------------------------
+# RatioCalculator
+# ---------------------------------------------------------------------------
+
+
+def test_ratio_calculator_stores_config():
+    """Constructor should store paths."""
+    calc = RatioCalculator(
+        input_dir="normalized",
+        output_file="ratios.json",
+    )
+    assert calc.input_dir == Path("normalized")
+
+
+def test_ratio_calculator_run_raises_on_empty_dir(tmp_path):
+    """run() should raise ValueError when no normalized files exist."""
+    calc = RatioCalculator(
+        input_dir=str(tmp_path),
+        output_file="ratios.json",
+    )
+    with pytest.raises(ValueError, match="No normalized files found"):
+        calc.run()
+
+
+def test_median_ratio_calculator_raises_without_run_dirs(tmp_path):
+    """run() should raise ValueError when no run directories exist."""
+    calc = MedianRatioCalculator(
+        runs_output_dir=str(tmp_path),
+    )
     with pytest.raises(ValueError, match="No run directories found"):
-        statement_cli.run_ratio_pipeline(valid_args)
+        calc.run()
 
 
-def test_run_ratio_pipeline_median_calls_aggregation(monkeypatch, valid_args, tmp_path):
-    """Median mode should call aggregator with resolved output paths."""
-    valid_args.ratios_aggregation = "median"
-    valid_args.runs_output_dir = str(tmp_path / "runs_root")
-    runs_root = Path(valid_args.runs_output_dir)
-    run_dirs = [runs_root / "run_01", runs_root / "run_02"]
-
-    monkeypatch.setattr(statement_cli, "list_run_dirs", Mock(return_value=run_dirs))
-    monkeypatch.setattr(
-        statement_cli,
-        "resolve_output_path",
-        Mock(side_effect=lambda root, rel: Path(root) / rel),
-    )
-    mocked_compute = Mock()
-    monkeypatch.setattr(
-        statement_cli, "compute_ratios_from_median_runs", mocked_compute
-    )
-
-    statement_cli.run_ratio_pipeline(valid_args)
-
-    mocked_compute.assert_called_once()
-    kwargs = mocked_compute.call_args.kwargs
-    assert kwargs["run_dirs"] == run_dirs
-    assert kwargs["ratios_output_file"] == runs_root / valid_args.ratios_output_file
-    assert (
-        kwargs["run_values_output_file"]
-        == runs_root / valid_args.run_values_output_file
-    )
-    assert kwargs["plots_dir"] == runs_root / valid_args.plots_dir
-    assert kwargs["plot_distributions"] is False
+# ---------------------------------------------------------------------------
+# Pure utility functions
+# ---------------------------------------------------------------------------
 
 
-def test_run_ratio_pipeline_single_invalid_input_dir_raises(valid_args):
-    """Single aggregation should reject a missing ratios input directory."""
-    valid_args.ratios_aggregation = "single"
-    valid_args.ratios_input_dir = "does_not_exist_for_test"
-
-    with pytest.raises(ValueError, match="Invalid ratios input dir"):
-        statement_cli.run_ratio_pipeline(valid_args)
+def test_safe_divide_normal():
+    assert safe_divide(10.0, 2.0) == 5.0
 
 
-def test_run_ratio_pipeline_single_calls_normalized_compute(monkeypatch, valid_args):
-    """Single aggregation should call normalized-file ratio computation."""
-    valid_args.ratios_aggregation = "single"
-    mocked_compute = Mock()
-    monkeypatch.setattr(
-        statement_cli, "compute_ratios_from_normalized_files", mocked_compute
-    )
-
-    statement_cli.run_ratio_pipeline(valid_args)
-
-    mocked_compute.assert_called_once()
-    kwargs = mocked_compute.call_args.kwargs
-    expected_input = Path(valid_args.ratios_input_dir)
-    expected_output = expected_input / valid_args.ratios_output_file
-    assert kwargs["input_dir"] == expected_input
-    assert kwargs["output_file"] == expected_output
+def test_safe_divide_none():
+    assert safe_divide(None, 2.0) is None
+    assert safe_divide(10.0, None) is None
 
 
-def test_main_orchestrates_parse_validate_extract_and_ratios(monkeypatch, valid_args):
-    """main should parse args and execute validate, extraction, then ratio pipeline."""
-    calls = []
-
-    monkeypatch.setattr(statement_cli, "parse_args", Mock(return_value=valid_args))
-
-    def _validate(args):
-        calls.append(("validate", args))
-
-    def _extract(args):
-        calls.append(("extract", args))
-
-    def _ratios(args):
-        calls.append(("ratios", args))
-
-    def _hallucination(args):
-        calls.append(("hallucination", args))
-
-    monkeypatch.setattr(statement_cli, "validate_args", _validate)
-    monkeypatch.setattr(statement_cli, "run_extraction_pipeline", _extract)
-    monkeypatch.setattr(statement_cli, "run_ratio_pipeline", _ratios)
-    monkeypatch.setattr(statement_cli, "run_hallucination_pipeline", _hallucination)
-
-    statement_cli.main()
-
-    assert calls == [
-        ("validate", valid_args),
-        ("extract", valid_args),
-        ("ratios", valid_args),
-        ("hallucination", valid_args),
-    ]
+def test_safe_divide_zero():
+    assert safe_divide(10.0, 0.0) is None
 
 
-def test_validate_args_rejects_negative_num_runs(valid_args):
-    """Negative num_extraction_runs should be rejected."""
-    valid_args.num_extraction_runs = -1
-
-    with pytest.raises(ValueError, match="--num-extraction-runs must be >= 1"):
-        statement_cli.validate_args(valid_args)
+def test_sum_if_all_present_complete():
+    assert sum_if_all_present(1.0, 2.0, 3.0) == 6.0
 
 
-def test_validate_args_rejects_negative_max_workers(valid_args):
-    """Negative max_workers should be rejected."""
-    valid_args.max_workers = -5
-
-    with pytest.raises(ValueError, match="--max-workers must be >= 1"):
-        statement_cli.validate_args(valid_args)
+def test_sum_if_all_present_missing():
+    assert sum_if_all_present(1.0, None, 3.0) is None
 
 
-def test_validate_args_boundary_values(valid_args):
-    """Boundary values (exactly 1) should be accepted."""
-    valid_args.num_extraction_runs = 1
-    valid_args.max_workers = 1
-    statement_cli.validate_args(valid_args)  # should not raise
+def test_calculate_ratios_all_none():
+    """All-None input should produce all-None ratios."""
+    derived, ratios = RatioCalculator._calculate_ratios({})
+    assert all(v is None for v in ratios.values())
+    assert all(v is None for v in derived.values())
 
 
-def test_run_ratio_pipeline_unknown_aggregation_raises(valid_args):
-    """An unknown ratios_aggregation mode should raise."""
-    valid_args.ratios_aggregation = "unknown_mode"
-    with pytest.raises((ValueError, KeyError)):
-        statement_cli.run_ratio_pipeline(valid_args)
-
-
-def test_run_hallucination_pipeline_skipped_when_disabled(monkeypatch, valid_args):
-    """When hallucination_report is False, analysis should not run."""
-    valid_args.hallucination_report = False
-    valid_args.ratios_aggregation = "median"
-    mocked_analysis = Mock()
-    monkeypatch.setattr(statement_cli, "run_hallucination_analysis", mocked_analysis)
-
-    statement_cli.run_hallucination_pipeline(valid_args)
-
-    mocked_analysis.assert_not_called()
-
-
-def test_run_hallucination_pipeline_skipped_when_single_aggregation(
-    monkeypatch, valid_args
-):
-    """When ratios_aggregation is 'single', hallucination analysis should not run."""
-    valid_args.hallucination_report = True
-    valid_args.ratios_aggregation = "single"
-    mocked_analysis = Mock()
-    monkeypatch.setattr(statement_cli, "run_hallucination_analysis", mocked_analysis)
-
-    statement_cli.run_hallucination_pipeline(valid_args)
-
-    mocked_analysis.assert_not_called()
-
-
-def test_run_hallucination_pipeline_calls_analysis_for_median(
-    monkeypatch, valid_args, tmp_path
-):
-    """Median aggregation with hallucination enabled should call analysis."""
-    valid_args.hallucination_report = True
-    valid_args.ratios_aggregation = "median"
-    valid_args.runs_output_dir = str(tmp_path / "runs_root")
-    valid_args.hallucination_top_k = 10
-
-    monkeypatch.setattr(
-        statement_cli,
-        "resolve_output_path",
-        Mock(side_effect=lambda root, rel: Path(root) / rel),
-    )
-    mocked_analysis = Mock()
-    monkeypatch.setattr(statement_cli, "run_hallucination_analysis", mocked_analysis)
-
-    statement_cli.run_hallucination_pipeline(valid_args)
-
-    mocked_analysis.assert_called_once()
-    kwargs = mocked_analysis.call_args.kwargs
-    runs_root = Path(valid_args.runs_output_dir)
-    assert kwargs["run_values_file"] == runs_root / valid_args.run_values_output_file
-    assert kwargs["output_file"] == runs_root / valid_args.hallucination_output_file
-    assert kwargs["top_k"] == 10
+def test_calculate_ratios_basic():
+    """Basic ratio computation with complete inputs."""
+    values = {
+        "total_revenue": 100.0,
+        "total_operating_cost": 60.0,
+        "cash_and_cash_equivalents": 10.0,
+        "short_term_market_securities": 5.0,
+        "total_accounts_receivable": 15.0,
+        "total_current_liabilities": 20.0,
+        "total_debt_short_term_and_long_term": 50.0,
+        "total_equity": 100.0,
+        "total_assets": 200.0,
+        "net_income": 25.0,
+        "taxes": 8.0,
+        "interest_expenses": 7.0,
+        "depreciation_and_amortization": 10.0,
+    }
+    derived, ratios = RatioCalculator._calculate_ratios(values)
+    assert derived["ebit"] == pytest.approx(40.0)
+    assert derived["ebitda"] == pytest.approx(50.0)
+    assert ratios["cost_to_income_ratio"] == pytest.approx(0.6)
+    assert ratios["debt_to_equity_ratio"] == pytest.approx(0.5)
