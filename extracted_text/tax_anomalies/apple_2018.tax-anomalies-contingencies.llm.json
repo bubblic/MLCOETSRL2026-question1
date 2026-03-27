@@ -1,0 +1,33 @@
+{
+  "query": "Item 7 Management's Discussion and Analysis (MD&A), and Item 8 Financial Statements and Supplementary Data sections specifically covering \"Income Taxes\" and \"Commitments and Contingencies\".",
+  "selected_pages": [
+    24,
+    25,
+    26,
+    27,
+    28,
+    29,
+    30,
+    31,
+    32,
+    33,
+    34,
+    35,
+    36,
+    37,
+    38,
+    54,
+    55,
+    56,
+    57,
+    62,
+    63,
+    64
+  ],
+  "extraction": {
+    "tax_onetime_amount": 1.5,
+    "tax_onetime_note": "Impact of the Tax Cuts and Jobs Act, composed of $2.0 billion remeasurement of net deferred tax assets/liabilities and $1.2 billion deemed repatriation tax, partially offset by a $1.7 billion impact on unrecognized tax benefits.",
+    "tax_contingency_amount": 33.589,
+    "tax_contingency_note": "Deemed repatriation tax payable of $33.589 billion to be paid in installments per the Tax Cuts and Jobs Act. Additionally, the European Commission State Aid Decision requires €13.1 billion plus €1.2 billion interest (approx. $16.3 billion at 2018 rates) held in escrow pending appeal, which is a potential future liability."
+  }
+}

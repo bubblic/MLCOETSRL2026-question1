@@ -1,0 +1,24 @@
+{
+  "query": "Item 7 Management's Discussion and Analysis (MD&A), and Item 8 Financial Statements and Supplementary Data sections specifically covering \"Income Taxes\" and \"Commitments and Contingencies\".",
+  "selected_pages": [
+    22,
+    23,
+    24,
+    25,
+    26,
+    27,
+    28,
+    40,
+    41,
+    42,
+    43,
+    44,
+    46
+  ],
+  "extraction": {
+    "tax_onetime_amount": null,
+    "tax_onetime_note": null,
+    "tax_contingency_amount": 4.5,
+    "tax_contingency_note": "The Company believes it is reasonably possible that its gross unrecognized tax benefits could decrease in the next 12 months by as much as $4.5 billion."
+  }
+}

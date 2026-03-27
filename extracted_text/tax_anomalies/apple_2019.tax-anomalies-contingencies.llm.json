@@ -1,0 +1,26 @@
+{
+  "query": "Item 7 Management's Discussion and Analysis (MD&A), and Item 8 Financial Statements and Supplementary Data sections specifically covering \"Income Taxes\" and \"Commitments and Contingencies\".",
+  "selected_pages": [
+    20,
+    21,
+    22,
+    23,
+    24,
+    25,
+    26,
+    27,
+    28,
+    29,
+    46,
+    47,
+    53,
+    54,
+    55
+  ],
+  "extraction": {
+    "tax_onetime_amount": null,
+    "tax_onetime_note": null,
+    "tax_contingency_amount": 29.506,
+    "tax_contingency_note": "Deemed repatriation tax payable of $29.506 billion, to be paid in installments per the Tax Cuts and Jobs Act."
+  }
+}

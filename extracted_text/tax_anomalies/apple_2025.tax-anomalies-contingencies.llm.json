@@ -1,0 +1,21 @@
+{
+  "query": "Item 7 Management's Discussion and Analysis (MD&A), and Item 8 Financial Statements and Supplementary Data sections specifically covering \"Income Taxes\" and \"Commitments and Contingencies\".",
+  "selected_pages": [
+    23,
+    24,
+    25,
+    26,
+    27,
+    28,
+    42,
+    43,
+    44,
+    48
+  ],
+  "extraction": {
+    "tax_onetime_amount": 10.2,
+    "tax_onetime_note": "One-time income tax charge of $10.2 billion net ($15.8 billion payable to Ireland, partially offset by a U.S. foreign tax credit of $4.8 billion and a decrease in unrecognized tax benefits of $823 million) recorded in Q4 2024 due to the European Court of Justice confirming the European Commission's 2016 State Aid Decision.",
+    "tax_contingency_amount": 6.0,
+    "tax_contingency_note": "The Company believes it is reasonably possible that its gross unrecognized tax benefits could decrease by as much as $6 billion in the next 12 months due to potential resolutions or closures of tax examinations."
+  }
+}
