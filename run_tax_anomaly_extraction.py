@@ -17,7 +17,9 @@ if __name__ == "__main__":
         llm_client=AzureLLMClient(),
     )
 
+    company = "aapl"
+
     extractor.run(
-        input_path="./annual_reports/for_tax_anomalies",
-        output_dir="extracted_text/tax_anomalies",
+        input_path=f"./annual_reports/for_tax_anomalies/{company}",
+        output_dir=f"extracted_text/tax_anomalies/{company}",
     )
