@@ -3,7 +3,7 @@
 Provides :class:`TaxAnomalyExtractor`, which extends
 :class:`BasePdfExtractor` to identify relevant 10-K pages and extract
 structured JSON describing one-time tax anomalies and future
-tax contingencies.
+tax contingencies, in billions.
 """
 
 from __future__ import annotations
@@ -140,6 +140,7 @@ class TaxAnomalyExtractor(BasePdfExtractor):
                 "tax_onetime_note": None,
                 "tax_contingency_amount": None,
                 "tax_contingency_note": None,
+                "amount_scale": None,
             }
 
         pages_text = self._format_pages(page_numbers, pages)
@@ -154,4 +155,5 @@ class TaxAnomalyExtractor(BasePdfExtractor):
                 "tax_contingency_amount",
             ),
             "tax_contingency_note": response.get("tax_contingency_note"),
+            "amount_scale": 1e9,
         }

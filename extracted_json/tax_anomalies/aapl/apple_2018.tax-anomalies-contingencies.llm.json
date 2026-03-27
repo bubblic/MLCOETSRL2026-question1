@@ -1,0 +1,37 @@
+{
+  "query": "Item 7 Management's Discussion and Analysis (MD&A), and Item 8 Financial Statements and Supplementary Data sections specifically covering \"Income Taxes\" and \"Commitments and Contingencies\".",
+  "selected_pages": [
+    24,
+    25,
+    26,
+    27,
+    28,
+    29,
+    30,
+    31,
+    32,
+    33,
+    34,
+    35,
+    36,
+    37,
+    38,
+    54,
+    55,
+    56,
+    57,
+    60,
+    61,
+    62,
+    63,
+    64
+  ],
+  "extraction": {
+    "current_tax_year": 2018,
+    "tax_onetime_amount": 1.5,
+    "tax_onetime_note": "Impact of the Tax Cuts and Jobs Act enacted December 22, 2017 increased the provision for income taxes by $1.5 billion during 2018, composed of $2.0 billion related to the remeasurement of net deferred tax assets and liabilities and $1.2 billion associated with the deemed repatriation tax, partially offset by a $1.7 billion impact the deemed repatriation tax had on unrecognized tax benefits.",
+    "tax_contingency_amount": 9.7,
+    "tax_contingency_note": "As of September 29, 2018, gross unrecognized tax benefits totaled $9.7 billion ($7.4 billion would impact the effective tax rate), with management believing it reasonably possible that gross unrecognized tax benefits could decrease by as much as $0.8 billion in the next 12 months. Additionally, the European Commission State Aid Decision resulted in a recovery amount of €13.1 billion plus interest of €1.2 billion being held in escrow pending conclusion of all appeals.",
+    "amount_scale": 1000000000.0
+  }
+}

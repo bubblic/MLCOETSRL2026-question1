@@ -23,6 +23,7 @@
     "tax_onetime_amount": -0.582,
     "tax_onetime_note": "One-time adjustment of U.S. foreign tax credits in response to regulations issued by the U.S. Department of the Treasury in December 2019 in connection with the U.S. Tax Cuts and Jobs Act of 2017",
     "tax_contingency_amount": 3.9,
-    "tax_contingency_note": "Gross unrecognized tax benefits could decrease in the next 12 months by as much as $3.9 billion"
+    "tax_contingency_note": "Estimated decrease in gross unrecognized tax benefits in the next 12 months",
+    "amount_scale": 1000000000.0
   }
 }

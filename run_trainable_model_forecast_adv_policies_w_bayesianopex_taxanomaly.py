@@ -29,10 +29,12 @@ if __name__ == "__main__":
 
     tf.random.set_seed(42)
 
+    company = "aapl"
+
     data = HistoricalDataLoader(
-        "aapl",
+        company,
         include_inflation=True,
-        include_tax_onetime=True,
+        tax_anomaly_dir=f"./extracted_json/tax_anomalies/{company}",
     )
 
     model = TrainableFinancialModel(

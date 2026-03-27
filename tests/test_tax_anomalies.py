@@ -87,22 +87,25 @@ def test_run_raises_on_empty_dir(extractor, tmp_path):
 def test_extract_tax_json_empty_pages(extractor):
     result = extractor._extract_tax_json(page_numbers=[], pages={})
     assert result == {
+        "current_tax_year": None,
         "tax_onetime_amount": None,
         "tax_onetime_note": None,
         "tax_contingency_amount": None,
         "tax_contingency_note": None,
+        "amount_scale": None,
     }
 
 
 def test_extract_tax_json_uses_raw_response(
-    extractor, mock_client, sample_pages,
+    extractor,
+    mock_client,
+    sample_pages,
 ):
     mock_client.ask_json.return_value = {
         "raw_response": '{"tax_onetime_amount": 1.2}',
     }
     with patch(
-        "financial_forecast.extraction.base_pdf_extractor."
-        "extract_json_from_text",
+        "financial_forecast.extraction.base_pdf_extractor." "extract_json_from_text",
         return_value={
             "tax_onetime_amount": 1.2,
             "tax_onetime_note": "One-time charge",
@@ -118,7 +121,9 @@ def test_extract_tax_json_uses_raw_response(
 
 
 def test_extract_tax_json_fallback_when_extraction_returns_none(
-    extractor, mock_client, sample_pages,
+    extractor,
+    mock_client,
+    sample_pages,
 ):
     mock_client.ask_json.return_value = {
         "raw_response": "some text",
@@ -128,8 +133,7 @@ def test_extract_tax_json_fallback_when_extraction_returns_none(
         "tax_contingency_note": "None",
     }
     with patch(
-        "financial_forecast.extraction.base_pdf_extractor."
-        "extract_json_from_text",
+        "financial_forecast.extraction.base_pdf_extractor." "extract_json_from_text",
         return_value=None,
     ):
         result = extractor._extract_tax_json([5, 6], sample_pages)
@@ -138,7 +142,9 @@ def test_extract_tax_json_fallback_when_extraction_returns_none(
 
 
 def test_extract_tax_json_partial_keys(
-    extractor, mock_client, sample_pages,
+    extractor,
+    mock_client,
+    sample_pages,
 ):
     mock_client.ask_json.return_value = {
         "tax_onetime_amount": 1.0,
@@ -154,7 +160,9 @@ def test_extract_tax_json_partial_keys(
 
 
 def test_extract_one_pdf_writes_json(
-    tmp_path, mock_client, sample_pages,
+    tmp_path,
+    mock_client,
+    sample_pages,
 ):
     input_pdf = tmp_path / "apple_2024.pdf"
     input_pdf.write_bytes(b"%PDF-1.4")
@@ -169,8 +177,7 @@ def test_extract_one_pdf_writes_json(
             return_value=sample_pages,
         ),
         patch(
-            "financial_forecast.extraction.base_pdf_extractor."
-            "select_pages_with_llm",
+            "financial_forecast.extraction.base_pdf_extractor." "select_pages_with_llm",
             return_value=[5, 6],
         ),
     ):
@@ -182,10 +189,7 @@ def test_extract_one_pdf_writes_json(
         }
         ext._extract_one_pdf(input_pdf, output_dir)
 
-    out_file = (
-        output_dir
-        / "apple_2024.tax-anomalies-contingencies.llm.json"
-    )
+    out_file = output_dir / "apple_2024.tax-anomalies-contingencies.llm.json"
     assert out_file.exists()
     payload = json.loads(out_file.read_text(encoding="utf-8"))
     assert payload["selected_pages"] == [5, 6]

@@ -8,26 +8,23 @@ Usage::
     # With inflation only:
     data = HistoricalDataLoader("aapl", include_inflation=True)
 
-    # Full enhancement (inflation + tax anomalies):
+    # Full enhancement (inflation + tax anomalies from extracted JSON):
     data = HistoricalDataLoader("aapl", include_inflation=True,
-                                include_tax_onetime=True)
+                                tax_anomaly_dir="./extracted_json/tax_anomalies/aapl")
 
     model = TrainableFinancialModel(opex_module=BayesianOpEx(),
                                     tax_anomalies=data.tax_onetime_payments)
-    ForecastPipeline(model=model, data=data, ...).run()
 
 To add a new company, create ``financial_forecast/data/<ticker>/`` with:
 
 - ``financial_statements.py`` containing ``get_financial_statements() -> dict``
-- (optional) ``tax_onetime_payments.py`` containing
-  ``get_tax_onetime_payments() -> tf.Tensor``
-
-No changes to this loader are needed.
 """
 
 from __future__ import annotations
 
 import importlib
+import json
+from pathlib import Path
 from typing import Any, Dict, Optional
 
 import tensorflow as tf
@@ -37,31 +34,26 @@ class HistoricalDataLoader:
     """Loads company-specific historical financial data.
 
     Dynamically imports from ``financial_forecast.data.<company>/`` based
-    on the ticker.  Each company package must expose a standard interface:
-
-    - ``financial_statements.get_financial_statements() -> Dict[str, tf.Tensor]``
-    - ``tax_onetime_payments.get_tax_onetime_payments() -> tf.Tensor``
-      (optional)
+    on the ticker.  Tax anomaly data is loaded from extracted JSON files
+    produced by :class:`TaxAnomalyExtractor`.
 
     Args:
         company: Company ticker, case-insensitive (e.g. ``"aapl"``).
-        include_inflation: Whether to load inflation data.  When ``False``,
-            :attr:`inflation` returns ``None`` and the pipeline trains
-            without inflation adjustments.
-        include_tax_onetime: Whether to load one-time tax anomaly data.
-            When ``False``, :attr:`tax_onetime_payments` returns ``None``
-            and the pipeline trains without tax adjustments.
+        include_inflation: Whether to load inflation data.
+        tax_anomaly_dir: Directory containing
+            ``*.tax-anomalies-contingencies.llm.json`` files.
+            If provided, tax anomaly data is loaded from these files.
     """
 
     def __init__(
         self,
         company: str,
         include_inflation: bool = False,
-        include_tax_onetime: bool = False,
+        tax_anomaly_dir: Optional[str] = None,
     ):
         self.company = company.lower()
         self.include_inflation = include_inflation
-        self.include_tax_onetime = include_tax_onetime
+        self.tax_anomaly_dir = tax_anomaly_dir
 
     @property
     def financial_statements(self) -> Dict[str, tf.Tensor]:
@@ -76,11 +68,11 @@ class HistoricalDataLoader:
         return self._load_inflation()
 
     @property
-    def tax_onetime_payments(self) -> Optional[tf.Tensor]:
-        """One-time tax anomaly data, or ``None`` if not included."""
-        if not self.include_tax_onetime:
+    def tax_onetime_payments(self) -> Optional[Dict[int, float]]:
+        """One-time tax anomaly data, or ``None`` if no dir provided."""
+        if self.tax_anomaly_dir is None:
             return None
-        return self._load_tax()
+        return self._load_tax_from_extracted_json()
 
     def _import_company_module(self, module_name: str):
         """Import ``financial_forecast.data.<company>.<module_name>``."""
@@ -89,8 +81,8 @@ class HistoricalDataLoader:
             return importlib.import_module(fqn)
         except ModuleNotFoundError:
             raise FileNotFoundError(
-                f"No {module_name} module found for company {self.company!r} "
-                f"(expected {fqn})"
+                f"No {module_name} module found for company "
+                f"{self.company!r} (expected {fqn})"
             ) from None
 
     def _load_historical(self) -> Dict[str, tf.Tensor]:
@@ -99,8 +91,34 @@ class HistoricalDataLoader:
 
     def _load_inflation(self) -> tf.Tensor:
         from financial_forecast.data.inflation import get_us_inflation
+
         return get_us_inflation()
 
-    def _load_tax(self) -> tf.Tensor:
-        mod = self._import_company_module("tax_onetime_payments")
-        return mod.get_tax_onetime_payments()
+    def _load_tax_from_extracted_json(self) -> Dict[int, float]:
+        """Load tax data from extracted JSON files.
+
+        Reads all ``*.tax-anomalies-contingencies.llm.json`` files in
+        :attr:`tax_anomaly_dir`, extracts non-null ``tax_onetime_amount``
+        values, and returns them as ``{year: amount_usd}``.
+        """
+        tax_dir = Path(self.tax_anomaly_dir)
+        if not tax_dir.exists():
+            raise FileNotFoundError(f"Tax anomaly directory not found: {tax_dir}")
+
+        json_files = sorted(tax_dir.glob("*.tax-anomalies-contingencies.llm.json"))
+        if not json_files:
+            raise FileNotFoundError(f"No tax anomaly JSON files found in: {tax_dir}")
+
+        result: Dict[int, float] = {}
+        for path in json_files:
+            with path.open("r", encoding="utf-8") as f:
+                payload = json.load(f)
+            extraction = payload.get("extraction", {})
+            scale = payload.get("amount_scale")
+            amount = extraction.get("tax_onetime_amount")
+            year = extraction.get("current_tax_year")
+            if amount is not None and scale is not None and year is not None:
+                # Extracted amounts are in billions; convert to USD
+                result[int(year)] = float(amount) * float(scale)
+
+        return result
