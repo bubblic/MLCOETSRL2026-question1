@@ -107,6 +107,7 @@ def test_extract_tax_json_uses_raw_response(
     with patch(
         "financial_forecast.extraction.base_pdf_extractor." "extract_json_from_text",
         return_value={
+            "current_tax_year": 2024,
             "tax_onetime_amount": 1.2,
             "tax_onetime_note": "One-time charge",
             "tax_contingency_amount": 0.4,

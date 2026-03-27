@@ -145,7 +145,16 @@ class TaxAnomalyExtractor(BasePdfExtractor):
 
         pages_text = self._format_pages(page_numbers, pages)
         prompt = self.extraction_prompt.format(pages=pages_text)
-        response = self._call_llm_with_fallback(prompt)
+
+        max_retries = 3
+        for attempt in range(max_retries):
+            response = self._call_llm_with_fallback(prompt)
+            if response.get("current_tax_year") is not None:
+                break
+            print(
+                f"  Retry {attempt + 1}/{max_retries}: "
+                f"current_tax_year was null"
+            )
 
         return {
             "current_tax_year": response.get("current_tax_year"),
