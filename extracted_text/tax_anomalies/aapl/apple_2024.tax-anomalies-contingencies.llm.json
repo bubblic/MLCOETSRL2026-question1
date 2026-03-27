@@ -14,9 +14,10 @@
     49
   ],
   "extraction": {
+    "current_tax_year": 2024,
     "tax_onetime_amount": 10.2,
-    "tax_onetime_note": "One-time income tax charge of $10.2 billion, net, related to the European Commission State Aid Decision, confirmed by the European Court of Justice in September 2024.",
-    "tax_contingency_amount": 13.0,
-    "tax_contingency_note": "Gross unrecognized tax benefits could decrease between approximately $5 billion and $13 billion in the next 12 months, primarily related to intercompany transfer pricing and deemed repatriation tax."
+    "tax_onetime_note": "One-time income tax charge of $10.2 billion, net, related to the European Commission State Aid Decision (ECJ confirmed the 2016 decision in September 2024), representing $15.8 billion payable to Ireland via release of escrow, partially offset by a U.S. foreign tax credit of $4.8 billion and decrease in unrecognized tax benefits of $823 million",
+    "tax_contingency_amount": 22.0,
+    "tax_contingency_note": "Total gross unrecognized tax benefits of $22.0 billion as of September 28, 2024, of which $10.8 billion would impact the effective tax rate if recognized; reasonably possible decrease of $5 billion to $13 billion in the next 12 months primarily related to intercompany transfer pricing and deemed repatriation tax"
   }
 }

@@ -42,8 +42,8 @@ DEFAULT_EXTRACTION_PROMPT = (
     "extract data regarding one-time tax anomalies and future tax contingencies.\n\n"
     "Carefully evaluate the text for the following:\n\n"
     "Current Year Anomalies: Identify any massive, non-recurring, discrete tax "
-    "charges or benefits that heavily skewed the current year's net income (e.g., "
-    "finalized state aid decisions, sudden impacts from new tax legislation).\n\n"
+    "charges or benefits ASSESSED THIS YEAR (not last year) that heavily skewed the current year's net income (e.g., "
+    "finalized state aid decisions, sudden impacts from new tax legislation). Positive for tax paid by company, negative for tax reduction or benefit for the company.\n\n"
     "Future Contingencies: Identify any quantified maximum tax exposures, unreserved "
     "tax liabilities, or significant unrecognized tax benefits (UTBs) that management "
     "indicates could be resolved or assessed in future years (e.g., tax funds held in "
@@ -54,6 +54,7 @@ DEFAULT_EXTRACTION_PROMPT = (
     "the text, output null for that field.\n\n"
     "JSON Schema:\n"
     "{{\n"
+    '  "current_tax_year": <number>,\n'
     '  "tax_onetime_amount": <number in billions or null>,\n'
     '  "tax_onetime_note": "<string explaining the anomaly or null>",\n'
     '  "tax_contingency_amount": <number in billions or null>,\n'
@@ -134,6 +135,7 @@ class TaxAnomalyExtractor(BasePdfExtractor):
         """Extract tax anomaly/contingency JSON from selected pages."""
         if not page_numbers:
             return {
+                "current_tax_year": None,
                 "tax_onetime_amount": None,
                 "tax_onetime_note": None,
                 "tax_contingency_amount": None,
@@ -145,6 +147,7 @@ class TaxAnomalyExtractor(BasePdfExtractor):
         response = self._call_llm_with_fallback(prompt)
 
         return {
+            "current_tax_year": response.get("current_tax_year"),
             "tax_onetime_amount": response.get("tax_onetime_amount"),
             "tax_onetime_note": response.get("tax_onetime_note"),
             "tax_contingency_amount": response.get(

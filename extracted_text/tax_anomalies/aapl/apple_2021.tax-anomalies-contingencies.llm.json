@@ -6,7 +6,9 @@
     24,
     25,
     26,
+    27,
     28,
+    29,
     43,
     44,
     45,
@@ -14,9 +16,10 @@
     51
   ],
   "extraction": {
+    "current_tax_year": 2021,
     "tax_onetime_amount": null,
     "tax_onetime_note": null,
-    "tax_contingency_amount": 0.0012,
-    "tax_contingency_note": "The company believes it is reasonably possible that its gross unrecognized tax benefits could decrease in the next 12 months by as much as $1.2 billion."
+    "tax_contingency_amount": 1.2,
+    "tax_contingency_note": "Company believes it is reasonably possible that gross unrecognized tax benefits could decrease by $1.2 billion in the next 12 months"
   }
 }

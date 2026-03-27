@@ -6,17 +6,18 @@
     24,
     25,
     26,
+    27,
     28,
-    29,
     43,
     44,
     45,
     50
   ],
   "extraction": {
-    "tax_onetime_amount": null,
-    "tax_onetime_note": null,
-    "tax_contingency_amount": 0.013,
-    "tax_contingency_note": "European Commission State Aid Decision: The adjusted recovery amount is €12.7 billion (approximately $13 billion), plus interest, funded into escrow pending legal appeal. The Company believes it is reasonably possible that its gross unrecognized tax benefits could decrease in the next 12 months by as much as $4.8 billion."
+    "current_tax_year": 2022,
+    "tax_onetime_amount": 0.542,
+    "tax_onetime_note": "Impact of the U.S. Tax Cuts and Jobs Act of 2017, specifically a $542 million charge related to regulatory guidance issued by the U.S. Department of the Treasury in 2022 impacting U.S. foreign tax credits",
+    "tax_contingency_amount": 16.8,
+    "tax_contingency_note": "Gross unrecognized tax benefits as of September 24, 2022. Of this amount, $8.0 billion would impact the effective tax rate if recognized, and it is reasonably possible that gross unrecognized tax benefits could decrease by as much as $4.8 billion in the next 12 months. Additionally, the Company has funded €12.7 billion (plus interest) into escrow related to the European Commission State Aid Decision pending appeal."
   }
 }

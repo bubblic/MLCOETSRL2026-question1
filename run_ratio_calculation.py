@@ -12,7 +12,7 @@ from financial_forecast.extraction.statement_ratios import RatioCalculator
 if __name__ == "__main__":
 
     calculator = RatioCalculator(
-        input_dir="deepseek_financial_statements",
+        input_dir="./extracted_json/financial_statements",
         output_file="financial_ratios.json",
     )
 

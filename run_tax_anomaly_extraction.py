@@ -21,5 +21,5 @@ if __name__ == "__main__":
 
     extractor.run(
         input_path=f"./annual_reports/for_tax_anomalies/{company}",
-        output_dir=f"extracted_text/tax_anomalies/{company}",
+        output_dir=f"./extracted_text/tax_anomalies/{company}",
     )
