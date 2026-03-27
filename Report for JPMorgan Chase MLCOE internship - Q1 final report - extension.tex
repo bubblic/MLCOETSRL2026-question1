@@ -2597,16 +2597,6 @@ model consumption:
 Script: \textbf{llm\_extract\_tax\_anomalies\_from\_pdf.py}
 
 \begin{lstlisting}[style=python]
-DEFAULT_SELECTION_QUERY = (
-    "Item 7 Management's Discussion and Analysis (MD&A), "
-    "and Item 8 Financial "
-    'Statements and Supplementary Data sections specifically '
-    'covering "Income Taxes" '
-    'and "Commitments and Contingencies".'
-)
-\end{lstlisting}
-
-\begin{lstlisting}[style=python]
 DEFAULT_SELECTION_PROMPT = (
     "You are given pages from a Form 10-K annual report.\n"
     "Identify all pages that contain any of the following:\n"
@@ -2614,52 +2604,34 @@ DEFAULT_SELECTION_PROMPT = (
     "2) Item 8: Financial Statements and Supplementary Data notes "
     "for:\n"
     " - Income Taxes\n"
-    " - Commitments and Contingencies\n\n"
     "Include pages with headings, substantive discussion, tables, "
     "and continuations of "
     "these sections.\n"
     'Return ONLY valid JSON with this exact shape: '
     '{{"pages": [<page_number>, ...]}}.\n'
     'If none match, return {{"pages": []}}.\n\n'
-    "Query: {query}\n\n"
     "Pages:\n{pages}"
 )
 \end{lstlisting}
 
 \begin{lstlisting}[style=python]
 DEFAULT_EXTRACTION_PROMPT = (
-    "You are an expert financial analyst. Your task is to analyze the "
-    "provided excerpts "
-    "from a company's Form 10-K (MD&A and Financial Footnotes) and "
-    "extract data regarding "
-    "one-time tax anomalies and future tax contingencies.\n\n"
+    "You are an expert financial analyst. Your task is to analyze the provided "
+    "excerpts from a company's Form 10-K (MD&A and Financial Footnotes) and "
+    "extract data regarding one-time tax anomalies.\n\n"
     "Carefully evaluate the text for the following:\n\n"
-    "Current Year Anomalies: Identify any massive, non-recurring, "
-    "discrete tax charges "
-    "or benefits that heavily skewed the current year's net income "
-    "(e.g., finalized state "
-    "aid decisions, sudden impacts from new tax legislation).\n\n"
-    "Future Contingencies: Identify any quantified maximum tax "
-    "exposures, unreserved tax "
-    "liabilities, or significant unrecognized tax benefits (UTBs) "
-    "that management indicates "
-    "could be resolved or assessed in future years (e.g., tax funds "
-    "held in escrow pending "
-    "appeal, estimated UTB decreases in the next 12 months).\n\n"
-    "You must respond ONLY with a valid JSON object using the exact "
-    "schema below. Do not "
-    "include any markdown formatting, preamble, or postscript. If a "
-    "specific data point is "
-    "not explicitly mentioned or cannot be reliably quantified from "
-    "the text, output null "
-    "for that field.\n\n"
+    "Current Year Anomalies: Identify any massive, non-recurring, discrete tax "
+    "charges or benefits ASSESSED THIS YEAR (not last year or next year) that skewed the current year's net income (e.g., "
+    "finalized state aid decisions, sudden impacts from new tax legislation). Positive for tax paid by company, negative for tax reduction or benefit for the company.\n\n"
+    "You must respond ONLY with a valid JSON object using the exact schema below. "
+    "Do not include any markdown formatting, preamble, or postscript. If a specific "
+    "data point is not explicitly mentioned or cannot be reliably quantified from "
+    "the text, output null for that field.\n\n"
     "JSON Schema:\n"
     "{{\n"
-    ' "tax_onetime_amount": <number in billions or null>,\n'
-    ' "tax_onetime_note": "<string explaining the anomaly or null>",\n'
-    ' "tax_contingency_amount": <number in billions or null>,\n'
-    ' "tax_contingency_note": "<string explaining the future reserve '
-    'or null>"\n'
+    '  "current_tax_year": <number>,\n'
+    '  "tax_onetime_amount": <number in billions or null>,\n'
+    '  "tax_onetime_note": "<string explaining the anomaly or null>",\n'
     "}}\n\n"
     "Pages:\n{pages}"
 )
@@ -2680,15 +2652,12 @@ JSON output:
 
 \begin{lstlisting}[style=json]
 {
-    "query": "Item 7 Management's Discussion and Analysis (MD&A), and Item 8 Financial Statements and Supplementary Data sections specifically covering \"Income Taxes\" and \"Commitments and Contingencies\".",
     "selected_pages": [
         23, 24, 25, 26, 27, 41, 42, 43, 45, 46, 47
     ],
     "extraction": {
         "tax_onetime_amount": 10.2,
-        "tax_onetime_note": "One-time income tax charge of $10.2 billion net related to the European Commission State Aid Decision.",
-        "tax_contingency_amount": 13,
-        "tax_contingency_note": "Gross unrecognized tax benefits could decrease between approximately $5 billion and $13 billion in the next 12 months, primarily related to intercompany transfer pricing and deemed repatriation tax."
+        "tax_onetime_note": "One-time income tax charge of $10.2 billion net related to the European Commission State Aid Decision."
     }
 }
 \end{lstlisting}

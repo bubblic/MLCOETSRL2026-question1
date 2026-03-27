@@ -1,0 +1,29 @@
+{
+  "selected_pages": [
+    24,
+    25,
+    26,
+    27,
+    28,
+    29,
+    30,
+    31,
+    32,
+    33,
+    34,
+    35,
+    36,
+    37,
+    38,
+    54,
+    55,
+    56,
+    57
+  ],
+  "extraction": {
+    "current_tax_year": 2018,
+    "tax_onetime_amount": 1.5,
+    "tax_onetime_note": "The impact of the U.S. Tax Cuts and Jobs Act increased the provision for income taxes by $1.5 billion in 2018. This was composed of $2.0 billion from the remeasurement of net deferred tax assets/liabilities and $1.2 billion from the deemed repatriation tax, partially offset by a $1.7 billion reduction in unrecognized tax benefits.",
+    "amount_scale": 1000000000.0
+  }
+}

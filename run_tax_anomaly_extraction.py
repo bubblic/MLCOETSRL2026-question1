@@ -1,4 +1,4 @@
-"""Extract tax anomalies and contingencies from 10-K PDFs.
+"""Extract tax anomalies from 10-K PDFs.
 
 Uses an LLM to identify relevant pages (Item 7/8 tax-related content)
 and extract structured JSON with one-time tax charges and future

@@ -1,9 +1,8 @@
-"""Tax anomaly and contingency extraction from Form 10-K PDFs.
+"""Tax anomaly extraction from Form 10-K PDFs.
 
 Provides :class:`TaxAnomalyExtractor`, which extends
 :class:`BasePdfExtractor` to identify relevant 10-K pages and extract
-structured JSON describing one-time tax anomalies and future
-tax contingencies, in billions.
+structured JSON describing one-time tax anomalies, in billions.
 """
 
 from __future__ import annotations
@@ -16,39 +15,27 @@ from financial_forecast.clients.azure_llm_client import AzureLLMClient
 import time
 
 
-DEFAULT_SELECTION_QUERY = (
-    "Item 7 Management's Discussion and Analysis (MD&A), and Item 8 Financial "
-    'Statements and Supplementary Data sections specifically covering "Income Taxes" '
-    'and "Commitments and Contingencies".'
-)
-
 DEFAULT_SELECTION_PROMPT = (
     "You are given pages from a Form 10-K annual report.\n"
     "Identify all pages that contain any of the following:\n"
     "1) Item 7: Management's Discussion and Analysis (MD&A)\n"
     "2) Item 8: Financial Statements and Supplementary Data notes for:\n"
     "   - Income Taxes\n"
-    "   - Commitments and Contingencies\n\n"
     "Include pages with headings, substantive discussion, tables, and "
     "continuations of these sections.\n"
     'Return ONLY valid JSON with this exact shape: {{"pages": [<page_number>, ...]}}.\n'
     'If none match, return {{"pages": []}}.\n\n'
-    "Query: {query}\n\n"
     "Pages:\n{pages}"
 )
 
 DEFAULT_EXTRACTION_PROMPT = (
     "You are an expert financial analyst. Your task is to analyze the provided "
     "excerpts from a company's Form 10-K (MD&A and Financial Footnotes) and "
-    "extract data regarding one-time tax anomalies and future tax contingencies.\n\n"
+    "extract data regarding one-time tax anomalies.\n\n"
     "Carefully evaluate the text for the following:\n\n"
     "Current Year Anomalies: Identify any massive, non-recurring, discrete tax "
-    "charges or benefits ASSESSED THIS YEAR (not last year) that heavily skewed the current year's net income (e.g., "
+    "charges or benefits that skewed the current year's net income (e.g., "
     "finalized state aid decisions, sudden impacts from new tax legislation). Positive for tax paid by company, negative for tax reduction or benefit for the company.\n\n"
-    "Future Contingencies: Identify any quantified maximum tax exposures, unreserved "
-    "tax liabilities, or significant unrecognized tax benefits (UTBs) that management "
-    "indicates could be resolved or assessed in future years (e.g., tax funds held in "
-    "escrow pending appeal, estimated UTB decreases in the next 12 months).\n\n"
     "You must respond ONLY with a valid JSON object using the exact schema below. "
     "Do not include any markdown formatting, preamble, or postscript. If a specific "
     "data point is not explicitly mentioned or cannot be reliably quantified from "
@@ -58,21 +45,17 @@ DEFAULT_EXTRACTION_PROMPT = (
     '  "current_tax_year": <number>,\n'
     '  "tax_onetime_amount": <number in billions or null>,\n'
     '  "tax_onetime_note": "<string explaining the anomaly or null>",\n'
-    '  "tax_contingency_amount": <number in billions or null>,\n'
-    '  "tax_contingency_note": "<string explaining the future reserve or null>"\n'
     "}}\n\n"
     "Pages:\n{pages}"
 )
 
 
 class TaxAnomalyExtractor(BasePdfExtractor):
-    """Extract tax anomalies and contingencies from 10-K PDFs.
+    """Extract tax anomalies from 10-K PDFs.
 
     Args:
         llm_client: Configured :class:`AzureLLMClient`.
-        query: Query text for page selection.
-        selection_prompt: Prompt template for page selection
-            (with ``{query}`` and ``{pages}`` placeholders).
+        selection_prompt: Prompt template for page selection.
         extraction_prompt: Prompt template for tax extraction
             (with ``{pages}`` placeholder).
         batch_size: Pages per LLM prompt during page selection.
@@ -83,7 +66,6 @@ class TaxAnomalyExtractor(BasePdfExtractor):
     def __init__(
         self,
         llm_client: AzureLLMClient,
-        query: str = DEFAULT_SELECTION_QUERY,
         selection_prompt: str = DEFAULT_SELECTION_PROMPT,
         extraction_prompt: str = DEFAULT_EXTRACTION_PROMPT,
         batch_size: int = 100,
@@ -96,7 +78,6 @@ class TaxAnomalyExtractor(BasePdfExtractor):
             parameters=parameters,
             max_workers=max_workers,
         )
-        self.query = query
         self.selection_prompt = selection_prompt
         self.extraction_prompt = extraction_prompt
 
@@ -108,7 +89,7 @@ class TaxAnomalyExtractor(BasePdfExtractor):
         print(f"Selecting pages for {pdf_path.name}...")
         selected_pages = self._select_pages(
             pages,
-            self.query,
+            "",
             is_financial_statement=False,
             prompt_override=self.selection_prompt,
         )
@@ -117,14 +98,13 @@ class TaxAnomalyExtractor(BasePdfExtractor):
         extraction = self._extract_tax_json(selected_pages, pages)
 
         result = {
-            "query": self.query,
             "selected_pages": selected_pages,
             "extraction": extraction,
         }
         self._write_json(
             output_dir,
             pdf_path,
-            "tax-anomalies-contingencies",
+            "tax-anomalies",
             result,
         )
 
@@ -139,8 +119,6 @@ class TaxAnomalyExtractor(BasePdfExtractor):
                 "current_tax_year": None,
                 "tax_onetime_amount": None,
                 "tax_onetime_note": None,
-                "tax_contingency_amount": None,
-                "tax_contingency_note": None,
                 "amount_scale": None,
             }
 
@@ -162,9 +140,5 @@ class TaxAnomalyExtractor(BasePdfExtractor):
             "current_tax_year": response.get("current_tax_year"),
             "tax_onetime_amount": response.get("tax_onetime_amount"),
             "tax_onetime_note": response.get("tax_onetime_note"),
-            "tax_contingency_amount": response.get(
-                "tax_contingency_amount",
-            ),
-            "tax_contingency_note": response.get("tax_contingency_note"),
             "amount_scale": 1e9,
         }

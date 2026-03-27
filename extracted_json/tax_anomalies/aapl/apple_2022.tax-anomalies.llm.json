@@ -1,0 +1,20 @@
+{
+  "selected_pages": [
+    22,
+    23,
+    24,
+    25,
+    26,
+    27,
+    28,
+    43,
+    44,
+    45
+  ],
+  "extraction": {
+    "current_tax_year": 2022,
+    "tax_onetime_amount": null,
+    "tax_onetime_note": null,
+    "amount_scale": 1000000000.0
+  }
+}

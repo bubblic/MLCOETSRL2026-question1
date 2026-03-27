@@ -41,7 +41,7 @@ class HistoricalDataLoader:
         company: Company ticker, case-insensitive (e.g. ``"aapl"``).
         include_inflation: Whether to load inflation data.
         tax_anomaly_dir: Directory containing
-            ``*.tax-anomalies-contingencies.llm.json`` files.
+            ``*.tax-anomalies.llm.json`` files.
             If provided, tax anomaly data is loaded from these files.
     """
 
@@ -97,7 +97,7 @@ class HistoricalDataLoader:
     def _load_tax_from_extracted_json(self) -> Dict[int, float]:
         """Load tax data from extracted JSON files.
 
-        Reads all ``*.tax-anomalies-contingencies.llm.json`` files in
+        Reads all ``*.tax-anomalies.llm.json`` files in
         :attr:`tax_anomaly_dir`, extracts non-null ``tax_onetime_amount``
         values, and returns them as ``{year: amount_usd}``.
         """
@@ -105,7 +105,7 @@ class HistoricalDataLoader:
         if not tax_dir.exists():
             raise FileNotFoundError(f"Tax anomaly directory not found: {tax_dir}")
 
-        json_files = sorted(tax_dir.glob("*.tax-anomalies-contingencies.llm.json"))
+        json_files = sorted(tax_dir.glob("*.tax-anomalies.llm.json"))
         if not json_files:
             raise FileNotFoundError(f"No tax anomaly JSON files found in: {tax_dir}")
 
