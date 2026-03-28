@@ -8,7 +8,9 @@ period payloads returned by the language model into a consistent schema.
 import json
 import re
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Union
+
+from financial_forecast.extraction.statement_config import StatementType
 
 
 def load_raw_statement(path: Path) -> str:
@@ -23,11 +25,12 @@ def load_raw_statement(path: Path) -> str:
 
 def build_prompt(
     company_id: str,
-    statement_type: str,
+    statement_type: StatementType,
     required_fields: List[str],
     statement_and_supplementary_tables: str,
 ) -> str:
     """Build the LLM prompt for one financial statement extraction."""
+    statement_label = statement_type.value.replace("-", " ").title()
     fields_schema = ",\n".join(
         [
             f'        "{field}": [{{"source_label": number}}]'
@@ -36,7 +39,7 @@ def build_prompt(
     )
     prompt = (
         "You are a financial statement extraction engine.\n"
-        f"Extract normalized {statement_type} values from the statement and supplementary tables.\n\n"
+        f"Extract normalized {statement_label} values from the statement and supplementary tables.\n\n"
         "Return ONLY valid JSON with this exact schema:\n"
         "{\n"
         '  "company_id": "string",\n'
@@ -63,11 +66,10 @@ def build_prompt(
         "8) For currency, report its formal 3-letter acronym.\n"
         "9) For scale, report the scale of the values in the statement. For example, if the values are in millions, the scale should be 1E6.\n"
         "10) For total_operating_cost, list all elements that reflect the total operational costs incurred in generating income and are included in standard practice for the industry the company is in.\n"
-        "11) For taxes, it is the tax assessed on the income. If a tax belongs to the cost of revenue, it should be part of total_operating_cost.\n"
-        "12) Generally, numbers in parentheses are negative.\n"
-        "13) For taxes, interest_expenses, and total_operating_cost, the sign convention is the opposite: if an element reduces income, it should be positive; and if it increases income, it should be negative.\n"
-        "14) For short_term_market_securities, these are liquid, unrestricted debt or equity investments intended to be sold in the short term, e.g., U.S. Treasuries, commercial paper, money market funds, publicly traded equities, short-term investments.\n"
-        "15) Return JSON only.\n\n"
+        "11) Generally, numbers in parentheses are negative.\n"
+        "12) For income_tax_expense, interest_expenses, and total_operating_cost, the sign convention is the opposite: if an element reduces income, it should be positive; and if it increases income, it should be negative.\n"
+        "13) For short_term_market_securities, these are liquid, unrestricted debt or equity investments intended to be sold in the short term, e.g., U.S. Treasuries, commercial paper, money market funds, publicly traded equities, short-term investments.\n"
+        "14) Return JSON only.\n\n"
         f"company_id: {company_id}\n\n"
         "statement and supplementary tables:\n"
         f"{statement_and_supplementary_tables}\n"

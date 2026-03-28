@@ -17,6 +17,7 @@ from financial_forecast.extraction.financial_statement_extractor import (
     FinancialStatementExtractor,
     SUPPLEMENTARY_EXTRACTION_MAX_PAGES,
 )
+from financial_forecast.extraction.statement_config import StatementType
 
 
 @pytest.fixture
@@ -49,7 +50,7 @@ def mock_client():
 def extractor(mock_client):
     """Extractor with default config and mock client."""
     return FinancialStatementExtractor(
-        queries=["Consolidated Balance Sheet"],
+        queries=[StatementType.BALANCE_SHEET],
         llm_client=mock_client,
     )
 
@@ -61,13 +62,13 @@ def extractor(mock_client):
 
 def test_constructor_stores_config(mock_client):
     ext = FinancialStatementExtractor(
-        queries=["Q1", "Q2"],
+        queries=[StatementType.BALANCE_SHEET, StatementType.INCOME_STATEMENT],
         llm_client=mock_client,
         batch_size=50,
         parameters={"temperature": 0.5},
         max_workers=2,
     )
-    assert ext.queries == ["Q1", "Q2"]
+    assert ext.queries == [StatementType.BALANCE_SHEET, StatementType.INCOME_STATEMENT]
     assert ext.batch_size == 50
     assert ext.parameters == {"temperature": 0.5}
     assert ext.max_workers == 2
@@ -101,7 +102,7 @@ def test_run_raises_on_empty_dir(extractor, tmp_path):
 def test_extract_table_requires_pages(extractor, sample_pages):
     with pytest.raises(ValueError, match="No pages selected"):
         extractor._extract_table(
-            query="Consolidated Balance Sheet",
+            query_label="Consolidated Balance Sheet",
             page_numbers=[],
             pages=sample_pages,
         )
@@ -114,7 +115,7 @@ def test_extract_table_uses_raw_response(extractor, mock_client, sample_pages):
         return_value={"parsed": True},
     ):
         result = extractor._extract_table(
-            query="Consolidated Balance Sheet",
+            query_label="Consolidated Balance Sheet",
             page_numbers=[1, 2],
             pages=sample_pages,
         )
@@ -129,7 +130,7 @@ def test_extract_table_uses_raw_response(extractor, mock_client, sample_pages):
 
 def test_extract_supplementary_no_pages(extractor, mock_client):
     result = extractor._extract_supplementary(
-        query="Q",
+        statement_type=StatementType.BALANCE_SHEET,
         primary_extraction={},
         page_numbers=[],
         pages={},
@@ -158,7 +159,7 @@ def test_extract_supplementary_aggregates_chunks(
         llm_client=mock_client,
     )
     result = ext._extract_supplementary(
-        query="Consolidated Balance Sheet",
+        statement_type=StatementType.BALANCE_SHEET,
         primary_extraction=sample_primary_extraction,
         page_numbers=[1, 2, 10],
         pages=sample_pages,
@@ -187,7 +188,7 @@ def test_extract_supplementary_missing_key(
         llm_client=mock_client,
     )
     result = ext._extract_supplementary(
-        query="Consolidated Balance Sheet",
+        statement_type=StatementType.BALANCE_SHEET,
         primary_extraction=sample_primary_extraction,
         page_numbers=[1, 2, 10],
         pages=sample_pages,
@@ -211,7 +212,7 @@ def test_extract_one_pdf_writes_json(
     output_dir = tmp_path / "out"
 
     ext = FinancialStatementExtractor(
-        queries=["Consolidated Balance Sheet"],
+        queries=[StatementType.BALANCE_SHEET],
         llm_client=mock_client,
     )
 
@@ -237,4 +238,5 @@ def test_extract_one_pdf_writes_json(
     assert output_file.exists()
     payload = json.loads(output_file.read_text(encoding="utf-8"))
     assert payload["query"] == "Consolidated Balance Sheet"
+    assert payload["statement_type"] == "consolidated-balance-sheet"
     assert payload["selected_pages"]["primary_statement_pages"] == [1, 2]

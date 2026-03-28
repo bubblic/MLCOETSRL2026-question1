@@ -76,17 +76,17 @@ class RatioCalculator:
         operating_cost = flat_values.get("total_operating_cost")
         cash = flat_values.get("cash_and_cash_equivalents")
         securities = flat_values.get("short_term_market_securities")
-        receivables = flat_values.get("total_accounts_receivable")
+        receivables = flat_values.get("net_accounts_receivable")
         current_liab = flat_values.get("total_current_liabilities")
         total_debt = flat_values.get("total_debt_short_term_and_long_term")
         total_equity = flat_values.get("total_equity")
         total_assets = flat_values.get("total_assets")
         net_income = flat_values.get("net_income")
-        taxes = flat_values.get("taxes")
+        income_tax_expense = flat_values.get("income_tax_expense")
         interest = flat_values.get("interest_expenses")
         dep_amort = flat_values.get("depreciation_and_amortization")
 
-        ebit = sum_if_all_present(net_income, interest, taxes)
+        ebit = sum_if_all_present(net_income, interest, income_tax_expense)
         ebitda = sum_if_all_present(ebit, dep_amort)
         quick_assets = sum_if_all_present(cash, securities, receivables)
         debt_plus_equity = sum_if_all_present(total_debt, total_equity)
@@ -97,7 +97,8 @@ class RatioCalculator:
             "debt_to_equity_ratio": safe_divide(total_debt, total_equity),
             "debt_to_assets_ratio": safe_divide(total_debt, total_assets),
             "debt_to_capital_ratio": safe_divide(
-                total_debt, debt_plus_equity,
+                total_debt,
+                debt_plus_equity,
             ),
             "debt_to_ebitda_ratio": safe_divide(total_debt, ebitda),
             "interest_coverage_ratio": safe_divide(ebit, interest),
@@ -115,9 +116,7 @@ class RatioCalculator:
         """Read normalized files and aggregate single values per company/year."""
         files = sorted(input_dir.glob("*.normalized.json"))
         if not files:
-            raise ValueError(
-                f"No normalized files found in: {input_dir}"
-            )
+            raise ValueError(f"No normalized files found in: {input_dir}")
 
         company_periods: RunMap = {}
         for path in files:
@@ -162,7 +161,8 @@ class RatioCalculator:
                 if currency:
                     year_record["currency"] = currency
                 single_values = statement_period_to_single_values(
-                    period, fields=fields,
+                    period,
+                    fields=fields,
                 )
                 year_record["field_values"].update(single_values)
                 year_record["present_fields"].update(fields)
@@ -190,7 +190,8 @@ class RatioCalculator:
         return normalized
 
     def _build_ratios_output(
-        self, company_periods: RunMap,
+        self,
+        company_periods: RunMap,
     ) -> Tuple[List[Dict[str, Any]], int]:
         """Build the output payload from company periods."""
         companies_output: List[Dict[str, Any]] = []
@@ -201,18 +202,22 @@ class RatioCalculator:
                 record = company_periods[company_id][year]
                 field_values = record["field_values"]
                 derived_values, ratios = self._calculate_ratios(field_values)
-                periods_out.append({
-                    "year": year,
-                    "currency": record.get("currency", ""),
-                    "field_values": field_values,
-                    "derived_values": derived_values,
-                    "ratios": ratios,
-                })
+                periods_out.append(
+                    {
+                        "year": year,
+                        "currency": record.get("currency", ""),
+                        "field_values": field_values,
+                        "derived_values": derived_values,
+                        "ratios": ratios,
+                    }
+                )
                 total_periods += 1
-            companies_output.append({
-                "company_id": company_id,
-                "periods": periods_out,
-            })
+            companies_output.append(
+                {
+                    "company_id": company_id,
+                    "periods": periods_out,
+                }
+            )
         return companies_output, total_periods
 
 
@@ -246,13 +251,13 @@ class MedianRatioCalculator(RatioCalculator):
         if not self.plots_dir.is_absolute():
             self.plots_dir = self.runs_root / self.plots_dir
         self.hallucination_output_file = (
-            Path(hallucination_output_file)
-            if hallucination_output_file else None
+            Path(hallucination_output_file) if hallucination_output_file else None
         )
         self.hallucination_top_k = hallucination_top_k
         # input_dir not used directly — overridden by runs
         super().__init__(
-            input_dir=runs_output_dir, output_file=output_file,
+            input_dir=runs_output_dir,
+            output_file=output_file,
         )
 
     def run(self) -> int:
@@ -263,12 +268,10 @@ class MedianRatioCalculator(RatioCalculator):
 
         run_dirs = list_run_dirs(self.runs_root)
         if not run_dirs:
-            raise ValueError(
-                f"No run directories found in {self.runs_root}"
-            )
+            raise ValueError(f"No run directories found in {self.runs_root}")
 
-        run_entries, median_map, field_distributions = (
-            self._build_run_value_tracking(run_dirs)
+        run_entries, median_map, field_distributions = self._build_run_value_tracking(
+            run_dirs
         )
 
         # Write run value tracking
@@ -302,7 +305,8 @@ class MedianRatioCalculator(RatioCalculator):
 
         if self.plot_distributions:
             plots_written = self._write_distribution_plots(
-                field_distributions, self.plots_dir,
+                field_distributions,
+                self.plots_dir,
             )
             print(f"Distribution plots written: {plots_written}")
 
@@ -310,6 +314,7 @@ class MedianRatioCalculator(RatioCalculator):
             from financial_forecast.extraction.statement_hallucination import (
                 run_hallucination_analysis,
             )
+
             hall_file = self.hallucination_output_file
             if not hall_file.is_absolute():
                 hall_file = self.runs_root / hall_file
@@ -326,7 +331,8 @@ class MedianRatioCalculator(RatioCalculator):
         return total_periods
 
     def _build_run_value_tracking(
-        self, run_dirs: List[Path],
+        self,
+        run_dirs: List[Path],
     ) -> Tuple[List[Dict[str, Any]], RunMap, List[Dict[str, Any]]]:
         """Build per-run values, medians, and distributions."""
         run_entries: List[Dict[str, Any]] = []
@@ -340,20 +346,26 @@ class MedianRatioCalculator(RatioCalculator):
                 periods_payload: List[Dict[str, Any]] = []
                 for year in sorted(run_map[company_id]):
                     record = run_map[company_id][year]
-                    periods_payload.append({
-                        "year": year,
-                        "currency": record.get("currency", ""),
-                        "field_values": record["field_values"],
-                    })
-                companies_payload.append({
-                    "company_id": company_id,
-                    "periods": periods_payload,
-                })
-            run_entries.append({
-                "run_id": f"run_{run_idx:02d}",
-                "source_dir": str(run_dir),
-                "companies": companies_payload,
-            })
+                    periods_payload.append(
+                        {
+                            "year": year,
+                            "currency": record.get("currency", ""),
+                            "field_values": record["field_values"],
+                        }
+                    )
+                companies_payload.append(
+                    {
+                        "company_id": company_id,
+                        "periods": periods_payload,
+                    }
+                )
+            run_entries.append(
+                {
+                    "run_id": f"run_{run_idx:02d}",
+                    "source_dir": str(run_dir),
+                    "companies": companies_payload,
+                }
+            )
 
         all_fields = all_statement_fields()
         all_keys: set = set()
@@ -374,35 +386,29 @@ class MedianRatioCalculator(RatioCalculator):
                 valid_values: List[float] = []
                 for run_map in per_run_maps:
                     value: Optional[float] = None
-                    period_record = (
-                        run_map.get(company_id, {}).get(year)
-                    )
+                    period_record = run_map.get(company_id, {}).get(year)
                     if period_record:
-                        run_currency = str(
-                            period_record.get("currency", "")
-                        ).strip()
+                        run_currency = str(period_record.get("currency", "")).strip()
                         if run_currency and not currency:
                             currency = run_currency
-                        raw_value = period_record.get(
-                            "field_values", {}
-                        ).get(field)
+                        raw_value = period_record.get("field_values", {}).get(field)
                         if isinstance(raw_value, (int, float)):
                             value = float(raw_value)
                     values_by_run.append(value)
                     if value is not None:
                         valid_values.append(value)
-                median_value = (
-                    median(valid_values) if valid_values else None
-                )
+                median_value = median(valid_values) if valid_values else None
                 median_field_values[field] = median_value
-                field_distributions.append({
-                    "company_id": company_id,
-                    "year": year,
-                    "field": field,
-                    "values_by_run": values_by_run,
-                    "non_null_values": valid_values,
-                    "median_value": median_value,
-                })
+                field_distributions.append(
+                    {
+                        "company_id": company_id,
+                        "year": year,
+                        "field": field,
+                        "values_by_run": values_by_run,
+                        "non_null_values": valid_values,
+                        "median_value": median_value,
+                    }
+                )
             median_map[company_id][year] = {
                 "currency": currency,
                 "field_values": median_field_values,
@@ -431,13 +437,16 @@ class MedianRatioCalculator(RatioCalculator):
         output_dir.mkdir(parents=True, exist_ok=True)
         for (company_id, year), entries in grouped.items():
             entries_sorted = sorted(
-                entries, key=lambda x: str(x["field"]),
+                entries,
+                key=lambda x: str(x["field"]),
             )
             n = len(entries_sorted)
             cols = 3
             rows = math.ceil(n / cols)
             fig, axes = plt.subplots(
-                rows, cols, figsize=(cols * 5, rows * 3.5),
+                rows,
+                cols,
+                figsize=(cols * 5, rows * 3.5),
             )
             if rows == 1 and cols == 1:
                 axes_list = [axes]
@@ -450,8 +459,7 @@ class MedianRatioCalculator(RatioCalculator):
                 ax = axes_list[idx]
                 values_by_run = entry["values_by_run"]
                 run_points = [
-                    (i + 1, v)
-                    for i, v in enumerate(values_by_run) if v is not None
+                    (i + 1, v) for i, v in enumerate(values_by_run) if v is not None
                 ]
                 if run_points:
                     xs = [p[0] for p in run_points]
@@ -462,7 +470,9 @@ class MedianRatioCalculator(RatioCalculator):
                 median_value = entry.get("median_value")
                 if isinstance(median_value, (int, float)):
                     ax.axhline(
-                        float(median_value), linestyle="--", linewidth=1.0,
+                        float(median_value),
+                        linestyle="--",
+                        linewidth=1.0,
                     )
                 ax.set_title(str(entry["field"]), fontsize=9)
                 ax.set_xlabel("Run #", fontsize=8)
@@ -473,7 +483,8 @@ class MedianRatioCalculator(RatioCalculator):
                 axes_list[idx].axis("off")
 
             fig.suptitle(
-                f"{company_id} - {year} field distributions", fontsize=12,
+                f"{company_id} - {year} field distributions",
+                fontsize=12,
             )
             fig.tight_layout(rect=[0, 0.02, 1, 0.96])
             company_dir = output_dir / sanitize_filename(company_id)

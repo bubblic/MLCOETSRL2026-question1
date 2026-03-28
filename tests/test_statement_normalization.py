@@ -15,6 +15,7 @@ import pytest
 from financial_forecast.extraction.financial_statement_extractor import (
     FinancialStatementExtractor,
 )
+from financial_forecast.extraction.statement_config import StatementType
 from financial_forecast.extraction.statement_normalizer import (
     StatementNormalizer,
 )
@@ -37,13 +38,13 @@ def test_extractor_stores_config():
     """Constructor should store queries, client, and parameters."""
     client = Mock()
     extractor = FinancialStatementExtractor(
-        queries=["Balance Sheet"],
+        queries=[StatementType.BALANCE_SHEET],
         llm_client=client,
         batch_size=50,
         parameters={"temperature": 0.5},
         max_workers=2,
     )
-    assert extractor.queries == ["Balance Sheet"]
+    assert extractor.queries == [StatementType.BALANCE_SHEET]
     assert extractor.llm_client is client
     assert extractor.batch_size == 50
     assert extractor.parameters == {"temperature": 0.5}
@@ -189,13 +190,13 @@ def test_calculate_ratios_basic():
         "total_operating_cost": 60.0,
         "cash_and_cash_equivalents": 10.0,
         "short_term_market_securities": 5.0,
-        "total_accounts_receivable": 15.0,
+        "net_accounts_receivable": 15.0,
         "total_current_liabilities": 20.0,
         "total_debt_short_term_and_long_term": 50.0,
         "total_equity": 100.0,
         "total_assets": 200.0,
         "net_income": 25.0,
-        "taxes": 8.0,
+        "income_tax_expense": 8.0,
         "interest_expenses": 7.0,
         "depreciation_and_amortization": 10.0,
     }

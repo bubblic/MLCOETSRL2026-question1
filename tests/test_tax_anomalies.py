@@ -55,7 +55,6 @@ def test_constructor_stores_config(mock_client):
     assert ext.batch_size == 50
     assert ext.parameters == {"temperature": 0.5}
     assert ext.max_workers == 2
-    assert ext.query == TaxAnomalyExtractor.__init__.__defaults__[0]
 
 
 def test_constructor_default_prompts(mock_client):

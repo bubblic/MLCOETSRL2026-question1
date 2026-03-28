@@ -3301,7 +3301,7 @@ STATEMENT_CONFIGS: Dict[str, Dict[str, Any]] = {
             "revenue",
             "total_operating_cost",
             "net_income",
-            "taxes",
+            "income_tax_expense",
             "interest_expenses",
         ],
     },
@@ -3455,21 +3455,18 @@ prompt = (
     "reflect the total operational costs incurred in "
     "generating income and are included in standard practice "
     "for the industry the company is in.\n"
-    "11) For taxes, it is the tax assessed on the income. If "
-    "a tax belongs to the cost of revenue, it should be part "
-    "of total_operating_cost.\n"
-    "12) Generally, numbers in parentheses are negative.\n"
-    "13) For taxes, interest_expenses, and "
+    "11) Generally, numbers in parentheses are negative.\n"
+    "12) For income_tax_expense, interest_expenses, and "
     "total_operating_cost, the sign convention is the "
     "opposite: if an element reduces income, it should be "
     "positive; and if it increases income, it should be "
     "negative.\n"
-    "14) For short_term_market_securities, these are liquid, "
+    "13) For short_term_market_securities, these are liquid, "
     "unrestricted debt or equity investments intended to be "
     "sold in the short term, e.g., U.S. Treasuries, "
     "commercial paper, money market funds, publicly traded "
     "equities, short-term investments.\n"
-    "15) Return JSON only.\n\n"
+    "14) Return JSON only.\n\n"
     f"company_id: {company_id}\n\n"
     "statement and supplementary tables:\n"
     f"{statement_and_supplementary_tables}\n"
@@ -3590,13 +3587,13 @@ We also calculate the top 15 hallucinated fields as below:
 \begin{lstlisting}[style=console]
 - exxon_2024 | total_operating_cost | rate_non_null=0.2970 (90/303)
 - microsoft_2025 | depreciation_and_amortization | rate_non_null=0.1980 (60/303)
-- volkswagen_2024 | total_accounts_receivable | rate_non_null=0.1881 (38/202)
+- volkswagen_2024 | net_accounts_receivable | rate_non_null=0.1881 (38/202)
 - jpmorgan_2024 | depreciation_and_amortization | rate_non_null=0.1683 (51/303)
 - volkswagen_2024 | depreciation_and_amortization | rate_non_null=0.1683 (34/202)
 - volkswagen_2024 | total_operating_cost | rate_non_null=0.1287 (26/202)
 - alibaba_2025 | cash_and_cash_equivalents | rate_non_null=0.0990 (20/202)
 - alibaba_2025 | short_term_market_securities | rate_non_null=0.0990 (20/202)
-- alibaba_2025 | total_accounts_receivable | rate_non_null=0.0990 (20/202)
+- alibaba_2025 | net_accounts_receivable | rate_non_null=0.0990 (20/202)
 - alibaba_2025 | total_assets | rate_non_null=0.0990 (20/202)
 - alibaba_2025 | total_current_liabilities | rate_non_null=0.0990 (20/202)
 - alibaba_2025 | total_debt_short_term_and_long_term | rate_non_null=0.0990 (20/202)
@@ -3692,7 +3689,7 @@ and 2023 in the 2023 annual report:
   "field_values": {
     "cash_and_cash_equivalents": 19153000000.0,
     "short_term_market_securities": 12150000000.0,
-    "total_accounts_receivable": 46956000000.0,
+    "net_accounts_receivable": 46956000000.0,
     "total_current_liabilities": 91173000000.0,
     "total_debt_short_term_and_long_term": 114699000000.0,
     "total_equity": 71927000000.0,
@@ -3700,7 +3697,7 @@ and 2023 in the 2023 annual report:
     "total_revenue": 156735000000.0,
     "total_operating_cost": 146421000000.0,
     "net_income": 9708000000.0,
-    "taxes": 1888000000.0,
+    "income_tax_expense": 1888000000.0,
     "interest_expenses": 987000000.0,
     "depreciation_and_amortization": 11290000000.0
   },
@@ -3726,7 +3723,7 @@ and 2023 in the 2023 annual report:
   "field_values": {
     "cash_and_cash_equivalents": 18853000000.0,
     "short_term_market_securities": 7613000000.0,
-    "total_accounts_receivable": 51454000000.0,
+    "net_accounts_receivable": 51454000000.0,
     "total_current_liabilities": 94445000000.0,
     "total_debt_short_term_and_long_term": 121741000000.0,
     "total_equity": 68189000000.0,
@@ -3734,7 +3731,7 @@ and 2023 in the 2023 annual report:
     "total_revenue": 171842000000.0,
     "total_operating_cost": 162544000000.0,
     "net_income": 9840000000.0,
-    "taxes": 563000000.0,
+    "income_tax_expense": 563000000.0,
     "interest_expenses": 911000000.0,
     "depreciation_and_amortization": 11888000000.0
   },
@@ -3771,7 +3768,7 @@ LVMH:
   "field_values": {
     "cash_and_cash_equivalents": 7301000000.0,
     "short_term_market_securities": 3552000000.0,
-    "total_accounts_receivable": 4258000000.0,
+    "net_accounts_receivable": 4258000000.0,
     "total_current_liabilities": 31543000000.0,
     "total_debt_short_term_and_long_term": 19739000000.0,
     "total_equity": 56604000000.0,
@@ -3779,7 +3776,7 @@ LVMH:
     "total_revenue": 79184000000.0,
     "total_operating_cost": 58220000000.0,
     "net_income": 14084000000.0,
-    "taxes": 5362000000.0,
+    "income_tax_expense": 5362000000.0,
     "interest_expenses": 271000000.0,
     "depreciation_and_amortization": 6226000000.0
   },
@@ -3805,7 +3802,7 @@ LVMH:
   "field_values": {
     "cash_and_cash_equivalents": 7774000000.0,
     "short_term_market_securities": 3490000000.0,
-    "total_accounts_receivable": 4728000000.0,
+    "net_accounts_receivable": 4728000000.0,
     "total_current_liabilities": 33145000000.0,
     "total_debt_short_term_and_long_term": 21907000000.0,
     "total_equity": 62701000000.0,
@@ -3813,7 +3810,7 @@ LVMH:
     "total_revenue": 86153000000.0,
     "total_operating_cost": 63600000000.0,
     "net_income": 15174000000.0,
-    "taxes": 5673000000.0,
+    "income_tax_expense": 5673000000.0,
     "interest_expenses": 760000000.0,
     "depreciation_and_amortization": 7177000000.0
   },
@@ -3839,7 +3836,7 @@ LVMH:
   "field_values": {
     "cash_and_cash_equivalents": 9631000000.0,
     "short_term_market_securities": 3956000000.0,
-    "total_accounts_receivable": 4731000000.0,
+    "net_accounts_receivable": 4731000000.0,
     "total_current_liabilities": 33696000000.0,
     "total_debt_short_term_and_long_term": 22942000000.0,
     "total_equity": 69287000000.0,
@@ -3847,7 +3844,7 @@ LVMH:
     "total_revenue": 84683000000.0,
     "total_operating_cost": 65804000000.0,
     "net_income": 12550000000.0,
-    "taxes": 5157000000.0,
+    "income_tax_expense": 5157000000.0,
     "interest_expenses": 952000000.0,
     "depreciation_and_amortization": 7796000000.0
   },
@@ -3878,7 +3875,7 @@ Tencent:
   "field_values": {
     "cash_and_cash_equivalents": 172320000000.0,
     "short_term_market_securities": 14903000000.0,
-    "total_accounts_receivable": 46606000000.0,
+    "net_accounts_receivable": 46606000000.0,
     "total_current_liabilities": 352157000000.0,
     "total_debt_short_term_and_long_term": 348618000000.0,
     "total_equity": 873681000000.0,
@@ -3886,7 +3883,7 @@ Tencent:
     "total_revenue": 609015000000.0,
     "total_operating_cost": 453642000000.0,
     "net_income": 118048000000.0,
-    "taxes": 43276000000.0,
+    "income_tax_expense": 43276000000.0,
     "interest_expenses": 12268000000.0,
     "depreciation_and_amortization": 59008000000.0
   },
@@ -3912,7 +3909,7 @@ Tencent:
   "field_values": {
     "cash_and_cash_equivalents": 132519000000.0,
     "short_term_market_securities": 12913000000.0,
-    "total_accounts_receivable": 48203000000.0,
+    "net_accounts_receivable": 48203000000.0,
     "total_current_liabilities": 396909000000.0,
     "total_debt_short_term_and_long_term": 338615000000.0,
     "total_equity": 1053896000000.0,
@@ -3920,7 +3917,7 @@ Tencent:
     "total_revenue": 660257000000.0,
     "total_operating_cost": 460160000000.0,
     "net_income": 196467000000.0,
-    "taxes": 45018000000.0,
+    "income_tax_expense": 45018000000.0,
     "interest_expenses": 11981000000.0,
     "depreciation_and_amortization": 56213000000.0
   },
@@ -3951,7 +3948,7 @@ Alibaba:
   "field_values": {
     "cash_and_cash_equivalents": 248125000000.0,
     "short_term_market_securities": 262955000000.0,
-    "total_accounts_receivable": 29362000000.0,
+    "net_accounts_receivable": 29362000000.0,
     "total_current_liabilities": 421507000000.0,
     "total_debt_short_term_and_long_term": 170776000000.0,
     "total_equity": 1101871000000.0,
@@ -3959,7 +3956,7 @@ Alibaba:
     "total_revenue": 941168000000.0,
     "total_operating_cost": 827818000000.0,
     "net_income": 71332000000.0,
-    "taxes": 22529000000.0,
+    "income_tax_expense": 22529000000.0,
     "interest_expenses": 7947000000.0,
     "depreciation_and_amortization": 44504000000.0
   },
@@ -3985,7 +3982,7 @@ Alibaba:
   "field_values": {
     "cash_and_cash_equivalents": 145487000000.0,
     "short_term_market_securities": 228826000000.0,
-    "total_accounts_receivable": 30652000000.0,
+    "net_accounts_receivable": 30652000000.0,
     "total_current_liabilities": 435346000000.0,
     "total_debt_short_term_and_long_term": 230703000000.0,
     "total_equity": 1078393000000.0,
@@ -3993,7 +3990,7 @@ Alibaba:
     "total_revenue": 996347000000.0,
     "total_operating_cost": 856203000000.0,
     "net_income": 125976000000.0,
-    "taxes": 35445000000.0,
+    "income_tax_expense": 35445000000.0,
     "interest_expenses": 9596000000.0,
     "depreciation_and_amortization": 42459000000.0
   },
@@ -4024,7 +4021,7 @@ JPMorgan Chase:
   "field_values": {
     "cash_and_cash_equivalents": 624151000000.0,
     "short_term_market_securities": 476588000000.0,
-    "total_accounts_receivable": 107363000000.0,
+    "net_accounts_receivable": 107363000000.0,
     "total_current_liabilities": 3155690000000.0,
     "total_debt_short_term_and_long_term": 436537000000.0,
     "total_equity": 327878000000.0,
@@ -4032,7 +4029,7 @@ JPMorgan Chase:
     "total_revenue": 239425000000.0,
     "total_operating_cost": 177813000000.0,
     "net_income": 49552000000.0,
-    "taxes": 12060000000.0,
+    "income_tax_expense": 12060000000.0,
     "interest_expenses": 81321000000.0,
     "depreciation_and_amortization": 7512000000.0
   },
@@ -4058,7 +4055,7 @@ JPMorgan Chase:
   "field_values": {
     "cash_and_cash_equivalents": 469317000000.0,
     "short_term_market_securities": 514547000000.0,
-    "total_accounts_receivable": 101223000000.0,
+    "net_accounts_receivable": 101223000000.0,
     "total_current_liabilities": 3256638000000.0,
     "total_debt_short_term_and_long_term": 454311000000.0,
     "total_equity": 344758000000.0,
@@ -4066,7 +4063,7 @@ JPMorgan Chase:
     "total_revenue": 278906000000.0,
     "total_operating_cost": 203825000000.0,
     "net_income": 58471000000.0,
-    "taxes": 16610000000.0,
+    "income_tax_expense": 16610000000.0,
     "interest_expenses": 101350000000.0,
     "depreciation_and_amortization": 7938000000.0
   },
@@ -4097,7 +4094,7 @@ ExxonMobil:
   "field_values": {
     "cash_and_cash_equivalents": 31568000000.0,
     "short_term_market_securities": 0.0,
-    "total_accounts_receivable": 38015000000.0,
+    "net_accounts_receivable": 38015000000.0,
     "total_current_liabilities": 65316000000.0,
     "total_debt_short_term_and_long_term": 41573000000.0,
     "total_equity": 212538000000.0,
@@ -4105,7 +4102,7 @@ ExxonMobil:
     "total_revenue": 344582000000.0,
     "total_operating_cost": 290950000000.0,
     "net_income": 36010000000.0,
-    "taxes": 15429000000.0,
+    "income_tax_expense": 15429000000.0,
     "interest_expenses": 849000000.0,
     "depreciation_and_amortization": 20641000000.0
   },
@@ -4131,7 +4128,7 @@ ExxonMobil:
   "field_values": {
     "cash_and_cash_equivalents": 23187000000.0,
     "short_term_market_securities": 0.0,
-    "total_accounts_receivable": 43681000000.0,
+    "net_accounts_receivable": 43681000000.0,
     "total_current_liabilities": 70307000000.0,
     "total_debt_short_term_and_long_term": 41710000000.0,
     "total_equity": 270606000000.0,
@@ -4139,7 +4136,7 @@ ExxonMobil:
     "total_revenue": 349585000000.0,
     "total_operating_cost": 299716000000.0,
     "net_income": 33680000000.0,
-    "taxes": 13810000000.0,
+    "income_tax_expense": 13810000000.0,
     "interest_expenses": 996000000.0,
     "depreciation_and_amortization": 23442000000.0
   },
@@ -4170,7 +4167,7 @@ Volkswagen:
   "field_values": {
     "cash_and_cash_equivalents": 43449000000.0,
     "short_term_market_securities": 26772000000.0,
-    "total_accounts_receivable": 88230000000.0,
+    "net_accounts_receivable": 88230000000.0,
     "total_current_liabilities": 206036000000.0,
     "total_debt_short_term_and_long_term": 232799000000.0,
     "total_equity": 189186000000.0,
@@ -4178,7 +4175,7 @@ Volkswagen:
     "total_revenue": 322284000000.0,
     "total_operating_cost": 314907000000.0,
     "net_income": 17861000000.0,
-    "taxes": 5237000000.0,
+    "income_tax_expense": 5237000000.0,
     "interest_expenses": 3640000000.0,
     "depreciation_and_amortization": 27566000000.0
   },
@@ -4204,7 +4201,7 @@ Volkswagen:
   "field_values": {
     "cash_and_cash_equivalents": 40296000000.0,
     "short_term_market_securities": 27326000000.0,
-    "total_accounts_receivable": 89985000000.0,
+    "net_accounts_receivable": 89985000000.0,
     "total_current_liabilities": 217039000000.0,
     "total_debt_short_term_and_long_term": 254081000000.0,
     "total_equity": 196731000000.0,
@@ -4212,7 +4209,7 @@ Volkswagen:
     "total_revenue": 324656000000.0,
     "total_operating_cost": 320570000000.0,
     "net_income": 12394000000.0,
-    "taxes": 4411000000.0,
+    "income_tax_expense": 4411000000.0,
     "interest_expenses": 3446000000.0,
     "depreciation_and_amortization": 31346000000.0
   },
@@ -4243,7 +4240,7 @@ Microsoft:
   "field_values": {
     "cash_and_cash_equivalents": 18315000000.0,
     "short_term_market_securities": 57228000000.0,
-    "total_accounts_receivable": 56924000000.0,
+    "net_accounts_receivable": 56924000000.0,
     "total_current_liabilities": 125286000000.0,
     "total_debt_short_term_and_long_term": 51630000000.0,
     "total_equity": 268477000000.0,
@@ -4251,7 +4248,7 @@ Microsoft:
     "total_revenue": 245122000000.0,
     "total_operating_cost": 135689000000.0,
     "net_income": 88136000000.0,
-    "taxes": 19651000000.0,
+    "income_tax_expense": 19651000000.0,
     "interest_expenses": 2935000000.0,
     "depreciation_and_amortization": 22287000000.0
   },
@@ -4277,7 +4274,7 @@ Microsoft:
   "field_values": {
     "cash_and_cash_equivalents": 30242000000.0,
     "short_term_market_securities": 64323000000.0,
-    "total_accounts_receivable": 69905000000.0,
+    "net_accounts_receivable": 69905000000.0,
     "total_current_liabilities": 141218000000.0,
     "total_debt_short_term_and_long_term": 43151000000.0,
     "total_equity": 343479000000.0,
@@ -4285,7 +4282,7 @@ Microsoft:
     "total_revenue": 281724000000.0,
     "total_operating_cost": 153196000000.0,
     "net_income": 101832000000.0,
-    "taxes": 21795000000.0,
+    "income_tax_expense": 21795000000.0,
     "interest_expenses": 2385000000.0,
     "depreciation_and_amortization": 34153000000.0
   },
@@ -4316,7 +4313,7 @@ Google:
   "field_values": {
     "cash_and_cash_equivalents": 24048000000.0,
     "short_term_market_securities": 86868000000.0,
-    "total_accounts_receivable": 47964000000.0,
+    "net_accounts_receivable": 47964000000.0,
     "total_current_liabilities": 81814000000.0,
     "total_debt_short_term_and_long_term": 11870000000.0,
     "total_equity": 283379000000.0,
@@ -4324,7 +4321,7 @@ Google:
     "total_revenue": 307394000000.0,
     "total_operating_cost": 223101000000.0,
     "net_income": 73795000000.0,
-    "taxes": 11922000000.0,
+    "income_tax_expense": 11922000000.0,
     "interest_expenses": 308000000.0,
     "depreciation_and_amortization": 11946000000.0
   },
@@ -4350,7 +4347,7 @@ Google:
   "field_values": {
     "cash_and_cash_equivalents": 23466000000.0,
     "short_term_market_securities": 72191000000.0,
-    "total_accounts_receivable": 52340000000.0,
+    "net_accounts_receivable": 52340000000.0,
     "total_current_liabilities": 89122000000.0,
     "total_debt_short_term_and_long_term": 10883000000.0,
     "total_equity": 325084000000.0,
@@ -4358,7 +4355,7 @@ Google:
     "total_revenue": 350018000000.0,
     "total_operating_cost": 237628000000.0,
     "net_income": 100118000000.0,
-    "taxes": 19697000000.0,
+    "income_tax_expense": 19697000000.0,
     "interest_expenses": 268000000.0,
     "depreciation_and_amortization": 15311000000.0
   },

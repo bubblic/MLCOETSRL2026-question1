@@ -15,6 +15,7 @@ from financial_forecast.extraction.statement_config import (
     SCHEMA_VERSION,
     ExtractionCounts,
     STATEMENT_CONFIGS,
+    StatementType,
     output_filename_for_source,
     parse_filename,
 )
@@ -191,7 +192,7 @@ class StatementNormalizer:
     def _extract_one_statement(
         self,
         company_id: str,
-        statement_type: str,
+        statement_type: StatementType,
         required_fields: List[str],
         statement_and_supplementary_tables: str,
     ) -> Dict[str, Any]:
@@ -215,7 +216,7 @@ class StatementNormalizer:
         )
         return {
             "company_id": str(result.get("company_id", company_id)),
-            "statement_type": statement_type,
+            "statement_type": statement_type.value,
             "periods": normalized_periods,
             "notes": str(result.get("notes", "")),
         }
