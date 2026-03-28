@@ -6,7 +6,7 @@ Chains the three extraction stages:
 3. Calculate financial ratios from normalized data
 
 Usage:
-    python run_extraction_pipeline.py
+    python run_pdf_to_ratios_pipeline.py
 """
 
 from financial_forecast.extraction.financial_statement_extractor import (
