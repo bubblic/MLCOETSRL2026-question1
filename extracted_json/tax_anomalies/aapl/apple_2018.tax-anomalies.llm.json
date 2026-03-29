@@ -1,0 +1,28 @@
+{
+  "selected_pages": [
+    24,
+    25,
+    26,
+    27,
+    28,
+    29,
+    30,
+    31,
+    32,
+    33,
+    34,
+    35,
+    36,
+    37,
+    38,
+    54,
+    55,
+    56
+  ],
+  "extraction": {
+    "current_tax_year": 2018,
+    "tax_onetime_amount": 1.515,
+    "tax_onetime_note": "Impact of the Tax Cuts and Jobs Act, including remeasurement of deferred tax assets/liabilities and deemed repatriation tax, net of effect on unrecognized tax benefits.",
+    "amount_scale": 1000000000.0
+  }
+}

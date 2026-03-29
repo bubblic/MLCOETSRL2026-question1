@@ -1,0 +1,25 @@
+{
+  "selected_pages": [
+    18,
+    19,
+    20,
+    21,
+    22,
+    23,
+    24,
+    25,
+    26,
+    27,
+    28,
+    29,
+    46,
+    47,
+    48
+  ],
+  "extraction": {
+    "current_tax_year": 2019,
+    "tax_onetime_amount": null,
+    "tax_onetime_note": null,
+    "amount_scale": 1000000000.0
+  }
+}

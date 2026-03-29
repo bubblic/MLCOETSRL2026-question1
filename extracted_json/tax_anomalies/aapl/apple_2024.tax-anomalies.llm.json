@@ -1,0 +1,19 @@
+{
+  "selected_pages": [
+    23,
+    24,
+    25,
+    26,
+    27,
+    28,
+    41,
+    42,
+    43
+  ],
+  "extraction": {
+    "current_tax_year": 2024,
+    "tax_onetime_amount": 10.2,
+    "tax_onetime_note": "One-time income tax charge of $10.2 billion, net, related to the European Commission State Aid Decision, confirmed by the European Court of Justice in September 2024.",
+    "amount_scale": 1000000000.0
+  }
+}
