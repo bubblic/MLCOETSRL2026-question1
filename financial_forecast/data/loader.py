@@ -114,7 +114,7 @@ class HistoricalDataLoader:
             with path.open("r", encoding="utf-8") as f:
                 payload = json.load(f)
             extraction = payload.get("extraction", {})
-            scale = payload.get("amount_scale")
+            scale = extraction.get("amount_scale")
             amount = extraction.get("tax_onetime_amount")
             year = extraction.get("current_tax_year")
             if amount is not None and scale is not None and year is not None:
