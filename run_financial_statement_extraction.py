@@ -26,6 +26,6 @@ if __name__ == "__main__":
     )
 
     extractor.run(
-        input_path="./annual_reports/for_financial_statements",
+        input_path="./annual_reports/for_financial_statements/alibaba_2025.pdf",  # can be a file or a folder
         output_dir="./extracted_text/financial_statements",
     )

@@ -155,25 +155,30 @@ class FinancialStatementExtractor(BasePdfExtractor):
         page_numbers: List[int],
         pages: Dict[int, Optional[str]],
     ) -> dict:
-        """Extract supplementary disclosure tables in chunks."""
+        """Extract supplementary disclosure tables in chunks.
+
+        Returns a flat dict with ``chunk_1``, ``chunk_2``, ... keys,
+        each containing the raw LLM response for that chunk.
+        """
         if not page_numbers:
-            return {"supplementary_tables": []}
+            return {}
 
         query_label = statement_type.value.replace("-", " ").title()
         elements_context = _get_supplementary_context(statement_type)
-        aggregated_tables = []
-        chunk_responses = []
+        result = {}
         primary_context = json.dumps(
             primary_extraction,
             ensure_ascii=False,
             indent=2,
         )
 
+        chunk_idx = 0
         for start in range(
             0,
             len(page_numbers),
             SUPPLEMENTARY_EXTRACTION_MAX_PAGES,
         ):
+            chunk_idx += 1
             chunk = page_numbers[start : start + SUPPLEMENTARY_EXTRACTION_MAX_PAGES]
             pages_text = self._format_pages(chunk, pages)
             prompt = (
@@ -182,34 +187,24 @@ class FinancialStatementExtractor(BasePdfExtractor):
                 f"Primary statement: {query_label}\n"
                 "Primary statement extraction context:\n"
                 f"{primary_context}\n\n"
-                "Infer the line items from the primary statement context "
+                f"\n{elements_context}\n"
+                "Infer the line items from the primary statement context and the financial elements "
                 "above. Extract supplementary tables related to those "
                 "inferred line items (for example, breakdowns/expansions/"
                 "schedules/notes such as an expanded 'Other Income' "
                 "table). You can be generous with the supplementary "
-                "tables you extract since it is better to have more than "
+                "tables you extract since it is better to have redundant information than "
                 "not have necessary information.\n"
-                f"\n{elements_context}\n"
                 "Return in a nice tabular format (in English).\n"
                 'If none are found, return "No supplementary tables '
                 'found".\n\n'
                 f"Pages:\n{pages_text}"
             )
             parsed = self._call_llm_with_fallback(prompt)
-            chunk_responses.append(parsed)
+            raw = parsed.get("raw_response", parsed)
+            result[f"chunk_{chunk_idx}"] = raw
 
-            tables = parsed.get("supplementary_tables")
-            if isinstance(tables, list):
-                aggregated_tables.extend(tables)
-
-        if aggregated_tables:
-            return {"supplementary_tables": aggregated_tables}
-        if len(chunk_responses) == 1:
-            return chunk_responses[0]
-        return {
-            "supplementary_tables": [],
-            "chunk_responses": chunk_responses,
-        }
+        return result
 
     @staticmethod
     def _build_supplementary_page_query(
@@ -226,7 +221,7 @@ class FinancialStatementExtractor(BasePdfExtractor):
         return (
             f"Supplementary disclosures, breakdowns, expansions, and "
             f"note tables for {query_label}.\n "
-            f"Use this extracted primary statement as context to infer "
+            f"Use this extracted primary statement and the following list of financial elements as context to infer "
             f"relevant line items and find related supplementary pages: "
             f"{primary_context}\n\n"
             f"{elements_context}"

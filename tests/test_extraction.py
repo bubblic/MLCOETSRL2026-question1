@@ -135,11 +135,11 @@ def test_extract_supplementary_no_pages(extractor, mock_client):
         page_numbers=[],
         pages={},
     )
-    assert result == {"supplementary_tables": []}
+    assert result == {}
     mock_client.ask_json.assert_not_called()
 
 
-def test_extract_supplementary_aggregates_chunks(
+def test_extract_supplementary_multiple_chunks(
     mock_client,
     sample_pages,
     sample_primary_extraction,
@@ -151,8 +151,8 @@ def test_extract_supplementary_aggregates_chunks(
         2,
     )
     mock_client.ask_json.side_effect = [
-        {"supplementary_tables": [{"id": "A"}]},
-        {"supplementary_tables": [{"id": "B"}]},
+        {"raw_response": "Chunk 1 data"},
+        {"raw_response": "Chunk 2 data"},
     ]
     ext = FinancialStatementExtractor(
         queries=[],
@@ -164,36 +164,24 @@ def test_extract_supplementary_aggregates_chunks(
         page_numbers=[1, 2, 10],
         pages=sample_pages,
     )
-    assert result == {"supplementary_tables": [{"id": "A"}, {"id": "B"}]}
+    assert result == {"chunk_1": "Chunk 1 data", "chunk_2": "Chunk 2 data"}
     assert mock_client.ask_json.call_count == 2
 
 
-def test_extract_supplementary_missing_key(
+def test_extract_supplementary_single_chunk(
+    extractor,
     mock_client,
     sample_pages,
     sample_primary_extraction,
-    monkeypatch,
 ):
-    monkeypatch.setattr(
-        "financial_forecast.extraction.financial_statement_extractor."
-        "SUPPLEMENTARY_EXTRACTION_MAX_PAGES",
-        2,
-    )
-    mock_client.ask_json.side_effect = [
-        {"unexpected_key": "data"},
-        {"supplementary_tables": [{"id": "B"}]},
-    ]
-    ext = FinancialStatementExtractor(
-        queries=[],
-        llm_client=mock_client,
-    )
-    result = ext._extract_supplementary(
+    mock_client.ask_json.return_value = {"raw_response": "Single chunk"}
+    result = extractor._extract_supplementary(
         statement_type=StatementType.BALANCE_SHEET,
         primary_extraction=sample_primary_extraction,
-        page_numbers=[1, 2, 10],
+        page_numbers=[1, 2],
         pages=sample_pages,
     )
-    assert "supplementary_tables" in result
+    assert result == {"chunk_1": "Single chunk"}
 
 
 # ---------------------------------------------------------------------------
@@ -230,7 +218,7 @@ def test_extract_one_pdf_writes_json(
     ):
         mock_client.ask_json.side_effect = [
             sample_primary_extraction,
-            {"supplementary_tables": [{"id": "N1"}]},
+            {"raw_response": "Supplementary data here"},
         ]
         ext._extract_one_pdf(input_pdf, output_dir)
 

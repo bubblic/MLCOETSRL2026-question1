@@ -12,8 +12,8 @@ from financial_forecast.extraction.statement_ratios import MedianRatioCalculator
 
 if __name__ == "__main__":
 
-    input_dir = "./extracted_text/financial_statements"
-    runs_output_dir = "./extracted_json/financial_statements_multiruns"
+    input_dir = "./extracted_text/financial_statements/alibaba"
+    runs_output_dir = "./extracted_json/financial_statements_multiruns/alibaba"
 
     # Stage 1: Run normalization N times
     normalizer = StatementNormalizer(
