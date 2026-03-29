@@ -5,7 +5,7 @@ pages in each PDF, then extracts primary financial tables and
 supplementary disclosures.
 
 Usage:
-    python run_financial_statement_extraction.py
+    python run_statement_extraction.py
 """
 
 from financial_forecast.extraction.financial_statement_extractor import (
