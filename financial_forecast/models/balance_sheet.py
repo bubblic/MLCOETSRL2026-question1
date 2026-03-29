@@ -3,12 +3,17 @@
 Composes pluggable capex, working capital, and purchases modules.
 """
 
+from typing import Dict
+
 import tensorflow as tf
 
 from financial_forecast.inference.state_index import (
     R_NCA,
     R_INV,
 )
+from financial_forecast.models.capex import CapexPolicy
+from financial_forecast.models.working_capital import WorkingCapitalPolicy
+from financial_forecast.models.purchases import PurchasesPolicy
 
 
 class BalanceSheetModel(tf.Module):
@@ -26,10 +31,10 @@ class BalanceSheetModel(tf.Module):
 
     def __init__(
         self,
-        capex_policy,
-        working_capital,
-        purchases_policy,
-        name="balance_sheet",
+        capex_policy: CapexPolicy,
+        working_capital: WorkingCapitalPolicy,
+        purchases_policy: PurchasesPolicy,
+        name: str = "balance_sheet",
     ):
         super().__init__(name=name)
 
@@ -37,7 +42,12 @@ class BalanceSheetModel(tf.Module):
         self.working_capital = working_capital
         self.purchases_policy = purchases_policy
 
-    def evolve_assets(self, state, sales_t, time_index):
+    def evolve_assets(
+        self,
+        state: tf.Tensor,
+        sales_t: tf.Tensor,
+        time_index: tf.Tensor,
+    ) -> Dict[str, tf.Tensor]:
         """Evolve asset accounts.
 
         Args:

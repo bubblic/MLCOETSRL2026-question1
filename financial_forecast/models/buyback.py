@@ -5,6 +5,7 @@
 """
 
 from abc import abstractmethod
+from typing import Dict
 
 import tensorflow as tf
 import tensorflow_probability as tfp
@@ -16,7 +17,7 @@ class BuybackPolicy(tf.Module):
     """Abstract base class for stock buyback policy."""
 
     @abstractmethod
-    def compute(self, depreciation):
+    def compute(self, depreciation: tf.Tensor) -> tf.Tensor:
         """Compute base stock buyback amount.
 
         Args:
@@ -27,15 +28,20 @@ class BuybackPolicy(tf.Module):
         """
 
     @abstractmethod
-    def loss(self, bb_actual, depr, scale_bb):
+    def loss(
+        self,
+        bb_actual: tf.Tensor,
+        depr: tf.Tensor,
+        scale_bb: tf.Tensor,
+    ) -> tf.Tensor:
         """Compute MSE loss for buybacks."""
 
     @abstractmethod
-    def init_from_data(self, s):
+    def init_from_data(self, s: Dict[str, tf.Tensor]) -> None:
         """Initialize parameters from historical averages."""
 
     @abstractmethod
-    def print_summary(self):
+    def print_summary(self) -> None:
         """Print learned parameters."""
 
 
@@ -51,7 +57,7 @@ class SimpleBuybackPolicy(BuybackPolicy):
             name="stock_buyback_pct",
         )
 
-    def init_from_data(self, s):
+    def init_from_data(self, s: Dict[str, tf.Tensor]) -> None:
         _f64 = lambda v: tf.constant(v, dtype=tf.float64)
         _EPS = 1e-12
         self.stock_buyback_pct.assign(
@@ -67,14 +73,19 @@ class SimpleBuybackPolicy(BuybackPolicy):
             )
         )
 
-    def compute(self, depreciation):
+    def compute(self, depreciation: tf.Tensor) -> tf.Tensor:
         return depreciation * self.stock_buyback_pct
 
-    def loss(self, bb_actual, depr, scale_bb):
+    def loss(
+        self,
+        bb_actual: tf.Tensor,
+        depr: tf.Tensor,
+        scale_bb: tf.Tensor,
+    ) -> tf.Tensor:
         pred = depr * self.stock_buyback_pct
         return tf.reduce_mean(tf.square((bb_actual - pred) / scale_bb))
 
-    def print_summary(self):
+    def print_summary(self) -> None:
         print(f"Stock Buyback %: {self.stock_buyback_pct.numpy():.5f}")
 
 
@@ -86,7 +97,7 @@ class BaselineBuybackPolicy(BuybackPolicy):
         self.sb_baseline = tf.Variable(0.0, dtype=tf.float64, name="sb_baseline")
         self.sb_ratio = tf.Variable(1.0, dtype=tf.float64, name="sb_ratio")
 
-    def init_from_data(self, s):
+    def init_from_data(self, s: Dict[str, tf.Tensor]) -> None:
         _EPS = 1e-12
         self.sb_ratio.assign(
             float(
@@ -95,14 +106,19 @@ class BaselineBuybackPolicy(BuybackPolicy):
         )
         self.sb_baseline.assign(0.0)
 
-    def compute(self, depreciation):
+    def compute(self, depreciation: tf.Tensor) -> tf.Tensor:
         return self.sb_baseline + self.sb_ratio * depreciation
 
-    def loss(self, bb_actual, depr, scale_bb):
+    def loss(
+        self,
+        bb_actual: tf.Tensor,
+        depr: tf.Tensor,
+        scale_bb: tf.Tensor,
+    ) -> tf.Tensor:
         pred = self.sb_baseline + self.sb_ratio * depr
         return tf.reduce_mean(tf.square((bb_actual - pred) / scale_bb))
 
-    def print_summary(self):
+    def print_summary(self) -> None:
         print(
             f"Stock Buyback (baseline + ratio*depr): "
             f"baseline={self.sb_baseline.numpy():.4f}, "

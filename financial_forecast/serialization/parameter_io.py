@@ -3,9 +3,10 @@
 import os
 
 import numpy as np
+import tensorflow as tf
 
 
-def _save_module_params(params, module, prefix=""):
+def _save_module_params(params: dict, module: tf.Module, prefix: str = "") -> None:
     """Save all trainable variables from a tf.Module."""
     for var in module.trainable_variables:
         key = prefix + var.name.split(":")[0].replace("/", "_")
@@ -17,7 +18,7 @@ def _save_module_params(params, module, prefix=""):
             params[key] = float(var.numpy())
 
 
-def save_parameters(model, path: str) -> None:
+def save_parameters(model: tf.Module, path: str) -> None:
     """Serialize every learnable parameter to a NumPy ``.npz`` archive."""
     params = {}
 
@@ -39,7 +40,7 @@ def save_parameters(model, path: str) -> None:
     np.savez(path, **params)
 
 
-def load_parameters(model, path: str) -> None:
+def load_parameters(model: tf.Module, path: str) -> None:
     """Restore model parameters from a previously saved ``.npz`` archive."""
     if not os.path.exists(path):
         raise FileNotFoundError(f"Parameter file not found: {path}")

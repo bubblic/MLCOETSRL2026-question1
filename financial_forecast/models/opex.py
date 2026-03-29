@@ -12,7 +12,7 @@ Designed to be composed into a financial model as
 
 from abc import abstractmethod
 from datetime import datetime
-from typing import Optional
+from typing import Dict, Optional, Tuple
 
 import matplotlib.pyplot as plt
 import tensorflow as tf
@@ -37,7 +37,12 @@ class OpExModule(tf.Module):
     is_stochastic: bool = False
 
     @abstractmethod
-    def predict(self, sales_t, cum_inflation, use_mean=False):
+    def predict(
+        self,
+        sales_t: tf.Tensor,
+        cum_inflation: tf.Tensor,
+        use_mean: bool = False,
+    ) -> tf.Tensor:
         """Compute OpEx for a single forecast step.
 
         Args:
@@ -50,11 +55,16 @@ class OpExModule(tf.Module):
         """
 
     @abstractmethod
-    def prepare_mc(self, n_samples, n_years):
+    def prepare_mc(self, n_samples: int, n_years: int) -> None:
         """Pre-sample stochastic values for Monte Carlo forecast."""
 
     @abstractmethod
-    def compute_mc_step(self, sales_t, cum_inflation, step):
+    def compute_mc_step(
+        self,
+        sales_t: tf.Tensor,
+        cum_inflation: tf.Tensor,
+        step: tf.Tensor,
+    ) -> tf.Tensor:
         """Compute OpEx for one MC forecast step.
 
         Args:
@@ -67,7 +77,13 @@ class OpExModule(tf.Module):
         """
 
     @abstractmethod
-    def loss(self, observed_opex, sales, cum_inflation, loss_scale):
+    def loss(
+        self,
+        observed_opex: tf.Tensor,
+        sales: tf.Tensor,
+        cum_inflation: tf.Tensor,
+        loss_scale: tf.Tensor,
+    ) -> tf.Tensor:
         """Compute the training loss for OpEx.
 
         Args:
@@ -81,23 +97,29 @@ class OpExModule(tf.Module):
         """
 
     @abstractmethod
-    def init_from_data(self, s):
+    def init_from_data(self, s: Dict[str, tf.Tensor]) -> None:
         """Initialize parameters from historical averages."""
 
     @abstractmethod
-    def prepare_for_training(self, amount_scale, scaled_sales, scaled_opex, inflation):
+    def prepare_for_training(
+        self,
+        amount_scale: float,
+        scaled_sales: tf.Tensor,
+        scaled_opex: tf.Tensor,
+        inflation: tf.Tensor,
+    ) -> None:
         """Store data-derived quantities for training and plotting."""
 
     @abstractmethod
-    def record_step(self, epoch, loss):
+    def record_step(self, epoch: int, loss: float) -> None:
         """Record training state for diagnostics."""
 
     @abstractmethod
-    def plot_diagnostics(self, show_plot=False):
+    def plot_diagnostics(self, show_plot: bool = False) -> None:
         """Plot training diagnostics (no-op if nothing to plot)."""
 
     @abstractmethod
-    def print_summary(self):
+    def print_summary(self) -> None:
         """Print learned parameter summary."""
 
 
@@ -129,41 +151,63 @@ class SimpleOpEx(OpExModule):
         self._historical_inflation = None
         self._training_history = {"epochs": [], "loss": []}
 
-    def init_from_data(self, s):
+    def init_from_data(self, s: Dict[str, tf.Tensor]) -> None:
         _EPS = 1e-12
         self.variable_opex_pct.assign(
             float(tf.reduce_mean(s["opex"] / tf.maximum(s["sales"], _EPS)))
         )
 
-    def prepare_for_training(self, amount_scale, scaled_sales, scaled_opex, inflation):
+    def prepare_for_training(
+        self,
+        amount_scale: float,
+        scaled_sales: tf.Tensor,
+        scaled_opex: tf.Tensor,
+        inflation: tf.Tensor,
+    ) -> None:
         """Store data-derived quantities."""
         self.amount_scale = amount_scale
         self._historical_sales_scaled = scaled_sales
         self._historical_opex_scaled = scaled_opex
         self._historical_inflation = inflation
 
-    def predict(self, sales_t, cum_inflation, use_mean=False):
+    def predict(
+        self,
+        sales_t: tf.Tensor,
+        cum_inflation: tf.Tensor,
+        use_mean: bool = False,
+    ) -> tf.Tensor:
         """Compute OpEx deterministically. ``use_mean`` is ignored."""
         return self.baseline_opex * cum_inflation + sales_t * self.variable_opex_pct
 
-    def prepare_mc(self, n_samples, n_years):
+    def prepare_mc(self, n_samples: int, n_years: int) -> None:
         """No-op — deterministic model has no stochastic values."""
 
-    def compute_mc_step(self, sales_t, cum_inflation, step):
+    def compute_mc_step(
+        self,
+        sales_t: tf.Tensor,
+        cum_inflation: tf.Tensor,
+        step: tf.Tensor,
+    ) -> tf.Tensor:
         """Compute OpEx deterministically (same for all samples)."""
         return self.predict(sales_t, cum_inflation)
 
-    def loss(self, observed_opex, sales, cum_inflation, loss_scale):
+    def loss(
+        self,
+        observed_opex: tf.Tensor,
+        sales: tf.Tensor,
+        cum_inflation: tf.Tensor,
+        loss_scale: tf.Tensor,
+    ) -> tf.Tensor:
         """MSE loss for deterministic OpEx."""
         pred = self.baseline_opex * cum_inflation + sales * self.variable_opex_pct
         return tf.reduce_mean(tf.square((observed_opex - pred) / loss_scale))
 
-    def record_step(self, epoch, loss):
+    def record_step(self, epoch: int, loss: float) -> None:
         """Record training state for diagnostics."""
         self._training_history["epochs"].append(epoch)
         self._training_history["loss"].append(loss)
 
-    def plot_diagnostics(self, show_plot=False):
+    def plot_diagnostics(self, show_plot: bool = False) -> None:
         """No-op for deterministic OpEx — nothing to plot."""
 
     def print_summary(self) -> None:
@@ -247,13 +291,19 @@ class BayesianOpEx(OpExModule):
             "noise_sigma": [],
         }
 
-    def init_from_data(self, s):
+    def init_from_data(self, s: Dict[str, tf.Tensor]) -> None:
         _EPS = 1e-12
         self.q_var_opex_loc.assign(
             float(tf.reduce_mean(s["opex"] / tf.maximum(s["sales"], _EPS)))
         )
 
-    def prepare_for_training(self, amount_scale, scaled_sales, scaled_opex, inflation):
+    def prepare_for_training(
+        self,
+        amount_scale: float,
+        scaled_sales: tf.Tensor,
+        scaled_opex: tf.Tensor,
+        inflation: tf.Tensor,
+    ) -> None:
         """Set data-derived quantities needed for training, inference, and plotting.
 
         Args:
@@ -268,7 +318,14 @@ class BayesianOpEx(OpExModule):
         self._historical_opex_scaled = scaled_opex
         self._historical_inflation = inflation
 
-    def _compute(self, sales_t, cum_inflation, var_opex, base_opex, noise):
+    def _compute(
+        self,
+        sales_t: tf.Tensor,
+        cum_inflation: tf.Tensor,
+        var_opex: tf.Tensor,
+        base_opex: tf.Tensor,
+        noise: tf.Tensor,
+    ) -> tf.Tensor:
         """Compute OpEx given pre-sampled parameters.
 
         Args:
@@ -284,7 +341,7 @@ class BayesianOpEx(OpExModule):
         sales_t_centered = sales_t - self.sales_offset
         return (base_opex * cum_inflation) + (sales_t_centered * var_opex) + noise
 
-    def sample(self):
+    def sample(self) -> Tuple[tf.Tensor, tf.Tensor]:
         """Sample OpEx parameters from the variational posterior.
 
         Returns:
@@ -294,7 +351,9 @@ class BayesianOpEx(OpExModule):
         q_base = tfd.Normal(loc=self.q_base_opex_loc, scale=self.q_base_opex_scale)
         return q_var.sample(), q_base.sample()
 
-    def predict(self, sales_t, cum_inflation, use_mean=False):
+    def predict(
+        self, sales_t: tf.Tensor, cum_inflation: tf.Tensor, use_mean: bool = False
+    ) -> tf.Tensor:
         """Sample parameters and compute OpEx in one call.
 
         Convenience method for the dict-based ``forecast_step`` wrapper.
@@ -311,7 +370,7 @@ class BayesianOpEx(OpExModule):
         var_opex, base_opex, noise = self._get_step_params(n, use_mean=use_mean)
         return self._compute(sales_t, cum_inflation, var_opex, base_opex, noise)
 
-    def prepare_mc(self, n_samples, n_years, start_year):
+    def prepare_mc(self, n_samples: int, n_years: int, start_year: float) -> None:
         """Pre-sample all stochastic values for a Monte Carlo forecast.
 
         Stores the samples internally.  The loop body then calls
@@ -331,7 +390,9 @@ class BayesianOpEx(OpExModule):
             [n_years, n_samples]
         )
 
-    def compute_mc_step(self, sales_t, cum_inflation, year):
+    def compute_mc_step(
+        self, sales_t: tf.Tensor, cum_inflation: tf.Tensor, year: tf.Tensor
+    ) -> tf.Tensor:
         """Compute OpEx for one MC forecast step using pre-sampled values.
 
         Args:
@@ -351,7 +412,9 @@ class BayesianOpEx(OpExModule):
             self._mc_noise[step],
         )
 
-    def _get_step_params(self, n_samples, use_mean=False):
+    def _get_step_params(
+        self, n_samples: int, use_mean: bool = False
+    ) -> Tuple[tf.Tensor, tf.Tensor, tf.Tensor]:
         """Return ``(var_opex, base_opex, noise)`` ready for a forecast step.
 
         Args:
@@ -375,7 +438,7 @@ class BayesianOpEx(OpExModule):
             noise = tfd.Normal(_ZERO, self.noise_sigma).sample([n_samples])
         return var_opex, base_opex, noise
 
-    def kl_divergence(self):
+    def kl_divergence(self) -> tf.Tensor:
         """Compute KL(posterior || prior) for both OpEx parameters.
 
         Returns:
@@ -389,7 +452,13 @@ class BayesianOpEx(OpExModule):
             q_base, prior_base
         )
 
-    def loss(self, observed_opex, sales, cum_inflation, loss_scale):
+    def loss(
+        self,
+        observed_opex: tf.Tensor,
+        sales: tf.Tensor,
+        cum_inflation: tf.Tensor,
+        loss_scale: tf.Tensor,
+    ) -> tf.Tensor:
         """Compute the ELBO loss for variational OpEx training.
 
         Encapsulates sales centering, sampling, negative log-likelihood,
@@ -416,7 +485,7 @@ class BayesianOpEx(OpExModule):
         n_obs = tf.cast(tf.shape(observed_opex)[0], tf.float64)
         return (nll + kl) / n_obs
 
-    def record_step(self, epoch, loss):
+    def record_step(self, epoch: int, loss: float) -> None:
         """Record training state for VI diagnostics."""
         h = self._training_history
         h["epochs"].append(epoch)
@@ -427,7 +496,7 @@ class BayesianOpEx(OpExModule):
         h["q_base_opex_scale"].append(self.q_base_opex_scale.numpy())
         h["noise_sigma"].append(self.noise_sigma.numpy())
 
-    def plot_diagnostics(self, show_plot=False):
+    def plot_diagnostics(self, show_plot: bool = False) -> None:
         """Plot VI parameter convergence over training epochs."""
         from financial_forecast.training.diagnostics import plot_vi_diagnostics
 

@@ -29,6 +29,7 @@ from financial_forecast.models.purchases import TrendCostRatioPolicy
 from financial_forecast.models.debt import TrendDebtPolicy
 from financial_forecast.models.capex import CapexPolicy
 from financial_forecast.models.working_capital import WorkingCapitalPolicy
+from financial_forecast.models.tax import TaxWithAnomalies, SimpleTax
 from financial_forecast.inference.trajectory_simulator import MonteCarloSimulator
 from financial_forecast.training.policy_trainer import PolicyTrainer
 from financial_forecast.training.structural_trainer import StructuralTrainer
@@ -48,6 +49,7 @@ def model():
         buyback_policy=BaselineBuybackPolicy(),
         purchases_policy=TrendCostRatioPolicy(),
         debt_policy=TrendDebtPolicy(),
+        tax_module=SimpleTax(),
     )
     m.base_year = 2018
     m.amount_scale = 1.0
@@ -592,7 +594,7 @@ def test_monte_carlo_with_tax_anomalies(mock_forecast_state):
         buyback_policy=BaselineBuybackPolicy(),
         purchases_policy=TrendCostRatioPolicy(),
         debt_policy=TrendDebtPolicy(),
-        tax_anomalies=tax_data,
+        tax_module=TaxWithAnomalies(tax_data),
     )
     m.base_year = 2018
     m.amount_scale = 1.0
@@ -638,7 +640,7 @@ def test_tax_anomaly_affects_historical_forecast(mock_forecast_state):
         buyback_policy=BaselineBuybackPolicy(),
         purchases_policy=TrendCostRatioPolicy(),
         debt_policy=TrendDebtPolicy(),
-        tax_anomalies=tax_data,
+        tax_module=TaxWithAnomalies(tax_data),
     )
     m.base_year = 2018
     m.amount_scale = 1e11

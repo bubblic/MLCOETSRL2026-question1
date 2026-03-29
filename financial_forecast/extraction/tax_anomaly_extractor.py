@@ -81,7 +81,11 @@ class TaxAnomalyExtractor(BasePdfExtractor):
         self.selection_prompt = selection_prompt
         self.extraction_prompt = extraction_prompt
 
-    def _extract_one_pdf(self, pdf_path: Path, output_dir: Path):
+    def _extract_one_pdf(
+        self,
+        pdf_path: Path,
+        output_dir: Path,
+    ) -> None:
         """Process one PDF for tax anomaly extraction."""
         pages = self._extract_pages(pdf_path)
         output_dir.mkdir(parents=True, exist_ok=True)

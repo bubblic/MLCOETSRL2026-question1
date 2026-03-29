@@ -11,9 +11,11 @@ Usage in entry point::
     data = HistoricalDataLoader("aapl", include_tax_onetime=True)
     model = TrainableFinancialModel(
         opex_module=BayesianOpEx(),
-        tax_anomalies=data.tax_onetime_payments,  # {2018: 1.5e9, ...}
+        tax_module=TaxWithAnomalies(data.tax_onetime_payments),
     )
 """
+
+from typing import Dict, Optional
 
 import tensorflow as tf
 import tensorflow_probability as tfp
@@ -24,7 +26,11 @@ tfb = tfp.bijectors
 class SimpleTax(tf.Module):
     """Tax = ebt * income_tax_pct."""
 
-    def __init__(self, initial_tax_pct=0.147, name="simple_tax"):
+    def __init__(
+        self,
+        initial_tax_pct: float = 0.147,
+        name: str = "simple_tax",
+    ):
         super().__init__(name=name)
         self.income_tax_pct = tfp.util.TransformedVariable(
             initial_value=initial_tax_pct,
@@ -33,7 +39,7 @@ class SimpleTax(tf.Module):
             name="tax_pct",
         )
 
-    def compute(self, ebt, year=None):
+    def compute(self, ebt: tf.Tensor, year: Optional[tf.Tensor] = None) -> tf.Tensor:
         """Compute income tax.
 
         Args:
@@ -46,10 +52,14 @@ class SimpleTax(tf.Module):
         """
         return ebt * self.income_tax_pct
 
-    def prepare_for_training(self, amount_scale, years=None):
+    def prepare_for_training(
+        self, amount_scale: float, years: Optional[tf.Tensor] = None
+    ) -> None:
         """Called by the pipeline before training. No-op for SimpleTax."""
 
-    def loss(self, observed_tax, net_income, loss_scale):
+    def loss(
+        self, observed_tax: tf.Tensor, net_income: tf.Tensor, loss_scale: tf.Tensor
+    ) -> tf.Tensor:
         """Compute MSE loss for tax prediction.
 
         Derives predicted tax from net income:
@@ -59,7 +69,7 @@ class SimpleTax(tf.Module):
         tax_pred = net_income / (_one / self.income_tax_pct - _one)
         return tf.reduce_mean(tf.square((observed_tax - tax_pred) / loss_scale))
 
-    def print_summary(self):
+    def print_summary(self) -> None:
         """Print learned parameters."""
         print(f"Final %IT: {self.income_tax_pct.numpy():.5f}")
 
@@ -80,8 +90,12 @@ class TaxWithAnomalies(SimpleTax):
             tax amount in USD.
     """
 
-    def __init__(self, tax_onetime_by_year, initial_tax_pct=0.147,
-                 name="tax_with_anomalies"):
+    def __init__(
+        self,
+        tax_onetime_by_year: Dict[int, float],
+        initial_tax_pct: float = 0.147,
+        name: str = "tax_with_anomalies",
+    ):
         super().__init__(initial_tax_pct=initial_tax_pct, name=name)
         self._onetime_by_year = tax_onetime_by_year  # {year: usd_amount}
         self._onetime_scaled_by_year = None
@@ -90,7 +104,9 @@ class TaxWithAnomalies(SimpleTax):
         self._lookup_tensor = None
         self._lookup_base_year = None
 
-    def prepare_for_training(self, amount_scale, years=None):
+    def prepare_for_training(
+        self, amount_scale: float, years: Optional[tf.Tensor] = None
+    ) -> None:
         """Scale stored onetime data and build training adjustment tensor.
 
         Args:
@@ -100,8 +116,7 @@ class TaxWithAnomalies(SimpleTax):
                 use inside ``@tf.function`` compiled training.
         """
         self._onetime_scaled_by_year = {
-            yr: amt / amount_scale
-            for yr, amt in self._onetime_by_year.items()
+            yr: amt / amount_scale for yr, amt in self._onetime_by_year.items()
         }
         # Build dense lookup tensor for graph-mode compute()
         all_years = sorted(self._onetime_by_year.keys())
@@ -118,13 +133,16 @@ class TaxWithAnomalies(SimpleTax):
         # Pre-compute training adjustment vector
         if years is not None:
             self._training_adjustments = tf.constant(
-                [self._onetime_scaled_by_year.get(int(yr), 0.0) for yr in years.numpy()],
+                [
+                    self._onetime_scaled_by_year.get(int(yr), 0.0)
+                    for yr in years.numpy()
+                ],
                 dtype=tf.float64,
             )
         else:
             self._training_adjustments = None
 
-    def compute(self, ebt, year=None):
+    def compute(self, ebt: tf.Tensor, year: Optional[tf.Tensor] = None) -> tf.Tensor:
         """Compute income tax, adding one-time anomaly if year has one.
 
         Args:
@@ -152,7 +170,9 @@ class TaxWithAnomalies(SimpleTax):
             tax = tax + adjustment
         return tax
 
-    def loss(self, observed_tax, net_income, loss_scale):
+    def loss(
+        self, observed_tax: tf.Tensor, net_income: tf.Tensor, loss_scale: tf.Tensor
+    ) -> tf.Tensor:
         """Compute MSE loss including one-time payments.
 
         Uses the pre-computed adjustment tensor built by

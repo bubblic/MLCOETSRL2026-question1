@@ -52,7 +52,12 @@ class TrajectorySimulator(ABC):
             Dict mapping metric names to ``[n_samples, n_years]`` tensors.
         """
 
-    def _summarize_trajectories(self, name, trajectories, amount_scale):
+    def _summarize_trajectories(
+        self,
+        name: str,
+        trajectories: tf.Tensor,
+        amount_scale: float,
+    ) -> None:
         """Print mean and 95% interval summary for one metric."""
         mean_vals = tf.reduce_mean(trajectories, axis=0)
         lower_bound = tfp.stats.percentile(trajectories, 2.5, axis=0)
@@ -71,8 +76,12 @@ class TrajectorySimulator(ABC):
             )
 
     def _print_forecast_report(
-        self, trajectories, amount_scale, forecast_years, n_samples
-    ):
+        self,
+        trajectories: Dict[str, tf.Tensor],
+        amount_scale: float,
+        forecast_years: tf.Tensor,
+        n_samples: int,
+    ) -> None:
         """Print summary tables and balance sheet for forecast trajectories."""
         s = self._summarize_trajectories
         s("Net Income", trajectories["net_income"], amount_scale)
@@ -254,12 +263,12 @@ class DeterministicSimulator(TrajectorySimulator):
 
     def run(
         self,
-        model,
-        initial_state,
-        sales_forecast,
-        cum_inf_forecast,
-        forecast_years,
-    ):
+        model: tf.Module,
+        initial_state: StateDict,
+        sales_forecast: tf.Tensor,
+        cum_inf_forecast: tf.Tensor,
+        forecast_years: tf.Tensor,
+    ) -> Dict[str, tf.Tensor]:
         print("\n--- Running Single-Point Forecast (deterministic) ---")
 
         state0 = initial_state_to_batched(initial_state, 1)
@@ -329,12 +338,12 @@ class MonteCarloSimulator(TrajectorySimulator):
 
     def run(
         self,
-        model,
-        initial_state,
-        sales_forecast,
-        cum_inf_forecast,
-        forecast_years,
-    ):
+        model: tf.Module,
+        initial_state: StateDict,
+        sales_forecast: tf.Tensor,
+        cum_inf_forecast: tf.Tensor,
+        forecast_years: tf.Tensor,
+    ) -> Dict[str, tf.Tensor]:
         n_samples = self.n_samples
         print(f"\n--- Running Monte Carlo Forecast ({n_samples} samples) ---")
 

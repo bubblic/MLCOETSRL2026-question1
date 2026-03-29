@@ -42,8 +42,8 @@ class StatementNormalizer:
 
     def __init__(
         self,
-        input_dir,
-        output_dir,
+        input_dir: str,
+        output_dir: str,
         temperature: float = 0.0,
         max_tokens: int = 8000,
         top_k: int = 1,
@@ -71,7 +71,7 @@ class StatementNormalizer:
     def run_multi(
         self,
         num_runs: int,
-        runs_output_dir,
+        runs_output_dir: str,
         append: bool = True,
     ) -> None:
         """Run multiple normalization passes for median aggregation.

@@ -15,6 +15,8 @@ Dependency flow::
                     ->  models/base   (model interface, read-only except assigns)
 """
 
+from typing import Optional
+
 import tensorflow as tf
 import tensorflow_probability as tfp
 
@@ -26,7 +28,7 @@ from financial_forecast.training.diagnostics import (
 tfd = tfp.distributions
 
 
-def _as_float64_tensor(value):
+def _as_float64_tensor(value: tf.Tensor) -> tf.Tensor:
     """Cast *value* to a ``tf.float64`` tensor."""
     return tf.convert_to_tensor(value, dtype=tf.float64)
 
@@ -43,38 +45,38 @@ class PolicyTrainer(BaseTrainer):
             per-call via the *epochs* argument of :meth:`train`.
     """
 
-    def __init__(self, epochs=25000):
+    def __init__(self, epochs: int = 25000):
         self.epochs = epochs
 
     def train(
         self,
-        model,
-        historical_sales,
-        historical_purchases,
-        historical_cogs,
-        historical_nca,
-        historical_depreciation,
-        historical_adv_pay_sales,
-        historical_adv_pay_purch,
-        historical_ar,
-        historical_ap,
-        historical_inventory,
-        historical_cash,
-        historical_ims,
-        historical_net_income,
-        historical_dividends,
-        historical_stock_buyback,
-        historical_opex,
-        historical_tax,
-        historical_eff_st_debt,
-        historical_inflation=None,
-        historical_years=None,
-        learning_rate=0.001,
-        epochs=None,
-        plot_every=1000,
-        show_plot=False,
-        loss_scale_mode="std",
-    ):
+        model: tf.Module,
+        historical_sales: tf.Tensor,
+        historical_purchases: tf.Tensor,
+        historical_cogs: tf.Tensor,
+        historical_nca: tf.Tensor,
+        historical_depreciation: tf.Tensor,
+        historical_adv_pay_sales: tf.Tensor,
+        historical_adv_pay_purch: tf.Tensor,
+        historical_ar: tf.Tensor,
+        historical_ap: tf.Tensor,
+        historical_inventory: tf.Tensor,
+        historical_cash: tf.Tensor,
+        historical_ims: tf.Tensor,
+        historical_net_income: tf.Tensor,
+        historical_dividends: tf.Tensor,
+        historical_stock_buyback: tf.Tensor,
+        historical_opex: tf.Tensor,
+        historical_tax: tf.Tensor,
+        historical_eff_st_debt: tf.Tensor,
+        historical_inflation: Optional[tf.Tensor] = None,
+        historical_years: Optional[tf.Tensor] = None,
+        learning_rate: float = 0.001,
+        epochs: Optional[int] = None,
+        plot_every: int = 1000,
+        show_plot: bool = False,
+        loss_scale_mode: str = "std",
+    ) -> None:
         """Train deterministic policy parameters and Bayesian OpEx jointly.
 
         Each loss component is normalized by its historical standard deviation

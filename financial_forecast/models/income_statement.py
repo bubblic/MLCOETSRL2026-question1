@@ -4,9 +4,13 @@ Owns the OpEx module, interest rate parameters, and market securities
 return.  Tax is injected at call time.
 """
 
+from typing import Dict
+
 import tensorflow as tf
 import tensorflow_probability as tfp
 
+from financial_forecast.models.opex import OpExModule
+from financial_forecast.models.tax import SimpleTax
 from financial_forecast.inference.state_index import (
     R_INV,
     R_EFF_ST_DEBT,
@@ -26,7 +30,11 @@ class IncomeStatementModel(tf.Module):
     at call time.
     """
 
-    def __init__(self, opex_module, name="income_statement"):
+    def __init__(
+        self,
+        opex_module: OpExModule,
+        name: str = "income_statement",
+    ):
         super().__init__(name=name)
         self.opex_module = opex_module
 
@@ -49,7 +57,7 @@ class IncomeStatementModel(tf.Module):
             name="market_securities_return_pct",
         )
 
-    def init_from_data(self, s):
+    def init_from_data(self, s: Dict[str, tf.Tensor]) -> None:
         """Initialize interest/return rates from historical averages."""
         _f64 = lambda v: tf.constant(v, dtype=tf.float64)
         _EPS = 1e-12
@@ -64,14 +72,14 @@ class IncomeStatementModel(tf.Module):
 
     def calculate_income(
         self,
-        state,
-        assets,
-        sales_t,
-        cum_inflation,
-        tax_module,
-        year,
-        use_mean_opex=True,
-    ):
+        state: tf.Tensor,
+        assets: Dict[str, tf.Tensor],
+        sales_t: tf.Tensor,
+        cum_inflation: tf.Tensor,
+        tax_module: SimpleTax,
+        year: tf.Tensor,
+        use_mean_opex: bool = True,
+    ) -> Dict[str, tf.Tensor]:
         """Compute income statement.
 
         Args:
@@ -132,7 +140,7 @@ class IncomeStatementModel(tf.Module):
             "principal_lt": principal_lt,
         }
 
-    def print_summary(self):
+    def print_summary(self) -> None:
         """Print learned parameters."""
         print(f"Final %AvgSTInt: " f"{self.avg_short_term_interest_pct.numpy():.5f}")
         print(f"Final %AvgLTInt: " f"{self.avg_long_term_interest_pct.numpy():.5f}")

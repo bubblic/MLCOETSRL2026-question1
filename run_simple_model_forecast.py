@@ -22,6 +22,7 @@ from financial_forecast.models.purchases import StaticCostRatioPolicy
 from financial_forecast.models.debt import SimpleDebtPolicy
 from financial_forecast.models.capex import CapexPolicy
 from financial_forecast.models.working_capital import WorkingCapitalPolicy
+from financial_forecast.models.tax import SimpleTax
 from financial_forecast.training.pipeline import ForecastPipeline
 from financial_forecast.inference.forecast_driver_models import (
     LinearSalesForecast,
@@ -45,6 +46,7 @@ if __name__ == "__main__":
         buyback_policy=SimpleBuybackPolicy(),
         purchases_policy=StaticCostRatioPolicy(),
         debt_policy=SimpleDebtPolicy(),
+        tax_module=SimpleTax(),
     )
 
     model.prepare(
@@ -54,6 +56,7 @@ if __name__ == "__main__":
 
     ForecastPipeline(
         model,
+        data=data,
         sales_forecast=LinearSalesForecast(
             data.financial_statements["sales"],
             forecast_years=10,

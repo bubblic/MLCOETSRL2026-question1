@@ -23,6 +23,7 @@ from financial_forecast.models.purchases import StaticCostRatioPolicy
 from financial_forecast.models.debt import SimpleDebtPolicy
 from financial_forecast.models.capex import CapexPolicy
 from financial_forecast.models.working_capital import WorkingCapitalPolicy
+from financial_forecast.models.tax import SimpleTax
 from financial_forecast.inference.trajectory_simulator import DeterministicSimulator
 from financial_forecast.training.policy_trainer import PolicyTrainer
 from financial_forecast.training.structural_trainer import StructuralTrainer
@@ -41,6 +42,7 @@ def model():
         buyback_policy=SimpleBuybackPolicy(),
         purchases_policy=StaticCostRatioPolicy(),
         debt_policy=SimpleDebtPolicy(),
+        tax_module=SimpleTax(),
     )
     m.base_year = 2018
     m.amount_scale = 1.0

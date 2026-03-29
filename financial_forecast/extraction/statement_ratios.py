@@ -32,7 +32,11 @@ class RatioCalculator:
         output_file: Path for the output ratios JSON file.
     """
 
-    def __init__(self, input_dir, output_file="financial_ratios.json"):
+    def __init__(
+        self,
+        input_dir: str,
+        output_file: str = "financial_ratios.json",
+    ):
         self.input_dir = Path(input_dir)
         self.output_file = Path(output_file)
         if not self.output_file.is_absolute():
@@ -235,11 +239,11 @@ class MedianRatioCalculator(RatioCalculator):
 
     def __init__(
         self,
-        runs_output_dir,
-        output_file="financial_ratios.json",
+        runs_output_dir: str,
+        output_file: str = "financial_ratios.json",
         plot_distributions: bool = False,
-        plots_dir="field_value_distributions",
-        hallucination_output_file=None,
+        plots_dir: str = "field_value_distributions",
+        hallucination_output_file: Optional[str] = None,
         hallucination_top_k: int = 15,
     ):
         self.runs_root = Path(runs_output_dir)

@@ -4,6 +4,8 @@ Owns asset growth, asset maintenance, and depreciation rate parameters.
 Computes NCA evolution: ``NCA_t = NCA_{t-1} - depr + capex``.
 """
 
+from typing import Dict, Tuple
+
 import tensorflow as tf
 import tensorflow_probability as tfp
 
@@ -20,7 +22,11 @@ class CapexPolicy(tf.Module):
         depreciation_rate: Fraction of NCA depreciated each period.
     """
 
-    def __init__(self, prior_strength_asset_maintain=1.0, name="capex"):
+    def __init__(
+        self,
+        prior_strength_asset_maintain: float = 1.0,
+        name: str = "capex",
+    ):
         super().__init__(name=name)
         self.prior_strength_am = prior_strength_asset_maintain
         self.asset_growth = tfp.util.TransformedVariable(
@@ -42,7 +48,11 @@ class CapexPolicy(tf.Module):
             name="depr_rate",
         )
 
-    def compute(self, nca_prev, sales_t):
+    def compute(
+        self,
+        nca_prev: tf.Tensor,
+        sales_t: tf.Tensor,
+    ) -> Tuple[tf.Tensor, tf.Tensor, tf.Tensor]:
         """Evolve non-current assets.
 
         Args:
@@ -58,8 +68,14 @@ class CapexPolicy(tf.Module):
         return depreciation, capex, nca_curr
 
     def loss(
-        self, delta_nca, depr_true, sales_aligned, nca_prev, scale_growth, scale_depr
-    ):
+        self,
+        delta_nca: tf.Tensor,
+        depr_true: tf.Tensor,
+        sales_aligned: tf.Tensor,
+        nca_prev: tf.Tensor,
+        scale_growth: tf.Tensor,
+        scale_depr: tf.Tensor,
+    ) -> Tuple[tf.Tensor, tf.Tensor, tf.Tensor]:
         """MSE losses for asset growth and depreciation, plus prior.
 
         Returns:
@@ -87,7 +103,7 @@ class CapexPolicy(tf.Module):
         ) * tf.square(self.asset_maintain - _one)
         return loss_growth, loss_depr, prior_loss_am
 
-    def init_from_data(self, s):
+    def init_from_data(self, s: Dict[str, tf.Tensor]) -> None:
         """Initialize parameters from historical averages."""
         _f64 = lambda v: tf.constant(v, dtype=tf.float64)
         _EPS = 1e-12
@@ -100,7 +116,7 @@ class CapexPolicy(tf.Module):
         ag = float(tf.reduce_mean(delta_nca / tf.maximum(s["sales"][1:], _EPS)))
         self.asset_growth.assign(_f64(max(_EPS, ag)))
 
-    def print_summary(self):
+    def print_summary(self) -> None:
         """Print learned parameters."""
         print(f"Final %AG: {self.asset_growth.numpy():.5f}")
         print(f"Final %AM: {self.asset_maintain.numpy():.5f}")

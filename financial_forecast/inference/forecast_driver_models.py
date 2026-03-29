@@ -45,8 +45,8 @@ class LinearSalesForecast(SalesForecastModel):
 
     def __init__(
         self,
-        historical_sales_usd,
-        forecast_years,
+        historical_sales_usd: tf.Tensor,
+        forecast_years: int,
     ):
         sales = historical_sales_usd
         avg_growth = tf.reduce_mean(sales[1:] - sales[:-1])
@@ -57,7 +57,7 @@ class LinearSalesForecast(SalesForecastModel):
         self._n_years = forecast_years
 
     @property
-    def n_years(self):
+    def n_years(self) -> int:
         return self._n_years
 
 
@@ -74,9 +74,9 @@ class ConstantInflationForecast(InflationForecastModel):
 
     def __init__(
         self,
-        historical_inflation,
-        forecast_years,
-        default_rate=0.03,
+        historical_inflation: tf.Tensor,
+        forecast_years: int,
+        default_rate: float = 0.03,
     ):
         inf = historical_inflation
         if tf.reduce_all(inf == 0.0):
@@ -95,5 +95,5 @@ class ConstantInflationForecast(InflationForecastModel):
         self._n_years = forecast_years
 
     @property
-    def n_years(self):
+    def n_years(self) -> int:
         return self._n_years

@@ -49,7 +49,11 @@ class BasePdfExtractor(ABC):
         self.parameters = parameters or {"temperature": 0, "top_k": 1}
         self.max_workers = max_workers
 
-    def run(self, input_path, output_dir="extracted_text"):
+    def run(
+        self,
+        input_path: str,
+        output_dir: str = "extracted_text",
+    ) -> None:
         """Extract from a single PDF or a directory of PDFs.
 
         Args:
@@ -66,9 +70,7 @@ class BasePdfExtractor(ABC):
         if input_path.is_dir():
             pdf_files = sorted(input_path.glob("*.pdf"))
             if not pdf_files:
-                raise FileNotFoundError(
-                    f"No PDF files found in {input_path}"
-                )
+                raise FileNotFoundError(f"No PDF files found in {input_path}")
             if self.max_workers <= 1:
                 for pdf_path in pdf_files:
                     self._extract_one_pdf(pdf_path, output_dir)
@@ -79,7 +81,9 @@ class BasePdfExtractor(ABC):
             ) as executor:
                 futures = {
                     executor.submit(
-                        self._extract_one_pdf, pdf_path, output_dir,
+                        self._extract_one_pdf,
+                        pdf_path,
+                        output_dir,
                     ): pdf_path
                     for pdf_path in pdf_files
                 }
@@ -93,12 +97,14 @@ class BasePdfExtractor(ABC):
                         ) from exc
             return
 
-        raise FileNotFoundError(
-            f"Input path does not exist: {input_path}"
-        )
+        raise FileNotFoundError(f"Input path does not exist: {input_path}")
 
     @abstractmethod
-    def _extract_one_pdf(self, pdf_path: Path, output_dir: Path):
+    def _extract_one_pdf(
+        self,
+        pdf_path: Path,
+        output_dir: Path,
+    ) -> None:
         """Process one PDF. Subclasses implement domain-specific logic."""
 
     # ------------------------------------------------------------------
@@ -152,8 +158,7 @@ class BasePdfExtractor(ABC):
         joined = []
         for page_num in page_numbers:
             joined.append(
-                f"Page {page_num}:\n"
-                f"{(pages.get(page_num) or '').strip()}"
+                f"Page {page_num}:\n" f"{(pages.get(page_num) or '').strip()}"
             )
         return "\n\n---\n\n".join(joined)
 
@@ -163,7 +168,7 @@ class BasePdfExtractor(ABC):
         pdf_path: Path,
         slug: str,
         result: dict,
-    ):
+    ) -> None:
         """Write extraction result as JSON."""
         output_dir.mkdir(parents=True, exist_ok=True)
         output_path = output_dir / f"{pdf_path.stem}.{slug}.llm.json"

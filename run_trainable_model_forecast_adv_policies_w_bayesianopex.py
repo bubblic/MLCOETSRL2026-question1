@@ -15,6 +15,7 @@ from financial_forecast.models.purchases import TrendCostRatioPolicy
 from financial_forecast.models.debt import TrendDebtPolicy
 from financial_forecast.models.capex import CapexPolicy
 from financial_forecast.models.working_capital import WorkingCapitalPolicy
+from financial_forecast.models.tax import SimpleTax
 from financial_forecast.training.policy_trainer import PolicyTrainer
 from financial_forecast.training.structural_trainer import StructuralTrainer
 from financial_forecast.training.pipeline import ForecastPipeline
@@ -44,6 +45,7 @@ if __name__ == "__main__":
         buyback_policy=BaselineBuybackPolicy(),
         purchases_policy=TrendCostRatioPolicy(),
         debt_policy=TrendDebtPolicy(),
+        tax_module=SimpleTax(),
     )
 
     model.prepare(
@@ -59,6 +61,7 @@ if __name__ == "__main__":
 
     ForecastPipeline(
         model,
+        data=data,
         sales_forecast=LinearSalesForecast(
             data.financial_statements["sales"],
             forecast_years=10,

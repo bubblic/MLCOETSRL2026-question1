@@ -6,6 +6,8 @@ Inherits all forecast logic from :class:`BaseFinancialModel` and adds:
 - :meth:`save_parameters` / :meth:`load_parameters` — ``.npz`` persistence.
 """
 
+from typing import Mapping, Optional
+
 import tensorflow as tf
 
 from financial_forecast.models.base import BaseFinancialModel
@@ -26,10 +28,10 @@ class TrainableFinancialModel(BaseFinancialModel):
 
     def prepare(
         self,
-        financial_statements,
-        inflation=None,
-        test_years=1,
-    ):
+        financial_statements: Mapping[str, tf.Tensor],
+        inflation: Optional[tf.Tensor] = None,
+        test_years: int = 1,
+    ) -> None:
         """Prepare model and configure sub-modules for training.
 
         Extends :meth:`BaseFinancialModel.prepare` by also calling
@@ -58,10 +60,10 @@ class TrainableFinancialModel(BaseFinancialModel):
 
     def train(
         self,
-        trainers,
-        parameters_save_path="trained_parameters.npz",
-        use_trained_parameters=False,
-    ):
+        trainers: list,
+        parameters_save_path: str = "trained_parameters.npz",
+        use_trained_parameters: bool = False,
+    ) -> None:
         """Train model parameters or load from disk.
 
         Must call :meth:`prepare` first.
@@ -73,6 +75,8 @@ class TrainableFinancialModel(BaseFinancialModel):
             use_trained_parameters: If ``True``, load from disk instead
                 of training.
         """
+        self.parameters_path = parameters_save_path
+
         if use_trained_parameters:
             self.load_parameters(parameters_save_path)
             return
@@ -146,10 +150,10 @@ class TrainableFinancialModel(BaseFinancialModel):
     # Serialization
     # ------------------------------------------------------------------
 
-    def save_parameters(self, path):
+    def save_parameters(self, path: str) -> None:
         """Save all model parameters to an .npz file."""
         _save_parameters(self, path)
 
-    def load_parameters(self, path):
+    def load_parameters(self, path: str) -> None:
         """Load model parameters from an .npz file."""
         _load_parameters(self, path)

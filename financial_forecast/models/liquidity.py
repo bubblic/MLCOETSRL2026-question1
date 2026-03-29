@@ -5,6 +5,7 @@
 """
 
 from abc import abstractmethod
+from typing import Dict
 
 import tensorflow as tf
 import tensorflow_probability as tfp
@@ -16,11 +17,11 @@ class LiquidityPolicy(tf.Module):
     """Abstract base class for liquidity allocation."""
 
     @abstractmethod
-    def init_from_data(self, s):
+    def init_from_data(self, s: Dict[str, tf.Tensor]) -> None:
         """Initialize parameters from historical averages."""
 
     @abstractmethod
-    def compute(self, sales_t, time_index):
+    def compute(self, sales_t: tf.Tensor, time_index: tf.Tensor) -> tuple:
         """Compute total liquidity, cash, and IMS.
 
         Args:
@@ -48,7 +49,7 @@ class CashTargetPolicy(LiquidityPolicy):
             name="cash_target_pct",
         )
 
-    def init_from_data(self, s):
+    def init_from_data(self, s: Dict[str, tf.Tensor]) -> None:
         _f64 = lambda v: tf.constant(v, dtype=tf.float64)
         _EPS = 1e-12
         self.cash_target_pct.assign(
@@ -60,18 +61,26 @@ class CashTargetPolicy(LiquidityPolicy):
             )
         )
 
-    def compute(self, sales_t, time_index):
+    def compute(self, sales_t: tf.Tensor, time_index: tf.Tensor) -> tuple:
         cash_target = sales_t * self.cash_target_pct
         return cash_target, cash_target, None
 
-    def loss(self, sales, cash, ims, time_indices, scale_tl, scale_cash):
+    def loss(
+        self,
+        sales: tf.Tensor,
+        cash: tf.Tensor,
+        ims: tf.Tensor,
+        time_indices: tf.Tensor,
+        scale_tl: tf.Tensor,
+        scale_cash: tf.Tensor,
+    ) -> tuple:
         """MSE loss on cash target only; IMS has no target."""
         loss_cash = tf.reduce_mean(
             tf.square((cash - sales * self.cash_target_pct) / scale_cash)
         )
         return loss_cash, tf.constant(0.0, dtype=tf.float64)
 
-    def print_summary(self, n_years):
+    def print_summary(self, n_years: int) -> None:
         print(f"Cash Target %: {self.cash_target_pct.numpy():.5f}")
 
 
@@ -93,7 +102,7 @@ class SimpleLiquidityPolicy(LiquidityPolicy):
             name="cash_pct_of_liquidity",
         )
 
-    def init_from_data(self, s):
+    def init_from_data(self, s: Dict[str, tf.Tensor]) -> None:
         _f64 = lambda v: tf.constant(v, dtype=tf.float64)
         _EPS = 1e-12
         total_liq = s["cash"] + s["ims"]
@@ -117,18 +126,26 @@ class SimpleLiquidityPolicy(LiquidityPolicy):
             )
         )
 
-    def compute(self, sales_t, time_index):
+    def compute(self, sales_t: tf.Tensor, time_index: tf.Tensor) -> tuple:
         total_liq_target = sales_t * self.total_liquidity_pct
         cash_target = total_liq_target * self.cash_pct_of_liquidity
         ims_target = total_liq_target - cash_target
         return total_liq_target, cash_target, ims_target
 
-    def print_summary(self, n_years):
+    def print_summary(self, n_years: int) -> None:
         """Print learned liquidity parameters."""
         print(f"Total Liquidity %: {self.total_liquidity_pct.numpy():.5f}")
         print(f"Cash % of Liquidity: {self.cash_pct_of_liquidity.numpy():.5f}")
 
-    def loss(self, sales, cash, ims, time_indices, scale_tl, scale_cash):
+    def loss(
+        self,
+        sales: tf.Tensor,
+        cash: tf.Tensor,
+        ims: tf.Tensor,
+        time_indices: tf.Tensor,
+        scale_tl: tf.Tensor,
+        scale_cash: tf.Tensor,
+    ) -> tuple:
         """MSE loss for total liquidity and cash split."""
         total_liq = cash + ims
         loss_tl = tf.reduce_mean(
@@ -155,7 +172,7 @@ class TrendLiquidityPolicy(LiquidityPolicy):
         self.cash_alpha = tf.Variable(-0.05, dtype=tf.float64, name="cash_alpha")
         self.cash_beta = tf.Variable(0.0, dtype=tf.float64, name="cash_beta")
 
-    def init_from_data(self, s):
+    def init_from_data(self, s: Dict[str, tf.Tensor]) -> None:
         _EPS = 1e-12
         total_liq = s["cash"] + s["ims"]
         tl_ratio = float(tf.reduce_mean(total_liq / tf.maximum(s["sales"], _EPS)))
@@ -171,7 +188,7 @@ class TrendLiquidityPolicy(LiquidityPolicy):
         self.cash_alpha.assign(math.log(cash_ratio / (1 - cash_ratio)))
         self.cash_beta.assign(0.0)
 
-    def compute(self, sales_t, time_index):
+    def compute(self, sales_t: tf.Tensor, time_index: tf.Tensor) -> tuple:
         tl_pct = tf.sigmoid(self.tl_alpha + self.tl_beta * time_index)
         total_liq_target = self.tl_baseline + sales_t * tl_pct
         cash_pct = tf.sigmoid(self.cash_alpha + self.cash_beta * time_index)
@@ -179,7 +196,7 @@ class TrendLiquidityPolicy(LiquidityPolicy):
         ims_target = total_liq_target - cash_target
         return total_liq_target, cash_target, ims_target
 
-    def print_summary(self, n_years):
+    def print_summary(self, n_years: int) -> None:
         """Print learned liquidity parameters."""
         import tensorflow as tf
 
@@ -205,7 +222,15 @@ class TrendLiquidityPolicy(LiquidityPolicy):
             f"{tf.sigmoid(self.cash_alpha + self.cash_beta * (n_years-1)).numpy():.4f}"
         )
 
-    def loss(self, sales, cash, ims, time_indices, scale_tl, scale_cash):
+    def loss(
+        self,
+        sales: tf.Tensor,
+        cash: tf.Tensor,
+        ims: tf.Tensor,
+        time_indices: tf.Tensor,
+        scale_tl: tf.Tensor,
+        scale_cash: tf.Tensor,
+    ) -> tuple:
         """MSE loss for logit-linear total liquidity and cash split."""
         total_liq = cash + ims
         tl_pct_t = tf.sigmoid(self.tl_alpha + self.tl_beta * time_indices)

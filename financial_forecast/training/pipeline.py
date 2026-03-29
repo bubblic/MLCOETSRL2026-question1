@@ -3,7 +3,7 @@
 Takes a model that has already been prepared (and optionally trained),
 generates forecast drivers via pluggable sales/inflation forecast models,
 runs the trajectory simulator, computes one-step-ahead historical fit,
-and plots results.
+plots results, and exports a self-contained JSON report.
 
 Example::
 
@@ -12,7 +12,11 @@ Example::
     ForecastPipeline(model, forecast_years=10).run()
 """
 
-from typing import Dict
+from __future__ import annotations
+
+import json
+from datetime import datetime
+from typing import Dict, Tuple
 
 import tensorflow as tf
 
@@ -22,6 +26,9 @@ from financial_forecast.inference.forecast_driver_models import (
     SalesForecastModel,
     InflationForecastModel,
 )
+from financial_forecast.training.io_utils import get_training_results_path
+from financial_forecast.data.loader import HistoricalDataLoader
+from financial_forecast.reporting.table_formatter import MarkdownTableFormatter
 
 
 class ForecastPipeline:
@@ -37,6 +44,8 @@ class ForecastPipeline:
     Args:
         model: A prepared :class:`BaseFinancialModel` or
             :class:`TrainableFinancialModel`.
+        data: The :class:`HistoricalDataLoader` used to prepare the
+            model.  Used to format historical tables in the JSON report.
         sales_forecast: An initialized sales forecast model (e.g.
             :class:`LinearSalesForecast`).
         inflation_forecast: An initialized inflation forecast model
@@ -46,13 +55,16 @@ class ForecastPipeline:
 
     def __init__(
         self,
-        model,
+        model: tf.Module,
+        data: HistoricalDataLoader,
         sales_forecast: SalesForecastModel,
         inflation_forecast: InflationForecastModel,
         show_plot: bool = False,
     ):
         self.model = model
         self._show_plot = show_plot
+        self._data = data
+        self._formatter = MarkdownTableFormatter()
 
         d = model._d
         n_hist = len(d["sales"])
@@ -77,10 +89,54 @@ class ForecastPipeline:
         )
 
     def run(self) -> None:
-        """Execute: trajectory forecast, historical fit, plot."""
+        """Execute: trajectory forecast, historical fit, plot, export JSON."""
         trajectories = self._run_trajectory_forecast()
         historical_fit, fit_years = self._compute_historical_fit()
         self._plot_results(trajectories, historical_fit, fit_years)
+        self._export_report_json(trajectories)
+
+    def _export_report_json(
+        self,
+        trajectories: Dict[str, tf.Tensor],
+    ) -> str:
+        """Export a self-contained JSON report from already-computed trajectories.
+
+        Uses ``data`` and ``formatter`` from construction, and reads
+        ``parameters_path`` from the model.
+
+        Args:
+            trajectories: Dict from :meth:`_run_trajectory_forecast`.
+
+        Returns:
+            Path to the saved JSON file.
+        """
+        scale = self.model.amount_scale
+
+        historical_table = self._formatter.format_historical(self._data)
+        forecast_table = self._formatter.format_forecast(
+            trajectories, self._forecast_years, scale
+        )
+
+        n_years = trajectories["total_assets"].shape[1]
+        forecast_year_labels = [int(self._forecast_years[i]) for i in range(n_years)]
+
+        report = {
+            "generated_at": datetime.now().isoformat(),
+            "company": self._data.company,
+            "parameters_path": getattr(self.model, "parameters_path", None),
+            "forecast_years": forecast_year_labels,
+            "amount_scale": float(scale),
+            "base_year": int(self.model.base_year),
+            "n_monte_carlo_samples": int(self.model.trajectory_simulator.n_samples),
+            "historical_table": historical_table,
+            "forecast_table": forecast_table,
+        }
+
+        out_path = get_training_results_path("forecast_report.json")
+        with open(out_path, "w", encoding="utf-8") as f:
+            json.dump(report, f, indent=2, ensure_ascii=False)
+        print(f"\nForecast report saved to: {out_path}")
+        return out_path
 
     def _run_trajectory_forecast(self) -> Dict[str, tf.Tensor]:
         """Run the model's trajectory simulator."""
@@ -93,7 +149,7 @@ class ForecastPipeline:
             self._forecast_years,
         )
 
-    def _compute_historical_fit(self):
+    def _compute_historical_fit(self) -> Tuple[Dict[str, tf.Tensor], tf.Tensor]:
         """One-step-ahead predictions on historical data.
 
         Returns:
@@ -177,9 +233,9 @@ class ForecastPipeline:
 
     def _plot_results(
         self,
-        trajectories,
-        historical_fit,
-        fit_years,
+        trajectories: Dict[str, tf.Tensor],
+        historical_fit: Dict[str, tf.Tensor],
+        fit_years: tf.Tensor,
     ) -> None:
         """Plot historical actuals, model fit, and forecast trajectories."""
         model = self.model

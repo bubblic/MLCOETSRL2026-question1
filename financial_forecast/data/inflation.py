@@ -7,7 +7,7 @@ the pipeline can demonstrate model behavior with and without inflation.
 import tensorflow as tf
 
 
-def get_us_inflation():
+def get_us_inflation() -> tf.Tensor:
     """Return annual US CPI inflation rates (2018-2025).
 
     Returns:

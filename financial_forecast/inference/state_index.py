@@ -5,6 +5,8 @@ These constants are the single source of truth for the tensor layout used by
 :func:`run_monte_carlo_forecast`.
 """
 
+from typing import Dict
+
 import tensorflow as tf
 
 # ---- Recurrent state: [n_samples, 14] ----
@@ -104,7 +106,9 @@ DIAGNOSTIC_KEYS = (
 )
 
 
-def state_dict_to_tensor(state_dict):
+def state_dict_to_tensor(
+    state_dict: Dict[str, tf.Tensor],
+) -> tf.Tensor:
     """Convert a scalar state dict to a 1-D tensor of shape ``[14]``.
 
     Args:
@@ -116,7 +120,10 @@ def state_dict_to_tensor(state_dict):
     return tf.stack([tf.cast(state_dict[k], tf.float64) for k in RECURRENT_KEYS])
 
 
-def initial_state_to_batched(state_dict, n_samples):
+def initial_state_to_batched(
+    state_dict: Dict[str, tf.Tensor],
+    n_samples: int,
+) -> tf.Tensor:
     """Broadcast a scalar state dict to a batched tensor ``[n_samples, 14]``.
 
     Args:

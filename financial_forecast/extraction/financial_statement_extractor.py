@@ -65,7 +65,11 @@ class FinancialStatementExtractor(BasePdfExtractor):
         )
         self.queries = queries
 
-    def _extract_one_pdf(self, pdf_path: Path, output_dir: Path):
+    def _extract_one_pdf(
+        self,
+        pdf_path: Path,
+        output_dir: Path,
+    ) -> None:
         """Process one PDF through all queries."""
         pages = self._extract_pages(pdf_path)
         output_dir.mkdir(parents=True, exist_ok=True)

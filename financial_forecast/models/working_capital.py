@@ -10,6 +10,8 @@ accounts to sales or purchases:
 - Inventory (% of sales)
 """
 
+from typing import Dict, Tuple
+
 import tensorflow as tf
 import tensorflow_probability as tfp
 
@@ -52,7 +54,9 @@ class WorkingCapitalPolicy(tf.Module):
             name="inv_pct",
         )
 
-    def compute_sales_based(self, sales_t):
+    def compute_sales_based(
+        self, sales_t: tf.Tensor
+    ) -> Tuple[tf.Tensor, tf.Tensor, tf.Tensor]:
         """Compute working capital accounts driven by sales.
 
         Args:
@@ -67,7 +71,9 @@ class WorkingCapitalPolicy(tf.Module):
             sales_t * self.advance_payments_sales_pct,
         )
 
-    def compute_purchases_based(self, purchases_t):
+    def compute_purchases_based(
+        self, purchases_t: tf.Tensor
+    ) -> Tuple[tf.Tensor, tf.Tensor]:
         """Compute working capital accounts driven by purchases.
 
         Args:
@@ -83,19 +89,19 @@ class WorkingCapitalPolicy(tf.Module):
 
     def loss(
         self,
-        sales,
-        purchases,
-        adv_ps_actual,
-        adv_pp_actual,
-        ar_actual,
-        ap_actual,
-        inv_actual,
-        scale_adv_ps,
-        scale_adv_pp,
-        scale_ar,
-        scale_ap,
-        scale_inv,
-    ):
+        sales: tf.Tensor,
+        purchases: tf.Tensor,
+        adv_ps_actual: tf.Tensor,
+        adv_pp_actual: tf.Tensor,
+        ar_actual: tf.Tensor,
+        ap_actual: tf.Tensor,
+        inv_actual: tf.Tensor,
+        scale_adv_ps: tf.Tensor,
+        scale_adv_pp: tf.Tensor,
+        scale_ar: tf.Tensor,
+        scale_ap: tf.Tensor,
+        scale_inv: tf.Tensor,
+    ) -> Tuple[tf.Tensor, tf.Tensor, tf.Tensor, tf.Tensor, tf.Tensor]:
         """MSE losses for all five working capital ratios.
 
         Returns:
@@ -123,7 +129,7 @@ class WorkingCapitalPolicy(tf.Module):
         )
         return loss_adv_ps, loss_adv_pp, loss_ar, loss_ap, loss_inv
 
-    def init_from_data(self, s):
+    def init_from_data(self, s: Dict[str, tf.Tensor]) -> None:
         """Initialize ratios from historical averages."""
         _f64 = lambda v: tf.constant(v, dtype=tf.float64)
         _EPS = 1e-12
@@ -164,7 +170,7 @@ class WorkingCapitalPolicy(tf.Module):
         )
         self.inventory_pct.assign(_f64(_mr(s["inventory"], s["sales"])))
 
-    def print_summary(self):
+    def print_summary(self) -> None:
         """Print learned parameters."""
         print(f"Final %AdvPS: {self.advance_payments_sales_pct.numpy():.5f}")
         print(f"Final %AdvPP: {self.advance_payments_purchases_pct.numpy():.5f}")

@@ -20,7 +20,16 @@ import tensorflow as tf
 from financial_forecast.models.balance_sheet import BalanceSheetModel
 from financial_forecast.models.income_statement import IncomeStatementModel
 from financial_forecast.models.cash_budget import CashBudgetModel
-from financial_forecast.models.tax import SimpleTax, TaxWithAnomalies
+from financial_forecast.models.opex import OpExModule
+from financial_forecast.models.capex import CapexPolicy
+from financial_forecast.models.working_capital import WorkingCapitalPolicy
+from financial_forecast.models.liquidity import LiquidityPolicy
+from financial_forecast.models.dividends import DividendPolicy
+from financial_forecast.models.buyback import BuybackPolicy
+from financial_forecast.models.purchases import PurchasesPolicy
+from financial_forecast.models.debt import DebtPolicy
+from financial_forecast.models.tax import SimpleTax
+from financial_forecast.inference.trajectory_simulator import TrajectorySimulator
 from financial_forecast.inference.state_index import RECURRENT_KEYS, DIAGNOSTIC_KEYS
 
 
@@ -70,17 +79,17 @@ class BaseFinancialModel(tf.Module):
 
     def __init__(
         self,
-        opex_module,
-        trajectory_simulator,
-        capex_policy,
-        working_capital,
-        liquidity_policy,
-        dividend_policy,
-        buyback_policy,
-        purchases_policy,
-        debt_policy,
-        tax_anomalies=None,
-        name=None,
+        opex_module: OpExModule,
+        trajectory_simulator: TrajectorySimulator,
+        capex_policy: CapexPolicy,
+        working_capital: WorkingCapitalPolicy,
+        liquidity_policy: LiquidityPolicy,
+        dividend_policy: DividendPolicy,
+        buyback_policy: BuybackPolicy,
+        purchases_policy: PurchasesPolicy,
+        debt_policy: DebtPolicy,
+        tax_module: SimpleTax,
+        name: Optional[str] = None,
     ):
         self.amount_scale = None
         self.base_year = None
@@ -97,10 +106,7 @@ class BaseFinancialModel(tf.Module):
             buyback_policy=buyback_policy,
         )
         self.trajectory_simulator = trajectory_simulator
-        if tax_anomalies is not None:
-            self.tax_module = TaxWithAnomalies(tax_anomalies)
-        else:
-            self.tax_module = SimpleTax()
+        self.tax_module = tax_module
 
         # Populated by prepare()
         self._d: Dict[str, tf.Tensor] = {}
@@ -111,7 +117,7 @@ class BaseFinancialModel(tf.Module):
         super().__init__(name=name)
 
     @property
-    def opex_module(self):
+    def opex_module(self) -> OpExModule:
         """Convenience accessor for the OpEx module owned by the income statement."""
         return self.income_statement.opex_module
 
@@ -220,10 +226,10 @@ class BaseFinancialModel(tf.Module):
     @tf.function
     def forecast_step(
         self,
-        state,
-        inputs,
-        use_mean_opex=True,
-    ):
+        state: Dict[str, tf.Tensor],
+        inputs: Dict[str, tf.Tensor],
+        use_mean_opex: bool = True,
+    ) -> Dict[str, tf.Tensor]:
         """Advance the financial state by one period (graph-compiled).
 
         Args:
@@ -250,12 +256,12 @@ class BaseFinancialModel(tf.Module):
 
     def forecast_step_compiled(
         self,
-        state,
-        sales_t,
-        year,
-        cum_inflation,
-        use_mean_opex=True,
-    ):
+        state: tf.Tensor,
+        sales_t: tf.Tensor,
+        year: tf.Tensor,
+        cum_inflation: tf.Tensor,
+        use_mean_opex: bool = True,
+    ) -> tuple[tf.Tensor, tf.Tensor]:
         """Batched single-period forecast -- single source of truth.
 
         Args:

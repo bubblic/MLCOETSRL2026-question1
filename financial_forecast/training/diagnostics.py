@@ -4,6 +4,7 @@ All functions accept pre-computed history dicts and are model-agnostic.
 """
 
 from datetime import datetime
+from typing import Dict, Optional
 
 import matplotlib.pyplot as plt
 import tensorflow as tf
@@ -11,7 +12,9 @@ import tensorflow as tf
 from financial_forecast.training.io_utils import get_training_results_path
 
 
-def plot_vi_diagnostics(vi_history, amount_scale, show_plot=False):
+def plot_vi_diagnostics(
+    vi_history: Dict, amount_scale: float, show_plot: bool = False
+) -> None:
     """Plot variational inference parameter convergence over training epochs.
 
     Args:
@@ -74,14 +77,14 @@ def plot_vi_diagnostics(vi_history, amount_scale, show_plot=False):
 
 
 def plot_simple_policy_diagnostics(
-    simple_history,
-    model,
-    time_indices,
-    logit_cr_hist,
-    historical_years,
-    n_years,
-    show_plot=False,
-):
+    simple_history: Dict,
+    model: tf.Module,
+    time_indices: tf.Tensor,
+    logit_cr_hist: tf.Tensor,
+    historical_years: Optional[tf.Tensor],
+    n_years: int,
+    show_plot: bool = False,
+) -> None:
     """Plot simple policy parameter training diagnostics.
 
     Args:
@@ -189,7 +192,9 @@ def plot_simple_policy_diagnostics(
         plt.close()
 
 
-def plot_structural_diagnostics(structural_history, show_plot=False):
+def plot_structural_diagnostics(
+    structural_history: Dict, show_plot: bool = False
+) -> None:
     """Plot structural parameter training diagnostics.
 
     Args:

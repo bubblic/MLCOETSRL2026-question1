@@ -5,8 +5,14 @@ investing, external, financing, and owner transactions.
 Delegates debt financing decisions to a pluggable ``DebtPolicy``.
 """
 
+from typing import Dict, Tuple
+
 import tensorflow as tf
 
+from financial_forecast.models.liquidity import LiquidityPolicy
+from financial_forecast.models.debt import DebtPolicy
+from financial_forecast.models.dividends import DividendPolicy
+from financial_forecast.models.buyback import BuybackPolicy
 from financial_forecast.inference.state_index import (
     R_AR,
     R_AP,
@@ -39,11 +45,11 @@ class CashBudgetModel(tf.Module):
 
     def __init__(
         self,
-        liquidity_policy,
-        debt_policy,
-        dividend_policy,
-        buyback_policy,
-        name="cash_budget",
+        liquidity_policy: LiquidityPolicy,
+        debt_policy: DebtPolicy,
+        dividend_policy: DividendPolicy,
+        buyback_policy: BuybackPolicy,
+        name: str = "cash_budget",
     ):
         super().__init__(name=name)
         self.liquidity_policy = liquidity_policy
@@ -53,12 +59,12 @@ class CashBudgetModel(tf.Module):
 
     def manage_liquidity(
         self,
-        state,
-        assets,
-        income,
-        sales_t,
-        time_index,
-    ):
+        state: tf.Tensor,
+        assets: Dict[str, tf.Tensor],
+        income: Dict[str, tf.Tensor],
+        sales_t: tf.Tensor,
+        time_index: tf.Tensor,
+    ) -> Dict[str, tf.Tensor]:
         """Compute cash budget and financing decisions."""
         zero = tf.constant(0.0, dtype=tf.float64)
         ar_prev = state[:, R_AR]
@@ -184,7 +190,13 @@ class CashBudgetModel(tf.Module):
             "ims_curr": ims_curr,
         }
 
-    def assemble_state(self, state, assets, income, financing):
+    def assemble_state(
+        self,
+        state: tf.Tensor,
+        assets: Dict[str, tf.Tensor],
+        income: Dict[str, tf.Tensor],
+        financing: Dict[str, tf.Tensor],
+    ) -> Tuple[tf.Tensor, tf.Tensor]:
         """Evolve liabilities, check balance sheet, pack output tensors."""
         ncl_prev = state[:, R_NCL]
         equity_prev = state[:, R_EQUITY]

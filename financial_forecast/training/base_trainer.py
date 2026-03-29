@@ -21,7 +21,7 @@ class BaseTrainer(ABC):
     """
 
     @abstractmethod
-    def train(self, model, **kwargs):
+    def train(self, model: object, **kwargs) -> None:
         """Train the model's parameters in-place.
 
         Args:

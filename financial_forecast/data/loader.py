@@ -13,7 +13,7 @@ Usage::
                                 tax_anomaly_dir="./extracted_json/tax_anomalies/aapl")
 
     model = TrainableFinancialModel(opex_module=BayesianOpEx(),
-                                    tax_anomalies=data.tax_onetime_payments)
+                                    tax_module=TaxWithAnomalies(data.tax_onetime_payments))
 
 To add a new company, create ``financial_forecast/data/<ticker>/`` with:
 
@@ -74,7 +74,7 @@ class HistoricalDataLoader:
             return None
         return self._load_tax_from_extracted_json()
 
-    def _import_company_module(self, module_name: str):
+    def _import_company_module(self, module_name: str) -> Any:
         """Import ``financial_forecast.data.<company>.<module_name>``."""
         fqn = f"financial_forecast.data.{self.company}.{module_name}"
         try:
