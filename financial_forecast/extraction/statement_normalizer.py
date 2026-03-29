@@ -45,7 +45,7 @@ class StatementNormalizer:
         input_dir: str,
         output_dir: str,
         temperature: float = 0.0,
-        max_tokens: int = 8000,
+        max_tokens: int = 100000,
         top_k: int = 1,
         max_workers: int = 9,
         message: str = "gen-ai-response",

@@ -67,11 +67,11 @@ if __name__ == "__main__":
         data=data,
         sales_forecast=LinearSalesForecast(
             data.financial_statements["sales"],
-            forecast_years=10,
+            forecast_years=8,
         ),
         inflation_forecast=ConstantInflationForecast(
             data.inflation,
-            forecast_years=10,
+            forecast_years=8,
         ),
     ).run()
 

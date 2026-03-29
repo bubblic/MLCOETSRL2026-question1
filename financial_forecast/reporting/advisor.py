@@ -2,7 +2,7 @@
 
 Provides a base class :class:`Advisor` that defines the interface for
 sending a financial report to an LLM and printing its response, and a
-concrete :class:`AzureCEOAdvisor` that uses the Azure DeepSeek endpoint.
+concrete :class:`DeepseekCEOAdvisor` that uses the Azure DeepSeek endpoint.
 """
 
 from __future__ import annotations
@@ -48,7 +48,7 @@ class Advisor(ABC):
         """
 
 
-class AzureCEOAdvisor(Advisor):
+class DeepseekCEOAdvisor(Advisor):
     """CEO/CFO advisor backed by the Azure DeepSeek reasoning model.
 
     Encapsulates the prompt template, Azure client configuration, and
@@ -117,7 +117,7 @@ Data Input:
         self._message = message
         self._parameters = parameters or {
             "temperature": 0.2,
-            "max_tokens": 1024,
+            "max_tokens": 100000,
             "top_k": 40,
         }
         self._raw = raw

@@ -9,12 +9,14 @@ Usage:
 
 import json
 
-from financial_forecast.reporting.advisor import AzureCEOAdvisor
+from financial_forecast.reporting.advisor import DeepseekCEOAdvisor
 
 
 if __name__ == "__main__":
 
-    report_path = "training_results/forecast_report.json"
+    report_path = (
+        "training_results/adv_policies_w_bayesianopex_taxanomalies/forecast_report.json"
+    )
 
     with open(report_path, "r", encoding="utf-8") as f:
         report = json.load(f)
@@ -26,12 +28,12 @@ if __name__ == "__main__":
     print(f"Monte Carlo samples: {report['n_monte_carlo_samples']}")
     print()
 
-    advisor = AzureCEOAdvisor(
+    advisor = DeepseekCEOAdvisor(
         message="gen-ai-response",
         parameters={
-            "temperature": 0.2,
-            "max_tokens": 1024,
-            "top_k": 40,
+            "temperature": 0,
+            "max_tokens": 100000,
+            "top_k": 1,
         },
     )
 
