@@ -14,7 +14,9 @@ pip install -e ".[dev]"
 
 ## Financial Forecast Models
 
-Each script can be run directly from the project root.
+Each script can be run directly from the project root. All forecast
+pipelines export a JSON report to ``training_results/`` for downstream
+use (e.g., LLM-based CEO recommendations).
 
 ### Simple Model (no training -- forward simulation only)
 
@@ -22,7 +24,10 @@ Each script can be run directly from the project root.
 python run_simple_model_forecast.py
 ```
 
-Demonstrates the Pareja (2009) Cash Budget construction as a pure forward simulation. Uses simple policies with parameters set from historical averages -- no gradient-based training. Produces a deterministic 10-year balance sheet forecast and one-step-ahead historical fit.
+Demonstrates the Pareja (2009) Cash Budget construction as a pure forward
+simulation. Uses simple policies with parameters set from historical
+averages -- no gradient-based training. Produces a deterministic 10-year
+balance sheet forecast and one-step-ahead historical fit.
 
 ### Trainable Model with Simple Policies
 
@@ -30,7 +35,9 @@ Demonstrates the Pareja (2009) Cash Budget construction as a pure forward simula
 python run_trainable_model_forecast_simple_policies.py
 ```
 
-Trains all simple policies (cash-target liquidity, simple dividends/buybacks, static cost ratio, simple debt, deterministic OpEx) via gradient descent, then forecasts.
+Trains all simple policies (cash-target liquidity, simple dividends/buybacks,
+static cost ratio, simple debt, deterministic OpEx) via gradient descent,
+then runs a deterministic 10-year forecast.
 
 ### Trainable Model with Advanced Policies
 
@@ -38,7 +45,8 @@ Trains all simple policies (cash-target liquidity, simple dividends/buybacks, st
 python run_trainable_model_forecast_adv_policies.py
 ```
 
-Uses trend-based liquidity, Lintner dividends, baseline buybacks, trend cost ratio, and trend debt. Deterministic simulator with SimpleOpEx.
+Uses trend-based liquidity, Lintner dividends, baseline buybacks, trend
+cost ratio, and trend debt. Deterministic simulator with SimpleOpEx.
 
 ### Trainable Model with Bayesian OpEx
 
@@ -46,7 +54,8 @@ Uses trend-based liquidity, Lintner dividends, baseline buybacks, trend cost rat
 python run_trainable_model_forecast_adv_policies_w_bayesianopex.py
 ```
 
-Advanced policies with Bayesian variational inference for OpEx and Monte Carlo simulation (1000 samples).
+Advanced policies with Bayesian variational inference for OpEx and Monte
+Carlo simulation (1,000 samples). Includes OpEx fit diagnostics.
 
 ### Trainable Model with Bayesian OpEx + Tax Anomalies
 
@@ -54,44 +63,79 @@ Advanced policies with Bayesian variational inference for OpEx and Monte Carlo s
 python run_trainable_model_forecast_adv_policies_w_bayesianopex_taxanomaly.py
 ```
 
-Adds one-time tax anomaly adjustments on top of the Bayesian OpEx configuration.
+The most complete model configuration. Adds LLM-extracted one-time tax
+anomaly adjustments (from 10-K filings) on top of the Bayesian OpEx
+configuration. Runs an 8-year Monte Carlo forecast and exports a JSON
+report for the LLM recommendation pipeline.
+
+#### Extraction Model Used for Tax Anomaly
+
+```bash
+python run_tax_anomaly_extraction.py
+```
+
+Extracts one-time tax charges and contingency amounts from 10-K PDFs
+using an LLM. Outputs structured JSON files used by ``TaxWithAnomalies``.
+
+### CEO Recommendation via LLM
+
+```bash
+python run_recommendation_to_ceo.py
+```
+
+Reads the forecast report JSON produced by the training pipeline and
+sends the historical + forecast tables to the Azure DeepSeek reasoning
+model for strategic capital-structure and capital-allocation analysis.
+Uses greedy decoding (temperature=0, top_k=1) for minimal hallucination.
 
 ## Financial Statement Extraction Pipeline
 
-```bash
-python -m scripts.run_extraction \
-  --input-dir extracted_text \
-  --num-extraction-runs 3 \
-  --ratios-aggregation median \
-  --runs-output-dir deepseek_financial_statements_runs \
-  --max-workers 9 \
-  --plot-distributions \
-  --hallucination-output-file hallucination_rates.json \
-  --hallucination-top-k 10
-```
+The extraction pipeline has three stages, each with its own run script:
 
-Reads extracted statement text files, calls the Azure DeepSeek endpoint to normalize field values, writes normalized JSON outputs, and computes financial ratios.
-
-### PDF Extraction
+### Stage 1: Extract Financial Statements from PDFs
 
 ```bash
-# Single file
-python -m financial_forecast.extraction.statement_extractor \
-  --input-file ./annual_reports/alibaba_2025.pdf \
-  --query "Consolidated Balance Sheet"
-
-# Full directory
-python -m financial_forecast.extraction.statement_extractor \
-  --input-dir ./annual_reports \
-  --query "Consolidated Balance Sheet"
+python run_statement_extraction.py
 ```
 
-### Tax Anomaly Extraction
+Uses an LLM to identify relevant pages in each 10-K PDF, then extracts
+primary financial tables and supplementary disclosures.
+
+### Stage 2: Normalize Extracted Statements
 
 ```bash
-python -m financial_forecast.extraction.tax_anomaly_extractor \
-  --input-file ./annual_reports/google_2024.pdf
+python run_statement_normalization.py
 ```
+
+Reads raw ``*.llm.json`` files, sends them to an LLM for field
+normalization, and writes structured ``*.normalized.json`` output.
+
+### Stage 2b: Multi-Run Normalization (Hallucination Measurement)
+
+```bash
+python run_statement_normalization_multi.py
+```
+
+Runs the LLM normalization N times on the same input, then computes
+median-aggregated ratios and hallucination rates across runs.
+
+### Stage 3: Calculate Financial Ratios
+
+```bash
+python run_ratio_calculation.py
+```
+
+Reads ``*.normalized.json`` files and computes derived metrics and
+financial ratios.
+
+### Full Pipeline (PDF to Ratios)
+
+```bash
+python run_pdf_to_ratios_pipeline.py
+```
+
+Chains all three stages: PDF extraction, LLM normalization, and ratio
+calculation in a single run.
 
 ## Running Tests
 
@@ -99,18 +143,20 @@ python -m financial_forecast.extraction.tax_anomaly_extractor \
 python -m pytest tests/ -v
 ```
 
+87 tests across 8 test files.
+
 ## Project Structure
 
 ```
 financial_forecast/               # Main package
   types.py                        # FinancialState, EconomicInputs dataclasses
   models/
-    base.py                       # BaseFinancialModel (abstract, shared forecast logic)
-    trainable_financial_model.py  # Composable model with pluggable policy modules
+    base.py                       # BaseFinancialModel (composable forecast logic)
+    trainable_financial_model.py  # Extends base with training + serialization
     balance_sheet.py              # Asset evolution
     income_statement.py           # Income computation
     cash_budget.py                # Liquidity & financing
-    opex.py                       # SimpleOpEx, BayesianOpEx
+    opex.py                       # OpExModule ABC, SimpleOpEx, BayesianOpEx
     capex.py                      # Asset growth & depreciation policy
     working_capital.py            # Working capital ratios (AR, AP, Inv)
     liquidity.py                  # Cash/IMS allocation policies
@@ -118,46 +164,50 @@ financial_forecast/               # Main package
     buyback.py                    # Buyback policies
     purchases.py                  # Cost ratio policies (Static, Trend)
     debt.py                       # Debt financing policies
-    tax.py                        # Tax modules (Simple, with anomalies)
+    tax.py                        # SimpleTax, TaxWithAnomalies
     llm_forecaster.py             # LLM-based balance sheet forecaster
   training/
-    pipeline.py                   # ForecastPipeline orchestrator
+    pipeline.py                   # ForecastPipeline orchestrator + JSON export
     base_trainer.py               # BaseTrainer abstract class
     policy_trainer.py             # Policy + OpEx parameter training
-    structural_trainer.py         # Structural parameter training
-    diagnostics.py                # Training diagnostics
+    structural_trainer.py         # Structural parameter training (with grad clipping)
+    diagnostics.py                # Training loss diagnostics
     io_utils.py                   # Training results I/O
   inference/
     trajectory_simulator.py       # DeterministicSimulator, MonteCarloSimulator
     state_index.py                # Tensor layout constants
+    forecast_driver_models.py     # Sales/inflation forecast models
     plotting.py                   # Forecast visualization
   serialization/
     parameter_io.py               # .npz parameter save/load
   data/
     loader.py                     # HistoricalDataLoader
-    inflation.py                  # Inflation data
+    inflation.py                  # US inflation data
     aapl/
       financial_statements.py     # Apple FY2018-FY2025 historical data
-      tax_onetime_payments.py     # Apple one-time tax payments
   extraction/
-    statement_extractor.py        # Two-stage LLM financial statement extraction
+    base_pdf_extractor.py         # Abstract PDF extraction base class
+    financial_statement_extractor.py  # Two-stage LLM financial statement extraction
     tax_anomaly_extractor.py      # Tax anomaly extraction from 10-K
     page_identifier.py            # LLM-based PDF page selection
     pdf_extractor.py              # pdfplumber wrapper
-    statement_cli.py              # Batch extraction CLI
     statement_config.py           # Extraction configuration
-    statement_normalization.py    # Field normalization
-    statement_extraction.py       # Extraction logic
+    statement_normalizer.py       # LLM-based field normalization
+    statement_normalization.py    # Normalization helpers
     statement_ratios.py           # Financial ratio computation
     statement_hallucination.py    # Hallucination analysis
     statement_runs.py             # Multi-run aggregation
+    utils.py                      # Extraction utilities
+  reporting/
+    table_formatter.py            # TableFormatter ABC, MarkdownTableFormatter
+    advisor.py                    # Advisor ABC, DeepseekCEOAdvisor
   clients/
     azure_llm_client.py           # Azure LLM HTTP client
 
-scripts/
-  run_extraction.py               # Batch extraction pipeline entry point
+run_*.py                          # Entry-point scripts (see above)
+send_reasoning_prompt.py          # Standalone LLM prompt script
 
-tests/                            # Test suite (99 tests)
+tests/                            # Test suite (87 tests)
   test_simple_model_forecast.py
   test_trainable_financial_model_simpleopex.py
   test_trainable_financial_model_bayesianopex.py
