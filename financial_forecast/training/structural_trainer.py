@@ -71,7 +71,7 @@ class StructuralTrainer(BaseTrainer):
         learning_rate: float = 0.001,
         epochs: Optional[int] = None,
         plot_every: int = 1000,
-        gradient_clip_norm: float = 5.0,
+        gradient_clip_norm: Optional[float] = 5.0,
         show_plot: bool = False,
         loss_scale_mode: str = "std",
     ) -> None:
