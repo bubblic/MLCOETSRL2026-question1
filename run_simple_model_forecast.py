@@ -5,7 +5,21 @@ forward simulation with policy parameters set from historical averages.
 No gradient-based optimization is performed; this is a pure forward
 projection of the balance sheet using the Pareja framework equations.
 
-Usage:
+Policies:
+    - OpEx: SimpleOpEx (deterministic linear)
+    - Liquidity: CashTargetPolicy (fixed cash-to-sales target)
+    - Dividends: SimpleDividendPolicy (constant payout ratio)
+    - Buybacks: SimpleBuybackPolicy (depreciation multiple)
+    - Purchases: StaticCostRatioPolicy (fixed cost-of-revenue ratio)
+    - Debt: SimpleDebtPolicy (deficit-driven, no trend)
+    - Tax: SimpleTax (flat effective rate)
+
+Outputs:
+    - Forecast plots saved to ``training_results/``
+    - Forecast report JSON saved to ``training_results/forecast_report.json``
+
+Usage::
+
     python run_simple_model_forecast.py
 """
 
@@ -34,8 +48,10 @@ if __name__ == "__main__":
 
     tf.random.set_seed(42)
 
+    # -- Step 1: Load historical financial data --
     data = HistoricalDataLoader("aapl", include_inflation=True)
 
+    # -- Step 2: Build model with simple (non-trainable) policies --
     model = BaseFinancialModel(
         opex_module=SimpleOpEx(),
         trajectory_simulator=DeterministicSimulator(),
@@ -49,11 +65,13 @@ if __name__ == "__main__":
         tax_module=SimpleTax(),
     )
 
+    # -- Step 3: Prepare model (scale data, initialize parameters) --
     model.prepare(
         financial_statements=data.financial_statements,
         inflation=data.inflation,
     )
 
+    # -- Step 4: Run forecast pipeline (simulate, plot, export JSON) --
     ForecastPipeline(
         model,
         data=data,

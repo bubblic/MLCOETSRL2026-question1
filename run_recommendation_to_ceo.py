@@ -1,9 +1,22 @@
-"""Send a forecast report JSON to the LLM for CEO/CFO recommendations.
+"""Send a forecast report to the LLM for CEO/CFO strategic recommendations.
 
-Reads the JSON artifact produced by ForecastPipeline.run() and sends
-the historical + forecast tables to the Azure reasoning model.
+Reads the self-contained JSON artifact produced by
+:meth:`ForecastPipeline.run` (which includes historical and forecast
+markdown tables, model metadata, and a reference to the trained
+parameters file) and sends it to the Azure DeepSeek reasoning model
+for capital-structure and capital-allocation analysis.
 
-Usage:
+Inputs:
+    - ``training_results/adv_policies_w_bayesianopex_taxanomalies/forecast_report.json``
+      (produced by the training pipeline)
+
+LLM Configuration:
+    - Model: DeepSeek-V3.2 (Azure-hosted reasoning model)
+    - temperature=0, top_k=1 (greedy decoding for minimal hallucination)
+    - max_tokens=100,000
+
+Usage::
+
     python run_recommendation_to_ceo.py
 """
 
@@ -14,6 +27,7 @@ from financial_forecast.reporting.advisor import DeepseekCEOAdvisor
 
 if __name__ == "__main__":
 
+    # -- Step 1: Load the forecast report JSON --
     report_path = (
         "training_results/adv_policies_w_bayesianopex_taxanomalies/forecast_report.json"
     )
@@ -28,6 +42,7 @@ if __name__ == "__main__":
     print(f"Monte Carlo samples: {report['n_monte_carlo_samples']}")
     print()
 
+    # -- Step 2: Configure the LLM advisor (greedy decoding) --
     advisor = DeepseekCEOAdvisor(
         message="gen-ai-response",
         parameters={
@@ -37,6 +52,7 @@ if __name__ == "__main__":
         },
     )
 
+    # -- Step 3: Build prompt and send to LLM --
     prompt = advisor.build_prompt(
         historical_table=report["historical_table"],
         forecast_table=report["forecast_table"],

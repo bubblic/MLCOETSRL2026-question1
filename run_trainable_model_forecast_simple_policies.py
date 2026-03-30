@@ -1,9 +1,28 @@
-"""Run the financial model with all simple policies.
+"""Run the trainable financial model with simple policies.
 
-Uses cash-target liquidity, simple dividends/buybacks, static cost ratio,
-deficit-driven debt, and deterministic OpEx.
+Trains policy and structural parameters via gradient descent, then
+runs a deterministic 10-year forecast.
 
-Usage:
+Policies:
+    - OpEx: SimpleOpEx (deterministic linear)
+    - Liquidity: CashTargetPolicy (fixed cash-to-sales target)
+    - Dividends: SimpleDividendPolicy (constant payout ratio)
+    - Buybacks: SimpleBuybackPolicy (depreciation multiple)
+    - Purchases: StaticCostRatioPolicy (fixed cost-of-revenue ratio)
+    - Debt: SimpleDebtPolicy (deficit-driven, no trend)
+    - Tax: SimpleTax (flat effective rate)
+
+Training:
+    - PolicyTrainer: 25,000 epochs
+    - StructuralTrainer: 20,000 epochs
+
+Outputs:
+    - Trained parameters saved to ``trained_parameters_simple_policies.npz``
+    - Forecast plots saved to ``training_results/``
+    - Forecast report JSON saved to ``training_results/forecast_report.json``
+
+Usage::
+
     python run_trainable_model_forecast_simple_policies.py
 """
 
@@ -33,11 +52,13 @@ if __name__ == "__main__":
 
     tf.random.set_seed(42)
 
+    # -- Step 1: Load historical financial data --
     data = HistoricalDataLoader(
         "aapl",
         include_inflation=True,
     )
 
+    # -- Step 2: Build model with simple policies --
     model = TrainableFinancialModel(
         opex_module=SimpleOpEx(),
         trajectory_simulator=DeterministicSimulator(),
@@ -51,17 +72,20 @@ if __name__ == "__main__":
         tax_module=SimpleTax(),
     )
 
+    # -- Step 3: Prepare model (scale data, initialize parameters) --
     model.prepare(
         financial_statements=data.financial_statements,
         inflation=data.inflation,
         test_years=1,
     )
 
+    # -- Step 4: Train policy and structural parameters --
     model.train(
         trainers=[PolicyTrainer(epochs=25000), StructuralTrainer(epochs=20000)],
         parameters_save_path="trained_parameters_simple_policies.npz",
     )
 
+    # -- Step 5: Run forecast pipeline (simulate, plot, export JSON) --
     ForecastPipeline(
         model,
         data=data,
