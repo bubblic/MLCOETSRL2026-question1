@@ -1005,8 +1005,10 @@ LTLoan\textsubscript{t} in \ul{2.3 Liabilities}.
   \emph{External Investment NLB}
 \end{enumerate}
 
-We redeem external investments from last year with a fixed percentage of
-return (\%MSReturn), and make new investments this year:
+We redeem external investments from last year with an effective
+percentage of return (\%MSReturn, derived from
+$(\text{EBT} - \text{EBIT} + \text{InterestExpense}) / \text{IMS}$
+historically, see \eqref{eq:ms_return_derivation}), and make new investments this year:
 
 \begin{equation}\label{eq:ext_invest_nlb}
 \text{External investment NLB}_t = \text{IMS}_{t-1} \cdot (1 + \text{\%MSReturn}) - \text{IMS}_t
@@ -1342,6 +1344,41 @@ depreciation (and amortization):
 \text{EBT}_t = \text{EBITDA}_t - \text{Depreciation}_t - \text{AvgSTInt}_t - \text{AvgLTInt}_t + \text{\%MSReturn} \cdot \text{IMS}_{t-1}
 \end{equation}
 
+\textbf{Derivation of historical \%MSReturn.}
+The term $\text{\%MSReturn} \cdot \text{IMS}_{t-1}$ represents income
+from short-term investments in market securities.  In practice, not all
+companies separately disclose this line item in their income statement;
+many lump it with other non-operating items (foreign exchange
+gains/losses, miscellaneous items, etc.) into a single ``Other
+income/(expense), net'' (OI\&E) line.  We therefore derive the
+historical values from the income statement identity:
+
+\begin{equation}\label{eq:ms_return_derivation}
+\text{MSReturn}_t = \text{EBT}_t - \text{EBIT}_t + \text{InterestExpense}_t
+\end{equation}
+
+This isolates all non-operating income/expense \emph{except} interest
+expense (which the model already handles via \%AvgSTInt and \%AvgLTInt).
+For companies like Apple, where investment income dominates OI\&E, this
+residual is a close proxy for the true return on the securities
+portfolio.  For companies with significant foreign exchange exposure, it
+may also absorb FX gains/losses.
+
+When Yahoo Finance does not provide Interest Expense separately (as is
+the case for some fiscal years), we fall back to
+$\text{MSReturn}_t = \text{EBT}_t - \text{EBIT}_t$ and set
+interest expense to zero for those years, which lumps all non-operating
+items into MSReturn but preserves the EBT identity.
+
+\textbf{Forward projection.}
+During forecasting, the model projects $\text{MSReturn}_t$ as a fixed
+percentage return on the prior period's IMS balance:
+$\text{\%MSReturn} \cdot \text{IMS}_{t-1}$.  The effective rate
+\%MSReturn is learned during training as the historical average of
+$\text{MSReturn}_t / \text{IMS}_{t-1}$, which absorbs the blended
+contribution of investment income and smaller non-operating items into a
+single rate parameter.
+
 Net income (NI\textsubscript{t}) is determined by subtracting the income
 tax:
 
@@ -1426,7 +1463,8 @@ drive every element given the variables to be trained are learned.
 \item
   AvgM : Average maturity of total long-term liability
 \item
-  \%MSReturn : Percentage return on the investment in market securities
+  \%MSReturn : Effective percentage return on the investment in market
+  securities, derived from historical $(\text{EBT} - \text{EBIT} + \text{InterestExpense}) / \text{IMS}$
 \item
   \%EF : Equity financing as a percentage of total excess cash needed
   after accounting for long-term investments and long-term obligations
@@ -1749,7 +1787,9 @@ equity will always be satisfied. We can check with test values in our
 simple TensorFlow model.
 
 This forward model has been implemented in Python in
-\textbf{simple\_financial\_model.py} using data from Apple's financial
+\textbf{run\_simple\_model\_forecast.py}, which composes
+the modular policy classes from the \texttt{financial\_forecast/} package
+using data from Apple's financial
 statements. The financial statements were first obtained from Yahoo
 finance as suggested by Question 4 (we wrote the script in
 \textbf{yahoofinance.py}), but we could only access past 4 years of
@@ -1758,8 +1798,7 @@ managed to obtain older financial data by directly pulling from Apple's
 10-K filings. The script that we wrote and used for the data extraction
 is found in \textbf{sec-edgar-download-extractor.py.}
 
-The following is the output of the code when run with: python
-.\textbackslash simple\_financial\_mode.py :
+The following is the output of the code when run with: \texttt{python run\_simple\_model\_forecast.py} :
 
 \includegraphics[width=4.67615in,height=0.9667in]{report_latex_media/media/image2.png}
 
@@ -1843,7 +1882,8 @@ together using the above trained variables:
 \item
   AvgM : Average maturity of total long-term liability
 \item
-  \%MSReturn : Percentage return on the investment in market securities
+  \%MSReturn : Effective percentage return on the investment in market
+  securities, derived from historical $(\text{EBT} - \text{EBIT} + \text{InterestExpense}) / \text{IMS}$
 \item
   \%EF : Equity financing as a percentage of total excess cash needed
   after accounting for long-term investments and long-term obligations
@@ -1856,14 +1896,16 @@ and \%EF concurrently via simple gradient while minimizing mean-square
 error between predicted and actual net income, stockholders equity,
 current liabilities, and non-current liabilities.
 
-The code has been implemented in trainable\_financial\_model.py. For
+The code has been implemented in \textbf{run\_trainable\_model\_forecast\_simple\_policies.py},
+which composes the \texttt{TrainableFinancialModel} with simple policy modules
+and runs the \texttt{PolicyTrainer} and \texttt{StructuralTrainer}. For
 this simple training model, \%AM = 100\% and Purchases are also used
 together with Sales as dual driver.
 
 In order to test the model's prediction capability, we train the
 parameters from Apple's 2018\textasciitilde2024 data, predict 2025 data,
 and compare it with the actual data. The following is the output after
-running \textbf{trainable\_financial\_model.py}:
+running \textbf{run\_trainable\_model\_forecast\_simple\_policies.py}:
 
 \includegraphics[width=\textwidth]{report_latex_media/media/image3.png}
 
@@ -1933,8 +1975,11 @@ slope and offset) that a simple linear regression gives you. It allows
 us to predict the OpEx, and therefore the earnings and other balance
 sheet elements, with a confidence interval.
 
-Most of the code from trainable\_financial\_model.py remains unchanged
-except how we model the OpEx during training. The following updates are
+Most of the code from the simple trainable model remains unchanged
+except how we model the OpEx during training. The OpEx module is swapped
+from \texttt{SimpleOpEx} to \texttt{BayesianOpEx}, and the trajectory
+simulator from \texttt{DeterministicSimulator} to
+\texttt{MonteCarloSimulator}. The following updates are
 made:
 
 \begin{enumerate}
@@ -1991,8 +2036,11 @@ includes the primary drivers, which are sales and purchases time series,
 and inflation, which is the external environment variable that we
 include in the model for predicting the operating expense.
 
-{\sloppy We implemented the updated Bayesian model in \textbf{trainable\_financial\_model\_taxanomaly\_effstdebt\_bayesian\_vi\_refactored.py}
-with the include\_tax\_anomalies = False, and the output is reproduced
+{\sloppy We implemented the updated Bayesian model in \textbf{run\_trainable\_model\_forecast\_adv\_policies\_w\_bayesianopex.py},
+which composes the \texttt{TrainableFinancialModel} with \texttt{BayesianOpEx},
+\texttt{MonteCarloSimulator}, and all advanced trend-based policies
+(\texttt{TrendLiquidityPolicy}, \texttt{LintnerDividendPolicy}, etc.)
+but with a \texttt{SimpleTax} module (no tax anomalies). The output is reproduced
 below:\par}
 
 \noindent\rule{\textwidth}{0.4pt}
@@ -2101,7 +2149,9 @@ EBIT (earnings before interests and taxes) is calculated by
 
 EBIT = Revenue -- COGS -- OpEx -- Depreciation
 
-Then, we account for interest payments and ST investment returns, which
+Then, we account for interest payments and ST investment returns
+(derived as $\text{EBT} - \text{EBIT} + \text{InterestExpense}$ from the
+income statement, see \eqref{eq:ms_return_derivation}), which
 are used to calculate EBT (earnings before taxes):
 
 EBT = EBIT -- interest payments + ST returns
@@ -2437,24 +2487,19 @@ Income Statement, and Cash Budget.}
 
 (10) Remember to write test cases.
 
-Response: Thank you for the reminder. We wrote test cases for all the
-scripts appearing in this report:
+Response: Thank you for the reminder. We wrote 87 test cases across 8 test files
+covering all modules in the codebase:
 
-simple\_financial\_model.py
-
-trainable\_financial\_model.py
-
-llm-only-balance-sheet-forecast.py
-
-llm\_extract\_tax\_anomalies\_from\_pdf.py
-
-send\_reasoning\_prompt.py
-
-\ul{llm\_extract\_financial\_statement\_from\_pdf.py}
-
-llm\_extract\_json\_from\_financial\_statements.py
-
-The test scripts have `test\_' in front of each name.
+\begin{itemize}
+\item \texttt{test\_simple\_model\_forecast.py} -- forward simulation model
+\item \texttt{test\_trainable\_financial\_model\_simpleopex.py} -- trainable model with deterministic OpEx
+\item \texttt{test\_trainable\_financial\_model\_bayesianopex.py} -- trainable model with Bayesian OpEx
+\item \texttt{test\_llm\_forecast.py} -- LLM-only balance sheet forecasting
+\item \texttt{test\_reasoning\_prompt.py} -- CEO/CFO recommendation prompt
+\item \texttt{test\_extraction.py} -- financial statement PDF extraction
+\item \texttt{test\_statement\_normalization.py} -- LLM field normalization
+\item \texttt{test\_tax\_anomalies.py} -- tax anomaly extraction and model integration
+\end{itemize}
 
 \textbf{Part 2}
 
@@ -2488,8 +2533,8 @@ report submission.
 \end{enumerate}
 
 We can use the same input data from part 1 and feed it to DeepSeekV3.2
-to forecast the balance sheet, as done in
-llm-only-balance-sheet-forecast.py.
+to forecast the balance sheet, as implemented in
+\texttt{financial\_forecast/models/llm\_forecaster.py}.
 
 \begin{quote}
 We use the following prompt with the identity check that assets =
@@ -2538,8 +2583,8 @@ prompt: Dict[str, Any] = {
 }
 \end{lstlisting}
 
-The returned fields are further processed within the script
-\textbf{llm-only-balance-sheet-forecast.py} to ensure the balance sheet
+The returned fields are further processed within
+\texttt{financial\_forecast/models/llm\_forecaster.py} to ensure the balance sheet
 identity holds. The forecasted values are plotted below:
 
 \includegraphics[width=\textwidth]{report_latex_media/media/image14.png}
@@ -2569,8 +2614,8 @@ tax overestimated by \textasciitilde2 billion). Net income
 (\textasciitilde100 billion dollars) is sales -- cogs -- opex --
 depreciation -- debt interest + market securities return -- tax, and we
 actually see good predicted values for COGS, opex, and depreciation
-(market securities return and interest payments are uncertain due to
-incomplete data, but their combined amount is order of magnitude smaller
+(market securities return is derived as $\text{EBT} - \text{EBIT} + \text{InterestExpense}$
+per \eqref{eq:ms_return_derivation}, and their combined amount is an order of magnitude smaller
 than tax) all show discrepancy from data of less than 1 billion, while
 tax, which takes \textasciitilde30\% of net income, is off from the data
 by \textasciitilde2 billion, almost 10\% higher than predicted which
@@ -2594,7 +2639,7 @@ We can feed the 10-K to LLM and ask it to identify pages that contain
 the one-off tax information, and extract this data in JSON format for
 model consumption:
 
-Script: \textbf{llm\_extract\_tax\_anomalies\_from\_pdf.py}
+Script: \textbf{run\_tax\_anomaly\_extraction.py} (using \texttt{TaxAnomalyExtractor} from \texttt{financial\_forecast/extraction/})
 
 \begin{lstlisting}[style=python]
 DEFAULT_SELECTION_PROMPT = (
@@ -2664,9 +2709,10 @@ JSON output:
 
 We update our balance sheet forecasting script to include the
 tax\_onetime\_amount for better learning of the baseline tax rate. We
-run the script
-trainable\_financial\_model\_taxanomaly\_effstdebt\_bayesian\-\_vi\_refactored.py
-with include\_tax\_anomalies=True.
+run
+\textbf{run\_trainable\_model\_forecast\_adv\_policies\_w\_bayesianopex\_taxanomaly.py},
+which injects a \texttt{TaxWithAnomalies(data.tax\_onetime\_payments)}
+module into the model instead of \texttt{SimpleTax()}.
 
 Effective tax rate drops from 17\% to 15.5\%! And the learning loss is
 smaller for the effective tax rate \%IT:
@@ -2795,8 +2841,14 @@ Data Input:
 
 ``\,''\,''
 
-The prompt with the context of the 10-year forecast is sent to our
-reasoning model by calling send\_reasoning\_prompt.py
+The prompt, together with the historical and forecast markdown tables
+from the JSON report artifact exported by \texttt{ForecastPipeline}, is
+sent to our reasoning model via \textbf{run\_recommendation\_to\_ceo.py}.
+This script loads the self-contained \texttt{forecast\_report.json},
+constructs the prompt using the \texttt{DeepseekCEOAdvisor} class (which
+extends the \texttt{Advisor} ABC from \texttt{financial\_forecast/reporting/advisor.py}),
+and calls the Azure DeepSeek endpoint with greedy decoding
+(\texttt{temperature=0}, \texttt{top\_k=1}) for minimal hallucination
 
 And here is the recommendation that our reasoning model generated:
 
@@ -2875,6 +2927,45 @@ This mechanism directly links the benefit of operating leverage to
 per-share earnings accretion and WACC optimization, while maintaining a
 cash safety net.
 \end{quote}
+
+\textbf{Modular Architecture and Forecast Report Pipeline}
+
+The codebase follows a modular, object-oriented architecture. All
+forecast logic lives in the \texttt{financial\_forecast/} Python package,
+organized into sub-packages:
+
+\begin{itemize}
+\item \texttt{models/} -- composable financial model with pluggable policy
+  modules (\texttt{BaseFinancialModel}, \texttt{TrainableFinancialModel}),
+  each module typed against its abstract base class (e.g.,
+  \texttt{OpExModule}, \texttt{LiquidityPolicy}, \texttt{DividendPolicy},
+  \texttt{DebtPolicy}, \texttt{SimpleTax})
+\item \texttt{training/} -- \texttt{ForecastPipeline} orchestrator,
+  \texttt{PolicyTrainer}, \texttt{StructuralTrainer}
+\item \texttt{inference/} -- \texttt{DeterministicSimulator},
+  \texttt{MonteCarloSimulator}, forecast driver models, plotting
+\item \texttt{extraction/} -- LLM-based PDF extraction, normalization,
+  ratio calculation, hallucination analysis
+\item \texttt{reporting/} -- \texttt{TableFormatter} ABC with
+  \texttt{MarkdownTableFormatter}, and \texttt{Advisor} ABC with
+  \texttt{DeepseekCEOAdvisor} for LLM-based CEO recommendations
+\item \texttt{data/} -- \texttt{HistoricalDataLoader} and per-company
+  data modules
+\item \texttt{serialization/} -- \texttt{.npz} parameter save/load
+\item \texttt{clients/} -- \texttt{AzureLLMClient} for Azure-hosted LLM
+  endpoints
+\end{itemize}
+
+The \texttt{ForecastPipeline} class automatically exports a self-contained
+JSON report (\texttt{forecast\_report.json}) containing historical and
+forecast markdown tables, model metadata, and a reference to the trained
+parameters file. This JSON artifact is consumed by
+\texttt{run\_recommendation\_to\_ceo.py} for downstream LLM analysis,
+decoupling the training/forecast stage from the LLM recommendation stage.
+
+All method signatures throughout the package use Python type hints,
+and each entry-point \texttt{run\_*.py} script is a thin orchestrator
+that wires together the modular components.
 
 \textbf{e, f, g) Financial Ratios and Automated Extraction Pipeline}
 
@@ -3120,7 +3211,7 @@ similar to how chain-of-thought prompting improves output quality
 feeding it to the LLM to extract the financial fields, we prevent
 context dilution which is known to degrade output quality \hyperlink{ref:liu23}{[Liu(23)]}.
 
-\textbf{\ul{llm\_extract\_financial\_statement\_from\_pdf.py}}
+\textbf{\ul{run\_statement\_extraction.py}} (using \texttt{FinancialStatementExtractor} from \texttt{financial\_forecast/extraction/})
 
 \textbf{Primary financial statement extraction:}
 
@@ -3536,30 +3627,17 @@ its hallucination rate, we repeated Step 5 (i.e., extracting json from
 financial statements for financial ratio calculations) for 101 runs and
 plotted each field value vs run using the following scripts:
 
-Run \textbf{llm\_extract\_json\_from\_financial\_statements.py} with
-these arguments:
+Run multi-run normalization via \textbf{run\_statement\_normalization\_multi.py},
+which invokes the \texttt{StatementNormalizer} and
+\texttt{MedianRatioCalculator} from \texttt{financial\_forecast/extraction/}:
 
 \begin{lstlisting}[style=console]
-python llm_extract_json_from_financial_statements.py \
-  --input-dir extracted_text \
-  --num-extraction-runs 101 \
-  --runs-output-dir deepseek_financial_statements_runs \
-  --max-workers 9 \
-  --plot-distributions
+python run_statement_normalization_multi.py
 \end{lstlisting}
 
-Then, run a simple script, \textbf{calculate\_hallucination\_rates.py},
-to plot the extracted json data to visualize hallucination rates for
-different financial fields from different companies:
-
-\begin{lstlisting}[style=console]
-python calculate_hallucination_rates.py \
-  --run-values-file deepseek_financial_statements_runs/\
-    runs_3_with_operating_cost_for_generating_income/\
-    extraction_run_values.json \
-  --output-file hallucination_rates.json \
-  --top-k 10
-\end{lstlisting}
+This performs multiple LLM normalization passes, computes median-aggregated
+ratios, and generates hallucination rate analysis via the
+\texttt{statement\_hallucination} module:
 
 The results are reproduced below for GM, LVMH, Tencent, Alibaba,
 JPMorgan Chase, Exxon Mobil, Volkswagen, Microsoft, and Google:
@@ -3674,10 +3752,10 @@ We see that the hallucination rate practically goes to zero:
 
 After obtaining the correct field values, calculating the various
 financial ratios is straightforward. We write a Python script for the
-calculation, which gives us definite results. The script is part of this
-json extraction script that runs automatically after extracting the
-relevant fields:
-\textbf{llm\_extract\_json\_from\_financial\_statements.py}
+calculation, which gives us definite results. The ratio calculation
+runs automatically after normalization via
+\textbf{run\_ratio\_calculation.py} (using \texttt{RatioCalculator} from
+\texttt{financial\_forecast/extraction/statement\_ratios.py})
 
 Calculated fields and financial ratios for GM are as follows for 2022
 and 2023 in the 2023 annual report:

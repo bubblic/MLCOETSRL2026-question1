@@ -164,7 +164,7 @@ class PolicyTrainer(BaseTrainer):
         nca_prev_aligned = nca_tensor[:-1]
         adv_ps_true = adv_pay_sales_tensor
         adv_pp_true = adv_pay_purch_tensor
-        purchases_aligned_adv_pp = purchases_tensor
+
         # Dividend smoothing (Lintner): D_t depends on NI_{t-1} and D_{t-1}
         div_true = div_tensor[1:]
         ni_prev_aligned = ni_tensor[:-1]
