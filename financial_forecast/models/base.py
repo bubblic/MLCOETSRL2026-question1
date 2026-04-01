@@ -168,7 +168,7 @@ class BaseFinancialModel(tf.Module):
     def structural_trainable_variables(self) -> list:
         """All variables optimized in the structural training phase."""
         return [
-            *self.income_statement.trainable_variables,
+            *self.income_statement.structural_trainable_variables,
             *self.cash_budget.debt_policy.structural_trainable_variables,
         ]
 
@@ -346,9 +346,16 @@ class BaseFinancialModel(tf.Module):
             d[k] = raw[k]
 
         n_hist = len(d["sales"])
-        d["inflation"] = (
-            inflation if inflation is not None else tf.zeros(n_hist, dtype=tf.float64)
-        )
+        if inflation is not None:
+            if len(inflation) < n_hist:
+                raise ValueError(
+                    f"inflation has {len(inflation)} values but "
+                    f"financial_statements has {n_hist} years"
+                )
+            # Align: take the last n_hist values (most recent years)
+            d["inflation"] = inflation[-n_hist:]
+        else:
+            d["inflation"] = tf.zeros(n_hist, dtype=tf.float64)
         d["effective_st_debt"] = (
             d["current_liabilities"]
             - d["accounts_payable"]

@@ -145,6 +145,14 @@ class SimpleOpEx(OpExModule):
             dtype=tf.float64,
             name="baseline_opex",
         )
+        # Non-trainable centering constant — decorrelates baseline from
+        # variable_opex_pct so gradient descent converges reliably.
+        self.sales_offset = tf.Variable(
+            0.0,
+            dtype=tf.float64,
+            trainable=False,
+            name="sales_offset",
+        )
         self.amount_scale = 1.0
         self._historical_sales_scaled = None
         self._historical_opex_scaled = None
@@ -152,10 +160,19 @@ class SimpleOpEx(OpExModule):
         self._training_history = {"epochs": [], "loss": []}
 
     def init_from_data(self, s: Dict[str, tf.Tensor]) -> None:
-        _EPS = 1e-12
-        self.variable_opex_pct.assign(
-            float(tf.reduce_mean(s["opex"] / tf.maximum(s["sales"], _EPS)))
+        # Center sales to decorrelate the slope and intercept, matching
+        # the BayesianOpEx pattern.  The LS fit on centered data gives
+        # slope = cov(sales, opex) / var(sales), intercept = mean(opex).
+        sales = tf.cast(s["sales"], tf.float64)
+        opex = tf.cast(s["opex"], tf.float64)
+        sales_mean = tf.reduce_mean(sales)
+        opex_mean = tf.reduce_mean(opex)
+        slope = tf.reduce_sum((sales - sales_mean) * (opex - opex_mean)) / (
+            tf.reduce_sum(tf.square(sales - sales_mean)) + 1e-12
         )
+        self.sales_offset.assign(float(sales_mean))
+        self.variable_opex_pct.assign(float(slope))
+        self.baseline_opex.assign(float(opex_mean))
 
     def prepare_for_training(
         self,
@@ -177,7 +194,8 @@ class SimpleOpEx(OpExModule):
         use_mean: bool = False,
     ) -> tf.Tensor:
         """Compute OpEx deterministically. ``use_mean`` is ignored."""
-        return self.baseline_opex * cum_inflation + sales_t * self.variable_opex_pct
+        sales_centered = sales_t - self.sales_offset
+        return self.baseline_opex * cum_inflation + sales_centered * self.variable_opex_pct
 
     def prepare_mc(self, n_samples: int, n_years: int) -> None:
         """No-op — deterministic model has no stochastic values."""
@@ -199,7 +217,8 @@ class SimpleOpEx(OpExModule):
         loss_scale: tf.Tensor,
     ) -> tf.Tensor:
         """MSE loss for deterministic OpEx."""
-        pred = self.baseline_opex * cum_inflation + sales * self.variable_opex_pct
+        sales_centered = sales - self.sales_offset
+        pred = self.baseline_opex * cum_inflation + sales_centered * self.variable_opex_pct
         return tf.reduce_mean(tf.square((observed_opex - pred) / loss_scale))
 
     def record_step(self, epoch: int, loss: float) -> None:

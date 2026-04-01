@@ -57,6 +57,18 @@ class IncomeStatementModel(tf.Module):
             name="market_securities_return_pct",
         )
 
+    @property
+    def structural_trainable_variables(self) -> list:
+        """Interest rate and MS return variables for the structural phase.
+
+        Excludes OpEx variables, which are optimized in the policy phase.
+        """
+        return [
+            *self.avg_short_term_interest_pct.trainable_variables,
+            *self.avg_long_term_interest_pct.trainable_variables,
+            *self.market_securities_return_pct.trainable_variables,
+        ]
+
     def init_from_data(self, s: Dict[str, tf.Tensor]) -> None:
         """Initialize interest/return rates from historical averages."""
         _f64 = lambda v: tf.constant(v, dtype=tf.float64)

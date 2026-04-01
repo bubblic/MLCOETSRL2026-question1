@@ -201,6 +201,9 @@ def build_financial_data(
     )
     equity = safe_get(bs, "Stockholders Equity", years)
 
+    # Save raw source value for comparison
+    current_liabilities_source = safe_get(bs, "Current Liabilities", years)
+
     # Derive current_liabilities to enforce the balance sheet identity:
     # Assets = Liabilities + Equity
     # CL = (NCA + AdvPP + AR + Inv + Cash + IMS) - NCL - Equity
@@ -265,6 +268,7 @@ def build_financial_data(
         "cash": cash,
         "ims": zero_if_nan_fields["ims"],
         "current_liabilities": current_liabilities,
+        "current_liabilities_source": current_liabilities_source,
         "current_lt_debt": current_lt_debt,
         "non_current_liabilities": non_current_liabilities,
         "equity": equity,
@@ -347,10 +351,10 @@ def generate_module_source(
         ("advance_payments_sales", "advance_payments_sales"),
         ("cash", "cash"),
         ("ims", "ims"),
-        ("current_liabilities", "current_liabilities"),
         ("current_lt_debt", "current_lt_debt"),
         ("non_current_liabilities", "non_current_liabilities"),
         ("equity", "equity"),
+        ("current_liabilities_source", "current_liabilities_source"),
     ]:
         sections.append(tensor_block(name, data[key]))
 
@@ -406,6 +410,7 @@ def get_financial_statements():
             cash                       - cash and cash equivalents
             ims                        - short-term investments
             current_liabilities        - derived to enforce Assets = L + E
+            current_liabilities_source - raw value from source (for comparison)
             current_lt_debt            - current portion of long-term debt
             non_current_liabilities    - non-current liabilities
             equity                     - stockholders\' equity
@@ -423,6 +428,12 @@ def get_financial_statements():
 {tensor_lines}
 
     # --- Derived ---
+    # Enforce balance sheet identity: Assets = Liabilities + Equity
+    current_liabilities = (
+        nca + advance_payments_purchases + accounts_receivable
+        + inventory + cash + ims
+        - non_current_liabilities - equity
+    )
     purchases = cogs + change_in_inventory
     cost_of_revenue = cogs + depreciation
 
@@ -449,6 +460,7 @@ def get_financial_statements():
         "cash": cash,
         "ims": ims,
         "current_liabilities": current_liabilities,
+        "current_liabilities_source": current_liabilities_source,
         "current_lt_debt": current_lt_debt,
         "non_current_liabilities": non_current_liabilities,
         "equity": equity,

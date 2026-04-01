@@ -27,7 +27,13 @@ class TrajectorySimulator(ABC):
     """Abstract base class for forecast engines.
 
     Provides shared reporting methods inherited by all engines.
+    Subclasses must define :attr:`n_samples`.
     """
+
+    @property
+    @abstractmethod
+    def n_samples(self) -> int:
+        """Number of Monte Carlo samples (1 for deterministic)."""
 
     @abstractmethod
     def run(
@@ -260,6 +266,10 @@ class DeterministicSimulator(TrajectorySimulator):
     Runs one trajectory with mean OpEx parameters.
     """
 
+    @property
+    def n_samples(self) -> int:
+        return 1
+
     def run(
         self,
         model: tf.Module,
@@ -333,8 +343,12 @@ class MonteCarloSimulator(TrajectorySimulator):
         n_samples: Number of Monte Carlo simulation paths.
     """
 
-    def __init__(self, n_samples=1000):
-        self.n_samples = n_samples
+    def __init__(self, n_samples: int = 1000):
+        self._n_samples = n_samples
+
+    @property
+    def n_samples(self) -> int:
+        return self._n_samples
 
     def run(
         self,
