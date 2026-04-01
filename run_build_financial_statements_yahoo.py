@@ -35,7 +35,7 @@ Field Mapping (Yahoo Finance -> Model):
         Current Deferred Revenue                -> advance_payments_sales
         Cash And Cash Equivalents               -> cash
         Other Short Term Investments            -> ims
-        Current Liabilities                     -> current_liabilities
+        (Derived from identity)                 -> current_liabilities
         Current Debt                            -> current_lt_debt
         Total Non Current Liabilities ...       -> non_current_liabilities
         Stockholders Equity                     -> equity
@@ -195,12 +195,32 @@ def build_financial_data(
     advance_payments_sales = safe_get(bs, "Current Deferred Revenue", years)
     cash = safe_get(bs, "Cash And Cash Equivalents", years)
     ims = safe_get(bs, "Other Short Term Investments", years)
-    current_liabilities = safe_get(bs, "Current Liabilities", years)
     current_lt_debt = safe_get(bs, "Current Debt", years)
     non_current_liabilities = safe_get(
         bs, "Total Non Current Liabilities Net Minority Interest", years
     )
     equity = safe_get(bs, "Stockholders Equity", years)
+
+    # Derive current_liabilities to enforce the balance sheet identity:
+    # Assets = Liabilities + Equity
+    # CL = (NCA + AdvPP + AR + Inv + Cash + IMS) - NCL - Equity
+    current_liabilities = [
+        (
+            (n + ap_ + ar + inv + c + im) - ncl_ - eq
+            if not any(np.isnan(v) for v in [n, ap_, ar, inv, c, im, ncl_, eq])
+            else float("nan")
+        )
+        for n, ap_, ar, inv, c, im, ncl_, eq in zip(
+            nca,
+            advance_payments_purchases,
+            accounts_receivable,
+            inventory,
+            cash,
+            ims,
+            non_current_liabilities,
+            equity,
+        )
+    ]
 
     # --- Cash Flow (negate: Yahoo uses cash-outflow-negative convention) ---
     change_in_inventory_raw = safe_get(cf, "Change In Inventory", years)
@@ -385,7 +405,7 @@ def get_financial_statements():
             advance_payments_sales     - current deferred revenue
             cash                       - cash and cash equivalents
             ims                        - short-term investments
-            current_liabilities        - total current liabilities
+            current_liabilities        - derived to enforce Assets = L + E
             current_lt_debt            - current portion of long-term debt
             non_current_liabilities    - non-current liabilities
             equity                     - stockholders\' equity

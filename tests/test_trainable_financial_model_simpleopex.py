@@ -166,33 +166,48 @@ def test_forecast_step_deterministic(model, mock_state, mock_inputs):
         ), f"{key} differs between calls"
 
 
+def _build_training_data(d):
+    """Build HistoricalTrainingData from the mock_historical dict."""
+    from financial_forecast.types import HistoricalTrainingData
+
+    return HistoricalTrainingData(
+        sales=d["sales"],
+        purchases=d["purchases"],
+        cogs=d["cogs"],
+        nca=d["nca"],
+        depreciation=d["depreciation"],
+        advance_payments_sales=d["adv_pay_sales"],
+        advance_payments_purchases=d["adv_pay_purch"],
+        accounts_receivable=d["ar"],
+        accounts_payable=d["ap"],
+        inventory=d["inventory"],
+        cash=d["cash"],
+        ims=d["ims"],
+        net_income=d["net_income"],
+        dividends=d["dividends"],
+        stock_buyback=d["stock_buyback"],
+        opex=d["opex"],
+        tax=d["tax"],
+        effective_st_debt=d["eff_st_debt"],
+        current_lt_debt=d.get("current_lt_debt", d["eff_st_debt"]),
+        non_current_liabilities=d.get("non_current_liabilities", d["eff_st_debt"]),
+        interest_payment=d.get("interest_payment", d["eff_st_debt"]),
+        ms_return=d.get("ms_return", d["eff_st_debt"]),
+        equity=d.get("equity", d["eff_st_debt"]),
+        inflation=d["inflation"],
+        years=d["years"],
+    )
+
+
 def test_training_executes(model, mock_historical):
     """Training with SimpleOpEx should complete without errors."""
-    d = mock_historical
+    data = _build_training_data(mock_historical)
     PolicyTrainer(epochs=2).train(
         model,
-        historical_sales=d["sales"],
-        historical_purchases=d["purchases"],
-        historical_cogs=d["cogs"],
-        historical_nca=d["nca"],
-        historical_depreciation=d["depreciation"],
-        historical_adv_pay_sales=d["adv_pay_sales"],
-        historical_adv_pay_purch=d["adv_pay_purch"],
-        historical_ar=d["ar"],
-        historical_ap=d["ap"],
-        historical_inventory=d["inventory"],
-        historical_cash=d["cash"],
-        historical_ims=d["ims"],
-        historical_net_income=d["net_income"],
-        historical_dividends=d["dividends"],
-        historical_stock_buyback=d["stock_buyback"],
-        historical_opex=d["opex"],
-        historical_tax=d["tax"],
-        historical_eff_st_debt=d["eff_st_debt"],
-        historical_inflation=d["inflation"],
-        historical_years=d["years"],
-        plot_every=1,
+        data,
+        loss_scale_mode="std",
         show_plot=False,
+        plot_every=1,
     )
     # Parameters should be finite after training
     assert tf.math.is_finite(tf.cast(model.opex_module.variable_opex_pct, tf.float64))

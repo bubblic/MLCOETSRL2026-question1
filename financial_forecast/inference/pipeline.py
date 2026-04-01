@@ -66,7 +66,7 @@ class ForecastPipeline:
         self._data = data
         self._formatter = MarkdownTableFormatter()
 
-        d = model._d
+        d = model.historical_data
         n_hist = len(d["sales"])
         n_fc = sales_forecast.n_years
 
@@ -83,7 +83,7 @@ class ForecastPipeline:
 
         # Cumulative inflation for forecast period
         cum_inf_hist = tf.math.cumprod(1 + d["inflation"])
-        last_cum_inf = cum_inf_hist[-(model._test_years + 1)]
+        last_cum_inf = cum_inf_hist[-(model.test_years + 1)]
         self._cum_inf_forecast = last_cum_inf * tf.math.cumprod(
             1 + inflation_forecast.forecast
         )
@@ -143,7 +143,7 @@ class ForecastPipeline:
         model = self.model
         return model.trajectory_simulator.run(
             model,
-            model._initial_state,
+            model.initial_state,
             self._sales_forecast,
             self._cum_inf_forecast,
             self._forecast_years,
@@ -157,8 +157,8 @@ class ForecastPipeline:
             names to USD tensors and *fit_years* is a 1-D year tensor.
         """
         model = self.model
-        s = model._s
-        d = model._d
+        s = model.scaled_data
+        d = model.historical_data
         scale = model.amount_scale
         inflation = d["inflation"]
         cum_inf_hist = tf.math.cumprod(1 + inflation)
@@ -196,7 +196,7 @@ class ForecastPipeline:
         fit_years = []
 
         for t in range(n_hist - 1):
-            state_t = model._build_state_from_index(t)
+            state_t = model.build_state_from_index(t)
             inputs_t = {
                 "sales_t": f64(s["sales"][t + 1]),
                 "year": f64(float(model.base_year + t + 1)),
@@ -239,7 +239,7 @@ class ForecastPipeline:
     ) -> None:
         """Plot historical actuals, model fit, and forecast trajectories."""
         model = self.model
-        d = model._d
+        d = model.historical_data
         scale = model.amount_scale
         n_hist = len(d["sales"])
 

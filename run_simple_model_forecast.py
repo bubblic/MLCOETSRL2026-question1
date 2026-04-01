@@ -37,7 +37,7 @@ from financial_forecast.models.debt import SimpleDebtPolicy
 from financial_forecast.models.capex import CapexPolicy
 from financial_forecast.models.working_capital import WorkingCapitalPolicy
 from financial_forecast.models.tax import SimpleTax
-from financial_forecast.training.pipeline import ForecastPipeline
+from financial_forecast.inference.pipeline import ForecastPipeline
 from financial_forecast.inference.forecast_driver_models import (
     LinearSalesForecast,
     ConstantInflationForecast,

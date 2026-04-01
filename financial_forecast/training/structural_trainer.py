@@ -15,12 +15,18 @@ Dependency flow::
                         ->  models/base   (model interface)
 """
 
-from typing import Optional
+from __future__ import annotations
+
+from typing import Optional, TYPE_CHECKING
 
 import tensorflow as tf
 
 from financial_forecast.training.base_trainer import BaseTrainer
 from financial_forecast.training.diagnostics import plot_structural_diagnostics
+
+if TYPE_CHECKING:
+    from financial_forecast.models.base import BaseFinancialModel
+    from financial_forecast.types import HistoricalTrainingData
 
 
 def _as_float64_tensor(value: tf.Tensor) -> tf.Tensor:
@@ -45,107 +51,39 @@ class StructuralTrainer(BaseTrainer):
 
     def train(
         self,
-        model: tf.Module,
-        historical_sales: tf.Tensor,
-        historical_nca: tf.Tensor,
-        historical_adv_pay_sales: tf.Tensor,
-        historical_adv_pay_purch: tf.Tensor,
-        historical_ar: tf.Tensor,
-        historical_ap: tf.Tensor,
-        historical_inventory: tf.Tensor,
-        historical_cash: tf.Tensor,
-        historical_ims: tf.Tensor,
-        historical_net_income: tf.Tensor,
-        historical_dividends: tf.Tensor,
-        historical_stock_buyback: tf.Tensor,
-        historical_opex: tf.Tensor,
-        historical_tax: tf.Tensor,
-        historical_effective_st_debt: tf.Tensor,
-        historical_current_lt_debt: tf.Tensor,
-        historical_non_current_liabilities: tf.Tensor,
-        historical_interest_payment: tf.Tensor,
-        historical_ms_return: tf.Tensor,
-        historical_equity: tf.Tensor,
-        historical_inflation: Optional[tf.Tensor] = None,
-        historical_years: Optional[tf.Tensor] = None,
+        model: BaseFinancialModel,
+        data: HistoricalTrainingData,
+        loss_scale_mode: str = "std",
+        show_plot: bool = False,
         learning_rate: float = 0.001,
         epochs: Optional[int] = None,
         plot_every: int = 1000,
         gradient_clip_norm: Optional[float] = 5.0,
-        show_plot: bool = False,
-        loss_scale_mode: str = "std",
     ) -> None:
-        """Train structural parameters using historical state transitions.
-
-        For each consecutive pair of historical years, the model runs
-        ``forecast_step`` (with deterministic mean OpEx) from the observed
-        state at time *t* and compares the predicted state at *t+1*
-        against the actual observations.
-
-        Args:
-            model: ``TrainableFinancialModel`` whose structural parameters
-                are updated in-place.
-            historical_sales: 1-D array-like of annual sales figures.
-            historical_nca: 1-D array-like of annual non-current assets.
-            historical_adv_pay_sales: Advance payments on sales.
-            historical_adv_pay_purch: Advance payments on purchases.
-            historical_ar: Accounts receivable.
-            historical_ap: Accounts payable.
-            historical_inventory: Inventory values.
-            historical_cash: Cash balances.
-            historical_ims: Investment in market securities.
-            historical_net_income: Net income.
-            historical_dividends: Dividend payments.
-            historical_stock_buyback: Stock buyback amounts.
-            historical_opex: Operating expenses.
-            historical_tax: Tax payments.
-            historical_effective_st_debt: Effective short-term debt.
-            historical_current_lt_debt: Current portion of long-term debt.
-            historical_non_current_liabilities: Non-current liabilities.
-            historical_interest_payment: Interest payments (may contain
-                NaN/Inf for missing observations).
-            historical_ms_return: Returns from market securities.
-            historical_equity: Stockholders' equity.
-            historical_inflation: Optional annual inflation rates.
-            historical_years: Optional fiscal years.
-            learning_rate: Adam optimizer learning rate.
-            epochs: Number of training iterations.
-            plot_every: History recording interval.
-            gradient_clip_norm: Maximum gradient norm for clipping.
-            show_plot: Whether to display plots interactively.
-            loss_scale_mode: ``"std"`` or ``"none"``.
-        """
+        """Train structural parameters using historical state transitions."""
         if epochs is None:
             epochs = self.epochs
 
-        sales_t = _as_float64_tensor(historical_sales)
-        nca_t = _as_float64_tensor(historical_nca)
-        adv_ps_t = _as_float64_tensor(historical_adv_pay_sales)
-        adv_pp_t = _as_float64_tensor(historical_adv_pay_purch)
-        ar_t = _as_float64_tensor(historical_ar)
-        ap_t = _as_float64_tensor(historical_ap)
-        inv_t = _as_float64_tensor(historical_inventory)
-        cash_t = _as_float64_tensor(historical_cash)
-        ims_t = _as_float64_tensor(historical_ims)
-        ni_t = _as_float64_tensor(historical_net_income)
-        div_t = _as_float64_tensor(historical_dividends)
-        eff_st_t = _as_float64_tensor(historical_effective_st_debt)
-        curr_lt_t = _as_float64_tensor(historical_current_lt_debt)
-        ncl_t = _as_float64_tensor(historical_non_current_liabilities)
-        interest_t = _as_float64_tensor(historical_interest_payment)
-        ms_return_t = _as_float64_tensor(historical_ms_return)
-        equity_t = _as_float64_tensor(historical_equity)
-        if historical_inflation is None:
-            historical_inflation = tf.zeros_like(sales_t)
-        inf_t = _as_float64_tensor(historical_inflation)
+        sales_t = _as_float64_tensor(data.sales)
+        nca_t = _as_float64_tensor(data.nca)
+        adv_ps_t = _as_float64_tensor(data.advance_payments_sales)
+        adv_pp_t = _as_float64_tensor(data.advance_payments_purchases)
+        ar_t = _as_float64_tensor(data.accounts_receivable)
+        ap_t = _as_float64_tensor(data.accounts_payable)
+        inv_t = _as_float64_tensor(data.inventory)
+        cash_t = _as_float64_tensor(data.cash)
+        ims_t = _as_float64_tensor(data.ims)
+        ni_t = _as_float64_tensor(data.net_income)
+        div_t = _as_float64_tensor(data.dividends)
+        eff_st_t = _as_float64_tensor(data.effective_st_debt)
+        curr_lt_t = _as_float64_tensor(data.current_lt_debt)
+        ncl_t = _as_float64_tensor(data.non_current_liabilities)
+        interest_t = _as_float64_tensor(data.interest_payment)
+        ms_return_t = _as_float64_tensor(data.ms_return)
+        equity_t = _as_float64_tensor(data.equity)
+        inf_t = _as_float64_tensor(data.inflation)
         cum_inf_t = tf.math.cumprod(1 + inf_t)
-
-        if historical_years is None:
-            historical_years = tf.cast(
-                tf.range(model.base_year, model.base_year + len(historical_sales)),
-                dtype=tf.float64,
-            )
-        years_t = _as_float64_tensor(historical_years)
+        years_t = _as_float64_tensor(data.years)
 
         optimizer = tf.optimizers.Adam(learning_rate=learning_rate)
         eps = tf.constant(1e-12, dtype=tf.float64)
@@ -177,10 +115,7 @@ class StructuralTrainer(BaseTrainer):
                 "Use 'std' or 'none'."
             )
 
-        vars_to_train = [
-            *model.income_statement.trainable_variables,
-            *model.cash_budget.debt_policy.structural_trainable_variables,
-        ]
+        vars_to_train = model.structural_trainable_variables
 
         structural_history = {
             "epochs": [],
@@ -194,7 +129,7 @@ class StructuralTrainer(BaseTrainer):
         }
 
         print("Training structural parameters...")
-        num_transitions = len(historical_sales) - 1
+        num_transitions = len(data.sales) - 1
 
         # Cast gradient clip norm to tensor for graph-mode compatibility
         clip_norm = (
@@ -340,8 +275,7 @@ class StructuralTrainer(BaseTrainer):
                 print(f"Epoch {i}: Structural Loss={loss_stack[_L_TOTAL].numpy():.4e}")
 
         print("Structural Training Complete.")
-        model.income_statement.print_summary()
-        model.cash_budget.debt_policy.print_structural_summary(num_transitions + 1)
+        model.print_structural_summary(num_transitions + 1)
         print("-" * 50)
 
         plot_structural_diagnostics(structural_history, show_plot)

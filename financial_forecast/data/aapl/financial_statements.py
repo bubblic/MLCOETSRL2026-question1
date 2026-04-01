@@ -139,8 +139,8 @@ def get_financial_statements():
             2645e6,
             2931e6,
             3933e6,
-            float('nan'),  # Placeholder removed: data unavailable for this fiscal year
-            float('nan'),  # Placeholder removed: data unavailable for this fiscal year
+            float("nan"),  # Placeholder removed: data unavailable for this fiscal year
+            float("nan"),  # Placeholder removed: data unavailable for this fiscal year
         ],
         dtype=tf.float64,
     )
@@ -256,19 +256,6 @@ def get_financial_statements():
         ],
         dtype=tf.float64,
     )
-    current_liabilities = tf.constant(
-        [
-            115929e6,
-            105718e6,
-            105392e6,
-            125481e6,
-            153982e6,
-            145308e6,
-            176392e6,
-            165631e6,
-        ],
-        dtype=tf.float64,
-    )
     current_lt_debt = tf.constant(
         [8784e6, 10260e6, 8773e6, 9613e6, 11128e6, 9822e6, 10912e6, 12350e6],
         dtype=tf.float64,
@@ -298,6 +285,20 @@ def get_financial_statements():
             73733000000,
         ],
         dtype=tf.float64,
+    )
+    # current_liabilities is derived to enforce the balance sheet identity:
+    # Assets = Liabilities + Equity, i.e.,
+    # NCA + AdvPP + AR + Inv + Cash + IMS = CL + NCL + Equity
+    # This absorbs any rounding across independently reported line items.
+    current_liabilities = (
+        nca
+        + advance_payments_purchases
+        + accounts_receivable
+        + inventory_plus_one[1:]
+        + cash
+        + ims
+        - non_current_liabilities
+        - equity
     )
 
     # --- Cash Flow ---

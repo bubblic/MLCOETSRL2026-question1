@@ -28,7 +28,7 @@ Field Mapping (SEC XBRL -> Model):
         ContractWithCustomerLiabilityCurrent   -> advance_payments_sales
         CashAndCashEquivalentsAtCarrying...    -> cash
         MarketableSecuritiesCurrent            -> ims
-        LiabilitiesCurrent                     -> current_liabilities
+        (Derived from identity)                 -> current_liabilities
         LongTermDebtCurrent                    -> current_lt_debt
         LiabilitiesNoncurrent                  -> non_current_liabilities
         StockholdersEquity                     -> equity
@@ -556,7 +556,7 @@ def build_financial_data(
     advance_payments_sales = get(DEFERRED_REV_CURRENT_TAGS)
     cash = get(CASH_TAGS)
     ims = get(SHORT_TERM_INVEST_TAGS)
-    current_liabilities = get(CURRENT_LIABILITIES_TAGS)
+    current_liabilities_raw = get(CURRENT_LIABILITIES_TAGS)
     current_lt_debt = get(CURRENT_DEBT_TAGS)
     equity = get(EQUITY_TAGS)
 
@@ -568,13 +568,41 @@ def build_financial_data(
         if not np.isnan(ncl_direct[i]):
             non_current_liabilities.append(ncl_direct[i])
         elif not np.isnan(total_liabilities[i]) and not np.isnan(
-            current_liabilities[i]
+            current_liabilities_raw[i]
         ):
             non_current_liabilities.append(
-                total_liabilities[i] - current_liabilities[i]
+                total_liabilities[i] - current_liabilities_raw[i]
             )
         else:
             non_current_liabilities.append(float("nan"))
+
+    # Derive current_liabilities to enforce the balance sheet identity:
+    # Assets = Liabilities + Equity
+    # CL = (NCA + AdvPP + AR + Inv + Cash + IMS) - NCL - Equity
+    current_liabilities = []
+    for i in range(len(years)):
+        vals = [
+            nca[i],
+            advance_payments_purchases[i],
+            accounts_receivable[i],
+            inventory[i],
+            cash[i],
+            ims[i],
+            non_current_liabilities[i],
+            equity[i],
+        ]
+        if any(np.isnan(v) for v in vals):
+            current_liabilities.append(float("nan"))
+        else:
+            assets = (
+                nca[i]
+                + advance_payments_purchases[i]
+                + accounts_receivable[i]
+                + inventory[i]
+                + cash[i]
+                + ims[i]
+            )
+            current_liabilities.append(assets - non_current_liabilities[i] - equity[i])
 
     # ── Cash Flow ─────────────────────────────────────────────────
     dividends_raw = get(DIVIDENDS_TAGS)
@@ -749,7 +777,7 @@ def get_financial_statements():
             advance_payments_sales     - current deferred revenue
             cash                       - cash and cash equivalents
             ims                        - short-term investments
-            current_liabilities        - total current liabilities
+            current_liabilities        - derived to enforce Assets = L + E
             current_lt_debt            - current portion of long-term debt
             non_current_liabilities    - non-current liabilities
             equity                     - stockholders\' equity

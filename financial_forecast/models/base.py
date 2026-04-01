@@ -31,6 +31,12 @@ from financial_forecast.models.debt import DebtPolicy
 from financial_forecast.models.tax import SimpleTax
 from financial_forecast.inference.trajectory_simulator import TrajectorySimulator
 from financial_forecast.inference.state_index import RECURRENT_KEYS, DIAGNOSTIC_KEYS
+from financial_forecast.types import (
+    RecurrentState,
+    ForecastInputs,
+    HistoricalTrainingData,
+    validate_recurrent_state,
+)
 
 
 _REQUIRED_KEYS = {
@@ -109,8 +115,8 @@ class BaseFinancialModel(tf.Module):
         self.tax_module = tax_module
 
         # Populated by prepare()
-        self._d: Dict[str, tf.Tensor] = {}
-        self._s: Dict[str, tf.Tensor] = {}
+        self._historical_data: Dict[str, tf.Tensor] = {}
+        self._scaled_data: Dict[str, tf.Tensor] = {}
         self._initial_state: Optional[Dict[str, tf.Tensor]] = None
         self._test_years: int = 0
 
@@ -120,6 +126,193 @@ class BaseFinancialModel(tf.Module):
     def opex_module(self) -> OpExModule:
         """Convenience accessor for the OpEx module owned by the income statement."""
         return self.income_statement.opex_module
+
+    @property
+    def historical_data(self) -> Dict[str, tf.Tensor]:
+        """Raw historical financial data in USD (read-only)."""
+        return dict(self._historical_data)
+
+    @property
+    def scaled_data(self) -> Dict[str, tf.Tensor]:
+        """Historical data scaled to model units (read-only)."""
+        return dict(self._scaled_data)
+
+    @property
+    def initial_state(self) -> RecurrentState:
+        """Balance-sheet state at the forecast start point."""
+        return dict(self._initial_state)
+
+    @property
+    def test_years(self) -> int:
+        """Number of historical years held out for testing."""
+        return self._test_years
+
+    # ------------------------------------------------------------------
+    # Trainable variable aggregation
+    # ------------------------------------------------------------------
+
+    @property
+    def policy_trainable_variables(self) -> list:
+        """All variables optimized in the policy training phase."""
+        return [
+            *self.balance_sheet.trainable_variables,
+            *self.tax_module.trainable_variables,
+            *self.cash_budget.liquidity_policy.trainable_variables,
+            *self.cash_budget.debt_policy.policy_trainable_variables,
+            *self.cash_budget.dividend_policy.trainable_variables,
+            *self.cash_budget.buyback_policy.trainable_variables,
+            *self.opex_module.trainable_variables,
+        ]
+
+    @property
+    def structural_trainable_variables(self) -> list:
+        """All variables optimized in the structural training phase."""
+        return [
+            *self.income_statement.trainable_variables,
+            *self.cash_budget.debt_policy.structural_trainable_variables,
+        ]
+
+    # ------------------------------------------------------------------
+    # Loss aggregation (raw, unscaled)
+    # ------------------------------------------------------------------
+
+    def compute_policy_losses(
+        self,
+        data: HistoricalTrainingData,
+    ) -> Dict[str, tf.Tensor]:
+        """Compute all raw (unscaled) policy loss components.
+
+        Delegates to each sub-module's ``loss()`` method with
+        ``scale=1.0``.  The trainer is responsible for scaling.
+
+        Args:
+            data: Historical training data (scaled).
+
+        Returns:
+            Dict mapping loss names to scalar tensors.
+        """
+        _one = tf.constant(1.0, dtype=tf.float64)
+
+        # Alignment: growth/depr use [1:] vs [:-1]
+        delta_nca = data.nca[1:] - data.nca[:-1]
+        depr_aligned = data.depreciation[1:]
+        sales_aligned = data.sales[1:]
+        nca_prev = data.nca[:-1]
+
+        # Alignment: Lintner dividend smoothing
+        div_aligned = data.dividends[1:]
+        ni_prev = data.net_income[:-1]
+        div_prev = data.dividends[:-1]
+
+        # Derived: cumulative inflation and time indices
+        cum_inf = tf.math.cumprod(1 + data.inflation)
+        time_indices = tf.cast(data.years, tf.float64) - tf.constant(
+            float(self.base_year), dtype=tf.float64
+        )
+
+        loss_growth, loss_depr, prior_loss_am = self.balance_sheet.capex_policy.loss(
+            delta_nca,
+            depr_aligned,
+            sales_aligned,
+            nca_prev,
+            _one,
+            _one,
+        )
+        loss_adv_ps, loss_adv_pp, loss_ar, loss_ap, loss_inv = (
+            self.balance_sheet.working_capital.loss(
+                data.sales,
+                data.purchases,
+                data.advance_payments_sales,
+                data.advance_payments_purchases,
+                data.accounts_receivable,
+                data.accounts_payable,
+                data.inventory,
+                _one,
+                _one,
+                _one,
+                _one,
+                _one,
+            )
+        )
+        loss_tl, loss_cash = self.cash_budget.liquidity_policy.loss(
+            data.sales,
+            data.cash,
+            data.ims,
+            time_indices,
+            _one,
+            _one,
+        )
+        loss_tax = self.tax_module.loss(data.tax, data.net_income, _one)
+        loss_div = self.cash_budget.dividend_policy.loss(
+            ni_prev,
+            div_aligned,
+            div_prev,
+            _one,
+        )
+        loss_bb = self.cash_budget.buyback_policy.loss(
+            data.stock_buyback,
+            data.depreciation,
+            _one,
+        )
+        loss_cost_ratio = self.balance_sheet.purchases_policy.loss(
+            data.sales,
+            data.cogs,
+            data.inventory,
+            time_indices,
+            _one,
+        )
+        loss_eff_st_debt = self.cash_budget.debt_policy.loss_st_debt(
+            data.effective_st_debt,
+            data.sales,
+            time_indices,
+            _one,
+        )
+        loss_opex = self.opex_module.loss(
+            data.opex,
+            data.sales,
+            cum_inf,
+            _one,
+        )
+
+        return {
+            "growth": loss_growth,
+            "depr": loss_depr,
+            "prior_am": prior_loss_am,
+            "adv_ps": loss_adv_ps,
+            "adv_pp": loss_adv_pp,
+            "ar": loss_ar,
+            "ap": loss_ap,
+            "inv": loss_inv,
+            "tl": loss_tl,
+            "cash": loss_cash,
+            "tax": loss_tax,
+            "div": loss_div,
+            "bb": loss_bb,
+            "cost_ratio": loss_cost_ratio,
+            "eff_st_debt": loss_eff_st_debt,
+            "opex": loss_opex,
+        }
+
+    # ------------------------------------------------------------------
+    # Summary printing
+    # ------------------------------------------------------------------
+
+    def print_policy_summary(self, n_years: int) -> None:
+        """Print all policy parameter summaries."""
+        self.balance_sheet.capex_policy.print_summary()
+        self.balance_sheet.working_capital.print_summary()
+        self.cash_budget.liquidity_policy.print_summary(n_years)
+        self.tax_module.print_summary()
+        self.cash_budget.dividend_policy.print_summary()
+        self.cash_budget.buyback_policy.print_summary()
+        self.cash_budget.debt_policy.print_policy_summary(n_years)
+        self.balance_sheet.purchases_policy.print_summary(n_years)
+        self.opex_module.print_summary()
+
+    def print_structural_summary(self, n_years: int) -> None:
+        """Print all structural parameter summaries."""
+        self.income_statement.print_summary()
+        self.cash_budget.debt_policy.print_structural_summary(n_years)
 
     # ------------------------------------------------------------------
     # Data preparation
@@ -148,7 +341,7 @@ class BaseFinancialModel(tf.Module):
                 "financial_statements missing required keys: " + ", ".join(missing)
             )
 
-        d = self._d
+        d = self._historical_data
         for k in _REQUIRED_KEYS:
             d[k] = raw[k]
 
@@ -167,14 +360,15 @@ class BaseFinancialModel(tf.Module):
         mean_sales = float(tf.reduce_mean(d["sales"]))
         scale = 10 ** int(tf.math.floor(tf.math.log(mean_sales) / tf.math.log(10.0)))
         for key in _REQUIRED_KEYS | _SUPPLEMENTAL_KEYS:
-            self._s[key] = d[key] / scale
+            self._scaled_data[key] = d[key] / scale
 
         # Configure model
         self.base_year = int(raw["years"][0])
         self.amount_scale = scale
 
         # Initial state: the year just before the test window
-        self._initial_state = self._build_state_from_index(-(test_years + 1))
+        self._initial_state = self.build_state_from_index(-(test_years + 1))
+        validate_recurrent_state(self._initial_state, "prepare")
 
         # Initialize parameters from historical averages
         self._init_parameters_from_data()
@@ -187,7 +381,7 @@ class BaseFinancialModel(tf.Module):
         for the trainable model these serve as better starting points
         for gradient descent.
         """
-        s = self._s
+        s = self._scaled_data
         self.balance_sheet.capex_policy.init_from_data(s)
         self.balance_sheet.working_capital.init_from_data(s)
         self.balance_sheet.purchases_policy.init_from_data(s)
@@ -198,9 +392,9 @@ class BaseFinancialModel(tf.Module):
         self.opex_module.init_from_data(s)
         self.income_statement.init_from_data(s)
 
-    def _build_state_from_index(self, index: int) -> Dict[str, tf.Tensor]:
-        """Build a state dict from scaled historical data at *index*."""
-        s = self._s
+    def build_state_from_index(self, index: int) -> RecurrentState:
+        """Build a recurrent state dict from scaled historical data at *index*."""
+        s = self._scaled_data
         f64 = lambda v: tf.constant(float(v), dtype=tf.float64)
         return {
             "nca": f64(s["nca"][index]),
@@ -226,15 +420,16 @@ class BaseFinancialModel(tf.Module):
     @tf.function
     def forecast_step(
         self,
-        state: Dict[str, tf.Tensor],
-        inputs: Dict[str, tf.Tensor],
+        state: RecurrentState,
+        inputs: ForecastInputs,
         use_mean_opex: bool = True,
     ) -> Dict[str, tf.Tensor]:
         """Advance the financial state by one period (graph-compiled).
 
         Args:
-            state: Dict at *t-1* with balance-sheet entries.
-            inputs: Dict with ``sales_t``, ``year``, ``cum_inflation``.
+            state: :class:`RecurrentState` dict at *t-1*.
+            inputs: :class:`ForecastInputs` dict with ``sales_t``,
+                ``year``, ``cum_inflation``.
             use_mean_opex: Use posterior mean (no sampling/noise).
 
         Returns:

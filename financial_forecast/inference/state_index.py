@@ -9,6 +9,8 @@ from typing import Dict
 
 import tensorflow as tf
 
+from financial_forecast.types import RecurrentState
+
 # ---- Recurrent state: [n_samples, 14] ----
 R_NCA = 0
 R_ADV_PP = 1
@@ -107,7 +109,7 @@ DIAGNOSTIC_KEYS = (
 
 
 def state_dict_to_tensor(
-    state_dict: Dict[str, tf.Tensor],
+    state_dict: RecurrentState,
 ) -> tf.Tensor:
     """Convert a scalar state dict to a 1-D tensor of shape ``[14]``.
 
@@ -121,7 +123,7 @@ def state_dict_to_tensor(
 
 
 def initial_state_to_batched(
-    state_dict: Dict[str, tf.Tensor],
+    state_dict: RecurrentState,
     n_samples: int,
 ) -> tf.Tensor:
     """Broadcast a scalar state dict to a batched tensor ``[n_samples, 14]``.

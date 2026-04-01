@@ -1,127 +1,167 @@
-"""Shared dataclasses for financial state and economic inputs.
+"""Type contracts and boundary validation for the financial forecast system.
 
-This module consolidates the ``FinancialState`` and ``EconomicInputs``
-dataclasses that were previously duplicated across multiple modules.  All
-model variants import from here to ensure a single source of truth.
+Provides :class:`RecurrentState` and :class:`ForecastInputs` TypedDicts
+that define the dict-key contracts used by ``forecast_step``,
+``TrajectorySimulator``, and ``state_index`` utilities.
 
-Why TensorFlow types?
-    Field values are typed as ``Any`` so they can hold either plain floats
-    (for initial data) or ``tf.Tensor`` objects (for gradient-tracked
-    computations).  TensorFlow tensors enable automatic differentiation
-    via ``tf.GradientTape`` and GPU-accelerated arithmetic.
+Also provides :func:`validate_recurrent_state` and
+:func:`validate_forecast_inputs` for runtime key-checking at system
+boundaries (model preparation, simulator entry) — never inside
+``@tf.function`` hot paths.
+
+Why TypedDict instead of dataclass?
+    ``@tf.function`` traces Python dicts natively into TensorFlow graphs.
+    TypedDicts add static type safety (mypy/pyright) with zero runtime
+    overhead, complemented by explicit boundary validators for runtime
+    correctness.
 """
 
 from __future__ import annotations
 
-from dataclasses import asdict, dataclass
-from typing import Any, Dict
+from dataclasses import dataclass
+from typing import Optional
+
+import tensorflow as tf
+
+try:
+    from typing import TypedDict
+except ImportError:
+    from typing_extensions import TypedDict
+
+
+# ------------------------------------------------------------------
+# TypedDict contracts
+# ------------------------------------------------------------------
+
+
+class RecurrentState(TypedDict):
+    """Dict contract for the 14-field recurrent state vector.
+
+    Keys match ``RECURRENT_KEYS`` in
+    :mod:`financial_forecast.inference.state_index`.
+    """
+
+    nca: tf.Tensor
+    advance_payments_purchases: tf.Tensor
+    accounts_receivable: tf.Tensor
+    inventory: tf.Tensor
+    cash: tf.Tensor
+    investment_in_market_securities: tf.Tensor
+    accounts_payable: tf.Tensor
+    advance_payments_sales: tf.Tensor
+    effective_st_debt: tf.Tensor
+    current_lt_debt: tf.Tensor
+    non_current_liabilities: tf.Tensor
+    equity: tf.Tensor
+    net_income: tf.Tensor
+    dividends: tf.Tensor
+
+
+class ForecastInputs(TypedDict):
+    """Dict contract for single-period forecast inputs."""
+
+    sales_t: tf.Tensor
+    year: tf.Tensor
+    cum_inflation: tf.Tensor
+
+
+# ------------------------------------------------------------------
+# Training data contract
+# ------------------------------------------------------------------
 
 
 @dataclass(frozen=True)
-class FinancialState:
-    """Represents the financial state of a company at a specific point in time.
+class HistoricalTrainingData:
+    """All historical time series needed for training, already scaled.
 
-    All monetary values are typically ``tf.Tensor`` (float64) or plain
-    ``float``.  The frozen dataclass ensures immutability, which is
-    important when states are passed through multi-step forecast chains.
-
-    Attributes:
-        nca: Non-current assets.
-        advance_payments_purchases: Prepayments for future purchases.
-        accounts_receivable: Outstanding customer receivables.
-        inventory: Current inventory holdings.
-        cash: Cash and cash equivalents.
-        investment_in_market_securities: Short-term marketable securities.
-        accounts_payable: Outstanding supplier payables.
-        advance_payments_sales: Deferred revenue from customer prepayments.
-        current_liabilities: Current liabilities (excl. AP and deferred rev).
-        non_current_liabilities: Long-term liabilities.
-        equity: Stockholders' equity.
-        net_income: Net income for the period.
-        liquidity_check: Diagnostic — should be near zero if budget closes.
-        balance_sheet_check: Diagnostic — Assets minus (Liabilities + Equity).
-        st_loan_issued: New short-term debt issued this period.
-        lt_loan_issued: New long-term debt issued this period.
-        st_principal_paid: Short-term principal repaid this period.
-        lt_principal_paid: Long-term principal repaid this period.
+    Consolidates the 20+ positional tensor arguments that
+    ``PolicyTrainer`` and ``StructuralTrainer`` previously accepted
+    via ``**kwargs`` into a single typed container.
     """
 
-    nca: Any
-    advance_payments_purchases: Any
-    accounts_receivable: Any
-    inventory: Any
-    cash: Any
-    investment_in_market_securities: Any
-    accounts_payable: Any
-    advance_payments_sales: Any
-    current_liabilities: Any
-    non_current_liabilities: Any
-    equity: Any
-    net_income: Any
-
-    # Diagnostic fields
-    liquidity_check: Any = 0.0
-    balance_sheet_check: Any = 0.0
-    st_loan_issued: Any = 0.0
-    lt_loan_issued: Any = 0.0
-    st_principal_paid: Any = 0.0
-    lt_principal_paid: Any = 0.0
-
-    def to_dict(self) -> Dict[str, Any]:
-        """Convert the state to a plain dictionary."""
-        return asdict(self)
-
-    @classmethod
-    def from_dict(cls, data: Dict[str, Any]) -> FinancialState:
-        """Create a ``FinancialState`` from a dictionary.
-
-        Supports legacy short-form keys (e.g. ``"ar"`` for
-        ``"accounts_receivable"``) and silently ignores unknown keys.
-
-        Args:
-            data: Dictionary of field values, possibly with legacy keys.
-
-        Returns:
-            A new ``FinancialState`` instance.
-        """
-        mapping = {
-            "adv_pp": "advance_payments_purchases",
-            "adv_ps": "advance_payments_sales",
-            "ar": "accounts_receivable",
-            "inv": "inventory",
-            "ap": "accounts_payable",
-            "cl": "current_liabilities",
-            "ncl": "non_current_liabilities",
-            "ni": "net_income",
-            "ims": "investment_in_market_securities",
-            # Legacy field name from SimpleFinancialModel
-            "check": "balance_sheet_check",
-            "stloan": "st_loan_issued",
-            "ltloan": "lt_loan_issued",
-        }
-        mapped_data = {mapping.get(k, k): v for k, v in data.items()}
-        valid_keys = cls.__dataclass_fields__.keys()
-        filtered_data = {k: v for k, v in mapped_data.items() if k in valid_keys}
-        return cls(**filtered_data)
+    sales: tf.Tensor
+    purchases: tf.Tensor
+    cogs: tf.Tensor
+    nca: tf.Tensor
+    depreciation: tf.Tensor
+    advance_payments_sales: tf.Tensor
+    advance_payments_purchases: tf.Tensor
+    accounts_receivable: tf.Tensor
+    accounts_payable: tf.Tensor
+    inventory: tf.Tensor
+    cash: tf.Tensor
+    ims: tf.Tensor
+    net_income: tf.Tensor
+    dividends: tf.Tensor
+    stock_buyback: tf.Tensor
+    opex: tf.Tensor
+    tax: tf.Tensor
+    effective_st_debt: tf.Tensor
+    current_lt_debt: tf.Tensor
+    non_current_liabilities: tf.Tensor
+    interest_payment: tf.Tensor
+    ms_return: tf.Tensor
+    equity: tf.Tensor
+    inflation: tf.Tensor
+    years: tf.Tensor
 
 
-@dataclass(frozen=True)
-class EconomicInputs:
-    """External economic drivers for a single forecast period.
+# ------------------------------------------------------------------
+# Expected key sets (derived from TypedDict annotations)
+# ------------------------------------------------------------------
 
-    Attributes:
-        sales_t: Revenue for the current period.
-        purchases_t: Purchases for the current period.
-        sales_t_plus_1: Revenue forecast for the next period (used for
-            advance-payment calculations).
-        purchases_t_plus_1: Purchases forecast for the next period.
-        cum_inflation: Cumulative inflation factor from base year to *t*.
-        t: Period index (integer year offset from base).
+_RECURRENT_STATE_KEYS = frozenset(RecurrentState.__annotations__)
+_FORECAST_INPUTS_KEYS = frozenset(ForecastInputs.__annotations__)
+
+
+# ------------------------------------------------------------------
+# Boundary validators
+# ------------------------------------------------------------------
+
+
+def validate_recurrent_state(state: dict, context: str = "") -> None:
+    """Check that *state* has exactly the 14 expected recurrent-state keys.
+
+    Call once at system boundaries (``prepare()``, simulator entry),
+    **never** inside ``@tf.function`` compiled paths.
+
+    Args:
+        state: Dict to validate.
+        context: Optional label included in error messages (e.g.
+            ``"prepare"`` or ``"TrajectorySimulator.run"``).
+
+    Raises:
+        KeyError: If keys are missing or unexpected keys are present.
     """
+    actual = frozenset(state.keys())
+    prefix = f"[{context}] " if context else ""
 
-    sales_t: Any
-    purchases_t: Any
-    sales_t_plus_1: Any
-    purchases_t_plus_1: Any
-    cum_inflation: Any
-    t: int = 0
+    missing = _RECURRENT_STATE_KEYS - actual
+    if missing:
+        raise KeyError(f"{prefix}RecurrentState missing keys: {sorted(missing)}")
+
+    extra = actual - _RECURRENT_STATE_KEYS
+    if extra:
+        raise KeyError(f"{prefix}RecurrentState has unexpected keys: {sorted(extra)}")
+
+
+def validate_forecast_inputs(inputs: dict, context: str = "") -> None:
+    """Check that *inputs* has exactly the 3 expected forecast-input keys.
+
+    Args:
+        inputs: Dict to validate.
+        context: Optional label included in error messages.
+
+    Raises:
+        KeyError: If keys are missing or unexpected keys are present.
+    """
+    actual = frozenset(inputs.keys())
+    prefix = f"[{context}] " if context else ""
+
+    missing = _FORECAST_INPUTS_KEYS - actual
+    if missing:
+        raise KeyError(f"{prefix}ForecastInputs missing keys: {sorted(missing)}")
+
+    extra = actual - _FORECAST_INPUTS_KEYS
+    if extra:
+        raise KeyError(f"{prefix}ForecastInputs has unexpected keys: {sorted(extra)}")

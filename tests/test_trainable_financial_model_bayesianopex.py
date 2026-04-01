@@ -253,6 +253,39 @@ def test_parameter_bounds(model):
     assert float(model.cash_budget.debt_policy.avg_maturity_years.numpy()) > 1.001
 
 
+def _build_training_data(d):
+    """Build HistoricalTrainingData from mock_historical_data dict."""
+    from financial_forecast.types import HistoricalTrainingData
+
+    return HistoricalTrainingData(
+        sales=d["sales"],
+        purchases=d["purchases"],
+        cogs=d["cogs"],
+        nca=d["nca"],
+        depreciation=d["depreciation"],
+        advance_payments_sales=d["adv_pay_sales"],
+        advance_payments_purchases=d["adv_pay_purch"],
+        accounts_receivable=d["ar"],
+        accounts_payable=d["ap"],
+        inventory=d["inventory"],
+        cash=d["cash"],
+        ims=d["ims"],
+        net_income=d["net_income"],
+        dividends=d["dividends"],
+        stock_buyback=d["stock_buyback"],
+        opex=d["opex"],
+        tax=d["tax"],
+        effective_st_debt=d["eff_st_debt"],
+        current_lt_debt=d["current_lt_debt"],
+        non_current_liabilities=d["non_current_liabilities"],
+        interest_payment=d["interest_payment"],
+        ms_return=d["ms_return"],
+        equity=d["equity"],
+        inflation=d["inflation"],
+        years=d["years"],
+    )
+
+
 def test_training_step_execution(
     model,
     mock_historical_data,
@@ -260,64 +293,24 @@ def test_training_step_execution(
     mock_forecast_inputs,
 ):
     """Both training loops should run for a few epochs without numerical failure."""
-    d = mock_historical_data
+    data = _build_training_data(mock_historical_data)
 
-    # Simple policy training: very short run just for execution and finite outputs.
     PolicyTrainer().train(
         model,
-        historical_sales=d["sales"],
-        historical_purchases=d["purchases"],
-        historical_cogs=d["cogs"],
-        historical_nca=d["nca"],
-        historical_depreciation=d["depreciation"],
-        historical_adv_pay_sales=d["adv_pay_sales"],
-        historical_adv_pay_purch=d["adv_pay_purch"],
-        historical_ar=d["ar"],
-        historical_ap=d["ap"],
-        historical_inventory=d["inventory"],
-        historical_cash=d["cash"],
-        historical_ims=d["ims"],
-        historical_net_income=d["net_income"],
-        historical_dividends=d["dividends"],
-        historical_stock_buyback=d["stock_buyback"],
-        historical_opex=d["opex"],
-        historical_tax=d["tax"],
-        historical_eff_st_debt=d["eff_st_debt"],
-        historical_inflation=d["inflation"],
-        historical_years=d["years"],
+        data,
+        loss_scale_mode="std",
+        show_plot=False,
         epochs=2,
         plot_every=1,
-        show_plot=False,
     )
 
-    # Structural parameter training: short run and check for finite post-training state.
     StructuralTrainer().train(
         model,
-        historical_sales=d["sales"],
-        historical_nca=d["nca"],
-        historical_adv_pay_sales=d["adv_pay_sales"],
-        historical_adv_pay_purch=d["adv_pay_purch"],
-        historical_ar=d["ar"],
-        historical_ap=d["ap"],
-        historical_inventory=d["inventory"],
-        historical_cash=d["cash"],
-        historical_ims=d["ims"],
-        historical_net_income=d["net_income"],
-        historical_dividends=d["dividends"],
-        historical_stock_buyback=d["stock_buyback"],
-        historical_opex=d["opex"],
-        historical_tax=d["tax"],
-        historical_effective_st_debt=d["eff_st_debt"],
-        historical_current_lt_debt=d["current_lt_debt"],
-        historical_non_current_liabilities=d["non_current_liabilities"],
-        historical_interest_payment=d["interest_payment"],
-        historical_ms_return=d["ms_return"],
-        historical_equity=d["equity"],
-        historical_inflation=d["inflation"],
-        historical_years=d["years"],
+        data,
+        loss_scale_mode="std",
+        show_plot=False,
         epochs=2,
         plot_every=1,
-        show_plot=False,
     )
 
     critical_params = [

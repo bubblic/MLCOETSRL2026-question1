@@ -5,7 +5,7 @@ investing, external, financing, and owner transactions.
 Delegates debt financing decisions to a pluggable ``DebtPolicy``.
 """
 
-from typing import Dict, Tuple
+from typing import Dict, Optional, Tuple
 
 import tensorflow as tf
 
@@ -65,63 +65,30 @@ class CashBudgetModel(tf.Module):
         sales_t: tf.Tensor,
         time_index: tf.Tensor,
     ) -> Dict[str, tf.Tensor]:
-        """Compute cash budget and financing decisions."""
+        """Compute cash budget and financing decisions (orchestrator)."""
         zero = tf.constant(0.0, dtype=tf.float64)
-        ar_prev = state[:, R_AR]
-        ap_prev = state[:, R_AP]
-        adv_pp_prev = state[:, R_ADV_PP]
-        adv_ps_prev = state[:, R_ADV_PS]
         cash_prev = state[:, R_CASH]
         ims_prev = state[:, R_IMS]
 
-        # 1. Operating NLB
-        sales_curr = sales_t - assets["ar_curr"] - adv_ps_prev
-        adv_ps_curr = assets["adv_ps_curr"]
-        inflows = sales_curr + ar_prev + adv_ps_curr
-
-        purchases_curr = assets["purchases_t"] - assets["ap_curr"] - adv_pp_prev
-        outflows = (
-            purchases_curr
-            + ap_prev
-            + assets["adv_pp_curr"]
-            + income["opex"]
-            + income["tax"]
-        )
-        operating_nlb = inflows - outflows
-
-        # 2. Capital expenditure outflow
+        operating_nlb = self._compute_operating_nlb(state, assets, income, sales_t)
         capex_nlb = -assets["capex"]
-
-        # 3. Return on market securities
         external_investment_nlb = income["ms_return"]
 
-        # Liquidity target
-        total_liquidity_target, cash_target, ims_target = self.liquidity_policy.compute(
+        liquidity_deficit_st, cash_target, ims_target = self._compute_liquidity_gap(
+            operating_nlb,
+            cash_prev,
+            ims_prev,
+            income,
             sales_t,
             time_index,
         )
 
-        # ST liquidity gap
-        liquidity_deficit_st = (
-            total_liquidity_target
-            - (cash_prev + ims_prev)
-            - operating_nlb
-            + income["principal_st"]
-            + income["interest_st"]
-        )
-
-        # 4. Debt policy determines ST debt
         eff_st_debt_curr = self.debt_policy.compute_st_debt(
             sales_t,
             time_index,
             liquidity_deficit_st,
         )
-
-        # 5. Transaction with owners
-        ni_prev = state[:, R_NET_INCOME]
-        div_paid_lastyr = state[:, R_DIVIDENDS]
-        dividends_paid_thisyr = self.dividend_policy.compute(ni_prev, div_paid_lastyr)
-        stock_buyback = self.buyback_policy.compute(assets["depreciation"])
+        dividends, stock_buyback = self._compute_owner_transactions(state, assets)
 
         liquidity_deficit_lt = (
             liquidity_deficit_st
@@ -130,19 +97,16 @@ class CashBudgetModel(tf.Module):
             - capex_nlb
             + income["principal_lt"]
             + income["interest_lt"]
-            + dividends_paid_thisyr
+            + dividends
             + stock_buyback
         )
-        long_term_financing = tf.maximum(zero, liquidity_deficit_lt)
 
-        # Debt policy determines LT financing mix
-        new_lt_loan, equity_financing = self.debt_policy.compute_financing_mix(
-            long_term_financing,
+        new_lt_loan, equity_financing = self._compute_lt_financing(
+            liquidity_deficit_lt,
             time_index,
         )
 
         if ims_target is not None:
-            # Excess cash from over-borrowing → additional stock buybacks
             excess_cash_buyback = tf.maximum(zero, -liquidity_deficit_lt)
             stock_buyback = stock_buyback + excess_cash_buyback
 
@@ -154,9 +118,7 @@ class CashBudgetModel(tf.Module):
             - income["interest_st"]
             - income["interest_lt"]
         )
-        transaction_with_owners_nlb = (
-            equity_financing - dividends_paid_thisyr - stock_buyback
-        )
+        transaction_with_owners_nlb = equity_financing - dividends - stock_buyback
         total_nlb = (
             operating_nlb
             + capex_nlb
@@ -165,30 +127,136 @@ class CashBudgetModel(tf.Module):
             + transaction_with_owners_nlb
         )
 
-        # Compute final cash and IMS
-        cash_curr = cash_target
-        # For liquidity policy that only defines cash target, the investment in market securities is from any excess cash beyond cash target.
-        if ims_target is None:
-            # IMS absorbs excess cash after meeting the cash target
-            ending_liquidity = (cash_prev + ims_prev) + total_nlb
-            ims_curr = tf.maximum(zero, ending_liquidity - cash_curr)
-        else:
-            ims_curr = ims_target
-
-        liquidity_check = (cash_prev + ims_prev) + total_nlb - cash_curr - ims_curr
+        cash_curr, ims_curr, liquidity_check = self._reconcile_cash_and_ims(
+            cash_target,
+            ims_target,
+            cash_prev,
+            ims_prev,
+            total_nlb,
+        )
 
         return {
-            "adv_ps_curr": adv_ps_curr,
+            "adv_ps_curr": assets["adv_ps_curr"],
             "eff_st_debt_curr": eff_st_debt_curr,
             "new_lt_loan": new_lt_loan,
             "equity_financing": equity_financing,
-            "dividends_curr": dividends_paid_thisyr,
+            "dividends_curr": dividends,
             "stock_buyback": stock_buyback,
             "liquidity_deficit_st": liquidity_deficit_st,
             "liquidity_check": liquidity_check,
             "cash_curr": cash_curr,
             "ims_curr": ims_curr,
         }
+
+    # ------------------------------------------------------------------
+    # Cash budget sub-computations
+    # ------------------------------------------------------------------
+
+    def _compute_operating_nlb(
+        self,
+        state: tf.Tensor,
+        assets: Dict[str, tf.Tensor],
+        income: Dict[str, tf.Tensor],
+        sales_t: tf.Tensor,
+    ) -> tf.Tensor:
+        """Net liquid balance from core operations: collections minus disbursements."""
+        ar_prev = state[:, R_AR]
+        ap_prev = state[:, R_AP]
+        adv_pp_prev = state[:, R_ADV_PP]
+        adv_ps_prev = state[:, R_ADV_PS]
+
+        sales_collected = sales_t - assets["ar_curr"] - adv_ps_prev
+        inflows = sales_collected + ar_prev + assets["adv_ps_curr"]
+
+        purchases_paid = assets["purchases_t"] - assets["ap_curr"] - adv_pp_prev
+        outflows = (
+            purchases_paid
+            + ap_prev
+            + assets["adv_pp_curr"]
+            + income["opex"]
+            + income["tax"]
+        )
+        return inflows - outflows
+
+    def _compute_liquidity_gap(
+        self,
+        operating_nlb: tf.Tensor,
+        cash_prev: tf.Tensor,
+        ims_prev: tf.Tensor,
+        income: Dict[str, tf.Tensor],
+        sales_t: tf.Tensor,
+        time_index: tf.Tensor,
+    ) -> Tuple[tf.Tensor, tf.Tensor, Optional[tf.Tensor]]:
+        """Liquidity target minus available funds -- drives ST borrowing need.
+
+        Returns:
+            Tuple ``(liquidity_deficit_st, cash_target, ims_target)``.
+        """
+        total_liq_target, cash_target, ims_target = self.liquidity_policy.compute(
+            sales_t,
+            time_index,
+        )
+        liquidity_deficit_st = (
+            total_liq_target
+            - (cash_prev + ims_prev)
+            - operating_nlb
+            + income["principal_st"]
+            + income["interest_st"]
+        )
+        return liquidity_deficit_st, cash_target, ims_target
+
+    def _compute_owner_transactions(
+        self,
+        state: tf.Tensor,
+        assets: Dict[str, tf.Tensor],
+    ) -> Tuple[tf.Tensor, tf.Tensor]:
+        """Dividends and stock buybacks based on prior-period income.
+
+        Returns:
+            Tuple ``(dividends, stock_buyback)``.
+        """
+        ni_prev = state[:, R_NET_INCOME]
+        div_paid_lastyr = state[:, R_DIVIDENDS]
+        dividends = self.dividend_policy.compute(ni_prev, div_paid_lastyr)
+        stock_buyback = self.buyback_policy.compute(assets["depreciation"])
+        return dividends, stock_buyback
+
+    def _compute_lt_financing(
+        self,
+        liquidity_deficit_lt: tf.Tensor,
+        time_index: tf.Tensor,
+    ) -> Tuple[tf.Tensor, tf.Tensor]:
+        """Debt/equity mix for long-term financing need.
+
+        Returns:
+            Tuple ``(new_lt_loan, equity_financing)``.
+        """
+        zero = tf.constant(0.0, dtype=tf.float64)
+        long_term_financing = tf.maximum(zero, liquidity_deficit_lt)
+        return self.debt_policy.compute_financing_mix(long_term_financing, time_index)
+
+    def _reconcile_cash_and_ims(
+        self,
+        cash_target: tf.Tensor,
+        ims_target: Optional[tf.Tensor],
+        cash_prev: tf.Tensor,
+        ims_prev: tf.Tensor,
+        total_nlb: tf.Tensor,
+    ) -> Tuple[tf.Tensor, tf.Tensor, tf.Tensor]:
+        """Allocate ending cash and IMS; compute liquidity check.
+
+        Returns:
+            Tuple ``(cash_curr, ims_curr, liquidity_check)``.
+        """
+        zero = tf.constant(0.0, dtype=tf.float64)
+        cash_curr = cash_target
+        if ims_target is None:
+            ending_liquidity = (cash_prev + ims_prev) + total_nlb
+            ims_curr = tf.maximum(zero, ending_liquidity - cash_curr)
+        else:
+            ims_curr = ims_target
+        liquidity_check = (cash_prev + ims_prev) + total_nlb - cash_curr - ims_curr
+        return cash_curr, ims_curr, liquidity_check
 
     def assemble_state(
         self,

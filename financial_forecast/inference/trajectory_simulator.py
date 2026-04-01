@@ -20,8 +20,7 @@ from financial_forecast.inference.state_index import (
     initial_state_to_batched,
     DIAGNOSTIC_KEYS,
 )
-
-StateDict = Dict[str, Any]
+from financial_forecast.types import RecurrentState, validate_recurrent_state
 
 
 class TrajectorySimulator(ABC):
@@ -34,7 +33,7 @@ class TrajectorySimulator(ABC):
     def run(
         self,
         model,
-        initial_state: StateDict,
+        initial_state: RecurrentState,
         sales_forecast: tf.Tensor,
         cum_inf_forecast: tf.Tensor,
         forecast_years: tf.Tensor,
@@ -43,7 +42,7 @@ class TrajectorySimulator(ABC):
 
         Args:
             model: Trained ``TrainableFinancialModel``.
-            initial_state: Balance-sheet state dict at forecast start.
+            initial_state: :class:`RecurrentState` dict at forecast start.
             sales_forecast: 1-D tensor of forecasted sales (scaled).
             cum_inf_forecast: 1-D tensor of cumulative inflation factors.
             forecast_years: 1-D tensor of calendar years.
@@ -264,11 +263,12 @@ class DeterministicSimulator(TrajectorySimulator):
     def run(
         self,
         model: tf.Module,
-        initial_state: StateDict,
+        initial_state: RecurrentState,
         sales_forecast: tf.Tensor,
         cum_inf_forecast: tf.Tensor,
         forecast_years: tf.Tensor,
     ) -> Dict[str, tf.Tensor]:
+        validate_recurrent_state(initial_state, "DeterministicSimulator.run")
         print("\n--- Running Single-Point Forecast (deterministic) ---")
 
         state0 = initial_state_to_batched(initial_state, 1)
@@ -339,11 +339,12 @@ class MonteCarloSimulator(TrajectorySimulator):
     def run(
         self,
         model: tf.Module,
-        initial_state: StateDict,
+        initial_state: RecurrentState,
         sales_forecast: tf.Tensor,
         cum_inf_forecast: tf.Tensor,
         forecast_years: tf.Tensor,
     ) -> Dict[str, tf.Tensor]:
+        validate_recurrent_state(initial_state, "MonteCarloSimulator.run")
         n_samples = self.n_samples
         print(f"\n--- Running Monte Carlo Forecast ({n_samples} samples) ---")
 
