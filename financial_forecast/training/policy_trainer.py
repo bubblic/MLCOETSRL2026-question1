@@ -353,6 +353,7 @@ class PolicyTrainer(BaseTrainer):
                     model.balance_sheet.working_capital.loss(
                         sales_tensor,
                         purchases_tensor,
+                        cogs_tensor,
                         adv_ps_true,
                         adv_pp_true,
                         ar_tensor,

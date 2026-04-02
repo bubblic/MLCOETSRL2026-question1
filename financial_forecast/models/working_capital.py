@@ -1,13 +1,13 @@
 """Working capital policy module.
 
 Owns the five balance-sheet ratio parameters that link working capital
-accounts to sales or purchases:
+accounts to sales, COGS, or purchases:
 
 - Advance payments on sales (% of sales)
 - Advance payments on purchases (% of purchases)
-- Accounts receivable (% of sales)
-- Accounts payable (% of purchases)
-- Inventory (% of sales)
+- Accounts receivable (% of sales, equivalent to DSO/365)
+- Accounts payable (% of purchases, equivalent to DPO/365)
+- Inventory (% of COGS, equivalent to DSI/365)
 """
 
 from typing import Dict, Tuple
@@ -47,27 +47,32 @@ class WorkingCapitalPolicy(tf.Module):
             dtype=tf.float64,
             name="ap_pct",
         )
-        self.inventory_pct = tfp.util.TransformedVariable(
+        self.inventory_cogs_pct = tfp.util.TransformedVariable(
             initial_value=0.0165,
             bijector=tfb.Softplus(),
             dtype=tf.float64,
-            name="inv_pct",
+            name="inv_cogs_pct",
         )
 
     def compute_sales_based(
-        self, sales_t: tf.Tensor
+        self, sales_t: tf.Tensor, cogs_t: tf.Tensor,
     ) -> Tuple[tf.Tensor, tf.Tensor, tf.Tensor]:
-        """Compute working capital accounts driven by sales.
+        """Compute working capital accounts driven by sales and COGS.
+
+        AR and advance payments scale with sales (DSO-based).
+        Inventory scales with COGS (DSI-based) because inventory is
+        carried at cost, not at selling price.
 
         Args:
             sales_t: ``[n_samples]`` current-period sales.
+            cogs_t: ``[n_samples]`` current-period cost of goods sold.
 
         Returns:
             Tuple ``(ar_curr, inv_curr, adv_ps_curr)``.
         """
         return (
             sales_t * self.account_receivables_pct,
-            sales_t * self.inventory_pct,
+            cogs_t * self.inventory_cogs_pct,
             sales_t * self.advance_payments_sales_pct,
         )
 
@@ -91,6 +96,7 @@ class WorkingCapitalPolicy(tf.Module):
         self,
         sales: tf.Tensor,
         purchases: tf.Tensor,
+        cogs: tf.Tensor,
         adv_ps_actual: tf.Tensor,
         adv_pp_actual: tf.Tensor,
         ar_actual: tf.Tensor,
@@ -125,7 +131,7 @@ class WorkingCapitalPolicy(tf.Module):
             tf.square((ap_actual - purchases * self.account_payables_pct) / scale_ap)
         )
         loss_inv = tf.reduce_mean(
-            tf.square((inv_actual - sales * self.inventory_pct) / scale_inv)
+            tf.square((inv_actual - cogs * self.inventory_cogs_pct) / scale_inv)
         )
         return loss_adv_ps, loss_adv_pp, loss_ar, loss_ap, loss_inv
 
@@ -168,7 +174,7 @@ class WorkingCapitalPolicy(tf.Module):
                 )
             )
         )
-        self.inventory_pct.assign(_f64(_mr(s["inventory"], s["sales"])))
+        self.inventory_cogs_pct.assign(_f64(_mr(s["inventory"], s["cogs"])))
 
     def print_summary(self) -> None:
         """Print learned parameters."""
@@ -176,4 +182,4 @@ class WorkingCapitalPolicy(tf.Module):
         print(f"Final %AdvPP: {self.advance_payments_purchases_pct.numpy():.5f}")
         print(f"Final %AR: {self.account_receivables_pct.numpy():.5f}")
         print(f"Final %AP: {self.account_payables_pct.numpy():.5f}")
-        print(f"Final %Inv: {self.inventory_pct.numpy():.5f}")
+        print(f"Final %Inv (COGS): {self.inventory_cogs_pct.numpy():.5f}")

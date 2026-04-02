@@ -37,6 +37,10 @@ class PurchasesPolicy(tf.Module):
         """
 
     @abstractmethod
+    def get_cost_ratio(self, time_index: tf.Tensor) -> tf.Tensor:
+        """Return the cost ratio for the given time index."""
+
+    @abstractmethod
     def loss(
         self,
         sales: tf.Tensor,
@@ -73,6 +77,9 @@ class StaticCostRatioPolicy(PurchasesPolicy):
         _EPS = 1e-12
         ratio = float(tf.reduce_mean(s["cogs"] / tf.maximum(s["sales"], _EPS)))
         self.cost_ratio.assign(_f64(min(1 - _EPS, max(_EPS, ratio))))
+
+    def get_cost_ratio(self, time_index: tf.Tensor) -> tf.Tensor:
+        return self.cost_ratio + tf.zeros_like(time_index)
 
     def compute(
         self,
@@ -124,6 +131,9 @@ class TrendCostRatioPolicy(PurchasesPolicy):
         self.cost_ratio_alpha.assign(math.log(ratio / (1 - ratio)))
         self.cost_ratio_beta.assign(0.0)
 
+    def get_cost_ratio(self, time_index: tf.Tensor) -> tf.Tensor:
+        return tf.sigmoid(self.cost_ratio_alpha + self.cost_ratio_beta * time_index)
+
     def compute(
         self,
         sales_t: tf.Tensor,
@@ -131,10 +141,7 @@ class TrendCostRatioPolicy(PurchasesPolicy):
         inv_prev: tf.Tensor,
         time_index: tf.Tensor,
     ) -> tf.Tensor:
-        cost_ratio_t = tf.sigmoid(
-            self.cost_ratio_alpha + self.cost_ratio_beta * time_index
-        )
-        return sales_t * cost_ratio_t + (inv_curr - inv_prev)
+        return sales_t * self.get_cost_ratio(time_index) + (inv_curr - inv_prev)
 
     def loss(
         self,

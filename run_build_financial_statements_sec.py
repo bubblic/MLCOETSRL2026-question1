@@ -59,7 +59,7 @@ import numpy as np
 
 # ===== Configuration ==========================================================
 # Change these for each company.
-TICKER = "AAPL"
+TICKER = "WMT"
 
 # Optional year range filter.  Set to None to use all available years.
 # The script automatically fetches one extra prior year for inventory
@@ -91,6 +91,7 @@ COST_OF_REVENUE_TAGS = [
 DEPRECIATION_TAGS = [
     "DepreciationDepletionAndAmortization",
     "DepreciationAndAmortization",
+    "DepreciationAmortizationAndAccretionNet",  # WMT
     "Depreciation",
 ]
 GROSS_PROFIT_TAGS = ["GrossProfit"]
@@ -123,17 +124,25 @@ NCA_TAGS = ["AssetsNoncurrent"]
 AR_TAGS = ["ReceivablesNetCurrent", "AccountsReceivableNetCurrent"]
 NONTRADE_AR_TAGS = ["NontradeReceivablesCurrent"]
 AP_TAGS = ["AccountsPayableCurrent"]
-OTHER_CURRENT_ASSETS_TAGS = ["OtherAssetsCurrent"]
+OTHER_CURRENT_ASSETS_TAGS = [
+    "OtherAssetsCurrent",
+    "PrepaidExpenseAndOtherAssetsCurrent",  # WMT, TSLA
+]
 DEFERRED_REV_CURRENT_TAGS = [
     "ContractWithCustomerLiabilityCurrent",
     "DeferredRevenueCurrent",
 ]
-TOTAL_LIABILITIES_TAGS = ["Liabilities"]
+TOTAL_LIABILITIES_TAGS = [
+    "Liabilities",
+    "LiabilitiesAndStockholdersEquity",  # WMT — need to subtract equity
+]
+LIABILITIES_AND_EQUITY_TAGS = ["LiabilitiesAndStockholdersEquity"]
 CASH_TAGS = ["CashAndCashEquivalentsAtCarryingValue"]
 SHORT_TERM_INVEST_TAGS = [
     "MarketableSecuritiesCurrent",
     "ShortTermInvestments",
     "AvailableForSaleSecuritiesCurrent",
+    "AvailableForSaleSecuritiesDebtSecuritiesCurrent",  # GM
     "OtherShortTermInvestments",
 ]
 CURRENT_LIABILITIES_TAGS = ["LiabilitiesCurrent"]
@@ -560,9 +569,14 @@ def build_financial_data(
     current_lt_debt = get(CURRENT_DEBT_TAGS)
     equity = get(EQUITY_TAGS)
 
-    # non_current_liabilities with fallback: total_liabilities - current_liabilities
+    # non_current_liabilities fallback chain:
+    #   1. Direct: LiabilitiesNoncurrent
+    #   2. Liabilities - LiabilitiesCurrent
+    #   3. LiabilitiesAndStockholdersEquity - LiabilitiesCurrent - Equity
+    #   4. TotalAssets - CurrentAssets - Equity (since L&E = Assets)
     ncl_direct = get(NON_CURRENT_LIABILITIES_TAGS)
     total_liabilities = get(TOTAL_LIABILITIES_TAGS)
+    liab_and_equity = get(LIABILITIES_AND_EQUITY_TAGS)
     non_current_liabilities = []
     for i in range(len(years)):
         if not np.isnan(ncl_direct[i]):
@@ -573,8 +587,33 @@ def build_financial_data(
             non_current_liabilities.append(
                 total_liabilities[i] - current_liabilities_raw[i]
             )
+        elif (
+            not np.isnan(liab_and_equity[i])
+            and not np.isnan(current_liabilities_raw[i])
+            and not np.isnan(equity[i])
+        ):
+            non_current_liabilities.append(
+                liab_and_equity[i] - current_liabilities_raw[i] - equity[i]
+            )
+        elif (
+            not np.isnan(total_assets[i])
+            and not np.isnan(current_liabilities_raw[i])
+            and not np.isnan(equity[i])
+        ):
+            non_current_liabilities.append(
+                total_assets[i] - current_liabilities_raw[i] - equity[i]
+            )
         else:
             non_current_liabilities.append(float("nan"))
+
+    # NaN -> 0.0 for fields where absence means zero (before identity derivation)
+    def zero_nan(vals):
+        return [0.0 if (isinstance(v, float) and np.isnan(v)) else v for v in vals]
+
+    inventory = zero_nan(inventory)
+    advance_payments_purchases = zero_nan(advance_payments_purchases)
+    advance_payments_sales = zero_nan(advance_payments_sales)
+    ims = zero_nan(ims)
 
     # Derive current_liabilities to enforce the balance sheet identity:
     # Assets = Liabilities + Equity
@@ -582,14 +621,8 @@ def build_financial_data(
     current_liabilities = []
     for i in range(len(years)):
         vals = [
-            nca[i],
-            advance_payments_purchases[i],
-            accounts_receivable[i],
-            inventory[i],
-            cash[i],
-            ims[i],
-            non_current_liabilities[i],
-            equity[i],
+            nca[i], accounts_receivable[i], cash[i],
+            non_current_liabilities[i], equity[i],
         ]
         if any(np.isnan(v) for v in vals):
             current_liabilities.append(float("nan"))
@@ -611,10 +644,6 @@ def build_financial_data(
     buyback_raw = get(BUYBACK_TAGS)
     stock_buyback = [abs(v) if not np.isnan(v) else 0.0 for v in buyback_raw]
 
-    # NaN -> 0.0 for fields where absence means zero
-    def zero_nan(vals):
-        return [0.0 if (isinstance(v, float) and np.isnan(v)) else v for v in vals]
-
     return {
         "years": years,
         "sales": revenue,
@@ -625,15 +654,15 @@ def build_financial_data(
         "tax": tax,
         "interest_payment": interest_payment,
         "ms_return": ms_return,
-        "inventory": zero_nan(inventory),
+        "inventory": inventory,
         "change_in_inventory": change_in_inventory,
         "nca": nca,
         "accounts_receivable": accounts_receivable,
         "accounts_payable": accounts_payable,
-        "advance_payments_purchases": zero_nan(advance_payments_purchases),
-        "advance_payments_sales": zero_nan(advance_payments_sales),
+        "advance_payments_purchases": advance_payments_purchases,
+        "advance_payments_sales": advance_payments_sales,
         "cash": cash,
-        "ims": zero_nan(ims),
+        "ims": ims,
         "current_liabilities": current_liabilities,
         "current_liabilities_source": current_liabilities_raw,
         "current_lt_debt": current_lt_debt,

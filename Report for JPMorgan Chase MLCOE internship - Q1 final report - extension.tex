@@ -688,7 +688,7 @@ This is a different approach from \hyperlink{ref:pareja09}{Pareja(09)} where the
 price, the unit cost, and the volume sold based on market research data
 on volume's price sensitivity. For the scope of this problem set, we
 lump these variables into an overarching sales driver whose evolution is
-modeled independently based on historical data.
+modeled independently based on historical data. Sales serves as the primary driver because it is the most fundamental measure of a firm's economic activity---all other financial statement items are either costs of generating revenue, assets deployed to support revenue, or financing decisions to fund those assets. In the corporate finance literature, revenue-driven forecasting is standard practice (Koller, Goedhart \& Wessels, 2020). The limitation of this approach is that it does not model the underlying demand drivers (price elasticity, market size, competitive dynamics) that determine revenue growth. The sales forecast itself is generated via linear extrapolation of historical trends---a pragmatic choice given the 4--8 years of available data, though macroeconomic-sensitive models (e.g., LSTM with GDP and inflation inputs) would improve robustness.
 
 We begin by modeling the asset elements.
 
@@ -738,7 +738,7 @@ component driven by sales expansion:
 
 By substituting \eqref{eq:depreciation} and \eqref{eq:capex} into \eqref{eq:nca_rollforward}, we can express
 the net change in non-current assets (ΔNCA\textsubscript{t}) purely in
-terms of our modeled variables. During model training, the optimizer
+terms of our modeled variables. The growth component (\%AG $\times$ Sales) assumes constant capital intensity of incremental revenue---a reasonable first approximation for asset-light technology firms where growth CapEx scales with business volume. For capital-intensive industries, a non-linear formulation (e.g., step functions for capacity expansion) may be more appropriate. During model training, the optimizer
 learns the parameters for the effective depreciation rate (\%Depr), the
 maintenance replacement ratio (\%AM), and the incremental asset growth
 coefficient (\%AG).
@@ -760,8 +760,8 @@ consumed by COGS:
 \end{equation}
 
 To ensure our predicted cost ratio remains strictly bounded between 0
-and 1, we transform the historical cost ratio using the logit function
-and model it as a linear function of time (t):
+and 1 (a cost ratio outside this range would imply negative costs or costs exceeding revenue, neither of which is sustainable), we transform the historical cost ratio using the logit function
+and model it as a linear function of time (t). The logit-linear parameterization allows for gradual trend shifts---for example, a declining cost ratio may reflect economies of scale, supply chain efficiencies, or pricing power gains. The linear time trend is a parsimonious choice; in practice, cost ratios may exhibit mean reversion as competitive pressure limits sustained margin expansion.
 
 \begin{equation}\label{eq:cost_ratio_logit}
 \text{logit}(\text{CR}_t) = \ln \left( \frac{\text{CR}_t}{1 - \text{CR}_t} \right) = \alpha_{\text{CR}} + \beta_{\text{CR}} \cdot t
@@ -783,11 +783,10 @@ this year's purchases, and this year's COGS:
 \text{Inv}_t = \text{Inv}_{t-1} + \text{Purchases}_t - \text{COGS}_t
 \end{equation}
 
-As done in \hyperlink{ref:pareja09}{Pareja(09)}, we set the inventory target as a percentage of
-sales:
+We set the inventory target as a percentage of cost of goods sold, rather than sales. Inventory is carried at cost (under FIFO or weighted-average accounting), so it should scale with the cost to produce goods, not the selling price. This is equivalent to modeling Days Sales of Inventory: $\text{\%Inv}_{\text{COGS}} = \text{DSI} / 365$.
 
 \begin{equation}\label{eq:inventory_target}
-\text{Inv}_t = \text{\%Inv} \cdot \text{Sales}_t
+\text{Inv}_t = \text{\%Inv}_{\text{COGS}} \cdot \text{COGS}_t = \text{\%Inv}_{\text{COGS}} \cdot \text{CR}_t \cdot \text{Sales}_t
 \end{equation}
 
 By substituting our known variables into \eqref{eq:inventory_rollforward}, we can solve for
@@ -802,7 +801,9 @@ balance the inventory account:
 \text{Purchases}_t = \text{\%Inv} \cdot (\text{Sales}_t - \text{Sales}_{t-1}) + \text{COGS}_t
 \end{equation}
 
-We add \%Inventory (\%Inv), $\alpha$\textsubscript{CR} and $\beta$\textsubscript{CR}
+(Note: while the model avoids the traditional balance-sheet plug, Purchases is computed from the inventory identity $\text{COGS} + \Delta\text{Inv}$, which functions as a derived quantity that ensures inventory consistency. Unlike a balance-sheet plug, this is a structural accounting identity, not a residual forced to reconcile Assets $=$ Liabilities $+$ Equity.)
+
+We add \%Inventory (\%Inv\textsubscript{COGS}), $\alpha$\textsubscript{CR} and $\beta$\textsubscript{CR}
 to the variables to be trained.
 
 \begin{enumerate}
@@ -823,7 +824,7 @@ demand. Therefore, we define:
 \end{equation}
 
 We add \%Advance payments to suppliers (\%AdvPP) to the variables to
-learn in our training.
+learn in our training. Advance payments are computed as a percentage of the current period's purchases (not next period's), avoiding forward-looking bias in the time-series model.
 
 \begin{enumerate}
 \def\labelenumi{\arabic{enumi}.}
@@ -840,7 +841,7 @@ customers are on credit and is receivable next year:
 \end{equation}
 
 We add \%Account receivables (\%AR) to the variables to learn in our
-training.
+training. Note that \%AR is equivalent to DSO/365, where DSO (Days Sales Outstanding) measures the average collection period. Similarly, the inventory ratio \%Inv\textsubscript{COGS} corresponds to DSI/365 (Days Sales of Inventory), and the payables ratio \%AP corresponds to DPO/365 (Days Payable Outstanding). Together, these three metrics define the Cash Conversion Cycle: $\text{CCC} = \text{DSO} + \text{DSI} - \text{DPO}$, a standard measure of working capital efficiency in corporate finance.
 
 \begin{enumerate}
 \def\labelenumi{\arabic{enumi}.}
@@ -1044,6 +1045,8 @@ where
 \text{Equity financing}_t = \text{LTLoan}_t \cdot \text{\%EF} / (1 - \text{\%EF})
 \end{equation}
 
+The equity financing proportion is trained from historical data, implicitly capturing the firm's revealed preference between debt and equity. This is consistent with the pecking order hypothesis (Myers \& Majluf, 1984), which predicts firms prefer internal funds, then debt, then equity---resulting in a low and relatively stable \%EF for profitable firms. The trained \%EF thus reflects the firm's historical position on the pecking order rather than an arbitrary split.
+
 \begin{equation}\label{eq:target_dividends}
 \text{Target Dividends}_{t-1} = \text{\%Payout ratio} \cdot \text{Net income}_{t-1}
 \end{equation}
@@ -1064,6 +1067,8 @@ Adjustment\_Speed parameter. So, the actual dividends equation becomes:
 \begin{equation}\label{eq:stock_buybacks}
 \text{Stock buybacks}_t = \text{\%Buyback ratio} \cdot \text{Depreciation}_t + \text{Any excess cash after meeting liquidity target}
 \end{equation}
+
+The Lintner (1956) partial-adjustment model remains empirically robust for mature dividend-paying firms (Brav et al., 2005). The key economic insight is that managers treat dividends as a commitment: cutting dividends signals financial distress, so firms smooth payouts to avoid involuntary future cuts. For mega-cap technology firms, the adjustment speed tends to be low (conservative smoothing), as these firms have ample retained earnings and prefer share buybacks for flexible capital return. The trained Adjustment\_Speed parameter captures this firm-specific conservatism.
 
 For companies like Apple, their revenue generates tremendous amount of
 cash that they sometimes use the excess cash to buy back shares to
@@ -1377,7 +1382,7 @@ $\text{\%MSReturn} \cdot \text{IMS}_{t-1}$.  The effective rate
 \%MSReturn is learned during training as the historical average of
 $\text{MSReturn}_t / \text{IMS}_{t-1}$, which absorbs the blended
 contribution of investment income and smaller non-operating items into a
-single rate parameter.
+single rate parameter. This fixed-percentage return assumption is a simplification: for firms with large treasury portfolios, investment returns depend on duration, credit quality, and market conditions. The trained parameter captures the historical average net return after FX effects and mark-to-market adjustments.
 
 Net income (NI\textsubscript{t}) is determined by subtracting the income
 tax:
@@ -1553,6 +1558,7 @@ Bijectors.
 
 Since we assume a flat short-term and long-term interest for loans and
 return on market securities, the only external variable is inflation.
+This flat-rate assumption is a first-order simplification. In practice, borrowing costs depend on the firm's leverage and credit quality (Merton, 1974). As the forecast shows rising debt levels, a more complete model would incorporate credit spread widening---a natural extension that would link the cost of debt to the evolving debt-to-equity ratio. The current approach is conservative: it understates the cost of increased leverage, producing optimistic net income projections for high-debt scenarios.
 
 \begin{itemize}
 \item
@@ -1953,6 +1959,12 @@ of potential improvements is as follows:
   Incorporating the company's stock buyback target if it has been
   disclosed publicly into training the buyback ratio with a neural
   network
+\item
+  Endogenizing the Weighted Average Cost of Capital (WACC) as a function of the forecasted capital structure. Since WACC depends on the debt-to-equity ratio and cost of debt---both of which change across the forecast horizon---this would link borrowing costs to leverage and enable DCF-based valuation directly from the model output.
+\item
+  Propagating uncertainty across all key drivers (sales growth, cost ratios, interest rates, CapEx intensity) via full Monte Carlo simulation, not just OpEx. Adding scenario analysis (base case, downside with revenue contraction, upside with margin expansion) would strengthen the forecast's decision-support value.
+\item
+  Computing projected financial ratios (debt-to-equity, interest coverage, current ratio) from the forecast output and flagging years where they breach investment-grade thresholds---enabling proactive capital structure management.
 \end{itemize}
 
 For our model, we choose to implement Bayesian learning with Variational

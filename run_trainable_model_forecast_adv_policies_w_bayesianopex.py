@@ -12,7 +12,7 @@ from financial_forecast.models.debt import TrendDebtPolicy
 if __name__ == "__main__":
     run_experiment(
         ExperimentConfig(
-            company="aapl",
+            company="wmt",
             opex_module=BayesianOpEx(),
             trajectory_simulator=MonteCarloSimulator(n_samples=1000),
             liquidity_policy=TrendLiquidityPolicy(),

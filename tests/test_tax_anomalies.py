@@ -102,7 +102,7 @@ def test_extract_tax_json_uses_raw_response(
         "raw_response": '{"tax_onetime_amount": 1.2}',
     }
     with patch(
-        "financial_forecast.extraction.base_pdf_extractor." "extract_json_from_text",
+        "financial_forecast.extraction.base_pdf_extractor.normalize_llm_response",
         return_value={
             "current_tax_year": 2024,
             "tax_onetime_amount": 1.2,
@@ -126,8 +126,12 @@ def test_extract_tax_json_fallback_when_extraction_returns_none(
         "tax_onetime_note": "Note",
     }
     with patch(
-        "financial_forecast.extraction.base_pdf_extractor." "extract_json_from_text",
-        return_value=None,
+        "financial_forecast.extraction.base_pdf_extractor.normalize_llm_response",
+        return_value={
+            "raw_response": "some text",
+            "tax_onetime_amount": 2.5,
+            "tax_onetime_note": "Note",
+        },
     ):
         result = extractor._extract_tax_json([5, 6], sample_pages)
 

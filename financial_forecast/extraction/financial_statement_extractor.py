@@ -16,7 +16,7 @@ from financial_forecast.extraction.statement_config import (
     STATEMENT_CONFIGS,
     StatementType,
 )
-from financial_forecast.clients.azure_llm_client import AzureLLMClient
+from financial_forecast.clients.protocols import LLMClient
 
 SUPPLEMENTARY_EXTRACTION_MAX_PAGES = 50
 
@@ -43,7 +43,7 @@ class FinancialStatementExtractor(BasePdfExtractor):
 
     Args:
         queries: Statement types to extract.
-        llm_client: Configured :class:`AzureLLMClient`.
+        llm_client: Configured :class:`LLMClient`.
         batch_size: Pages per LLM prompt during page selection.
         parameters: Extra parameters forwarded to the LLM.
         max_workers: Number of PDFs to process in parallel.
@@ -52,7 +52,7 @@ class FinancialStatementExtractor(BasePdfExtractor):
     def __init__(
         self,
         queries: List[StatementType],
-        llm_client: AzureLLMClient,
+        llm_client: LLMClient,
         batch_size: int = 100,
         parameters: Optional[Dict] = None,
         max_workers: int = 9,

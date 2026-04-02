@@ -11,11 +11,11 @@ from __future__ import annotations
 import json
 import re
 
-from financial_forecast.clients.azure_llm_client import AzureLLMClient
+from financial_forecast.clients.protocols import LLMClient
 
 
 def select_pages_with_llm(
-    client: AzureLLMClient,
+    client: LLMClient,
     parameters: dict[str, object],
     pages: dict[int, str | None],
     query: str,
@@ -102,6 +102,27 @@ def build_page_blocks(batch_pages: dict[int, str]) -> str:
         text = (batch_pages[page_num] or "").strip()
         page_blocks.append(f"Page {page_num}:\n{text}")
     return "\n\n---\n\n".join(page_blocks)
+
+
+def normalize_llm_response(response: dict[str, object]) -> dict[str, object]:
+    """Normalize an LLM response by extracting JSON from ``raw_response``.
+
+    If the response contains a ``raw_response`` key whose value embeds
+    a JSON object, extract and return it.  Otherwise return the original
+    response unchanged.
+
+    Args:
+        response: Parsed response dict from ``LLMClient.ask_json()``.
+
+    Returns:
+        The normalized response dict.
+    """
+    if not isinstance(response, dict) or "raw_response" not in response:
+        return response
+    extracted = extract_json_from_text(str(response["raw_response"]))
+    if extracted is not None:
+        return extracted
+    return response
 
 
 def extract_json_from_text(text: str) -> dict[str, object] | None:

@@ -229,7 +229,7 @@ def test_parameter_bounds(model):
         model.balance_sheet.working_capital.advance_payments_purchases_pct,
         model.balance_sheet.working_capital.account_receivables_pct,
         model.balance_sheet.working_capital.account_payables_pct,
-        model.balance_sheet.working_capital.inventory_pct,
+        model.balance_sheet.working_capital.inventory_cogs_pct,
         model.opex_module.q_var_opex_scale,
         model.opex_module.q_base_opex_scale,
         model.opex_module.noise_sigma,

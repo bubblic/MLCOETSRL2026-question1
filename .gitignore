@@ -221,3 +221,10 @@ __marimo__/
 .arelle
 xbrl_download_root
 previouslydownloaded
+
+# Loan pricing artefacts (cached data, generated outputs)
+loan_pricing/artifacts/raw/fred/*.csv
+loan_pricing/artifacts/raw/sec/*.json
+loan_pricing/artifacts/processed/figures/*.png
+loan_pricing/artifacts/processed/tables/*.csv
+loan_pricing/artifacts/processed/models/*.joblib

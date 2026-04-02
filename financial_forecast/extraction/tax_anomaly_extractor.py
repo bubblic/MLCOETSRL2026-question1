@@ -11,7 +11,7 @@ from pathlib import Path
 from typing import Dict, List, Optional
 
 from financial_forecast.extraction.base_pdf_extractor import BasePdfExtractor
-from financial_forecast.clients.azure_llm_client import AzureLLMClient
+from financial_forecast.clients.protocols import LLMClient
 import time
 
 
@@ -54,7 +54,7 @@ class TaxAnomalyExtractor(BasePdfExtractor):
     """Extract tax anomalies from 10-K PDFs.
 
     Args:
-        llm_client: Configured :class:`AzureLLMClient`.
+        llm_client: Configured :class:`LLMClient`.
         selection_prompt: Prompt template for page selection.
         extraction_prompt: Prompt template for tax extraction
             (with ``{pages}`` placeholder).
@@ -65,7 +65,7 @@ class TaxAnomalyExtractor(BasePdfExtractor):
 
     def __init__(
         self,
-        llm_client: AzureLLMClient,
+        llm_client: LLMClient,
         selection_prompt: str = DEFAULT_SELECTION_PROMPT,
         extraction_prompt: str = DEFAULT_EXTRACTION_PROMPT,
         batch_size: int = 100,

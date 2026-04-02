@@ -66,8 +66,9 @@ class BalanceSheetModel(tf.Module):
             sales_t,
         )
 
+        cogs_direct = sales_t * self.purchases_policy.get_cost_ratio(time_index)
         ar_curr, inv_curr, adv_ps_curr = self.working_capital.compute_sales_based(
-            sales_t
+            sales_t, cogs_direct,
         )
         purchases_t = self.purchases_policy.compute(
             sales_t,

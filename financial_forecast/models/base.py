@@ -222,6 +222,7 @@ class BaseFinancialModel(tf.Module):
             self.balance_sheet.working_capital.loss(
                 data.sales,
                 data.purchases,
+                data.cogs,
                 data.advance_payments_sales,
                 data.advance_payments_purchases,
                 data.accounts_receivable,

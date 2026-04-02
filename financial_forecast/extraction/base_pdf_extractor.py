@@ -17,9 +17,9 @@ from typing import Dict, List, Optional
 
 from financial_forecast.extraction.page_identifier import (
     select_pages_with_llm,
-    extract_json_from_text,
+    normalize_llm_response,
 )
-from financial_forecast.clients.azure_llm_client import AzureLLMClient
+from financial_forecast.clients.protocols import LLMClient
 from financial_forecast.extraction.pdf_extractor import extract_text_pdfplumber
 
 
@@ -31,7 +31,7 @@ class BasePdfExtractor(ABC):
     implement :meth:`_extract_one_pdf` with their specific extraction logic.
 
     Args:
-        llm_client: Configured :class:`AzureLLMClient`.
+        llm_client: Configured :class:`LLMClient`.
         batch_size: Pages per LLM prompt during page selection.
         parameters: Extra parameters forwarded to the LLM.
         max_workers: Number of PDFs to process in parallel.
@@ -39,7 +39,7 @@ class BasePdfExtractor(ABC):
 
     def __init__(
         self,
-        llm_client: AzureLLMClient,
+        llm_client: LLMClient,
         batch_size: int = 100,
         parameters: Optional[Dict] = None,
         max_workers: int = 9,
@@ -141,13 +141,7 @@ class BasePdfExtractor(ABC):
             parameters=self.parameters,
             reasoning=True,
         )
-        if "raw_response" in response:
-            extracted = extract_json_from_text(
-                str(response["raw_response"]),
-            )
-            if extracted:
-                return extracted
-        return response
+        return normalize_llm_response(response)
 
     @staticmethod
     def _format_pages(

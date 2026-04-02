@@ -111,7 +111,7 @@ def test_extract_table_requires_pages(extractor, sample_pages):
 def test_extract_table_uses_raw_response(extractor, mock_client, sample_pages):
     mock_client.ask_json.return_value = {"raw_response": '{"parsed": true}'}
     with patch(
-        "financial_forecast.extraction.base_pdf_extractor.extract_json_from_text",
+        "financial_forecast.extraction.base_pdf_extractor.normalize_llm_response",
         return_value={"parsed": True},
     ):
         result = extractor._extract_table(
