@@ -4,12 +4,12 @@ from typing import Any, Dict
 from unittest.mock import Mock
 
 from financial_forecast.clients.protocols import LLMClient
-from financial_forecast.extraction.risk.category_extraction import (
+from risk.category_extraction import (
     extract_all_categories,
     extract_category,
 )
-from financial_forecast.extraction.risk.risk_categories import RiskCategory
-from financial_forecast.extraction.risk.usage_tracker import UsageTracker
+from risk.risk_categories import RiskCategory
+from risk.usage_tracker import UsageTracker
 
 
 class FakeLLMClient:

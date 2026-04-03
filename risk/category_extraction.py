@@ -14,10 +14,10 @@ from pydantic import ValidationError
 
 from financial_forecast.clients.protocols import LLMClient
 from financial_forecast.extraction.page_identifier import normalize_llm_response
-from financial_forecast.extraction.risk.models import CATEGORY_MODELS
-from financial_forecast.extraction.risk.prompts import EXTRACTION_PROMPTS
-from financial_forecast.extraction.risk.risk_categories import RiskCategory
-from financial_forecast.extraction.risk.usage_tracker import UsageTracker
+from risk.models import CATEGORY_MODELS
+from risk.prompts import EXTRACTION_PROMPTS
+from risk.risk_categories import RiskCategory
+from risk.usage_tracker import UsageTracker
 
 
 def extract_category(

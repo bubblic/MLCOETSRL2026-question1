@@ -10,8 +10,8 @@ import json
 from typing import Any, Dict
 
 from financial_forecast.clients.protocols import LLMClient
-from financial_forecast.extraction.risk.prompts import SYNTHESIS_PROMPT
-from financial_forecast.extraction.risk.usage_tracker import UsageTracker
+from risk.prompts import SYNTHESIS_PROMPT
+from risk.usage_tracker import UsageTracker
 
 
 def synthesise_risk_memo(

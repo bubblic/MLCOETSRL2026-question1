@@ -3,7 +3,7 @@
 import pytest
 from pydantic import ValidationError
 
-from financial_forecast.extraction.risk.models import (
+from risk.models import (
     AuditorOpinionResult,
     CategoryResult,
     CashFlowWarning,

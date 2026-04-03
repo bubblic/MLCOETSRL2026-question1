@@ -6,8 +6,8 @@ from unittest.mock import Mock, patch
 
 import pytest
 
-from financial_forecast.extraction.risk.risk_categories import RiskCategory
-from financial_forecast.extraction.risk.risk_extractor import RiskWarningsExtractor
+from risk.risk_categories import RiskCategory
+from risk.risk_extractor import RiskWarningsExtractor
 
 
 MOCK_PAGES = {i: f"Text of page {i}" for i in range(1, 31)}
@@ -57,7 +57,7 @@ def mock_llm_client():
 
 class TestExtractOnePdfFullPipeline:
     @patch(
-        "financial_forecast.extraction.risk.risk_extractor.BasePdfExtractor._extract_pages",
+        "risk.risk_extractor.BasePdfExtractor._extract_pages",
         return_value=MOCK_PAGES,
     )
     def test_full_pipeline_writes_output(self, mock_extract, mock_llm_client, tmp_path):
@@ -86,7 +86,7 @@ class TestExtractOnePdfFullPipeline:
         assert result["risk_memo"]["risk_memo"] == MOCK_SYNTHESIS_TEXT
 
     @patch(
-        "financial_forecast.extraction.risk.risk_extractor.BasePdfExtractor._extract_pages",
+        "risk.risk_extractor.BasePdfExtractor._extract_pages",
         return_value=MOCK_PAGES,
     )
     def test_usage_tracker_records_stages(self, mock_extract, mock_llm_client, tmp_path):
@@ -114,7 +114,7 @@ class TestExtractOnePdfFullPipeline:
 
 class TestExtractOnePdfNoFlags:
     @patch(
-        "financial_forecast.extraction.risk.risk_extractor.BasePdfExtractor._extract_pages",
+        "risk.risk_extractor.BasePdfExtractor._extract_pages",
         return_value=MOCK_PAGES,
     )
     def test_no_flagged_pages(self, mock_extract, tmp_path):
@@ -145,7 +145,7 @@ class TestExtractOnePdfNoFlags:
 
 class TestOutputFileNaming:
     @patch(
-        "financial_forecast.extraction.risk.risk_extractor.BasePdfExtractor._extract_pages",
+        "risk.risk_extractor.BasePdfExtractor._extract_pages",
         return_value=MOCK_PAGES,
     )
     def test_output_follows_convention(self, mock_extract, mock_llm_client, tmp_path):
@@ -167,7 +167,7 @@ class TestOutputFileNaming:
 
 class TestCustomCategories:
     @patch(
-        "financial_forecast.extraction.risk.risk_extractor.BasePdfExtractor._extract_pages",
+        "risk.risk_extractor.BasePdfExtractor._extract_pages",
         return_value=MOCK_PAGES,
     )
     def test_subset_of_categories(self, mock_extract, tmp_path):
@@ -204,7 +204,7 @@ class TestCustomCategories:
 
 class TestRunSingleFile:
     @patch(
-        "financial_forecast.extraction.risk.risk_extractor.BasePdfExtractor._extract_pages",
+        "risk.risk_extractor.BasePdfExtractor._extract_pages",
         return_value=MOCK_PAGES,
     )
     def test_single_pdf_path(self, mock_extract, mock_llm_client, tmp_path):

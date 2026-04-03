@@ -2,7 +2,7 @@
 
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
-from financial_forecast.extraction.risk.usage_tracker import UsageTracker
+from risk.usage_tracker import UsageTracker
 
 
 class TestUsageTracker:

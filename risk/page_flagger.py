@@ -13,13 +13,13 @@ from typing import Any, Dict, List, Optional
 
 from financial_forecast.clients.protocols import LLMClient
 from financial_forecast.extraction.page_identifier import normalize_llm_response
-from financial_forecast.extraction.risk.models import FlaggedPage
-from financial_forecast.extraction.risk.prompts import PAGE_FLAG_PROMPT
-from financial_forecast.extraction.risk.risk_categories import (
+from risk.models import FlaggedPage
+from risk.prompts import PAGE_FLAG_PROMPT
+from risk.risk_categories import (
     ALL_CATEGORIES,
     RiskCategory,
 )
-from financial_forecast.extraction.risk.usage_tracker import UsageTracker
+from risk.usage_tracker import UsageTracker
 
 
 @dataclass(frozen=True)

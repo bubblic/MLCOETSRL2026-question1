@@ -9,20 +9,21 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
-from typing import Dict, List, Optional
+from typing import Any, Dict, List, Optional
 
+from risk.anonymizer import EntityAnonymizer
 from financial_forecast.clients.protocols import LLMClient
 from financial_forecast.extraction.base_pdf_extractor import BasePdfExtractor
-from financial_forecast.extraction.risk.category_extraction import (
+from risk.category_extraction import (
     extract_all_categories,
 )
-from financial_forecast.extraction.risk.page_flagger import flag_all_pages
-from financial_forecast.extraction.risk.risk_categories import (
+from risk.page_flagger import flag_all_pages
+from risk.risk_categories import (
     DEFAULT_CHUNK_SIZE,
     RiskCategory,
 )
-from financial_forecast.extraction.risk.synthesiser import synthesise_risk_memo
-from financial_forecast.extraction.risk.usage_tracker import UsageTracker
+from risk.synthesiser import synthesise_risk_memo
+from risk.usage_tracker import UsageTracker
 
 
 class RiskWarningsExtractor(BasePdfExtractor):
@@ -42,6 +43,10 @@ class RiskWarningsExtractor(BasePdfExtractor):
         parameters: Extra parameters forwarded to the LLM.
         max_workers: Number of PDFs to process in parallel.
         category_workers: Parallelism for Stage 2 category extraction.
+        known_entities: Optional entity list for anonymization.
+            Each entry is a dict with ``"type"`` and ``"names"`` keys.
+        use_ner: Use spacy NER for automatic entity detection.
+        anonymize_years: Replace absolute years with relative markers.
     """
 
     def __init__(
@@ -53,6 +58,9 @@ class RiskWarningsExtractor(BasePdfExtractor):
         parameters: Optional[Dict] = None,
         max_workers: int = 9,
         category_workers: int = 4,
+        known_entities: Optional[List[Dict[str, Any]]] = None,
+        use_ner: bool = True,
+        anonymize_years: bool = True,
     ):
         super().__init__(
             llm_client=llm_client,
@@ -63,6 +71,9 @@ class RiskWarningsExtractor(BasePdfExtractor):
         self.categories = categories or list(RiskCategory)
         self.chunk_size = chunk_size
         self.category_workers = category_workers
+        self.known_entities = known_entities
+        self.use_ner = use_ner
+        self.anonymize_years = anonymize_years
 
     def _extract_one_pdf(
         self,
@@ -76,6 +87,15 @@ class RiskWarningsExtractor(BasePdfExtractor):
         print(f"Stage 0: Parsing {pdf_path.name}...")
         pages = self._extract_pages(pdf_path)
         print(f"Extracted {len(pages)} pages")
+
+        # Stage 0.5: Entity anonymization
+        anonymizer = EntityAnonymizer(
+            known_entities=self.known_entities,
+            use_ner=self.use_ner,
+            anonymize_years=self.anonymize_years,
+        )
+        pages = anonymizer.anonymize_pages(pages)
+        print(f"Anonymized {len(anonymizer.entity_map())} entities")
 
         # Stage 1: Flag pages
         print("Stage 1: Flagging risk-relevant pages...")
@@ -112,11 +132,12 @@ class RiskWarningsExtractor(BasePdfExtractor):
             findings, self.llm_client, self.parameters, tracker
         )
 
-        # Write output
+        # Write output (de-anonymize findings and memo)
         result = {
             "flagged_pages": flagged_summary,
-            "category_results": findings,
-            "risk_memo": memo,
+            "category_results": anonymizer.deanonymize(findings),
+            "risk_memo": anonymizer.deanonymize(memo),
+            "entity_map": anonymizer.entity_map(),
             "usage": tracker.summary(),
         }
         self._write_json(output_dir, pdf_path, "risk-warnings", result)

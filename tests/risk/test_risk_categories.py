@@ -1,6 +1,6 @@
 """Tests for risk_categories module."""
 
-from financial_forecast.extraction.risk.risk_categories import (
+from risk.risk_categories import (
     ALL_CATEGORIES,
     DEFAULT_CHUNK_SIZE,
     RiskCategory,

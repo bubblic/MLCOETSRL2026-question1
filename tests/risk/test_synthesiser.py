@@ -2,8 +2,8 @@
 
 from unittest.mock import Mock
 
-from financial_forecast.extraction.risk.synthesiser import synthesise_risk_memo
-from financial_forecast.extraction.risk.usage_tracker import UsageTracker
+from risk.synthesiser import synthesise_risk_memo
+from risk.usage_tracker import UsageTracker
 
 
 SAMPLE_FINDINGS = {

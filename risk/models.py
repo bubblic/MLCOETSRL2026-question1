@@ -10,7 +10,7 @@ from typing import Any, Dict, List, Optional, Union
 
 from pydantic import BaseModel, Field, TypeAdapter
 
-from financial_forecast.extraction.risk.risk_categories import RiskCategory
+from risk.risk_categories import RiskCategory
 
 
 # ---------------------------------------------------------------------------

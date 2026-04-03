@@ -2,18 +2,18 @@
 
 from unittest.mock import Mock
 
-from financial_forecast.extraction.risk.page_flagger import (
+from risk.page_flagger import (
     PageChunk,
     chunk_pages,
     flag_all_pages,
     flag_pages_in_chunk,
     _parse_flag_response,
 )
-from financial_forecast.extraction.risk.risk_categories import (
+from risk.risk_categories import (
     ALL_CATEGORIES,
     RiskCategory,
 )
-from financial_forecast.extraction.risk.usage_tracker import UsageTracker
+from risk.usage_tracker import UsageTracker
 
 
 def _make_pages(n: int):

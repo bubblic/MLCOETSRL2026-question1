@@ -10,20 +10,41 @@ requires-python = ">=3.9"
 dependencies = [
     "tensorflow>=2.14",
     "tensorflow-probability>=0.22",
+    "numpy>=1.24",
+    "pandas>=2.0",
+    "pydantic>=2.0",
     "matplotlib>=3.7",
     "python-dotenv>=1.0",
     "pdfplumber>=0.10",
-    "numpy>=1.24",
-    "pydantic>=2.0",
 ]
 
 [project.optional-dependencies]
 dev = [
     "pytest>=7.0",
 ]
+loan-pricing = [
+    "scikit-learn>=1.3",
+]
+credit-rating = [
+    "transformers>=4.30",
+    "scikit-learn>=1.3",
+    "pydantic-settings>=2.0",
+    "shap>=0.42",
+    "fastapi>=0.100",
+    "uvicorn>=0.23",
+    "typer>=0.9",
+]
+risk = [
+    "spacy>=3.5",
+]
+data = [
+    "sec-edgar-downloader>=5.0",
+    "yfinance>=0.2",
+    "arelle>=2.0",
+]
 
 [tool.setuptools.packages.find]
-include = ["financial_forecast*", "loan_pricing*"]
+include = ["financial_forecast*", "credit_rating*", "loan_pricing*", "risk*"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

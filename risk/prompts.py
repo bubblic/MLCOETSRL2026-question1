@@ -7,7 +7,7 @@ system context is embedded as the opening paragraph of each prompt.
 
 from __future__ import annotations
 
-from financial_forecast.extraction.risk.risk_categories import RiskCategory
+from risk.risk_categories import RiskCategory
 
 # ---------------------------------------------------------------------------
 # Stage 1: Page flagging
