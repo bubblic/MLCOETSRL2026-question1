@@ -150,7 +150,10 @@ class SimpleDebtPolicy(DebtPolicy):
 
     @property
     def structural_trainable_variables(self) -> List[tf.Variable]:
-        return [self.avg_maturity_years.trainable_variables[0]]
+        return [
+            self.avg_maturity_years.trainable_variables[0],
+            self.equity_financing_pct.trainable_variables[0],
+        ]
 
     def loss_st_debt(
         self,
