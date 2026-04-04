@@ -1,201 +1,177 @@
 % type the following command to generate pdf file:
 %   tectonic "Report for JPMorgan Chase MLCOE internship - Q1 final report - extension.tex"
 
-% Options for packages loaded elsewhere
-\PassOptionsToPackage{unicode}{hyperref}
-\PassOptionsToPackage{hyphens}{url}
-\documentclass[
-]{article}
-\usepackage{xcolor}
-\usepackage{amsmath,amssymb}
-\setcounter{secnumdepth}{-\maxdimen} % remove section numbering
-\usepackage{iftex}
-\ifPDFTeX
-  \usepackage[T1]{fontenc}
-  \usepackage[utf8]{inputenc}
-  \usepackage{textcomp} % provide euro and other symbols
-\else % if luatex or xetex
-  \usepackage{unicode-math} % this also loads fontspec
-  \defaultfontfeatures{Scale=MatchLowercase}
-  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
-  \usepackage{xeCJK}
-  \setCJKmainfont{Hiragino Sans GB}
-\fi
-\usepackage{lmodern}
-\ifPDFTeX\else
-  % xetex/luatex font selection
-\fi
-% Use upquote if available, for straight quotes in verbatim environments
-\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
-\IfFileExists{microtype.sty}{% use microtype if available
-  \usepackage[]{microtype}
-  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
-}{}
-\makeatletter
-\@ifundefined{KOMAClassName}{% if non-KOMA class
-  \IfFileExists{parskip.sty}{%
-    \usepackage{parskip}
-  }{% else
-    \setlength{\parindent}{0pt}
-    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
-}{% if KOMA class
-  \KOMAoptions{parskip=half}}
-\makeatother
-\usepackage[margin=1in]{geometry}
+\documentclass[12pt,a4paper]{article}
+
+% --- Packages ---
+\usepackage[margin=2.5cm]{geometry}
+\usepackage{hyperref}
 \usepackage{listings}
-\definecolor{codebg}{RGB}{245,245,245}
-\definecolor{codegreen}{RGB}{0,128,0}
+\usepackage{xcolor}
+\usepackage[breakable,skins]{tcolorbox}
+\newtcolorbox{llmoutput}[1][]{
+  colback=gray!5, colframe=gray!50,
+  fonttitle=\bfseries, title={#1},
+  breakable, enhanced
+}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{enumitem}
+\usepackage{titlesec}
+\usepackage{fancyhdr}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{amsmath,amssymb}
+\usepackage{lmodern}
+\usepackage{parskip}
+\usepackage{unicode-math}
+\defaultfontfeatures{Scale=MatchLowercase}
+\defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\usepackage{xeCJK}
+\setCJKmainfont{Hiragino Sans GB}
+\usepackage{soul}
+
+% --- Colour Definitions ---
+\definecolor{codeblue}{RGB}{30,100,200}
 \definecolor{codegray}{RGB}{100,100,100}
-\definecolor{codeblue}{RGB}{0,0,180}
-\definecolor{codepurple}{RGB}{128,0,128}
-\lstdefinestyle{python}{
-  language=Python,
-  backgroundcolor=\color{codebg},
-  basicstyle=\ttfamily\small,
-  keywordstyle=\color{codeblue}\bfseries,
-  stringstyle=\color{codegreen},
-  commentstyle=\color{codegray}\itshape,
-  breaklines=true,
-  breakatwhitespace=false,
-  frame=single,
-  rulecolor=\color{codegray!30},
-  xleftmargin=4pt,
-  xrightmargin=4pt,
-  aboveskip=8pt,
-  belowskip=8pt,
-  showstringspaces=false,
-  columns=flexible,
-  literate={\_}{\_}1,
+\definecolor{codegreen}{RGB}{0,140,0}
+\definecolor{codered}{RGB}{180,0,0}
+\definecolor{backcolour}{RGB}{245,245,245}
+\definecolor{jpblue}{RGB}{0,45,114}
+
+% --- Code Listing Styles ---
+\lstdefinestyle{pythonstyle}{
+    language=Python,
+    backgroundcolor=\color{backcolour},
+    commentstyle=\color{codegreen},
+    keywordstyle=\color{codeblue}\bfseries,
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{codered},
+    basicstyle=\ttfamily\footnotesize,
+    breakatwhitespace=false,
+    breaklines=true,
+    captionpos=b,
+    keepspaces=true,
+    numbers=left,
+    numbersep=5pt,
+    showspaces=false,
+    showstringspaces=false,
+    showtabs=false,
+    tabsize=4,
+    frame=single,
+    rulecolor=\color{codegray},
+    literate={\_}{\_}1,
 }
 \lstdefinestyle{json}{
-  backgroundcolor=\color{codebg},
-  basicstyle=\ttfamily\small,
-  stringstyle=\color{codegreen},
-  breaklines=true,
-  breakatwhitespace=false,
-  frame=single,
-  rulecolor=\color{codegray!30},
-  xleftmargin=4pt,
-  xrightmargin=4pt,
-  aboveskip=8pt,
-  belowskip=8pt,
-  showstringspaces=false,
-  columns=flexible,
-  literate={\_}{\_}1,
+    backgroundcolor=\color{backcolour},
+    basicstyle=\ttfamily\footnotesize,
+    stringstyle=\color{codegreen},
+    breaklines=true,
+    breakatwhitespace=false,
+    frame=single,
+    rulecolor=\color{codegray},
+    showstringspaces=false,
+    tabsize=2,
+    literate={\_}{\_}1,
 }
 \lstdefinestyle{console}{
-  backgroundcolor=\color{codebg},
-  basicstyle=\ttfamily\small,
-  breaklines=true,
-  breakatwhitespace=false,
-  frame=single,
-  rulecolor=\color{codegray!30},
-  xleftmargin=4pt,
-  xrightmargin=4pt,
-  aboveskip=8pt,
-  belowskip=8pt,
-  showstringspaces=false,
-  columns=flexible,
+    backgroundcolor=\color{backcolour},
+    basicstyle=\ttfamily\footnotesize,
+    breaklines=true,
+    breakatwhitespace=false,
+    frame=single,
+    rulecolor=\color{codegray},
+    showstringspaces=false,
 }
-\usepackage{graphicx}
+\lstdefinestyle{python}{style=pythonstyle}
+\lstset{style=pythonstyle}
+
+% --- Image scaling (kept from pandoc) ---
 \makeatletter
 \newsavebox\pandoc@box
-\newcommand*\pandocbounded[1]{% scales image to fit in text height/width
+\newcommand*\pandocbounded[1]{%
   \sbox\pandoc@box{#1}%
   \Gscale@div\@tempa{\textheight}{\dimexpr\ht\pandoc@box+\dp\pandoc@box\relax}%
   \Gscale@div\@tempb{\linewidth}{\wd\pandoc@box}%
-  \ifdim\@tempb\p@<\@tempa\p@\let\@tempa\@tempb\fi% select the smaller of both
+  \ifdim\@tempb\p@<\@tempa\p@\let\@tempa\@tempb\fi
   \ifdim\@tempa\p@<\p@\scalebox{\@tempa}{\usebox\pandoc@box}%
   \else\usebox{\pandoc@box}%
   \fi%
 }
-% Set default figure placement to htbp
 \def\fps@figure{htbp}
 \makeatother
-\ifLuaTeX
-  \usepackage{luacolor}
-  \usepackage[soul]{lua-ul}
-\else
-  \usepackage{soul}
-\fi
-\setlength{\emergencystretch}{3em} % prevent overfull lines
+
+% --- Pandoc compatibility ---
+\setlength{\emergencystretch}{3em}
 \providecommand{\tightlist}{%
   \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
-\usepackage{bookmark}
-\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
-\urlstyle{same}
+
+% --- Header / Footer ---
+\pagestyle{fancy}
+\fancyhf{}
+\rhead{\color{jpblue}\textbf{JP Morgan --- Q1 Final Report}}
+\lhead{\color{jpblue}Confidential}
+\rfoot{Page \thepage}
+\lfoot{\color{codegray}\today}
+
+% --- Section Formatting ---
+\titleformat{\section}{\large\bfseries\color{jpblue}}{}{0em}{}[\titlerule]
+\titleformat{\subsection}{\normalsize\bfseries\color{jpblue}}{}{0em}{}
+
+% --- Hyperref ---
 \hypersetup{
   colorlinks=true,
-  linkcolor=blue,
-  urlcolor=blue,
-  citecolor=blue,
-  pdfcreator={LaTeX via pandoc}}
-
-\author{}
-\date{}
+  linkcolor=jpblue,
+  urlcolor=jpblue,
+  citecolor=jpblue,
+  pdftitle={Final Report for JPMorgan Chase MLCOE Internship -- Q1},
+  pdfauthor={Jaebum (Albert) Chung},
+}
 
 \begin{document}
 
-\textbf{Final Report for JPMorgan Chase MLCOE internship -- Question 1}
+% --- Title Page ---
+\begin{titlepage}
+  \centering
+  \vspace*{2cm}
+  {\Huge\bfseries\color{jpblue} Financial Statement Forecasting\par}
+  \vspace{0.3cm}
+  {\Huge\bfseries\color{jpblue} from Annual Reports\par}
+  \vspace{0.5cm}
+  {\large\color{codegray} A Structural No-Plug Approach with Machine Learning\par}
+  \vspace{2cm}
+  \rule{0.6\textwidth}{0.4pt}\\[0.5cm]
+  {\large JP Morgan --- MLCOE Internship Project (Question 1)\par}
+  \vspace{0.5cm}
+  {\normalsize Jaebum (Albert) Chung\par}
+  \vspace{0.3cm}
+  {\normalsize February 26, 2026\par}
+  \vspace{3cm}
+  \begin{abstract}
+    \noindent This report implements a structural financial statement forecasting model
+    based on the no-plug framework of Pareja (2009), where the balance sheet is derived
+    endogenously from the cash budget and income statement without circular references.
+    Policy variables are trained from historical data using gradient-based optimisation,
+    and Bayesian extensions provide confidence intervals via Monte Carlo simulation.
+    The framework is extended with LLM-based extraction pipelines for automated
+    ingestion of annual reports and strategic financial analysis.
+  \end{abstract}
+\end{titlepage}
 
-Jaebum (Albert) Chung
+\tableofcontents
+\newpage
 
-February 26, 2026
+\section{Introduction}
 
-\textbf{Table of Content}
-\begin{quote}
-Introduction
+\subsection{Literature Review}
 
-Part 1
-\begin{quote}
-\begin{enumerate}
-\def\labelenumi{\arabic{enumi}.}
-\item
-  The Balance Sheet Elements
-\item
-  Mathematical Equations Governing the Balance Sheet Elements
-\item
-  Time Series Representation of the Balance Sheet
-\item
-  Training the Model
-\item
-  Applying Machine Learning
-\item
-  Projected Balance Sheet, Income Statement, and Cash Budget
-\end{enumerate}
-\end{quote}
-
-Reviewer's Feedback
-
-Part 2
-\begin{quote}
-\begin{enumerate}
-\def\labelenumi{\alph{enumi})}
-\item
-  LLM Selection and Infrastructure Setup
-\item
-  LLM-Only Balance Sheet Forecasting
-\item
-  Combining LLM with the Balance Sheet Forecasting Model (Tax Anomalies)
-\item
-  Strategic Recommendations for CEO/CFO
-\item[e, f, g)] Financial Ratios and Automated Extraction Pipeline
-\item[h, i)] Applicability to Other Annual Reports
-\end{enumerate}
-\end{quote}
-\end{quote}
-
-\textbf{Introduction}
-
-\ul{Literature Review}
-
-\emph{The Limitations of "Plug" Variables in Financial Forecasting}
+\emph{The Limitations of ``Plug'' Variables in Financial Forecasting}
 
 Financial statement forecasting is a foundational practice in corporate
 finance, yet traditional methodologies often compromise the integrity of
-the double-entry accounting system. As reviewed in Pareja et al. (2007)
-and Pareja (2009), a significant portion of existing literature relies
-on the use of "plugs": balancing variables forced to reconcile the
+the double-entry accounting system. As reviewed in \hyperlink{ref:pareja07}{Pareja et al.\ (2007)}
+and \hyperlink{ref:pareja09}{Pareja (2009)}, a significant portion of existing literature relies
+on the use of ``plugs'': balancing variables forced to reconcile the
 difference between Assets and Liabilities plus Equity. Typically,
 analysts assign a specific account (often Cash, Debt or Equity
 \hyperlink{ref:pareja09}{[Pareja(09)]}) to absorb any discrepancies in the forecast.
@@ -217,8 +193,8 @@ identities and deterministic valuation rules, such as the First-In,
 First-Out (FIFO) inventory method \hyperlink{ref:iasb21}{[IASB(21)]}. Consequently, the
 direct application of machine learning algorithms, such as Long
 Short-Term Memory (LSTM) networks, to forecast individual line items is
-often methodologically flawed. Because these \textquotesingle black
-box\textquotesingle{} models treat variables as probabilistic time
+often methodologically flawed. Because these `black
+box' models treat variables as probabilistic time
 series rather than components of an integrated system, they fail to
 enforce the structural interconnectedness required by double-entry
 bookkeeping. This limitation frequently results in forecasts that
@@ -226,7 +202,79 @@ violate the fundamental accounting equation (Assets = Liabilities +
 Equity), thereby rendering the model incapable of accurately assessing a
 company's overall financial health.
 
-\ul{Proposed Methodology: A Structural "No-Plug" Approach}
+\subsection{The Double-Entry Principle}
+\label{sec:double-entry}
+
+Double-entry bookkeeping is the foundation of modern accounting. Its
+central rule is that every financial transaction must be recorded as two
+equal and opposite entries across accounts, so that the fundamental
+accounting equation is preserved at all times:
+
+\[
+\text{Assets} = \text{Liabilities} + \text{Equity}
+\]
+
+To see why, consider two scenarios and how they flow through the
+three core financial statements: the Income Statement, the Statement
+of Cash Flows, and the Balance Sheet.
+
+\paragraph{Example 1: A credit sale and subsequent collection
+(Income Statement $\to$ Balance Sheet $\to$ Cash Flow Statement).}
+A company sells \$1{,}000 of goods on credit. At the point of sale,
+the Income Statement records \$1{,}000 in Revenue, which---after
+taxes and expenses---flows into Net Income and ultimately into
+Retained Earnings (a component of Equity). On the Balance Sheet,
+Accounts Receivable (an asset) increases by \$1{,}000. The equation
+remains balanced: assets rose by \$1{,}000 (AR) and equity rose by
+the same amount (via Retained Earnings absorbing Net Income).
+
+When the customer later pays the \$1{,}000 in cash, the Cash Flow
+Statement records a \$1{,}000 operating cash inflow. On the Balance
+Sheet, Cash increases by \$1{,}000 while Accounts Receivable
+decreases by \$1{,}000---one asset replaced another, and Total Assets
+are unchanged. The equation still holds because this is a pure asset
+swap. Notice how a single economic event (a sale) creates an accrual
+on the Income Statement first, then resolves through the Cash Flow
+Statement later, with the Balance Sheet tracking both stages.
+
+\paragraph{Example 2: Debt-financed equipment purchase
+(Cash Flow Statement $\to$ Balance Sheet $\to$ Income Statement).}
+A company borrows \$2{,}000 in long-term debt and immediately uses
+the proceeds to purchase equipment. The Cash Flow Statement records a
+\$2{,}000 inflow under financing activities (the borrowing) and a
+\$2{,}000 outflow under investing activities (the capital
+expenditure)---net cash impact is zero. On the Balance Sheet,
+Non-Current Assets (equipment) increase by \$2{,}000 and Long-Term
+Debt (a liability) increases by \$2{,}000. Both sides of the equation
+grew by the same amount, so it remains balanced.
+
+In subsequent periods, the transaction continues to ripple through the
+statements. The Income Statement records Depreciation expense (reducing
+Net Income as the asset is consumed) and Interest expense on the debt
+(reducing Net Income further). Both expenses flow back to the Balance
+Sheet: Depreciation reduces Non-Current Assets, and the lower Net
+Income reduces Retained Earnings. Meanwhile, the Cash Flow Statement
+captures the interest and principal payments as outflows---each
+reducing Cash on the Balance Sheet while simultaneously reducing the
+outstanding Debt liability. At every step, the equation holds.
+
+\paragraph{Connection to our model.}
+These two examples illustrate the principle that underpins the entire
+forecasting model in this report. In our implementation, the Statement
+of Cash Flows is realized as a \emph{Cash Budget} decomposed into
+five net liquidity balances: operating, capital expense, financing,
+owner transactions, and discretionary. Every revenue event, expense,
+and cash movement is explicitly routed through the appropriate Cash
+Budget module, and every accrual is tracked on the Balance Sheet.
+Because no ``plug'' variable forces the equation to balance, the
+accounting identity
+$\text{Assets} = \text{Liabilities} + \text{Equity}$ must
+\emph{emerge} from the correctness of the model's logic. If a single
+cash flow is misrouted or an accrual is omitted, the identity breaks
+and the error is immediately detectable---this is the core validation
+mechanism described in Section~\ref{sec:testing}.
+
+\subsection{Proposed Methodology: A Structural ``No-Plug'' Approach}
 
 To address these limitations, this report implements a structural
 forecasting model based on the framework proposed by Pareja (2009). The
@@ -256,7 +304,7 @@ the treasury strategies of modern multinational corporations like Apple
 or General Motors. Where the original model might treat Marketable
 Securities solely as a reservoir for excess cash, our implementation
 models these securities as a distinct portion of the
-company\textquotesingle s liquidity strategy \hyperlink{ref:almeida14}{[Almeida(14)]}. This
+company's liquidity strategy \hyperlink{ref:almeida14}{[Almeida(14)]}. This
 adjustment allows for a more realistic depiction of how large firms
 manage capital allocation between operational cash and interest-bearing
 assets.
@@ -268,26 +316,25 @@ variable to be also trained.
 
 Once the relationships and policy variables connecting the financial
 statement elements are established, the methodology utilizes Sales
-Revenue and Purchases as the central drivers. By anchoring the forecast
-to these core operational activities, the model can accurately predict
-the evolution of the balance sheet and income statement while
-maintaining the necessary accounting linkages.
+Revenue as the single primary driver. All other elements---cost of
+goods sold, inventory, receivables, payables, and liquidity---are
+derived from Sales through trained policy ratios, while Purchases
+is computed endogenously from the inventory balance identity rather
+than forecast independently. By anchoring the forecast to this core
+operational activity, the model can accurately predict the evolution
+of the balance sheet and income statement while maintaining the
+necessary accounting linkages.
 
-\ul{Testing and Validation Plan}
+\subsection{Testing and Validation Plan}
 
-The validity of this implementation is verified through a rigorous
-"Balance Check." Because the model eschews plugs, the fundamental
-accounting identity (\emph{Assets = Liabilities + Equity}) serves as a
-strict test of correctness rather than a guaranteed outcome.
-
-Our testing plan involves running the forecast over a multi-year horizon
-and calculating the delta between Total Assets and Total Claims at every
-time step. In this "no-plug" environment, a delta of zero confirms that
-all cash inflows and outflows have been correctly captured and routed
-through the Cash Budget. Any deviation from zero indicates a specific
-error in the logic (e.g., a "leak" in the system where an expense was
-recorded but cash was not deducted), allowing us to pinpoint and resolve
-structural flaws that traditional models would mask.
+Because the model eschews plugs, the fundamental accounting identity
+(\emph{Assets = Liabilities + Equity}) becomes a \emph{falsifiable} test
+of correctness rather than a guaranteed outcome. A nonzero delta at any
+forecast step constitutes a genuine failure, exposing structural errors
+that plug-based models would silently absorb. This property is the
+foundation of our validation strategy, which combines the accounting
+identity invariant with a comprehensive programmatic test suite. The
+full testing methodology is detailed in Section~\ref{sec:testing}.
 
 The following sections (\textbf{1. The Balance Sheet Elements},
 \textbf{2. Mathematical Equations Governing the Balance Sheet Elements,}
@@ -296,15 +343,11 @@ answers to the questions 1 and 2, submitted codes are answers to
 questions 3 and 4, and the remaining sections (\textbf{4. Training the
 Model} and \textbf{5. Applying Machine Learning}) provide answers to
 questions 5, 6, 7, 8. For Part 2, the answers to the questions a)
-\textasciitilde{} i) are directly mapped to its headings.
+{\textasciitilde} i) are directly mapped to its headings.
 
-\textbf{Part 1}
+\section{Part 1}
 
-\begin{enumerate}
-\def\labelenumi{\arabic{enumi}.}
-\item
-  \textbf{The Balance Sheet Elements}
-\end{enumerate}
+\subsection{1. The Balance Sheet Elements}
 
 The elements of a balance sheet from \hyperlink{ref:pareja09}{Pareja(09)} are as follows:
 
@@ -602,7 +645,7 @@ Stockholder equity (\textbf{SE\textsubscript{t}})
   \end{itemize}
 \end{itemize}
 
-\ul{Post Part 1:}
+\subsubsection{Post Part 1}
 
 We further upgrade the models to better represent Apple's historical
 data, namely the effective ST debt in Current liabilities:
@@ -666,12 +709,7 @@ Equity
 
 \emph{Same as before}
 
-\begin{enumerate}
-\def\labelenumi{\arabic{enumi}.}
-\setcounter{enumi}{1}
-\item
-  \textbf{Mathematical Equations Governing the Balance Sheet Elements}
-\end{enumerate}
+\subsection{2. Mathematical Equations Governing the Balance Sheet Elements}
 
 We refer to \hyperlink{ref:pareja09}{Pareja(09)} for constructing the mathematical equations that
 link all the elements on the balance sheet without circularity or plugs.
@@ -688,21 +726,13 @@ This is a different approach from \hyperlink{ref:pareja09}{Pareja(09)} where the
 price, the unit cost, and the volume sold based on market research data
 on volume's price sensitivity. For the scope of this problem set, we
 lump these variables into an overarching sales driver whose evolution is
-modeled independently based on historical data. Sales serves as the primary driver because it is the most fundamental measure of a firm's economic activity---all other financial statement items are either costs of generating revenue, assets deployed to support revenue, or financing decisions to fund those assets. In the corporate finance literature, revenue-driven forecasting is standard practice (Koller, Goedhart \& Wessels, 2020). The limitation of this approach is that it does not model the underlying demand drivers (price elasticity, market size, competitive dynamics) that determine revenue growth. The sales forecast itself is generated via linear extrapolation of historical trends---a pragmatic choice given the 4--8 years of available data, though macroeconomic-sensitive models (e.g., LSTM with GDP and inflation inputs) would improve robustness.
+modeled independently based on historical data. Sales serves as the primary driver because it is the most fundamental measure of a firm's economic activity---all other financial statement items are either costs of generating revenue, assets deployed to support revenue, or financing decisions to fund those assets. In the corporate finance literature, revenue-driven forecasting is standard practice \hyperlink{ref:koller20}{[Koller(20)]}. The limitation of this approach is that it does not model the underlying demand drivers (price elasticity, market size, competitive dynamics) that determine revenue growth. The sales forecast itself is generated via linear extrapolation of historical trends---a pragmatic choice given the 4--8 years of available data, though macroeconomic-sensitive models (e.g., LSTM with GDP and inflation inputs) would improve robustness.
 
 We begin by modeling the asset elements.
 
-\begin{enumerate}
-\def\labelenumi{\arabic{enumi}.}
-\item
-  \ul{Assets}
+\subsubsection{Assets}
 
-  \begin{enumerate}
-  \def\labelenumii{\arabic{enumii}.}
-  \item
-    \emph{Non-Current Assets (NCA)}
-  \end{enumerate}
-\end{enumerate}
+\paragraph{Non-Current Assets (NCA)}
 
 The balance of non-current assets evolves sequentially as existing fixed
 assets depreciate over their useful lifecycle and new capital
@@ -743,12 +773,7 @@ learns the parameters for the effective depreciation rate (\%Depr), the
 maintenance replacement ratio (\%AM), and the incremental asset growth
 coefficient (\%AG).
 
-\begin{enumerate}
-\def\labelenumi{\arabic{enumi}.}
-\setcounter{enumi}{1}
-\item
-  \emph{Cost of Goods Sold (COGS) and Inventory}
-\end{enumerate}
+\subsubsection{Cost of Goods Sold (COGS) and Inventory}
 
 Instead of modeling purchases independently and using the Cost of Goods
 Sold (COGS) as a plug, we directly model COGS based on historical margin
@@ -789,9 +814,7 @@ We set the inventory target as a percentage of cost of goods sold, rather than s
 \text{Inv}_t = \text{\%Inv}_{\text{COGS}} \cdot \text{COGS}_t = \text{\%Inv}_{\text{COGS}} \cdot \text{CR}_t \cdot \text{Sales}_t
 \end{equation}
 
-By substituting our known variables into \eqref{eq:inventory_rollforward}, we can solve for
-Purchases\textsubscript{t}, which now acts as the necessary plug to
-balance the inventory account:
+Since Inv\textsubscript{t} and COGS\textsubscript{t} are both independently forecast, Purchases\textsubscript{t} is fully determined by rearranging the inventory identity (7):
 
 \begin{equation}\label{eq:purchases}
 \text{Purchases}_t = \text{Inv}_t - \text{Inv}_{t-1} + \text{COGS}_t
@@ -801,17 +824,12 @@ balance the inventory account:
 \text{Purchases}_t = \text{\%Inv} \cdot (\text{Sales}_t - \text{Sales}_{t-1}) + \text{COGS}_t
 \end{equation}
 
-(Note: while the model avoids the traditional balance-sheet plug, Purchases is computed from the inventory identity $\text{COGS} + \Delta\text{Inv}$, which functions as a derived quantity that ensures inventory consistency. Unlike a balance-sheet plug, this is a structural accounting identity, not a residual forced to reconcile Assets $=$ Liabilities $+$ Equity.)
+Rather than being forecast independently, Purchases\textsubscript{t} is derived directly from the structural accounting identity — it is the quantity of goods that must have been purchased to arrive at the target inventory level given the period's COGS. This is distinct from a balance-sheet plug: no residual is being forced to reconcile a constraint; the identity holds by construction, and Purchases\textsubscript{t}​ is simply its remaining free variable.
 
 We add \%Inventory (\%Inv\textsubscript{COGS}), $\alpha$\textsubscript{CR} and $\beta$\textsubscript{CR}
 to the variables to be trained.
 
-\begin{enumerate}
-\def\labelenumi{\arabic{enumi}.}
-\setcounter{enumi}{2}
-\item
-  \emph{Advance Payments for Purchases}
-\end{enumerate}
+\subsubsection{Advance Payments for Purchases}
 
 Advance payments to suppliers for purchases (AdvPP) can be modeled as
 strictly proportional to the total purchases made during the current
@@ -826,12 +844,7 @@ demand. Therefore, we define:
 We add \%Advance payments to suppliers (\%AdvPP) to the variables to
 learn in our training. Advance payments are computed as a percentage of the current period's purchases (not next period's), avoiding forward-looking bias in the time-series model.
 
-\begin{enumerate}
-\def\labelenumi{\arabic{enumi}.}
-\setcounter{enumi}{3}
-\item
-  \emph{Account Receivables}
-\end{enumerate}
+\subsubsection{Account Receivables}
 
 Next, we have account receivables. A fraction of this year's sales to
 customers are on credit and is receivable next year:
@@ -843,12 +856,7 @@ customers are on credit and is receivable next year:
 We add \%Account receivables (\%AR) to the variables to learn in our
 training. Note that \%AR is equivalent to DSO/365, where DSO (Days Sales Outstanding) measures the average collection period. Similarly, the inventory ratio \%Inv\textsubscript{COGS} corresponds to DSI/365 (Days Sales of Inventory), and the payables ratio \%AP corresponds to DPO/365 (Days Payable Outstanding). Together, these three metrics define the Cash Conversion Cycle: $\text{CCC} = \text{DSO} + \text{DSI} - \text{DPO}$, a standard measure of working capital efficiency in corporate finance.
 
-\begin{enumerate}
-\def\labelenumi{\arabic{enumi}.}
-\setcounter{enumi}{4}
-\item
-  \emph{Total Liquidity}
-\end{enumerate}
+\subsubsection{Total Liquidity}
 
 Finally, the last element in our assets is total liquidity (TL).
 Following \hyperlink{ref:pareja09}{Pareja(09)}, we model the total liquidity available as a
@@ -875,23 +883,14 @@ short-term investment into market securities. We have updated the name
 from Cash Budget to Liquidity Budget to reflect our use of total
 liquidity to represent both cash and market securities investment.
 
-\begin{enumerate}
-\def\labelenumi{\arabic{enumi}.}
-\setcounter{enumi}{1}
-\item
-  \ul{Liquidity Budget}
-\end{enumerate}
+\subsubsection{Liquidity Budget}
 
 We can break down flows into/out of liquidity balance into net liquidity
 balances (NLB) pertaining to the following activities: operating,
 capital expense, financing, external investment, and transaction with
 owners. The final liquidity is the sum of all NLBs.
 
-\begin{enumerate}
-\def\labelenumi{\arabic{enumi}.}
-\item
-  \emph{Operating NLB}
-\end{enumerate}
+\paragraph{Operating NLB}
 
 Operating activity captures all inflows from sales (current year sales
 revenue, account receivables from last year, advance payments from
@@ -935,12 +934,7 @@ We can model IT\textsubscript{t} as a percentage of net income
 We add \%IT, OB\textsubscript{T\_start} (base operating expense of the
 first element in a time series) and \%OR to our variables to be trained.
 
-\begin{enumerate}
-\def\labelenumi{\arabic{enumi}.}
-\setcounter{enumi}{1}
-\item
-  \emph{Capital Expense NLB}
-\end{enumerate}
+\paragraph{Capital Expense NLB}
 
 Investment is made into the non-current assets to:
 
@@ -961,11 +955,7 @@ $\text{CapEx}_t = \text{Depreciation}_t + \text{Sales}_t \cdot \text{\%Asset gro
 \text{CapEx NLB}_t = -\text{CapEx}_t = -\text{Depreciation}_t - \text{Sales}_t \cdot \text{\%Asset growth}
 \end{equation}
 
-\begin{enumerate}
-\def\labelenumi{\arabic{enumi}.}
-\item
-  \emph{Financing NLB}
-\end{enumerate}
+\paragraph{Financing NLB}
 
 This is the net liquidity balance after obtaining more liquidity from
 new short-term loan (STLoan\textsubscript{t}) and new long-term loan
@@ -999,12 +989,7 @@ We add AvgM, \%AvgSTInt and \%AvgLTInt to our variables to learn. We
 derive the expression for STLoan\textsubscript{t} and
 LTLoan\textsubscript{t} in \ul{2.3 Liabilities}.
 
-\begin{enumerate}
-\def\labelenumi{\arabic{enumi}.}
-\setcounter{enumi}{1}
-\item
-  \emph{External Investment NLB}
-\end{enumerate}
+\paragraph{External Investment NLB}
 
 We redeem external investments from last year with an effective
 percentage of return (\%MSReturn, derived from
@@ -1024,12 +1009,7 @@ invest a proportion of total liquidity balance. Using \eqref{eq:ims}:
 
 We add \%MSReturn to our training variables to be learned.
 
-\begin{enumerate}
-\def\labelenumi{\arabic{enumi}.}
-\setcounter{enumi}{2}
-\item
-  \emph{Transaction with owners NLB}
-\end{enumerate}
+\paragraph{Transaction with Owners NLB}
 
 In \hyperlink{ref:pareja09}{Pareja(09)}'s model, owners can make additional investments to finance a
 portion of long-term debt, which counts as an inflow to liquidity. The
@@ -1078,12 +1058,7 @@ ratio (\%PR) and \%Buyback ratio (\%BB) to our variables to learn. We
 will define the equations for Net income\textsubscript{t} in \ul{2.4.
 Income Statement}.
 
-\begin{enumerate}
-\def\labelenumi{\arabic{enumi}.}
-\setcounter{enumi}{3}
-\item
-  \emph{Final NLB}
-\end{enumerate}
+\paragraph{Final NLB}
 
 We obtain the final net liquidity balance\textsubscript{t} by summing
 all the different activities' NLB\textsubscript{t}:
@@ -1099,17 +1074,9 @@ because we have the target liquidity balance given by \eqref{eq:total_liquidity}
 
 $\text{TL}_t = \text{\%TL} \cdot \text{Sales}_t$ from \eqref{eq:total_liquidity}
 
-\begin{enumerate}
-\def\labelenumi{\arabic{enumi}.}
-\item
-  \ul{Liabilities}
+\subsubsection{Liabilities}
 
-  \begin{enumerate}
-  \def\labelenumii{\arabic{enumii}.}
-  \item
-    \emph{Account Payables}
-  \end{enumerate}
-\end{enumerate}
+\paragraph{Account Payables}
 
 Account payables are modeled as a percentage of total purchases made
 this year, payable next year to the suppliers:
@@ -1120,16 +1087,11 @@ this year, payable next year to the suppliers:
 
 We add \%AP to our variables to be trained.
 
-\begin{enumerate}
-\def\labelenumi{\arabic{enumi}.}
-\setcounter{enumi}{1}
-\item
-  \emph{Advance Payments for Future Sales}
-\end{enumerate}
+\subsubsection{Advance Payments for Future Sales}
 
 Advance payments received from customers for future sales
 (AdvPS\textsubscript{t}) are modeled as a direct proportion of the
-current year\textquotesingle s total sales. This assumes that the volume
+current year's total sales. This assumes that the volume
 of upfront customer payments scales linearly with overall revenue
 generation. Therefore, we define:
 
@@ -1139,12 +1101,7 @@ generation. Therefore, we define:
 
 We add \%AdvPS to our variables to be trained.
 
-\begin{enumerate}
-\def\labelenumi{\arabic{enumi}.}
-\setcounter{enumi}{2}
-\item
-  \emph{Current Liabilities}
-\end{enumerate}
+\subsubsection{Current Liabilities}
 
 \emph{From Part 1:}
 
@@ -1197,10 +1154,9 @@ where
 We adjust how we model the current liabilities to better fit Apple's
 historical data.
 
-\subsubsection{Modeling Effective Short-Term
-Debt}\label{modeling-effective-short-term-debt}
+\subsubsection{Modeling Effective Short-Term Debt}
 
-\ul{The Problem}
+\paragraph{The Problem}
 
 A strictly deficit-driven approach calculates new short-term loans as a
 reaction to cash shortfalls. This forces short-term borrowing to zero
@@ -1213,7 +1169,7 @@ The forecasted Current and non-current liabilities thus fall to zero:
 
 \includegraphics[width=\textwidth]{report_latex_media/media/image1.png}
 
-\ul{Defining the Metric}
+\paragraph{Defining the Metric}
 
 Effective short-term debt isolates the operational and short-term
 financing liabilities that scale directly with the size of the business,
@@ -1233,7 +1189,7 @@ Which equates to the core components we are modeling:
 \text{Effective ST Debt}_t = \text{ST Debt}_t + \text{Accrued Expenses}_t + \text{Other Current Liabilities}_t
 \end{equation}
 
-\ul{The Solution \& Implementation}
+\paragraph{The Solution \& Implementation}
 
 To reflect actual corporate financing behavior, effective short-term
 debt is now modeled as a policy-driven metric rather than a
@@ -1241,48 +1197,30 @@ deficit-driven reaction. It is projected as a logit-linear ratio of
 sales, mirroring the methodology used for the cost ratio and target
 liquidity.
 
-\begin{enumerate}
-\def\labelenumi{\arabic{enumi}.}
-\item
-  \textbf{Logit-Linear Trend:} We calculate the target short-term debt
+\paragraph{Logit-Linear Trend} We calculate the target short-term debt
   as a percentage of sales using a sigmoid function over the time index
   t. This utilizes the learned parameters $\alpha$\textsubscript{ST\_Debt} and
   $\beta$\textsubscript{ST\_Debt}:
-\end{enumerate}
 
 \begin{equation}\label{eq:pct_stdebt_sigmoid}
 \text{\%STDebt}_t = \text{sigmoid}(\alpha_{\text{ST\_Debt}} + t \cdot \beta_{\text{ST\_Debt}})
 \end{equation}
 
-\begin{enumerate}
-\def\labelenumi{\arabic{enumi}.}
-\setcounter{enumi}{1}
-\item
-  \textbf{Effective ST Debt Calculation:} The actual target volume is
+\paragraph{Effective ST Debt Calculation} The actual target volume is
   then derived directly from the forecasted sales for that period:
-\end{enumerate}
 
 \begin{equation}\label{eq:eff_st_debt_calc}
 \text{Effective ST Debt}_t = \text{Sales}_t \cdot \text{\%STDebt}_t
 \end{equation}
 
-\begin{enumerate}
-\def\labelenumi{\arabic{enumi}.}
-\setcounter{enumi}{2}
-\item
-  \textbf{Liquidity Cascade:} Because short-term debt is now an
+\paragraph{Liquidity Cascade} Because short-term debt is now an
   established structural policy, it acts as an \emph{input} to the
   long-term liquidity deficit. The calculated effective short-term debt
   funds a portion of the required capital, shifting the role of the
-  purely deficit-driven "plug" entirely to the long-term financing
+  purely deficit-driven ``plug'' entirely to the long-term financing
   variable.
 
-  \begin{enumerate}
-  \def\labelenumii{\arabic{enumii}.}
-  \item
-    \emph{Non-current Liabilities}
-  \end{enumerate}
-\end{enumerate}
+\paragraph{Non-current Liabilities}
 
 Non-current liabilities include the new effective
 LTLoan\textsubscript{t} issued this year, and last year's non-current
@@ -1293,11 +1231,7 @@ liabilities.
 \text{NLiab}_t = \text{Total LT liability}_t \cdot (1 - 1/\text{AvgM})
 \end{equation}
 
-\begin{enumerate}
-\def\labelenumi{\arabic{enumi}.}
-\item
-  \ul{Equity}
-\end{enumerate}
+\subsubsection{Equity}
 
 This year's equity accounts for the additional equity financing this
 year, net income from this year, dividends paid out this year, and stock
@@ -1325,12 +1259,7 @@ We have most of what we need to learn the training variables except
 dividends and income tax, which will come from modeling the net income
 in the income statement.
 
-\begin{enumerate}
-\def\labelenumi{\arabic{enumi}.}
-\setcounter{enumi}{1}
-\item
-  \ul{Income Statement}
-\end{enumerate}
+\subsubsection{Income Statement}
 
 We have all the components needed from the previous sections to
 construct the elements related to net income.
@@ -1398,12 +1327,7 @@ $\text{Dividends}_t = \text{\%PR} \cdot \text{NI}_t$ from \eqref{eq:target_divid
 We now have everything we need to represent every element in the balance
 sheet as a time series.
 
-\begin{enumerate}
-\def\labelenumi{\arabic{enumi}.}
-\setcounter{enumi}{2}
-\item
-  \textbf{Time Series Representation of the Balance Sheet}
-\end{enumerate}
+\subsection{3. Time Series Representation of the Balance Sheet}
 
 We re-write every element in the balance sheet as a time series that
 have been simplified by combining the equations above. The primary
@@ -1495,7 +1419,7 @@ trainable variables and the underlying equations. These constraints are
 implemented natively within the optimizer using TensorFlow Probability
 Bijectors.
 
-\textbf{1. Domain Constraints on Trainable Variables}
+\subsubsection{1. Domain Constraints on Trainable Variables}
 
 \begin{itemize}
 \item
@@ -1529,11 +1453,11 @@ Bijectors.
   even if extrapolated decades into the future.
 \end{itemize}
 
-\textbf{2. Logical Constraints on Equations}
+\subsubsection{2. Logical Constraints on Equations}
 
 \begin{itemize}
 \item
-  \textbf{Non-Negative Borrowing:} A company cannot issue "negative"
+  \textbf{Non-Negative Borrowing:} A company cannot issue ``negative''
   debt to reduce cash. In the Liquidity Budget equations, the issuance
   of new short-term and long-term loans is constrained using a maximum
   function: \$New\textbackslash\_Loan\_t = \textbackslash max(0,
@@ -1793,16 +1717,16 @@ equity will always be satisfied. We can check with test values in our
 simple TensorFlow model.
 
 This forward model has been implemented in Python in
-\textbf{run\_simple\_model\_forecast.py}, which composes
+\texttt{run\_simple\_model\_forecast.py}, which composes
 the modular policy classes from the \texttt{financial\_forecast/} package
 using data from Apple's financial
 statements. The financial statements were first obtained from Yahoo
 finance as suggested by Question 4 (we wrote the script in
-\textbf{yahoofinance.py}), but we could only access past 4 years of
+\texttt{yahoofinance.py}), but we could only access past 4 years of
 data, which is not sufficient for training in the following section. We
 managed to obtain older financial data by directly pulling from Apple's
 10-K filings. The script that we wrote and used for the data extraction
-is found in \textbf{sec-edgar-download-extractor.py.}
+is found in \texttt{sec-edgar-download-extractor.py}.
 
 The following is the output of the code when run with: \texttt{python run\_simple\_model\_forecast.py} :
 
@@ -1813,12 +1737,7 @@ equity identity is satisfied because our model follows the double-entry
 principle with any inflows and outflows on the balance sheet as done by
 \hyperlink{ref:pareja09}{Pareja(09)}.
 
-\begin{enumerate}
-\def\labelenumi{\arabic{enumi}.}
-\setcounter{enumi}{3}
-\item
-  \textbf{Training the Model}
-\end{enumerate}
+\subsection{4. Training the Model}
 
 Out of the variables to be trained, there are quite a few that are
 easily trained independently from other variables by looking at balance
@@ -1902,7 +1821,7 @@ and \%EF concurrently via simple gradient while minimizing mean-square
 error between predicted and actual net income, stockholders equity,
 current liabilities, and non-current liabilities.
 
-The code has been implemented in \textbf{run\_trainable\_model\_forecast\_simple\_policies.py},
+The code has been implemented in \texttt{run\_trainable\allowbreak{}\_model\allowbreak{}\_forecast\allowbreak{}\_simple\allowbreak{}\_policies.py},
 which composes the \texttt{TrainableFinancialModel} with simple policy modules
 and runs the \texttt{PolicyTrainer} and \texttt{StructuralTrainer}. For
 this simple training model, \%AM = 100\% and Purchases are also used
@@ -1911,7 +1830,7 @@ together with Sales as dual driver.
 In order to test the model's prediction capability, we train the
 parameters from Apple's 2018\textasciitilde2024 data, predict 2025 data,
 and compare it with the actual data. The following is the output after
-running \textbf{run\_trainable\_model\_forecast\_simple\_policies.py}:
+running \texttt{run\_trainable\allowbreak{}\_model\allowbreak{}\_forecast\allowbreak{}\_simple\allowbreak{}\_policies.py}:
 
 \includegraphics[width=\textwidth]{report_latex_media/media/image3.png}
 
@@ -1930,12 +1849,7 @@ Our model can also forecast earnings because net income is automatically
 calculated when predicting the elements on the balance sheet, and is
 outputted as ``net\_income'' as shown above.
 
-\begin{enumerate}
-\def\labelenumi{\arabic{enumi}.}
-\setcounter{enumi}{4}
-\item
-  \textbf{Applying Machine Learning}
-\end{enumerate}
+\subsection{5. Applying Machine Learning}
 
 As our model is rather a simple model based on \hyperlink{ref:pareja09}{Pareja(09)}, there is a lot
 of improvements that could make the model more performant. A short list
@@ -2048,12 +1962,12 @@ includes the primary drivers, which are sales and purchases time series,
 and inflation, which is the external environment variable that we
 include in the model for predicting the operating expense.
 
-{\sloppy We implemented the updated Bayesian model in \textbf{run\_trainable\_model\_forecast\_adv\_policies\_w\_bayesianopex.py},
+We implemented the updated Bayesian model in \texttt{run\_trainable\allowbreak{}\_model\allowbreak{}\_forecast\allowbreak{}\_adv\allowbreak{}\_policies\allowbreak{}\_w\allowbreak{}\_bayesianopex.py},
 which composes the \texttt{TrainableFinancialModel} with \texttt{BayesianOpEx},
 \texttt{MonteCarloSimulator}, and all advanced trend-based policies
 (\texttt{TrendLiquidityPolicy}, \texttt{LintnerDividendPolicy}, etc.)
 but with a \texttt{SimpleTax} module (no tax anomalies). The output is reproduced
-below:\par}
+below:
 
 \noindent\rule{\textwidth}{0.4pt}
 
@@ -2131,12 +2045,7 @@ Year | Mean     | 2.5% CI  | 97.5% CI
 \includegraphics[width=\textwidth]{report_latex_media/media/image6.png}
 \includegraphics[width=\textwidth]{report_latex_media/media/image7.png}
 
-\begin{enumerate}
-\def\labelenumi{\arabic{enumi}.}
-\setcounter{enumi}{5}
-\item
-  \textbf{Projected Balance Sheet, Income Statement, and Cash Budget}
-\end{enumerate}
+\subsection{6. Projected Balance Sheet, Income Statement, and Cash Budget}
 
 We describe how we calculate the cash budget and income statement which
 are related to the balance sheet.
@@ -2189,15 +2098,15 @@ Cash Budget has 5 modules: Operating Activities, Investing Activities,
 External Financing, Transactions with Owners, and Discretionary
 Transactions.
 
-\textbf{Module 1: Operating Activities}
+\subsubsection{Module 1: Operating Activities}
 
-\ul{Cash Inflows}
+\paragraph{Cash Inflows}
 
 Inflows from sales
 
 \emph{Total inflows = Inflows from sales}
 
-\ul{Cash Outflows}
+\paragraph{Cash Outflows}
 
 Payments for purchases = COGS
 
@@ -2207,33 +2116,33 @@ Income Tax
 
 \emph{Total outflows = COGS + OpEx + Income Tax}
 
-\ul{Operating Net Cash Balance}
+\paragraph{Operating Net Cash Balance}
 
 = Total inflows -- Total outflows
 
 = Sales -- COGS -- OpEx -- Income Tax
 
-\textbf{Module 2: Investing Activities}
+\subsubsection{Module 2: Investing Activities}
 
-\ul{Cash Inflow}
+\paragraph{Cash Inflow}
 
 \emph{Total inflows = 0}
 
-\ul{Cash Outflow}
+\paragraph{Cash Outflow}
 
 Investment in fixed assets = CapEx
 
 \emph{Total outflows = CapEx}
 
-\ul{Investing Net Cash Balance}
+\paragraph{Investing Net Cash Balance}
 
 = Inflow -- Outflow
 
 = -CapEx
 
-\textbf{Module 3: External Financing}
+\subsubsection{Module 3: External Financing}
 
-\ul{Cash Inflows}
+\paragraph{Cash Inflows}
 
 ST loan
 
@@ -2241,7 +2150,7 @@ LT loan
 
 \emph{Total inflows = ST loan + LT loan}
 
-\ul{Cash Outflows}
+\paragraph{Cash Outflows}
 
 ST principal payment
 
@@ -2254,22 +2163,22 @@ LT interest
 \emph{Total outflows = ST principal + ST interest + LT principal + LT
 interest}
 
-\ul{Financing Net Cash Balance}
+\paragraph{Financing Net Cash Balance}
 
 = Inflow -- Outflow
 
 = ST loan + LT loan -- ST principal -- LT principal -- ST interest -- LT
 interest
 
-\textbf{Module 4: Transactions with Owners}
+\subsubsection{Module 4: Transactions with Owners}
 
-\ul{Cash Inflows}
+\paragraph{Cash Inflows}
 
 Invested equity = Equity financing
 
 \emph{Total Inflows = Invested equity}
 
-\ul{Cash Outflows}
+\paragraph{Cash Outflows}
 
 Dividends from last year
 
@@ -2277,26 +2186,26 @@ Stock Buyback
 
 \emph{Total Outflows = Dividends from last year + Stock buyback}
 
-\ul{Owners' Transaction Net Cash Balance}
+\paragraph{Owners' Transaction Net Cash Balance}
 
 = Inflows -- Outflows
 
 = Equity financing -- Dividends from last year -- Stock buyback
 
-\textbf{Module 5: Discretionary Transactions}
+\subsubsection{Module 5: Discretionary Transactions}
 
-\ul{Cash Inflows}
+\paragraph{Cash Inflows}
 
 Return from ST investments
 
 \emph{Total inflows = Return from ST investments}
 
-\ul{Cash Outflows}
+\paragraph{Cash Outflows}
 
 No outflow because our model's policy allocates a fraction of total
 liquidity to ST investments instead of allocating excess cash to it
 
-\ul{Discretionary Transaction Net Cash Balance}
+\paragraph{Discretionary Transaction Net Cash Balance}
 
 = Inflows -- Outflows
 
@@ -2312,214 +2221,9 @@ Statement, and Cash Budget is attached below:
 \includegraphics[width=\textwidth]{report_latex_media/media/image10.png}
 \includegraphics[width=\textwidth]{report_latex_media/media/image11.png}
 
-\textbf{\hfill\break
-}
+\section{Part 2}
 
-\textbf{Reviewer's Feedback}
-
-\emph{(1) You identified the principle of ``no plug'' and some
-accounting identities, such as non-current assets (NCA) being a function
-of depreciation and capex:}
-
-\emph{NCA\_t = NCA\_t-1 -- Depreciation\_t + CapEx\_t}
-
-\emph{However, later, while formulating the time-series model, you
-consider the non-current asset at time t to be driven by a ratio:}
-
-\emph{NCA\_t = NCA\_t-1 * (1 + \%AG)}
-
-\emph{Is it possible to design a workflow that fully respects the
-accounting identities (like the first equation) and can be driven by
-drivers?}
-
-\ul{Response:} Thank you for catching this mistake. This was a typo in
-the report; the actual script had the correct relationship of CapEx\_t =
-\%AG * Sales\_t . We fixed the typo in the report
-
-\emph{(2) What is the difference between the FIFO and LIFO principles in
-accounting? Under what circumstances will these two accounting choices
-make a difference? Is it possible to avoid using COGS as a plug?}
-
-\ul{Response:} FIFO (First-In, First-Out): Under FIFO, the oldest
-inventory costs are matched against current sales revenues.
-
-LIFO (Last-In, First-Out): Under LIFO, the most recent inventory costs
-are matched against current sales revenues.
-
-The most difference can arise from these two accounting standards when
-there is a rapid inflationary (deflationary) environment. Under FIFO,
-the cost ratio will be smoother and slightly lower (higher) than the
-actual current cost of replacement. Under LIFO, the cost ratio will be
-more volatile since the recent inventory cost is used, and it will
-tightly track the inflation (deflation) and will squeeze (grow) the
-margin immediately. Under inflation = 0\%, FIFO and LIFO should equal
-each other because old cost = new cost. Under high inflation, FIFO
-profit \textgreater{} LIFO profit.
-
-In our model, we avoid using COGS as a plug by updating it so that we
-learn the cost ratio (CR\textsubscript{t}) directly from the historical
-COGS and sales data by modeling cost ratio as a logit and learning the
-underlying parameters $\alpha$ and $\beta$ to ensure positivity :
-
-$\text{logit}(\text{CR}_t) = \ln(\text{CR}_t / (1 - \text{CR}_t)) = \alpha + \beta \cdot t$ (from \eqref{eq:cost_ratio_logit})
-
-$\text{CR}_t = \text{COGS}_t / \text{Sales}_t$
-(from \eqref{eq:cost_ratio})
-
-(3) Similar to (1), can you list out all the entities (rows) in the
-income statement, cash budget, and balance sheet (simplified versions
-are fine)? Then analyze how these three statements connect with each
-other. You may start with revenue on the income statement.
-
-Response: We now include the 10-year forecasted Balance Sheet, Income
-Statement, and Cash Budget in \textbf{6. Projected Balance Sheet, Income
-Statement, and Cash Budget.}
-
-\emph{(4) Advance payment is defined as: AdvPP\_t = \%AdvPP *
-Purchase\_t+1}
-
-\emph{Is it possible to remove the future dependency on this variable?
-It may break causal timing and introduce leakage during training. Are
-there alternative approaches to model this term?}
-
-\ul{Response:} We updated our model such that the advance payments for
-purchases (AdvPP) are proportional to this year's purchases instead of
-next year, with the justification:
-
-\begin{itemize}
-\item
-  From 2.1.3. Advance Payments for Purchases : ``Advance payments to
-  suppliers for purchases (\$AdvPP\$) can be modeled as strictly
-  proportional to the total purchases made during the current year. This
-  approach relies on the simplifying assumption that current purchasing
-  volumes serve as a reliable proxy for near-term future demand.''
-\end{itemize}
-
-Same is applied for advance payments from customers for sales (AdvPS):
-
-\begin{itemize}
-\item
-  From 2.3.2. Advance Payments for Future Sales: ``Advance payments
-  received from customers for future sales (\$AdvPC\$) are modeled as a
-  direct proportion of the current year\textquotesingle s total sales.
-  This assumes that the volume of upfront customer payments scales
-  linearly with overall revenue generation.''
-\end{itemize}
-
-\emph{(5) For CapEx, it's great that you split this term into
-maintenance capex and growth capex:}
-
-\emph{CapEx\_t = MaintenanceCapex\_t + GrowthCapex\_t}
-
-\emph{You further assume maintenance capex is tied to depreciation. This
-is a common approach when forecasting future cash flows by assuming a
-firm is in a steady state. What if the firm is not in a steady state?}
-
-\ul{Response:} We updated our model to handle the case where the asset
-replacement rate is not unitary (= 1.0). We reflect that change in the
-report as well:
-
-\begin{itemize}
-\item
-  From \emph{Non-Current Assets (NCA):} ``To model CapEx, we diverge
-  from a rigid steady-state assumption where maintenance perfectly
-  offsets depreciation. Instead, we decompose CapEx into a maintenance
-  component (scaled by a trainable parameter, \%AM, to reflect partial,
-  full, or inflationary replacement) and a growth component driven by
-  sales expansion:
-\end{itemize}
-
-$\text{CapEx}_t = \text{\%AM} \cdot \text{Depreciation}_t + \text{\%AG} \cdot \text{Sales}_t$ \eqref{eq:capex}''
-
-\emph{(6) In your report, the financing dynamics on debt are as
-follows:}
-
-\emph{Debt\_t-1 =\textgreater{} Interest\_t, PrincipalDue\_t
-=\textgreater{} deficit\_t =\textgreater{} Debt\_t}
-
-\emph{Can you plot the amount of debt and see whether the outcome is
-sensible?}
-
-\noindent\begin{minipage}{0.48\textwidth}\centering\includegraphics[width=\linewidth]{report_latex_media/media/image12.png}\end{minipage}\hfill\begin{minipage}{0.48\textwidth}\centering\includegraphics[width=\linewidth]{report_latex_media/media/image13.png}\end{minipage}
-
-\ul{Response:} We have plotted the forecasted debt levels (see above).
-The outcome is sensible and mathematically stable. We verified that the
-model does not fall into an explosive \textquotesingle debt
-spiral.\textquotesingle{} The financing dynamics converge realistically.
-
-Specifically for Apple, the model accurately captures two key trends:
-
-\begin{enumerate}
-\def\labelenumi{\arabic{enumi}.}
-\item
-  Short-Term Debt: The model predicts short-term debt scaling
-  proportionally with Sales. This correctly reflects
-  Apple\textquotesingle s real-world strategy of utilizing revolving
-  credit and commercial paper for working capital needs, despite
-  possessing a large cash balance.
-\item
-  Long-Term Debt: The forecast accurately continues the historical trend
-  of Apple slowly paying down its non-current liabilities.Ultimately,
-  the plot confirms that the endogenous deficit calculation handles debt
-  rollover gracefully without compounding errors.
-\end{enumerate}
-
-\emph{(7) Some rules seem a bit ad hoc. Is it possible to tie this to
-terms with a stronger financial relationship?}
-
-\ul{Response:} We can redefine our training variables from arbitrary
-percentages to these time-based efficiency metrics.
-
-Receivables: Instead of \%AR, we can train a target DSO (Days Sale
-Outstanding) parameter.
-
-AR\textsubscript{t} = DSO / 365 * Sales\textsubscript{t}
-
-Inventory: Inventory is a function of the cost to produce goods, not the
-final sales price. Tie it to COGS using DSI (Days Sales of Inventory)
-
-Inv\textsubscript{t} = DSI / 365 * COGS\textsubscript{t}
-
-Payables: We can use DPO (Days Purchases Outstanding) instead of \%AP:
-
-AP\textsubscript{t} = DPO / 365 * Purchases\textsubscript{t}
-
-(8) Can you specify the possible constraints for the variables and
-equations? Please add them to the report and implement them in the code.
-
-\ul{Response:} Thank you. We have added a new section \ul{Parameter
-Constraints and Bounds}
-
-\emph{(9) After you have trained the model, can you also perform
-inference and simulate a firm's financial statements for several years?}
-
-\ul{Response:} We now include the 10-year forecasted Balance Sheet,
-Income Statement, and Cash Budget in \textbf{6. Projected Balance Sheet,
-Income Statement, and Cash Budget.}
-
-(10) Remember to write test cases.
-
-Response: Thank you for the reminder. We wrote 87 test cases across 8 test files
-covering all modules in the codebase:
-
-\begin{itemize}
-\item \texttt{test\_simple\_model\_forecast.py} -- forward simulation model
-\item \texttt{test\_trainable\_financial\_model\_simpleopex.py} -- trainable model with deterministic OpEx
-\item \texttt{test\_trainable\_financial\_model\_bayesianopex.py} -- trainable model with Bayesian OpEx
-\item \texttt{test\_llm\_forecast.py} -- LLM-only balance sheet forecasting
-\item \texttt{test\_reasoning\_prompt.py} -- CEO/CFO recommendation prompt
-\item \texttt{test\_extraction.py} -- financial statement PDF extraction
-\item \texttt{test\_statement\_normalization.py} -- LLM field normalization
-\item \texttt{test\_tax\_anomalies.py} -- tax anomaly extraction and model integration
-\end{itemize}
-
-\textbf{Part 2}
-
-\begin{enumerate}
-\def\labelenumi{\alph{enumi})}
-\item
-  \textbf{LLM Selection and Infrastructure Setup}
-\end{enumerate}
+\subsection{a) LLM Selection and Infrastructure Setup}
 
 My favorite LLM is DeepSeek V3.2 for reasoning which has 128k context
 window and gpt-5-nano for non-reasoning task which has 400k context
@@ -2537,12 +2241,7 @@ variable in a .env file, with its content being:
 We have included the .env file in the zipped file attached with our
 report submission.
 
-\begin{enumerate}
-\def\labelenumi{\alph{enumi})}
-\setcounter{enumi}{1}
-\item
-  \textbf{LLM-Only Balance Sheet Forecasting}
-\end{enumerate}
+\subsection{b) LLM-Only Balance Sheet Forecasting}
 
 We can use the same input data from part 1 and feed it to DeepSeekV3.2
 to forecast the balance sheet, as implemented in
@@ -2610,13 +2309,7 @@ equity, so the script's procedure that ensures the identity results in
 negative equity value. It is clear that LLM-only forecasting of balance
 sheet fields is severely inadequate.
 
-\begin{enumerate}
-\def\labelenumi{\alph{enumi})}
-\setcounter{enumi}{2}
-\item
-  \textbf{Combining LLM with the Balance Sheet Forecasting Model (Tax
-  Anomalies)}
-\end{enumerate}
+\subsection{c) Combining LLM with the Balance Sheet Forecasting Model (Tax Anomalies)}
 
 Is it possible to combine LLM with the balance sheet forecasting model?
 Yes. When we look at the forecasted model, we see that one of the major
@@ -2651,7 +2344,7 @@ We can feed the 10-K to LLM and ask it to identify pages that contain
 the one-off tax information, and extract this data in JSON format for
 model consumption:
 
-Script: \textbf{run\_tax\_anomaly\_extraction.py} (using \texttt{TaxAnomalyExtractor} from \texttt{financial\_forecast/extraction/})
+Script: \texttt{run\_tax\_anomaly\_extraction.py} (using \texttt{TaxAnomalyExtractor} from \texttt{financial\_forecast/extraction/})
 
 \begin{lstlisting}[style=python]
 DEFAULT_SELECTION_PROMPT = (
@@ -2719,20 +2412,19 @@ JSON output:
 }
 \end{lstlisting}
 
+\begin{sloppypar}
 We update our balance sheet forecasting script to include the
 tax\_onetime\_amount for better learning of the baseline tax rate. We
 run
-\textbf{run\_trainable\_model\_forecast\_adv\_policies\_w\_bayesianopex\_taxanomaly.py},
+\texttt{run\_trainable\allowbreak{}\_model\allowbreak{}\_forecast\allowbreak{}\_adv\allowbreak{}\_policies\allowbreak{}\_w\allowbreak{}\_bayesianopex\allowbreak{}\_taxanomaly.py},
 which injects a \texttt{TaxWithAnomalies(data.tax\_onetime\_payments)}
 module into the model instead of \texttt{SimpleTax()}.
+\end{sloppypar}
 
 Effective tax rate drops from 17\% to 15.5\%! And the learning loss is
 smaller for the effective tax rate \%IT:
 
-\ul{\hfill\break
-}
-
-\ul{Before:}
+\paragraph{Before}
 
 \includegraphics[width=\textwidth]{report_latex_media/media/image20.png}
 
@@ -2744,10 +2436,7 @@ Before accounting for tax anomalies. The predicted net income is 1.09e11
 dollars, which is off by 2.68\%, or 3 billion dollars, from the actual
 value of 1.12e11 dollars.
 
-\ul{\hfill\break
-}
-
-\ul{After:}
+\paragraph{After}
 
 \includegraphics[width=\textwidth]{report_latex_media/media/image22.png}
 
@@ -2760,102 +2449,69 @@ After accounting for tax anomalies. The predicted net income in 2025 is
 the actual value of 1.12e11 dollars! The income tax MSE loss during
 training also drops by an order of magnitude.
 
-\begin{enumerate}
-\def\labelenumi{\alph{enumi})}
-\setcounter{enumi}{3}
-\item
-  \textbf{Strategic Recommendations for CEO/CFO}
-\end{enumerate}
+\subsection{d) Strategic Recommendations for CEO/CFO}
 
 For recommendation to CEO/CFO given our result, we feed the following
 prompt, and attach the historical and 10-year forecast of balance sheet
 and income statement:
 
-Prompt = ``\,''\,''
+\begin{lstlisting}[style=python]
+CEO_ADVISOR_PROMPT = (
+    "You are an elite Corporate Finance Advisor and Strategic Capital "
+    "Expert at a top-tier investment bank. You specialize in advising "
+    "the CEOs and CFOs of mature, cash-generative mega-cap technology "
+    "firms on capital structure optimization, liquidity management, "
+    "and capital allocation.\n\n"
 
-You are an elite Corporate Finance Advisor and Strategic Capital Expert
-at a top-tier investment bank. You specialize in advising the CEOs and
-CFOs of mature, cash-generative mega-cap technology firms on capital
-structure optimization, liquidity management, and capital allocation.
+    "Context & Task:\n"
+    "I will provide you with two sets of financial data for a target "
+    "company:\n"
+    "  Historical Baseline: Actual financial performance from recent "
+    "years.\n"
+    "  ML Forecast: A multi-year financial forecast (Balance Sheet, "
+    "Income Statement, and Cash Budget) generated by an advanced "
+    "Monte Carlo machine learning ensemble.\n"
+    "Your task is to analyze the historical data against the forecast "
+    "to identify the three most critical financial leverage points "
+    "(risks or opportunities) over the forecasted period.\n\n"
 
-Context \& Task:
+    "STRICT GUARDRAILS (CRITICAL):\n"
+    "  NO OPERATIONAL ADVICE: Do not recommend operational, marketing,"
+    " or business strategy changes.\n"
+    "  STRICTLY FINANCIAL DOMAIN: Recommendations must be confined to "
+    "Capital Structure (debt/equity mix, WACC), Liquidity & Treasury "
+    "(working capital, commercial paper), and Capital Allocation "
+    "(dividends, share repurchases, CapEx).\n"
+    "  MANDATORY EVIDENCE: You cannot make a claim without citing "
+    "specific numbers from the provided tables.\n\n"
 
-I will provide you with two sets of financial data for a target company:
+    "Analytical Heuristics (The Mega-Cap Tech Lens):\n"
+    "  Historical Benchmarking: Always contextualize the forecast by "
+    "comparing it to the historical baseline. Identify structural "
+    "breaks or trend accelerations.\n"
+    "  Strategic Leverage vs. Distress: Do not penalize shrinking "
+    "Equity from aggressive buybacks -- treat as WACC optimization, "
+    "not distress, if FCF remains strong.\n"
+    "  Net Debt Focus: Evaluate Cash + Marketable Securities against "
+    "Liabilities; assess if debt is easily serviced.\n"
+    "  Operating Leverage: Note if Revenue/NI grows faster or slower "
+    "than historical OpEx.\n\n"
 
-Historical Baseline: Actual financial performance from recent years.
+    "Output Format:\n"
+    "Provide exactly 3 strategic priorities. For each:\n"
+    "  Observation: [Quantitative trend, forecast vs. historical]\n"
+    "  Implication: [Financial risk or WACC opportunity]\n"
+    "  Recommendation: [Precise corporate finance action]\n\n"
 
-ML Forecast: A multi-year financial forecast (Balance Sheet, Income
-Statement, and Cash Budget) generated by an advanced Monte Carlo machine
-learning ensemble.
-
-Your task is to analyze the historical data against the forecast to
-identify the three most critical financial leverage points (risks or
-opportunities) over the forecasted period.
-
-STRICT GUARDRAILS (CRITICAL):
-
-NO OPERATIONAL ADVICE: You are strictly forbidden from recommending
-operational, marketing, or business strategy changes. Do not suggest
-"launching new products," "increasing sales efforts," or "improving
-supply chain efficiency."
-
-STRICTLY FINANCIAL DOMAIN: Your recommendations must be confined purely
-to Corporate Finance: Capital Structure (debt/equity mix, WACC),
-Liquidity \& Treasury (working capital, commercial paper), and Capital
-Allocation (dividends, share repurchases, CapEx).
-
-MANDATORY EVIDENCE: You cannot make a claim without citing specific
-numbers from the provided tables.
-
-Analytical Heuristics (The Mega-Cap Tech Lens \& Trend Analysis):
-
-Historical Benchmarking (Crucial): Always contextualize the forecast by
-comparing it to the historical baseline. Identify structural breaks
-(where the forecast deviates significantly from historical trends) or
-trend accelerations.
-
-Strategic Leverage vs. Distress: Do not penalize shrinking Accounting
-Equity. If Equity is declining due to aggressive Stock Buybacks and
-Dividends, treat this as highly efficient Capital Return and WACC
-optimization---NOT financial distress---provided Net Income and Free
-Cash Flow remain historically strong.
-
-Net Debt Focus: Evaluate liquidity by looking at Cash + Marketable
-Securities against Liabilities. Mega-cap tech companies often issue debt
-simply to lower their cost of capital; evaluate if the forecasted debt
-load is easily serviced by operating cash flows relative to historical
-interest coverage.
-
-Operating Leverage: Note if the forecast predicts Revenue and Net Income
-growing at a faster or slower rate than historical Operating Expenses
-(OpEx).
-
-Output Format:
-
-Provide exactly 3 strategic priorities. For each, use this exact
-structure:
-
-Observation: {[}State the specific quantitative trend, explicitly
-contrasting the forecasted figures against the historical baseline. Cite
-exact numbers and years{]}.
-
-Implication: {[}Explain the financial/credit risk or the WACC
-optimization opportunity this trend creates for the balance sheet{]}.
-
-Recommendation: {[}State the precise corporate finance action the
-CFO/CEO must execute to manage this specific trajectory{]}.
-
-Data Input:
-
-\emph{{[}Insert Historical Tables / JSON here{]}}
-
-\emph{{[}Insert ML Forecast Tables / JSON here{]}}
-
-``\,''\,''
+    "Data Input:\n"
+    "{historical_tables}\n\n"
+    "{forecast_tables}"
+)
+\end{lstlisting}
 
 The prompt, together with the historical and forecast markdown tables
 from the JSON report artifact exported by \texttt{ForecastPipeline}, is
-sent to our reasoning model via \textbf{run\_recommendation\_to\_ceo.py}.
+sent to our reasoning model via \texttt{run\_recommendation\_to\_ceo.py}.
 This script loads the self-contained \texttt{forecast\_report.json},
 constructs the prompt using the \texttt{DeepseekCEOAdvisor} class (which
 extends the \texttt{Advisor} ABC from \texttt{financial\_forecast/reporting/advisor.py}),
@@ -2864,73 +2520,78 @@ and calls the Azure DeepSeek endpoint with greedy decoding
 
 And here is the recommendation that our reasoning model generated:
 
-\subsubsection{\texorpdfstring{\textbf{Analysis of Financial Leverage
-Points}}{Analysis of Financial Leverage Points}}\label{analysis-of-financial-leverage-points}
+\begin{llmoutput}[LLM-Generated Recommendation: Analysis of Financial Leverage Points]
 
-\textbf{Observation:}~The forecast projects a significant and
-accelerating decline in Stockholders\textquotesingle{} Equity, from
+\paragraph{Priority 1: Capital Return Sustainability}\mbox{}\\
+\textit{Observation.}~The forecast projects a significant and
+accelerating decline in Stockholders'{} Equity, from
 \$70.7B in FY2025 to \$40.8B in FY2034, while Net Income grows from
 \$111.1B to \$215.4B over the same period. This is a structural break
-from the historical baseline (2017-2023), where Equity averaged \$78.5B
+from the historical baseline (2017--2023), where Equity averaged \$78.5B
 and showed no consistent downward trend, even as Net Income grew.
 
-\textbf{Implication:}~This trajectory indicates an extremely aggressive
+\textit{Implication.}~This trajectory indicates an extremely aggressive
 capital return policy is embedded in the forecast, far exceeding
 historical levels. While this optimizes WACC by shrinking the equity
 base, it creates a critical dependency on continuous, high levels of
 free cash flow. The balance sheet is being deliberately levered,
 shifting from an equity-heavy to a more debt-dependent structure.
 
-\textbf{Recommendation:}~The CFO must formally establish and communicate
+\textit{Recommendation.}~The CFO must formally establish and communicate
 a~\textbf{Sustainable Capital Return Framework}. This framework should
 define the maximum allowable annual capital return (dividends +
 buybacks) as a percentage of forward-looking Free Cash Flow (e.g.,
-80-90\%), ensuring it does not jeopardize the credit rating or the
+80--90\%), ensuring it does not jeopardize the credit rating or the
 ability to service the forecasted rising debt load. This moves the
 policy from implicit to explicit, managing investor expectations and
 credit agency concerns.
 
-\textbf{Observation:}~The forecast shows a dramatic increase
+\noindent\rule{\linewidth}{0.3pt}
+
+\paragraph{Priority 2: Refinancing and Liquidity Risk}\mbox{}\\
+\textit{Observation.}~The forecast shows a dramatic increase
 in~\textbf{Effective Short-Term Debt}, which balloons from \$87.2B in
 FY2025 to \$190.3B by FY2034. Concurrently, highly liquid assets (Cash +
 Marketable Securities) are projected to decline from a combined \$62.3B
 to \$60.2B. This creates a rising~\textbf{Net Debt}~position.
-Historically (2020-2023), the company maintained a robust liquidity
+Historically (2020--2023), the company maintained a robust liquidity
 buffer, with Cash + Securities averaging \$55.8B against much lower debt
 levels.
 
-\textbf{Implication:}~The company is forecasted to become significantly
+\textit{Implication.}~The company is forecasted to become significantly
 more reliant on short-term wholesale funding. This introduces
 substantial refinancing and interest rate risk, especially as interest
 payments are projected to rise from \$4.5B to \$7.5B. The shrinking
 liquidity coverage ratio could pressure credit spreads and commercial
 paper rates during market stress.
 
-\textbf{Recommendation:}~Execute a~\textbf{Strategic Liability
+\textit{Recommendation.}~Execute a~\textbf{Strategic Liability
 Management Exercise}. The Treasury must term out a significant portion
 of the forecasted short-term debt into longer-dated fixed-rate bonds.
 This locks in historically low(er) long-term rates for a mega-cap tech
 issuer, reduces refinancing risk, and better matches the duration of the
-company\textquotesingle s long-lived assets. Concurrently, establish a
+company's long-lived assets. Concurrently, establish a
 minimum liquidity covenant (e.g., Cash + Securities $\geq$ 1.0x ST Debt) for
 internal risk management.
 
-\textbf{Observation:}~The forecast predicts a powerful~\textbf{positive
+\noindent\rule{\linewidth}{0.3pt}
+
+\paragraph{Priority 3: Operating Leverage and Capital Allocation}\mbox{}\\
+\textit{Observation.}~The forecast predicts a powerful~\textbf{positive
 operating leverage}~trend. From FY2025 to FY2034, Revenue grows by
 46.5\% (\$416B to \$610B), while the combined growth of COGS and OpEx is
 only 39.5\%. This divergence accelerates EBIT margin expansion. This is
-a continuation but acceleration of a historical trend; from 2017-2023,
+a continuation but acceleration of a historical trend; from 2017--2023,
 Revenue grew 47.2\% while COGS+OpEx grew 45.8\%.
 
-\textbf{Implication:}~This trajectory will generate super-linear growth
+\textit{Implication.}~This trajectory will generate super-linear growth
 in Free Cash Flow, the fundamental driver for all capital allocation
 decisions (debt service, buybacks, dividends). It provides immense
 balance sheet flexibility and debt capacity. However, it also raises the
 strategic opportunity cost of holding excess, low-yielding cash on the
 balance sheet.
 
-\begin{quote}
-\textbf{Recommendation:}~Initiate a~\textbf{Dynamic Share Repurchase
+\textit{Recommendation.}~Initiate a~\textbf{Dynamic Share Repurchase
 Program}~tied to Free Cash Flow Surplus. Instead of a fixed buyback
 amount, the program should automatically allocate a percentage of
 quarterly FCF in excess of a pre-determined threshold (e.g., FCF above
@@ -2938,48 +2599,10 @@ levels needed for debt service and a baseline dividend) to repurchases.
 This mechanism directly links the benefit of operating leverage to
 per-share earnings accretion and WACC optimization, while maintaining a
 cash safety net.
-\end{quote}
 
-\textbf{Modular Architecture and Forecast Report Pipeline}
+\end{llmoutput}
 
-The codebase follows a modular, object-oriented architecture. All
-forecast logic lives in the \texttt{financial\_forecast/} Python package,
-organized into sub-packages:
-
-\begin{itemize}
-\item \texttt{models/} -- composable financial model with pluggable policy
-  modules (\texttt{BaseFinancialModel}, \texttt{TrainableFinancialModel}),
-  each module typed against its abstract base class (e.g.,
-  \texttt{OpExModule}, \texttt{LiquidityPolicy}, \texttt{DividendPolicy},
-  \texttt{DebtPolicy}, \texttt{SimpleTax})
-\item \texttt{training/} -- \texttt{ForecastPipeline} orchestrator,
-  \texttt{PolicyTrainer}, \texttt{StructuralTrainer}
-\item \texttt{inference/} -- \texttt{DeterministicSimulator},
-  \texttt{MonteCarloSimulator}, forecast driver models, plotting
-\item \texttt{extraction/} -- LLM-based PDF extraction, normalization,
-  ratio calculation, hallucination analysis
-\item \texttt{reporting/} -- \texttt{TableFormatter} ABC with
-  \texttt{MarkdownTableFormatter}, and \texttt{Advisor} ABC with
-  \texttt{DeepseekCEOAdvisor} for LLM-based CEO recommendations
-\item \texttt{data/} -- \texttt{HistoricalDataLoader} and per-company
-  data modules
-\item \texttt{serialization/} -- \texttt{.npz} parameter save/load
-\item \texttt{clients/} -- \texttt{AzureLLMClient} for Azure-hosted LLM
-  endpoints
-\end{itemize}
-
-The \texttt{ForecastPipeline} class automatically exports a self-contained
-JSON report (\texttt{forecast\_report.json}) containing historical and
-forecast markdown tables, model metadata, and a reference to the trained
-parameters file. This JSON artifact is consumed by
-\texttt{run\_recommendation\_to\_ceo.py} for downstream LLM analysis,
-decoupling the training/forecast stage from the LLM recommendation stage.
-
-All method signatures throughout the package use Python type hints,
-and each entry-point \texttt{run\_*.py} script is a thin orchestrator
-that wires together the modular components.
-
-\textbf{e, f, g) Financial Ratios and Automated Extraction Pipeline}
+\subsection{e, f, g) Financial Ratios and Automated Extraction Pipeline}
 
 We need to calculate cost-to-income, quick ratio, debt-to-equity ratio,
 debt-to-assets ratio, debt-to-capital ratio, debt-to-EBITDA ratio, and
@@ -2994,7 +2617,6 @@ interest coverage ratio:
 \begin{quote}
 = Describes company's operating efficiency. Operating Expense includes
 cost of revenue.
-\end{quote}
 
 \begin{itemize}
 \item
@@ -3005,6 +2627,7 @@ cost of revenue.
   operating and other expenses'' and ``Automotive and other selling,
   general and administrative expense''
 \end{itemize}
+\end{quote}
 
 \begin{enumerate}
 \def\labelenumi{\arabic{enumi}.}
@@ -3014,6 +2637,7 @@ cost of revenue.
   + Accounts Receivable) / Current Liabilities
 \end{enumerate}
 
+\begin{quote}
 = Ability to meet short-term liabilities with the most liquid assets
 
 \begin{itemize}
@@ -3022,6 +2646,7 @@ cost of revenue.
   Market Securities}, \textbf{Accounts Receivable}, and \textbf{Current
   Liabilities} from \textbf{Balance Sheet}
 \end{itemize}
+\end{quote}
 
 \begin{enumerate}
 \def\labelenumi{\arabic{enumi}.}
@@ -3031,11 +2656,13 @@ cost of revenue.
   Equity
 \end{enumerate}
 
+\begin{quote}
 \begin{itemize}
 \item
   LLM to extract \textbf{Total Debt} (including short-term and long-term
   debts) and \textbf{Total Equity} from \textbf{Balance Sheet}
 \end{itemize}
+\end{quote}
 
 \begin{enumerate}
 \def\labelenumi{\arabic{enumi}.}
@@ -3045,11 +2672,13 @@ cost of revenue.
   Assets
 \end{enumerate}
 
+\begin{quote}
 \begin{itemize}
 \item
   Total Debt already extracted. LLM to extract \textbf{Total Assets}
   from \textbf{Balance Sheet}
 \end{itemize}
+\end{quote}
 
 \begin{enumerate}
 \def\labelenumi{\arabic{enumi}.}
@@ -3059,10 +2688,12 @@ cost of revenue.
   (Short-Term Debt + Long-Term Debt + Total Equity)
 \end{enumerate}
 
+\begin{quote}
 \begin{itemize}
 \item
   Total Debt and Total Equity already extracted.
 \end{itemize}
+\end{quote}
 
 \begin{enumerate}
 \def\labelenumi{\arabic{enumi}.}
@@ -3071,6 +2702,7 @@ cost of revenue.
   Debt-to-EBITDA ratio = (Short-Term Debt + Long-Term Debt) / EBITDA
 \end{enumerate}
 
+\begin{quote}
 = How many years it would take for a company to pay back its debt using
 its EBITDA
 
@@ -3082,6 +2714,7 @@ its EBITDA
   \textbf{Cash Flows} to calculate EBITDA = Net Income + Interest
   Expenses + Taxes + Depreciation + Amortization
 \end{itemize}
+\end{quote}
 
 \begin{enumerate}
 \def\labelenumi{\arabic{enumi}.}
@@ -3090,6 +2723,7 @@ its EBITDA
   Interest Coverage ratio = EBIT / Interest Expense
 \end{enumerate}
 
+\begin{quote}
 = How easily a company can pay interest on its outstanding debt
 
 \begin{itemize}
@@ -3097,13 +2731,11 @@ its EBITDA
   Interest Expense already extracted. Calculate EBIT = Net Income +
   Interest Expenses + Taxes
 \end{itemize}
+\end{quote}
 
-\textbf{\hfill\break
-}
+\subsubsection{List of Fields to Be Extracted}
 
-\textbf{List of fields to be extracted:}
-
-\ul{Balance Sheet}
+\paragraph{Balance Sheet}
 
 \begin{itemize}
 \item
@@ -3122,7 +2754,7 @@ its EBITDA
   Total Assets
 \end{itemize}
 
-\ul{Income Statement}
+\paragraph{Income Statement}
 
 \begin{itemize}
 \item
@@ -3137,7 +2769,7 @@ its EBITDA
   Interest Expenses
 \end{itemize}
 
-\ul{Cash Flows}
+\paragraph{Cash Flows}
 
 \begin{itemize}
 \item
@@ -3223,11 +2855,13 @@ similar to how chain-of-thought prompting improves output quality
 feeding it to the LLM to extract the financial fields, we prevent
 context dilution which is known to degrade output quality \hyperlink{ref:liu23}{[Liu(23)]}.
 
-\textbf{\ul{run\_statement\_extraction.py}} (using \texttt{FinancialStatementExtractor} from \texttt{financial\_forecast/extraction/})
+\subsubsection{run\_statement\_extraction.py}
 
-\textbf{Primary financial statement extraction:}
+Using \texttt{FinancialStatementExtractor} from \texttt{financial\_forecast/extraction/}.
 
-\ul{Step 1: Page number identifying step}
+\paragraph{Primary financial statement extraction}
+
+\paragraph{Step 1: Page number identifying step}
 
 \begin{lstlisting}[style=python]
 prompt = (
@@ -3254,7 +2888,7 @@ Where:
   extracted with pdfplumber
 \end{itemize}
 
-\ul{Step 2: Table extraction step}
+\paragraph{Step 2: Table extraction step}
 
 \begin{lstlisting}[style=python]
 prompt = (
@@ -3279,9 +2913,9 @@ Output from Step 2:
 
 \includegraphics[width=3.94631in,height=4.18705in]{report_latex_media/media/image27.png}
 
-\textbf{Supplementary tables extraction:}
+\paragraph{Supplementary tables extraction}
 
-\ul{Step 3: Page number identifying step}
+\paragraph{Step 3: Page number identifying step}
 
 \begin{lstlisting}[style=python]
 supplementary_query = (
@@ -3318,7 +2952,7 @@ Where:
   extracted with pdfplumber
 \end{itemize}
 
-\ul{Step 4: Table extraction step}
+\paragraph{Step 4: Table extraction step}
 
 \begin{lstlisting}[style=python]
 prompt = (
@@ -3367,10 +3001,7 @@ Output from Step 4:
 \includegraphics[width=\textwidth]{report_latex_media/media/image32.png}
 \includegraphics[width=\textwidth]{report_latex_media/media/image33.png}
 
-\ul{\hfill\break
-}
-
-\ul{Step 5: Extracting relevant fields as JSON for ratio calculation}
+\paragraph{Step 5: Extracting relevant fields as JSON for ratio calculation}
 
 Then, from this final extracted information containing primary and
 supplementary tables, we extract the relevant elements from each
@@ -3578,7 +3209,7 @@ prompt = (
 
 Output example for GM's 2023 annual report:
 
-\ul{Before: LLM attempts to add the total debt by itself}
+\paragraph{Before: LLM attempts to add the total debt by itself}
 
 \begin{lstlisting}[style=json]
 {
@@ -3596,7 +3227,7 @@ Output example for GM's 2023 annual report:
 },
 \end{lstlisting}
 
-\ul{After: LLM lists out all the original elements without summation}
+\paragraph{After: LLM lists out all the original elements without summation}
 
 \begin{lstlisting}[style=json]
 {
@@ -3639,7 +3270,7 @@ its hallucination rate, we repeated Step 5 (i.e., extracting json from
 financial statements for financial ratio calculations) for 101 runs and
 plotted each field value vs run using the following scripts:
 
-Run multi-run normalization via \textbf{run\_statement\_normalization\_multi.py},
+Run multi-run normalization via \texttt{run\_statement\allowbreak{}\_normalization\allowbreak{}\_multi.py},
 which invokes the \texttt{StatementNormalizer} and
 \texttt{MedianRatioCalculator} from \texttt{financial\_forecast/extraction/}:
 
@@ -3766,7 +3397,7 @@ After obtaining the correct field values, calculating the various
 financial ratios is straightforward. We write a Python script for the
 calculation, which gives us definite results. The ratio calculation
 runs automatically after normalization via
-\textbf{run\_ratio\_calculation.py} (using \texttt{RatioCalculator} from
+\texttt{run\_ratio\_calculation.py} (using \texttt{RatioCalculator} from
 \texttt{financial\_forecast/extraction/statement\_ratios.py})
 
 Calculated fields and financial ratios for GM are as follows for 2022
@@ -3843,7 +3474,7 @@ and 2023 in the 2023 annual report:
 }
 \end{lstlisting}
 
-\textbf{h, i) Applicability to Other Annual Reports}
+\subsection{h, i) Applicability to Other Annual Reports}
 
 Our script works for other annual reports as well, including LVMH,
 Tencent, Alibaba, JPMorgan Chase, ExxonMobil, Volkswagen, Microsoft, and
@@ -4467,10 +4098,173 @@ Google:
 }
 \end{lstlisting}
 
-\textbf{\hfill\break
-}
+\section{Software Architecture}
 
-\textbf{References}
+The codebase follows a modular, object-oriented architecture. All
+forecast logic lives in the \texttt{financial\_forecast/} Python package,
+organized into sub-packages:
+
+\begin{itemize}
+\item \texttt{models/} -- composable financial model with pluggable policy
+  modules (\texttt{BaseFinancialModel}, \texttt{TrainableFinancialModel}),
+  each module typed against its abstract base class (e.g.,
+  \texttt{OpExModule}, \texttt{LiquidityPolicy}, \texttt{DividendPolicy},
+  \texttt{DebtPolicy}, \texttt{SimpleTax})
+\item \texttt{training/} -- \texttt{ForecastPipeline} orchestrator,
+  \texttt{PolicyTrainer}, \texttt{StructuralTrainer}
+\item \texttt{inference/} -- \texttt{DeterministicSimulator},
+  \texttt{MonteCarloSimulator}, forecast driver models, plotting
+\item \texttt{extraction/} -- LLM-based PDF extraction, normalization,
+  ratio calculation, hallucination analysis
+\item \texttt{reporting/} -- \texttt{TableFormatter} ABC with
+  \texttt{MarkdownTableFormatter}, and \texttt{Advisor} ABC with
+  \texttt{DeepseekCEOAdvisor} for LLM-based CEO recommendations
+\item \texttt{data/} -- \texttt{HistoricalDataLoader} and per-company
+  data modules
+\item \texttt{serialization/} -- \texttt{.npz} parameter save/load
+\item \texttt{clients/} -- \texttt{AzureLLMClient} for Azure-hosted LLM
+  endpoints
+\end{itemize}
+
+The \texttt{ForecastPipeline} class automatically exports a self-contained
+JSON report (\texttt{forecast\_report.json}) containing historical and
+forecast markdown tables, model metadata, and a reference to the trained
+parameters file. This JSON artifact is consumed by
+\texttt{run\_recommendation\_to\_ceo.py} for downstream LLM analysis,
+decoupling the training/forecast stage from the LLM recommendation stage.
+
+All method signatures throughout the package use Python type hints,
+and each entry-point \texttt{run\_*.py} script is a thin orchestrator
+that wires together the modular components.
+
+\section{Testing and Validation}
+\label{sec:testing}
+
+This section describes the validation strategy used to verify the
+correctness of both the structural financial forecast model (Part~1) and
+the LLM-based extraction and analysis pipelines (Part~2). The test suite
+is implemented in Python using \texttt{pytest} and comprises 22 test
+files organized into a layered architecture of unit, integration, and
+end-to-end tests.
+
+\subsection{Balance Sheet Identity as Core Invariant}
+
+The ``no-plug'' design of the forecast model means the fundamental
+accounting identity (\emph{Assets = Liabilities + Equity}) is not
+enforced by a balancing variable---it must \emph{emerge} from the
+correctness of every cash flow, accrual, and valuation equation. This
+makes the identity a powerful test oracle: at every forecast step, we
+compute
+
+\[
+\Delta_t = \lvert \text{Total Assets}_t - (\text{Total Liabilities}_t + \text{Equity}_t) \rvert
+\]
+
+and assert $\Delta_t < 10^{-4}$. A nonzero delta pinpoints a specific
+structural error (e.g., an expense recorded without a corresponding cash
+deduction), rather than being silently absorbed by a plug. This check is
+executed across all forecast horizons and all model variants
+(deterministic, SimpleOpEx, BayesianOpEx) as the primary integration
+test.
+
+\subsection{Test Suite Architecture}
+
+The test suite is organized by the module under test, with each layer
+building on the one below it:
+
+\begin{itemize}
+  \item \textbf{Type contract tests} (\texttt{test\_types.py}):
+    Validate the \texttt{RecurrentState} (14-key) and
+    \texttt{ForecastInputs} (3-key) TypedDict schemas, ensuring missing,
+    extra, or misspelled keys raise \texttt{KeyError} with descriptive
+    context labels.
+
+  \item \textbf{Decomposed unit tests}
+    (\texttt{test\_cash\_budget\_decomposed.py},
+    \texttt{test\_policy\_trainer\_decomposed.py}): Verify individual
+    computations against hand-calculated values using concrete tensors
+    (e.g., operating net liquidity balance, loss scale computation under
+    STD and NONE modes).
+
+  \item \textbf{Model variant tests}
+    (\texttt{test\_simple\_model\_forecast.py},
+    \texttt{test\_trainable\_financial\_model\_simpleopex.py},
+    \texttt{test\_trainable\_financial\_model\_bayesianopex.py}):
+    Each model configuration is tested for balance sheet identity,
+    finite output values, determinism (for non-stochastic variants), and
+    serialization round-trip correctness.
+
+  \item \textbf{Simulation interface tests}
+    (\texttt{test\_simulator\_interface.py}): Verify that
+    \texttt{DeterministicSimulator} and \texttt{MonteCarloSimulator}
+    expose consistent interfaces and correct default parameters.
+
+  \item \textbf{Regression tests}
+    (\texttt{test\_inflation\_alignment.py}): Guard against a previously
+    discovered bug where inflation data of different length than
+    financial history caused silent misalignment. Tests verify
+    tail-alignment, exact-length pass-through, and \texttt{ValueError}
+    on insufficient data.
+
+  \item \textbf{Extraction pipeline tests}
+    (\texttt{test\_extraction.py}, \texttt{test\_tax\_anomalies.py},
+    \texttt{test\_statement\_normalization.py},
+    \texttt{test\_llm\_forecast.py}): Test the LLM-based financial
+    statement extraction, tax anomaly detection, statement normalization,
+    and LLM balance sheet forecasting pipelines. These use
+    \texttt{unittest.mock} to isolate tests from external API calls.
+
+  \item \textbf{Risk warning pipeline tests}
+    (\texttt{tests/risk/}---8 files): End-to-end integration tests for
+    the risk extraction pipeline, including PDF page flagging, category
+    extraction, risk memo synthesis, entity anonymization, and Pydantic
+    model validation for domain types.
+\end{itemize}
+
+\subsection{Testing Strategies}
+
+The following strategies are applied across the test suite:
+
+\begin{itemize}
+  \item \textbf{Balance sheet identity invariant}: Every model test
+    asserts $\lvert \text{Assets} - \text{Claims} \rvert < 10^{-4}$ at
+    each forecast step, across all time horizons and model variants.
+
+  \item \textbf{Finite-value enforcement}: All TensorFlow tensor outputs
+    are checked with \texttt{tf.debugging.assert\_all\_finite} or
+    equivalent assertions to detect NaN or Inf propagation.
+
+  \item \textbf{Determinism checks}: Non-stochastic model variants are
+    called multiple times with identical inputs; outputs must be
+    bit-identical across runs.
+
+  \item \textbf{Stochastic correctness}: The BayesianOpEx variant is
+    tested for variational sampling sanity, bijector-implied economic
+    bounds (ensuring sampled parameters remain in economically meaningful
+    ranges), and Monte Carlo trajectory finiteness across all samples.
+
+  \item \textbf{Numerical precision}: All financial computations use
+    \texttt{tf.float64} (enforced by dtype assertions in tests).
+    Floating-point comparisons use \texttt{pytest.approx()} with
+    explicit tolerances. Loss scale computations handle degenerate cases
+    with $\epsilon = 10^{-12}$.
+
+  \item \textbf{Mock isolation}: LLM and external API interactions are
+    replaced with \texttt{unittest.mock} patches, ensuring tests run
+    deterministically without network access. Control flow, JSON output
+    structure, and file naming conventions are verified against mocked
+    responses.
+
+  \item \textbf{Serialization round-trips}: Trainable model parameters
+    are saved and reloaded, with assertions that restored values match
+    originals within floating-point tolerance.
+
+  \item \textbf{Pydantic validation}: Risk domain models are tested for
+    type coercion (e.g., string-to-int page numbers), optional field
+    handling, union type acceptance, and rejection of invalid inputs.
+\end{itemize}
+
+\section{References}
 
 \hypertarget{ref:almeida14}{}\hyperlink{ref:almeida14}{[Almeida(14)]} Almeida, Heitor et al., (2014), ``Corporate Liquidity
 Management: A Conceptual Framework and Survey'', Available at SSRN:
@@ -4485,6 +4279,9 @@ deep learning: With Python, Keras and TensorFlow probability. Manning.
 \hypertarget{ref:iasb21}{}\hyperlink{ref:iasb21}{[IASB(21)]} International Accounting Standards Board (IASB). (2021).
 IAS 2: Inventories.
 \url{https://www.ifrs.org/content/dam/ifrs/publications/pdf-standards/english/2024/issued/part-a/ias-2-inventories.pdf?bypass=on}
+
+\hypertarget{ref:koller20}{}\hyperlink{ref:koller20}{[Koller(20)]} Koller, T., Goedhart, M., \& Wessels, D. (2020).
+\emph{Valuation: Measuring and Managing the Value of Companies} (7th ed.). McKinsey \& Company.
 
 \hypertarget{ref:liu23}{}\hyperlink{ref:liu23}{[Liu(23)]} Liu, Nelson F. et al, (2023), ``Lost in the Middle: How
 Language Models Use Long Contexts'',
@@ -4506,5 +4303,344 @@ Elicits Reasoning in Large Language Models'',
 Statement Checking Relationship Recognition System Based on Large
 Language Models'',
 \url{https://dl.acm.org/doi/pdf/10.1145/3745238.3745291}
+
+\appendix
+
+\section{Reviewer's Feedback}
+
+\subsection{Feedback on Part 1}
+
+\emph{(1) You identified the principle of ``no plug'' and some
+accounting identities, such as non-current assets (NCA) being a function
+of depreciation and capex:}
+
+\emph{NCA\_t = NCA\_t-1 -- Depreciation\_t + CapEx\_t}
+
+\emph{However, later, while formulating the time-series model, you
+consider the non-current asset at time t to be driven by a ratio:}
+
+\emph{NCA\_t = NCA\_t-1 * (1 + \%AG)}
+
+\emph{Is it possible to design a workflow that fully respects the
+accounting identities (like the first equation) and can be driven by
+drivers?}
+
+\textbf{Response:} Thank you for catching this mistake. This was a typo in
+the report; the actual script had the correct relationship of CapEx\_t =
+\%AG * Sales\_t . We fixed the typo in the report
+
+\emph{(2) What is the difference between the FIFO and LIFO principles in
+accounting? Under what circumstances will these two accounting choices
+make a difference? Is it possible to avoid using COGS as a plug?}
+
+\textbf{Response:} FIFO (First-In, First-Out): Under FIFO, the oldest
+inventory costs are matched against current sales revenues.
+
+LIFO (Last-In, First-Out): Under LIFO, the most recent inventory costs
+are matched against current sales revenues.
+
+The most difference can arise from these two accounting standards when
+there is a rapid inflationary (deflationary) environment. Under FIFO,
+the cost ratio will be smoother and slightly lower (higher) than the
+actual current cost of replacement. Under LIFO, the cost ratio will be
+more volatile since the recent inventory cost is used, and it will
+tightly track the inflation (deflation) and will squeeze (grow) the
+margin immediately. Under inflation = 0\%, FIFO and LIFO should equal
+each other because old cost = new cost. Under high inflation, FIFO
+profit \textgreater{} LIFO profit.
+
+In our model, we avoid using COGS as a plug by updating it so that we
+learn the cost ratio (CR\textsubscript{t}) directly from the historical
+COGS and sales data by modeling cost ratio as a logit and learning the
+underlying parameters $\alpha$ and $\beta$ to ensure positivity :
+
+$\text{logit}(\text{CR}_t) = \ln(\text{CR}_t / (1 - \text{CR}_t)) = \alpha + \beta \cdot t$ (from \eqref{eq:cost_ratio_logit})
+
+$\text{CR}_t = \text{COGS}_t / \text{Sales}_t$
+(from \eqref{eq:cost_ratio})
+
+(3) Similar to (1), can you list out all the entities (rows) in the
+income statement, cash budget, and balance sheet (simplified versions
+are fine)? Then analyze how these three statements connect with each
+other. You may start with revenue on the income statement.
+
+Response: We now include the 10-year forecasted Balance Sheet, Income
+Statement, and Cash Budget in \textbf{6. Projected Balance Sheet, Income
+Statement, and Cash Budget.}
+
+\emph{(4) Advance payment is defined as: AdvPP\_t = \%AdvPP *
+Purchase\_t+1}
+
+\emph{Is it possible to remove the future dependency on this variable?
+It may break causal timing and introduce leakage during training. Are
+there alternative approaches to model this term?}
+
+\textbf{Response:} We updated our model such that the advance payments for
+purchases (AdvPP) are proportional to this year's purchases instead of
+next year, with the justification:
+
+\begin{itemize}
+\item
+  From 2.1.3. Advance Payments for Purchases : ``Advance payments to
+  suppliers for purchases (\$AdvPP\$) can be modeled as strictly
+  proportional to the total purchases made during the current year. This
+  approach relies on the simplifying assumption that current purchasing
+  volumes serve as a reliable proxy for near-term future demand.''
+\end{itemize}
+
+Same is applied for advance payments from customers for sales (AdvPS):
+
+\begin{itemize}
+\item
+  From 2.3.2. Advance Payments for Future Sales: ``Advance payments
+  received from customers for future sales (\$AdvPC\$) are modeled as a
+  direct proportion of the current year's total sales.
+  This assumes that the volume of upfront customer payments scales
+  linearly with overall revenue generation.''
+\end{itemize}
+
+\emph{(5) For CapEx, it's great that you split this term into
+maintenance capex and growth capex:}
+
+\emph{CapEx\_t = MaintenanceCapex\_t + GrowthCapex\_t}
+
+\emph{You further assume maintenance capex is tied to depreciation. This
+is a common approach when forecasting future cash flows by assuming a
+firm is in a steady state. What if the firm is not in a steady state?}
+
+\textbf{Response:} We updated our model to handle the case where the asset
+replacement rate is not unitary (= 1.0). We reflect that change in the
+report as well:
+
+\begin{itemize}
+\item
+  From \emph{Non-Current Assets (NCA):} ``To model CapEx, we diverge
+  from a rigid steady-state assumption where maintenance perfectly
+  offsets depreciation. Instead, we decompose CapEx into a maintenance
+  component (scaled by a trainable parameter, \%AM, to reflect partial,
+  full, or inflationary replacement) and a growth component driven by
+  sales expansion:
+\end{itemize}
+
+$\text{CapEx}_t = \text{\%AM} \cdot \text{Depreciation}_t + \text{\%AG} \cdot \text{Sales}_t$ \eqref{eq:capex}''
+
+\emph{(6) In your report, the financing dynamics on debt are as
+follows:}
+
+\emph{Debt\_t-1 =\textgreater{} Interest\_t, PrincipalDue\_t
+=\textgreater{} deficit\_t =\textgreater{} Debt\_t}
+
+\emph{Can you plot the amount of debt and see whether the outcome is
+sensible?}
+
+\noindent\begin{minipage}{0.48\textwidth}\centering\includegraphics[width=\linewidth]{report_latex_media/media/image12.png}\end{minipage}\hfill\begin{minipage}{0.48\textwidth}\centering\includegraphics[width=\linewidth]{report_latex_media/media/image13.png}\end{minipage}
+
+\textbf{Response:} We have plotted the forecasted debt levels (see above).
+The outcome is sensible and mathematically stable. We verified that the
+model does not fall into an explosive `debt
+spiral' The financing dynamics converge realistically.
+
+Specifically for Apple, the model accurately captures two key trends:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\item
+  Short-Term Debt: The model predicts short-term debt scaling
+  proportionally with Sales. This correctly reflects
+  Apple's real-world strategy of utilizing revolving
+  credit and commercial paper for working capital needs, despite
+  possessing a large cash balance.
+\item
+  Long-Term Debt: The forecast accurately continues the historical trend
+  of Apple slowly paying down its non-current liabilities.Ultimately,
+  the plot confirms that the endogenous deficit calculation handles debt
+  rollover gracefully without compounding errors.
+\end{enumerate}
+
+\emph{(7) Some rules seem a bit ad hoc. Is it possible to tie this to
+terms with a stronger financial relationship?}
+
+\textbf{Response:} We can redefine our training variables from arbitrary
+percentages to these time-based efficiency metrics.
+
+Receivables: Instead of \%AR, we can train a target DSO (Days Sale
+Outstanding) parameter.
+
+AR\textsubscript{t} = DSO / 365 * Sales\textsubscript{t}
+
+Inventory: Inventory is a function of the cost to produce goods, not the
+final sales price. Tie it to COGS using DSI (Days Sales of Inventory)
+
+Inv\textsubscript{t} = DSI / 365 * COGS\textsubscript{t}
+
+Payables: We can use DPO (Days Purchases Outstanding) instead of \%AP:
+
+AP\textsubscript{t} = DPO / 365 * Purchases\textsubscript{t}
+
+(8) Can you specify the possible constraints for the variables and
+equations? Please add them to the report and implement them in the code.
+
+\textbf{Response:} Thank you. We have added a new section \ul{Parameter
+Constraints and Bounds}
+
+\emph{(9) After you have trained the model, can you also perform
+inference and simulate a firm's financial statements for several years?}
+
+\textbf{Response:} We now include the 10-year forecasted Balance Sheet,
+Income Statement, and Cash Budget in \textbf{6. Projected Balance Sheet,
+Income Statement, and Cash Budget.}
+
+(10) Remember to write test cases.
+
+Response: Thank you for the reminder. We wrote 87 test cases across 8 test files
+covering all modules in the codebase:
+
+\begin{itemize}
+\item \texttt{test\_simple\_model\_forecast.py} -- forward simulation model
+\item \texttt{test\_trainable\_financial\_model\_simpleopex.py} -- trainable model with deterministic OpEx
+\item \texttt{test\_trainable\_financial\_model\_bayesianopex.py} -- trainable model with Bayesian OpEx
+\item \texttt{test\_llm\_forecast.py} -- LLM-only balance sheet forecasting
+\item \texttt{test\_reasoning\_prompt.py} -- CEO/CFO recommendation prompt
+\item \texttt{test\_extraction.py} -- financial statement PDF extraction
+\item \texttt{test\_statement\_normalization.py} -- LLM field normalization
+\item \texttt{test\_tax\_anomalies.py} -- tax anomaly extraction and model integration
+\end{itemize}
+
+\subsection{Feedback on Part 2}
+
+\emph{(1) In the guideline, we have asked you to ``you must submit your
+code in TensorFlow and Python.'' TensorFlow is not only for deep
+learning and training, but also for vectorization management. That means
+you need to rewrite your codes by using TensorFlow in place of NumPy
+with the existing framework. NumPy are not strictly forbidden, as they
+can still be applied when downloading data from Yahoo Finance, data
+preprocessing and plotting.}
+
+\textbf{Response:} We refactored all core modules (training, inference,
+model) to use TensorFlow exclusively. All trainable parameters are
+\texttt{tf.Variable} instances, the forecast loop and training steps are
+compiled into TensorFlow graphs via \texttt{@tf.function}, and gradient
+updates use \texttt{GradientTape} for automatic differentiation. NumPy
+is retained only for data serialization (\texttt{np.savez}/\texttt{np.load})
+and preprocessing. We observed a performance improvement of over 100x
+from graph compilation alone.
+
+\emph{(2) Specifically, what is the merit of TensorFlow compared to
+NumPy?}
+
+\textbf{Response:} In the context of this codebase, TensorFlow provides
+six concrete advantages over NumPy:
+
+\begin{enumerate}
+\item \textbf{Automatic differentiation.}
+  \texttt{GradientTape} computes gradients for over 50 coupled financial
+  parameters without manual calculus. A NumPy implementation would
+  require finite-difference approximation or hand-derived gradients for
+  every parameter---impractical given the interdependencies of the
+  financial statements.
+
+\item \textbf{Graph compilation.}
+  The \texttt{@tf.function} decorator compiles the forecast loop and
+  training step into optimized computation graphs, enabling over 100x
+  speedup compared to eager Python/NumPy loops across 25{,}000+ training
+  epochs.
+
+\item \textbf{Constrained trainable variables.}
+  \texttt{tfp.util.TransformedVariable} with bijectors (Softplus,
+  Sigmoid, Chain) automatically enforces economic constraints---such as
+  positivity for growth rates, or $[0, 1]$ bounds for payout
+  ratios---during gradient updates. NumPy has no equivalent; manual
+  clamping after each optimization step would be required.
+
+\item \textbf{Vectorized Monte Carlo simulation.}
+  \texttt{tf.TensorArray} and \texttt{tf.while\_loop} inside
+  \texttt{@tf.function} efficiently batch 1{,}000+ stochastic
+  trajectories. NumPy would require explicit Python loops or complex
+  pre-allocated array management that cannot be graph-compiled.
+
+\item \textbf{Variational inference.}
+  TensorFlow Probability enables Bayesian OpEx modeling with automatic
+  KL divergence gradients through sampling operations---computing the
+  Evidence Lower Bound (ELBO) loss requires differentiating through
+  stochastic nodes, which is not possible natively in NumPy.
+
+\item \textbf{Module system.}
+  \texttt{tf.Module} provides automatic variable discovery and tracking
+  across a hierarchy of policy submodules (CapEx, working capital,
+  liquidity, debt, dividends, buyback, tax). This eliminates manual
+  parameter bookkeeping that a NumPy implementation would require.
+\end{enumerate}
+
+\emph{(3) Codebase structure: Ultimately, we are delivering a Python
+package to our client. Please refactor it to an OOP style, with proper
+codebase hierarchy.}
+
+\textbf{Response:} We refactored the entire codebase following four
+guiding principles:
+
+\begin{enumerate}
+\item OOP principles---proper encapsulation, inheritance, polymorphism,
+  and abstraction
+\item Clean Code principles (Robert Martin)---meaningful naming,
+  single-responsibility functions and classes, SOLID principles
+\item PEP~8 and PEP~20 compliance
+\item Pythonic style per Fluent Python---Python idioms over Java-style
+  patterns
+\end{enumerate}
+
+We used Claude Code's Plan Mode to conduct a systematic code review
+before refactoring. The following prompt was used to leverage the tool
+effectively:
+
+\begin{lstlisting}[basicstyle=\ttfamily\scriptsize, breaklines=true]
+Enter planning mode. Do not modify any files yet.
+
+I am a finance/quant intern candidate at JP Morgan and need a thorough,
+honest code review of this financial forecasting codebase before I submit it.
+The interviewer specifically referenced these three books as the standard
+I should meet:
+
+1. Clean Code (Robert C. Martin)
+2. Clean Code in Python (Mariano Anaya)
+3. Fluent Python (Luciano Ramalho)
+
+Please review the entire codebase systematically across these dimensions:
+1. OOP Design & SOLID Principles
+2. Module Cohesion & Coupling
+3. Pythonic Style (Fluent Python lens)
+4. Naming & Readability (Clean Code lens)
+5. Type Hints & Contracts
+6. Test Coverage Gaps
+
+After completing the review, produce a structured report with:
+- A severity rating per issue (Critical / Major / Minor)
+- The specific file and line range for each issue
+- A one-line explanation of which principle it violates
+- Do NOT suggest fixes yet
+\end{lstlisting}
+
+\emph{(4) Add docstring and comment: please ensure your code is
+well-documented in English and follow established docstring conventions
+(such as PEP257 for Python).}
+
+\textbf{Response:} All public interfaces are now documented with
+PEP~257-compliant docstrings as part of the refactoring effort.
+
+\emph{(5) Attempting LaTeX: Can you try illustrating your ideas in a
+LaTeX-generated PDF?}
+
+\textbf{Response:} The report has been rewritten in LaTeX.
+
+\emph{(6) Double Entry Principle: Can you start with a section to discuss
+in detail what double entry principle means by providing with some
+examples? An example from items on income statement and one from
+statement of cashflow will help the reader understanding why it can keep
+the balance sheet balanced.}
+
+\textbf{Response:} We have added a dedicated subsection in the
+Introduction---see Section~\ref{sec:double-entry}, \emph{The
+Double-Entry Principle}---which explains the principle with two worked
+examples: a credit sale (income statement to balance sheet) and a
+receivable collection (cash budget to balance sheet).
 
 \end{document}
