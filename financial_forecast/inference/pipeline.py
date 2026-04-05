@@ -16,16 +16,21 @@ from __future__ import annotations
 
 import json
 from datetime import datetime
-from typing import Dict, Tuple
+from typing import Dict, Optional, Tuple
 
+import numpy as np
 import tensorflow as tf
 
 from financial_forecast.inference.plotting import plot_historical_and_forecast
-from financial_forecast.inference.state_index import DIAGNOSTIC_KEYS
+from financial_forecast.inference.state_index import (
+    DIAGNOSTIC_KEYS,
+    RECURRENT_KEYS,
+)
 from financial_forecast.inference.forecast_driver_models import (
     SalesForecastModel,
     InflationForecastModel,
 )
+from financial_forecast.models.opex import BayesianOpEx
 from financial_forecast.training.io_utils import get_training_results_path
 from financial_forecast.data.loader import HistoricalDataLoader
 from financial_forecast.reporting.table_formatter import MarkdownTableFormatter
@@ -91,8 +96,10 @@ class ForecastPipeline:
     def run(self) -> None:
         """Execute: trajectory forecast, historical fit, plot, export JSON."""
         trajectories = self._run_trajectory_forecast()
-        historical_fit, fit_years = self._compute_historical_fit()
-        self._plot_results(trajectories, historical_fit, fit_years)
+        fit_mean, fit_lower, fit_upper, fit_years = self._compute_historical_fit()
+        self._plot_results(
+            trajectories, fit_mean, fit_lower, fit_upper, fit_years
+        )
         self._export_report_json(trajectories)
 
     def _export_report_json(
@@ -149,20 +156,37 @@ class ForecastPipeline:
             self._forecast_years,
         )
 
-    def _compute_historical_fit(self) -> Tuple[Dict[str, tf.Tensor], tf.Tensor]:
+    def _compute_historical_fit(
+        self,
+    ) -> Tuple[
+        Dict[str, tf.Tensor],
+        Optional[Dict[str, tf.Tensor]],
+        Optional[Dict[str, tf.Tensor]],
+        tf.Tensor,
+    ]:
         """One-step-ahead predictions on historical data.
 
+        When the model's trajectory simulator is a
+        :class:`MonteCarloSimulator` with ``n_samples > 1`` *and* the
+        OpEx module is a :class:`BayesianOpEx`, each transition is
+        evaluated on a tiled batched state with stochastic OpEx, and
+        the returned tensors summarize the MC draws as a mean with
+        2.5%/97.5% credible bounds.  Otherwise, the fit is a
+        single-sample deterministic point estimate (``use_mean_opex=True``)
+        and the lower/upper returns are ``None``.
+
         Returns:
-            Tuple ``(fit_dict, fit_years)`` where *fit_dict* maps metric
-            names to USD tensors and *fit_years* is a 1-D year tensor.
+            Tuple ``(fit_mean, fit_lower, fit_upper, fit_years)``.
+            *fit_mean* is a dict of USD tensors (one per historical
+            transition).  *fit_lower* and *fit_upper* are the matching
+            2.5%/97.5% bounds when MC is active, or ``None`` when the
+            fit is deterministic.  *fit_years* is a 1-D year tensor.
         """
         model = self.model
         s = model.scaled_data
         d = model.historical_data
         scale = model.amount_scale
-        inflation = d["inflation"]
-        cum_inf_hist = tf.math.cumprod(1 + inflation)
-
+        cum_inf_hist = tf.math.cumprod(1 + d["inflation"])
         n_hist = len(d["sales"])
         f64 = lambda v: tf.constant(float(v), dtype=tf.float64)
 
@@ -192,49 +216,126 @@ class ForecastPipeline:
             "equity_financing",
             "liquidity_deficit_st",
         ]
-        fit = {k: [] for k in hist_fit_keys}
-        fit_years = []
+
+        # Decide whether to run MC.  MC only makes sense if the
+        # trajectory simulator is configured with multiple samples AND
+        # the OpEx module is stochastic (BayesianOpEx); otherwise all
+        # samples would collapse to the same value.
+        n_mc_samples = int(model.trajectory_simulator.n_samples)
+        use_mc = n_mc_samples > 1 and isinstance(
+            model.opex_module, BayesianOpEx
+        )
+
+        fit_mean = {k: [] for k in hist_fit_keys}
+        fit_lower = {k: [] for k in hist_fit_keys} if use_mc else None
+        fit_upper = {k: [] for k in hist_fit_keys} if use_mc else None
+        fit_years: list = []
+
+        if use_mc:
+            # Pre-sample the Bayesian OpEx posterior + aleatoric noise
+            # once, covering every historical transition.  Indexed by
+            # ``year - start_year`` inside ``compute_mc_step``.
+            model.opex_module.prepare_mc(
+                n_samples=n_mc_samples,
+                n_years=n_hist,
+                start_year=float(model.base_year + 1),
+            )
+            diag_index = {k: i for i, k in enumerate(DIAGNOSTIC_KEYS)}
 
         for t in range(n_hist - 1):
-            state_t = model.build_state_from_index(t)
-            inputs_t = {
-                "sales_t": f64(s["sales"][t + 1]),
-                "year": f64(float(model.base_year + t + 1)),
-                "cum_inflation": f64(cum_inf_hist[t + 1]),
-            }
-            pred = model.forecast_step(
-                state_t,
-                inputs_t,
-                use_mean_opex=True,
-            )
+            state_dict = model.build_state_from_index(t)
+            sales_t_val = f64(s["sales"][t + 1])
+            year_val = f64(float(model.base_year + t + 1))
+            cum_inf_val = f64(cum_inf_hist[t + 1])
 
-            for key in hist_fit_keys:
-                if key == "total_assets":
-                    val = sum(
-                        pred[k]
-                        for k in [
-                            "nca",
-                            "advance_payments_purchases",
-                            "accounts_receivable",
-                            "inventory",
-                            "cash",
-                            "investment_in_market_securities",
-                        ]
-                    )
-                else:
-                    val = pred[key]
-                fit[key].append(float(val.numpy()) * scale)
+            if not use_mc:
+                inputs_t = {
+                    "sales_t": sales_t_val,
+                    "year": year_val,
+                    "cum_inflation": cum_inf_val,
+                }
+                pred = model.forecast_step(
+                    state_dict,
+                    inputs_t,
+                    use_mean_opex=True,
+                )
+                for key in hist_fit_keys:
+                    if key == "total_assets":
+                        val = sum(
+                            pred[k]
+                            for k in [
+                                "nca",
+                                "advance_payments_purchases",
+                                "accounts_receivable",
+                                "inventory",
+                                "cash",
+                                "investment_in_market_securities",
+                            ]
+                        )
+                    else:
+                        val = pred[key]
+                    fit_mean[key].append(float(val.numpy()) * scale)
+            else:
+                # Tile the historical scalar state to [n_mc_samples, 14]
+                # and dispatch to the compiled batched forecast path
+                # with stochastic OpEx.
+                state_row = tf.stack(
+                    [
+                        tf.cast(state_dict[k], tf.float64)
+                        for k in RECURRENT_KEYS
+                    ]
+                )
+                state_batch = tf.broadcast_to(
+                    state_row[tf.newaxis, :],
+                    [n_mc_samples, state_row.shape[0]],
+                )
+                sales_batch = tf.fill([n_mc_samples], sales_t_val)
+                _, diagnostics = model.forecast_step_compiled(
+                    state_batch,
+                    sales_batch,
+                    year_val,
+                    cum_inf_val,
+                    False,  # use_mean_opex
+                )
+                diag_np = diagnostics.numpy() * scale
+                total_assets_samples = sum(
+                    diag_np[:, diag_index[k]]
+                    for k in [
+                        "nca",
+                        "advance_payments_purchases",
+                        "accounts_receivable",
+                        "inventory",
+                        "cash",
+                        "investment_in_market_securities",
+                    ]
+                )
+                for key in hist_fit_keys:
+                    if key == "total_assets":
+                        samples = total_assets_samples
+                    else:
+                        samples = diag_np[:, diag_index[key]]
+                    fit_mean[key].append(float(np.mean(samples)))
+                    fit_lower[key].append(float(np.percentile(samples, 2.5)))
+                    fit_upper[key].append(float(np.percentile(samples, 97.5)))
+
             fit_years.append(model.base_year + t + 1)
 
-        for k in fit:
-            fit[k] = tf.constant(fit[k], dtype=tf.float64)
-        fit_years = tf.constant(fit_years, dtype=tf.float64)
-        return fit, fit_years
+        for k in fit_mean:
+            fit_mean[k] = tf.constant(fit_mean[k], dtype=tf.float64)
+        if use_mc:
+            for k in fit_lower:
+                fit_lower[k] = tf.constant(fit_lower[k], dtype=tf.float64)
+                fit_upper[k] = tf.constant(fit_upper[k], dtype=tf.float64)
+
+        fit_years_tensor = tf.constant(fit_years, dtype=tf.float64)
+        return fit_mean, fit_lower, fit_upper, fit_years_tensor
 
     def _plot_results(
         self,
         trajectories: Dict[str, tf.Tensor],
         historical_fit: Dict[str, tf.Tensor],
+        historical_fit_lower: Optional[Dict[str, tf.Tensor]],
+        historical_fit_upper: Optional[Dict[str, tf.Tensor]],
         fit_years: tf.Tensor,
     ) -> None:
         """Plot historical actuals, model fit, and forecast trajectories."""
@@ -289,6 +390,8 @@ class ForecastPipeline:
             sales_hist_usd=d["sales"],
             sales_forecast_usd=self._sales_forecast_usd,
             historical_fit=historical_fit,
+            historical_fit_lower=historical_fit_lower,
+            historical_fit_upper=historical_fit_upper,
             historical_fit_years=fit_years,
             show_plot=self._show_plot,
         )

@@ -21,6 +21,8 @@ def plot_historical_and_forecast(
     sales_hist_usd: Optional[tf.Tensor] = None,
     sales_forecast_usd: Optional[tf.Tensor] = None,
     historical_fit: Optional[Dict[str, tf.Tensor]] = None,
+    historical_fit_lower: Optional[Dict[str, tf.Tensor]] = None,
+    historical_fit_upper: Optional[Dict[str, tf.Tensor]] = None,
     historical_fit_years: Optional[tf.Tensor] = None,
     show_plot: bool = False,
 ) -> None:
@@ -42,7 +44,14 @@ def plot_historical_and_forecast(
         sales_hist_usd: Optional historical sales in USD.
         sales_forecast_usd: Optional deterministic sales forecast in USD.
         historical_fit: Optional mapping of ``{name: array_in_usd}`` for
-            model-fitted historical values.
+            model-fitted historical values (mean series).
+        historical_fit_lower: Optional mapping of
+            ``{name: array_in_usd}`` with the 2.5% bound of the 1-step
+            MC fit.  When provided together with ``historical_fit_upper``,
+            a shaded 95% credible band is drawn around the fit mean.
+        historical_fit_upper: Optional mapping of
+            ``{name: array_in_usd}`` with the 97.5% bound of the 1-step
+            MC fit.
         historical_fit_years: Optional year labels for fitted values.
         show_plot: Whether to call ``plt.show()`` after saving.
     """
@@ -147,21 +156,42 @@ def plot_historical_and_forecast(
             )
 
         # Model fit on historical data (one-step-ahead predictions)
+        has_mc_bounds = (
+            historical_fit_lower is not None
+            and historical_fit_upper is not None
+            and historical_fit_lower is not None
+            and name in (historical_fit_lower or {})
+            and name in (historical_fit_upper or {})
+        )
         if (
             historical_fit is not None
             and historical_fit_years is not None
             and name in historical_fit
         ):
+            fit_label = (
+                "Model Fit (1-step MC mean)"
+                if has_mc_bounds
+                else "Model Fit (1-step)"
+            )
             ax.plot(
                 historical_fit_years,
                 historical_fit[name],
                 "^--",
                 color="tab:red",
-                label="Model Fit (1-step)",
+                label=fit_label,
                 markersize=5,
                 linewidth=1.2,
                 alpha=0.85,
             )
+            if has_mc_bounds:
+                ax.fill_between(
+                    historical_fit_years,
+                    historical_fit_lower[name],
+                    historical_fit_upper[name],
+                    color="tab:red",
+                    alpha=0.2,
+                    label="1-step 95% CI",
+                )
 
         # Forecast mean + 95% CI
         ax.plot(
