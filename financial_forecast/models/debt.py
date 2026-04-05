@@ -188,7 +188,7 @@ class TrendDebtPolicy(DebtPolicy):
     def __init__(self, name="trend_debt"):
         super().__init__(name=name)
         self.st_debt_baseline = tfp.util.TransformedVariable(
-            initial_value=0.0,
+            initial_value=0.01,
             bijector=tfb.Softplus(),
             dtype=tf.float64,
             name="st_debt_baseline",

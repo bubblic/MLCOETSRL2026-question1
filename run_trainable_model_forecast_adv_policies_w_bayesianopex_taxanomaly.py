@@ -21,7 +21,7 @@ if __name__ == "__main__":
             buyback_policy=BaselineBuybackPolicy(),
             purchases_policy=TrendCostRatioPolicy(),
             debt_policy=TrendDebtPolicy(),
-            forecast_years=8,
+            forecast_years=10,
             parameters_save_path="trained_parameters_adv_policies_w_bayesianopex_taxanomaly.npz",
         )
     )

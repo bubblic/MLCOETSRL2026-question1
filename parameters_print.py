@@ -34,8 +34,8 @@ dividend_payout_ratio_pct = data["dividend_payout_ratio_pct"]
 dividend_adjustment_speed = data.get("dividend_adjustment_speed", "N/A (old file)")
 sb_baseline = data["sb_baseline"]
 sb_ratio = data["sb_ratio"]
-st_debt_alpha = data["st_debt_alpha"]
-st_debt_beta = data["st_debt_beta"]
+st_debt_baseline = data["st_debt_baseline"]
+st_debt_pct = data["st_debt_pct"]
 cost_ratio_alpha = data["cost_ratio_alpha"]
 cost_ratio_beta = data["cost_ratio_beta"]
 q_var_opex_loc = data["q_var_opex_loc"]
@@ -89,13 +89,8 @@ print(
     f"ratio={sb_ratio:.6f}"
 )
 print(
-    f"Effective ST Debt % of Sales (logit-linear): alpha={st_debt_alpha:.4f}, "
-    f"beta={st_debt_beta:.6f}"
-)
-print(
-    f"  => %EffSTDebt at t=0: {sigmoid(st_debt_alpha):.4f}, "
-    f"%EffSTDebt at t={len(historical_sales)-1}: "
-    f"{sigmoid(st_debt_alpha + st_debt_beta * (len(historical_sales)-1)):.4f}"
+    f"Effective ST Debt (baseline + % of sales): "
+    f"baseline={st_debt_baseline:.4f}, pct={st_debt_pct:.5f}"
 )
 
 print(

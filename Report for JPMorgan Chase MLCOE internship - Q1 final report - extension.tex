@@ -4301,6 +4301,42 @@ the smaller effective sample size of state transitions, consistent with
 the theoretical expectation that indirect estimation paths have lower
 Fisher information.
 
+Beyond the numerical tolerance checks above, we also verify the fit
+\emph{visually} by taking the trained recovery model and applying its
+own one-step-ahead prediction (\texttt{forecast\_step}) to every
+historical transition, then overlaying the resulting fitted values on
+the synthetic observations.  This is the same one-step-ahead diagnostic
+that \texttt{ForecastPipeline} uses for real historical data.
+Figure~\ref{fig:param_recovery_fit_s4} shows the result for
+Scenario~4 (the most involved scenario, with Bayesian OpEx and tax
+anomalies).  Across twelve key metrics---including the net income,
+cost of goods sold, operating expenses (with injected noise),
+tax (with the 2020 anomaly spike and 2022 dip), non-current assets,
+cash, working-capital components, and the full capital structure
+(effective short-term debt, non-current liabilities, equity)---the
+red fitted series tracks the black synthetic truth essentially
+perfectly.  This confirms that the recovered parameters reproduce the
+data-generating process not only in isolation (passing the per-parameter
+tolerance tests) but also jointly through the full forward model
+evolution, including the cash budget circularity.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{report_latex_media/media/parameter_recovery_s4_fit.png}
+\caption{Parameter recovery, Scenario~4 (advanced policies + Bayesian
+OpEx + tax anomalies): one-step-ahead fit of the trained recovery
+model against the synthetic ground truth it was trained on.  Black
+markers are the synthetic observations produced by the generator model;
+red markers are the trained model's \texttt{forecast\_step}
+predictions, initialized from each preceding state.  The 2020 spike and
+2022 dip in the Tax panel correspond to the known one-time anomalies
+$\delta_{2020}=\$2\text{B}$ and $\delta_{2022}=-\$0.5\text{B}$, which
+the \texttt{TaxWithAnomalies} module reproduces exactly.  The slight
+noise in the OpEx panel reflects the injected aleatoric noise
+$\varepsilon_t\sim\mathcal{N}(0,\sigma^2)$.}
+\label{fig:param_recovery_fit_s4}
+\end{figure}
+
 \section{References}
 
 \hypertarget{ref:almeida14}{}\hyperlink{ref:almeida14}{[Almeida(14)]} Almeida, Heitor et al., (2014), ``Corporate Liquidity
