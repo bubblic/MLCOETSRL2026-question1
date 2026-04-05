@@ -19,7 +19,7 @@ def _ensure_spacy_ner() -> None:
     except (ImportError, OSError):
         print("Installing spacy and en_core_web_sm model...")
         subprocess.check_call(
-            [sys.executable, "-m", "pip", "install", "spacy>=3.5"],
+            [sys.executable, "-m", "pip", "install", "spacy>=3.5,<3.8"],
             stdout=subprocess.DEVNULL,
         )
         subprocess.check_call(

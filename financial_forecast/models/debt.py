@@ -174,19 +174,30 @@ class SimpleDebtPolicy(DebtPolicy):
 
 
 class TrendDebtPolicy(DebtPolicy):
-    """Policy-driven ST debt (logit-linear), time-varying equity financing mix."""
+    """Policy-driven ST debt (baseline + % of sales), time-varying equity financing mix.
+
+    Effective ST debt is modeled as an affine function of sales:
+    ``eff_st_debt = st_debt_baseline + sales * st_debt_pct``, with both
+    parameters constrained to be non-negative via softplus. This avoids
+    the sigmoid-saturation artifact of a pure ``sales * sigmoid(...)``
+    form (which would asymptote to 100% of sales) and allows for a
+    fixed component (e.g. revolving facility minimums, notes payable)
+    that doesn't scale from zero with sales.
+    """
 
     def __init__(self, name="trend_debt"):
         super().__init__(name=name)
-        self.st_debt_alpha = tf.Variable(
-            -1.59,
+        self.st_debt_baseline = tfp.util.TransformedVariable(
+            initial_value=0.0,
+            bijector=tfb.Softplus(),
             dtype=tf.float64,
-            name="st_debt_alpha",
+            name="st_debt_baseline",
         )
-        self.st_debt_beta = tf.Variable(
-            0.0,
+        self.st_debt_pct = tfp.util.TransformedVariable(
+            initial_value=0.17,
+            bijector=tfb.Softplus(),
             dtype=tf.float64,
-            name="st_debt_beta",
+            name="st_debt_pct",
         )
         self.ef_alpha = tf.Variable(-1.73, dtype=tf.float64, name="ef_alpha")
         self.ef_beta = tf.Variable(0.0, dtype=tf.float64, name="ef_beta")
@@ -202,15 +213,26 @@ class TrendDebtPolicy(DebtPolicy):
     def init_from_data(self, s: Dict[str, tf.Tensor]) -> None:
         _f64 = lambda v: tf.constant(v, dtype=tf.float64)
         _EPS = 1e-12
-        import math
 
-        # ST debt as % of sales → logit
-        st_ratio = float(
-            tf.reduce_mean(s["effective_st_debt"] / tf.maximum(s["sales"], _EPS))
-        )
-        st_ratio = min(1 - _EPS, max(_EPS, st_ratio))
-        self.st_debt_alpha.assign(math.log(st_ratio / (1 - st_ratio)))
-        self.st_debt_beta.assign(0.0)
+        # ST debt = baseline + pct * sales → OLS on historical pairs
+        sales = tf.cast(s["sales"], tf.float64)
+        eff_st = tf.cast(s["effective_st_debt"], tf.float64)
+        x_mean = float(tf.reduce_mean(sales))
+        y_mean = float(tf.reduce_mean(eff_st))
+        x_var = float(tf.reduce_mean((sales - x_mean) ** 2))
+        if x_var > _EPS:
+            x_cov = float(tf.reduce_mean((sales - x_mean) * (eff_st - y_mean)))
+            pct = x_cov / x_var
+            baseline = y_mean - pct * x_mean
+        else:
+            pct = y_mean / max(x_mean, _EPS)
+            baseline = 0.0
+        # Both must be non-negative for softplus domain; clip any negative
+        # OLS residual into the baseline/pct split.
+        pct = max(_EPS, pct)
+        baseline = max(_EPS, baseline)
+        self.st_debt_baseline.assign(_f64(baseline))
+        self.st_debt_pct.assign(_f64(pct))
         # avg maturity
         total_lt = s["non_current_liabilities"] + s["current_lt_debt"]
         avg_mat = float(
@@ -221,8 +243,7 @@ class TrendDebtPolicy(DebtPolicy):
     def compute_st_debt(
         self, sales_t: tf.Tensor, time_index: tf.Tensor, liquidity_deficit_st: tf.Tensor
     ) -> tf.Tensor:
-        st_debt_pct = tf.sigmoid(self.st_debt_alpha + self.st_debt_beta * time_index)
-        return sales_t * st_debt_pct
+        return self.st_debt_baseline + sales_t * self.st_debt_pct
 
     def compute_financing_mix(
         self, long_term_financing: tf.Tensor, time_index: tf.Tensor
@@ -242,7 +263,10 @@ class TrendDebtPolicy(DebtPolicy):
 
     @property
     def policy_trainable_variables(self) -> List[tf.Variable]:
-        return [self.st_debt_alpha, self.st_debt_beta]
+        return [
+            self.st_debt_baseline.trainable_variables[0],
+            self.st_debt_pct.trainable_variables[0],
+        ]
 
     @property
     def structural_trainable_variables(self) -> List[tf.Variable]:
@@ -259,27 +283,15 @@ class TrendDebtPolicy(DebtPolicy):
         time_indices: tf.Tensor,
         scale: tf.Tensor,
     ) -> tf.Tensor:
-        """MSE loss for policy-driven ST debt."""
-        st_debt_pct_pred = tf.sigmoid(
-            self.st_debt_alpha + self.st_debt_beta * time_indices
-        )
-        return tf.reduce_mean(
-            tf.square((eff_st_debt - sales * st_debt_pct_pred) / scale)
-        )
+        """MSE loss for policy-driven ST debt (baseline + % of sales)."""
+        pred = self.st_debt_baseline + sales * self.st_debt_pct
+        return tf.reduce_mean(tf.square((eff_st_debt - pred) / scale))
 
     def print_policy_summary(self, n_years: int) -> None:
-        import tensorflow as tf
-
         print(
-            f"Effective ST Debt % of Sales (logit-linear): "
-            f"alpha={self.st_debt_alpha.numpy():.4f}, "
-            f"beta={self.st_debt_beta.numpy():.6f}"
-        )
-        print(
-            f"  => %EffSTDebt at t=0: "
-            f"{tf.sigmoid(self.st_debt_alpha).numpy():.4f}, "
-            f"%EffSTDebt at t={n_years-1}: "
-            f"{tf.sigmoid(self.st_debt_alpha + self.st_debt_beta * (n_years-1)).numpy():.4f}"
+            f"Effective ST Debt (baseline + % of sales): "
+            f"baseline={self.st_debt_baseline.numpy():.4f}, "
+            f"pct={self.st_debt_pct.numpy():.5f}"
         )
 
     def print_structural_summary(self, n_years: int) -> None:

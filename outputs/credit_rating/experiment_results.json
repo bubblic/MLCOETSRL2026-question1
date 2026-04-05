@@ -1,0 +1,317 @@
+{
+  "training": {
+    "best_epoch": 7,
+    "final_train_loss": 1.4475311623063198,
+    "final_val_loss": 1.5798776651683606,
+    "num_epochs": 18
+  },
+  "evaluation": {
+    "baseline_accuracy": 0.197098976109215,
+    "baseline_mae_notches": 1.3156996587030716,
+    "baseline_macro_f1": 0.06838798614514728,
+    "baseline_spearman_rho": 0.06633111836552487,
+    "baseline_ig_accuracy": 0.34044368600682595,
+    "test_samples": 1172
+  },
+  "case_study_evergrande": {
+    "company": "China Evergrande Group",
+    "ticker": "3333.HK",
+    "fiscal_year": 2022,
+    "ratios": {
+      "debt_to_equity": -0.7023809523809523,
+      "debt_to_assets": 0.3390804597701149,
+      "debt_to_capital": -2.36,
+      "debt_to_ebitda": -39.333333333333336,
+      "interest_coverage": -0.3508771929824561,
+      "current_ratio": 1.0135135135135136,
+      "quick_ratio": 0.07047297297297297,
+      "cash_ratio": 0.009662162162162162,
+      "working_capital_to_assets": 0.011494252873563218,
+      "operating_cash_flow_ratio": -0.02702702702702703,
+      "gross_margin": 0.08695652173913043,
+      "operating_margin": -0.08695652173913043,
+      "net_margin": -0.4608695652173913,
+      "return_on_assets": -0.06091954022988506,
+      "return_on_equity": 0.1261904761904762,
+      "asset_turnover": 0.13218390804597702,
+      "receivables_turnover": 2.5555555555555554,
+      "inventory_turnover": 0.23333333333333334,
+      "payables_turnover": 0.3181818181818182,
+      "cost_to_income": 1.0869565217391304,
+      "log_total_assets": 14.369395671190711,
+      "log_total_revenue": 12.345834587905333,
+      "revenue_growth": -0.08,
+      "asset_growth": -0.24347826086956523,
+      "retained_earnings_to_assets": -0.5172413793103449
+    },
+    "altman_z_prime_prime": {
+      "score": 1.220093557872227,
+      "zone": "Grey Zone"
+    },
+    "model_prediction": {
+      "rating": "CCC_CC",
+      "confidence": 0.45862525701522827,
+      "is_investment_grade": false,
+      "top_classes": [
+        {
+          "class": "CCC_CC",
+          "probability": 0.45862525701522827
+        },
+        {
+          "class": "A",
+          "probability": 0.2531231641769409
+        },
+        {
+          "class": "AAA_AA",
+          "probability": 0.12355311214923859
+        }
+      ]
+    },
+    "shenanigans": {
+      "beneish_m_score": 4.216432954896456,
+      "beneish_is_manipulator": true,
+      "earnings_flags": [
+        {
+          "id": "EMS-1",
+          "name": "Premature Revenue Recognition",
+          "flagged": false,
+          "value": -0.11067193675889325,
+          "threshold": 0.1
+        },
+        {
+          "id": "EMS-2",
+          "name": "Bogus Revenue",
+          "flagged": false,
+          "value": -0.28695652173913044,
+          "threshold": 0.1
+        },
+        {
+          "id": "EMS-3",
+          "name": "One-Time Gains Boosting Income",
+          "flagged": false,
+          "value": 15000.0,
+          "threshold": 0.2
+        },
+        {
+          "id": "EMS-4",
+          "name": "Shifting Current Expenses to Later Period",
+          "flagged": false,
+          "value": 0.04695652173913034,
+          "threshold": -0.05
+        },
+        {
+          "id": "EMS-5",
+          "name": "Improper Capitalisation of Expenses",
+          "flagged": false,
+          "value": 0.4,
+          "threshold": 2.5
+        },
+        {
+          "id": "EMS-6",
+          "name": "Extended Depreciation / Amortisation",
+          "flagged": false,
+          "value": 0.002856515051636997,
+          "threshold": -0.15
+        },
+        {
+          "id": "EMS-7",
+          "name": "Understated Liabilities",
+          "flagged": false,
+          "value": -0.03896103896103886,
+          "threshold": -0.15
+        },
+        {
+          "id": "EMS-8",
+          "name": "Revenue Channel Stuffing",
+          "flagged": false,
+          "value": -0.18478260869565213,
+          "threshold": 0.1
+        }
+      ],
+      "cash_flow_flags": [
+        {
+          "id": "CFS-1",
+          "name": "Shifting Operating Cash Outflows to Investing",
+          "flagged": true,
+          "value": 2000.0,
+          "threshold": 0.8
+        },
+        {
+          "id": "CFS-2",
+          "name": "Financing Inflows Inflating Operating CF",
+          "flagged": false,
+          "value": 0.0,
+          "threshold": 0.5
+        },
+        {
+          "id": "CFS-3",
+          "name": "Boosting Operating CF with Asset Sales",
+          "flagged": false,
+          "value": 0.0,
+          "threshold": 0.3
+        },
+        {
+          "id": "CFS-4",
+          "name": "Receivables Factoring",
+          "flagged": false,
+          "value": -0.18181818181818182,
+          "threshold": -0.2
+        }
+      ],
+      "total_flags_raised": 2,
+      "overall_risk": "HIGH"
+    }
+  },
+  "case_study_enron": {
+    "company": "Enron Corp",
+    "ticker": "ENRNQ",
+    "fiscal_year": 2000,
+    "ratios": {
+      "debt_to_equity": 0.8918047079337402,
+      "debt_to_assets": 0.15616078652886128,
+      "debt_to_capital": 0.4714042121756763,
+      "debt_to_ebitda": 3.6428062678062676,
+      "interest_coverage": 2.3305489260143197,
+      "current_ratio": 1.0695275645990283,
+      "quick_ratio": 0.4344152643807646,
+      "cash_ratio": 0.048370062662817716,
+      "working_capital_to_assets": 0.030151290780574935,
+      "operating_cash_flow_ratio": 0.1682391044145603,
+      "gross_margin": 0.062229013086745576,
+      "operating_margin": 0.01937711456607368,
+      "net_margin": 0.009713361577156238,
+      "return_on_assets": 0.01494588034135841,
+      "return_on_equity": 0.08535309503051439,
+      "asset_turnover": 1.5386928842953758,
+      "receivables_turnover": 9.69497883801462,
+      "inventory_turnover": 99.17838405036726,
+      "payables_turnover": 9.66728035184617,
+      "cost_to_income": 0.9806228854339263,
+      "log_total_assets": 11.089851222101203,
+      "log_total_revenue": 11.520784501680495,
+      "revenue_growth": 1.5126894694854407,
+      "asset_growth": 0.9622839339744166,
+      "retained_earnings_to_assets": 0.04924965268766316
+    },
+    "altman_z_score": {
+      "score": 1.869581469682394,
+      "zone": "Grey Zone"
+    },
+    "model_prediction": {
+      "rating": "B",
+      "confidence": 0.9568896889686584,
+      "is_investment_grade": false,
+      "top_classes": [
+        {
+          "class": "B",
+          "probability": 0.9568896889686584
+        },
+        {
+          "class": "AAA_AA",
+          "probability": 0.025752270594239235
+        },
+        {
+          "class": "BB",
+          "probability": 0.01064841914921999
+        }
+      ]
+    },
+    "shenanigans": {
+      "beneish_m_score": 5.587041554750578,
+      "beneish_is_manipulator": true,
+      "beneish_threshold": -2.22,
+      "earnings_flags": [
+        {
+          "id": "EMS-1",
+          "name": "Premature Revenue Recognition",
+          "flagged": true,
+          "value": 0.3654783625184096,
+          "threshold": 0.1
+        },
+        {
+          "id": "EMS-2",
+          "name": "Bogus Revenue",
+          "flagged": false,
+          "value": -0.037702527061484886,
+          "threshold": 0.1
+        },
+        {
+          "id": "EMS-3",
+          "name": "One-Time Gains Boosting Income",
+          "flagged": false,
+          "value": 0.8922368696379995,
+          "threshold": 0.2
+        },
+        {
+          "id": "EMS-4",
+          "name": "Shifting Current Expenses to Later Period",
+          "flagged": false,
+          "value": 0.0006169021870175984,
+          "threshold": -0.05
+        },
+        {
+          "id": "EMS-5",
+          "name": "Improper Capitalisation of Expenses",
+          "flagged": true,
+          "value": 2.784795321637427,
+          "threshold": 2.5
+        },
+        {
+          "id": "EMS-6",
+          "name": "Extended Depreciation / Amortisation",
+          "flagged": false,
+          "value": -0.007450238730207823,
+          "threshold": -0.15
+        },
+        {
+          "id": "EMS-7",
+          "name": "Understated Liabilities",
+          "flagged": false,
+          "value": 0.04147571252368011,
+          "threshold": -0.15
+        },
+        {
+          "id": "EMS-8",
+          "name": "Revenue Channel Stuffing",
+          "flagged": false,
+          "value": -0.3657610682484429,
+          "threshold": 0.1
+        }
+      ],
+      "cash_flow_flags": [
+        {
+          "id": "CFS-1",
+          "name": "Shifting Operating Cash Outflows to Investing",
+          "flagged": false,
+          "value": 0.49822138522703496,
+          "threshold": 0.8
+        },
+        {
+          "id": "CFS-2",
+          "name": "Financing Inflows Inflating Operating CF",
+          "flagged": false,
+          "value": 0.11948106298388785,
+          "threshold": 0.5
+        },
+        {
+          "id": "CFS-3",
+          "name": "Boosting Operating CF with Asset Sales",
+          "flagged": false,
+          "value": 0.0,
+          "threshold": 0.3
+        },
+        {
+          "id": "CFS-4",
+          "name": "Receivables Factoring",
+          "flagged": false,
+          "value": 2.431023102310231,
+          "threshold": -0.2
+        }
+      ],
+      "total_flags_raised": 3,
+      "overall_risk": "HIGH"
+    },
+    "expected_m_score_above_threshold": true,
+    "m_score_validation_passed": true
+  }
+}

@@ -1,0 +1,149 @@
+{
+  "company": "China Evergrande Group",
+  "ticker": "3333.HK",
+  "fiscal_year": 2022,
+  "ratios": {
+    "debt_to_equity": -0.7023809523809523,
+    "debt_to_assets": 0.3390804597701149,
+    "debt_to_capital": -2.36,
+    "debt_to_ebitda": -39.333333333333336,
+    "interest_coverage": -0.3508771929824561,
+    "current_ratio": 1.0135135135135136,
+    "quick_ratio": 0.07047297297297297,
+    "cash_ratio": 0.009662162162162162,
+    "working_capital_to_assets": 0.011494252873563218,
+    "operating_cash_flow_ratio": -0.02702702702702703,
+    "gross_margin": 0.08695652173913043,
+    "operating_margin": -0.08695652173913043,
+    "net_margin": -0.4608695652173913,
+    "return_on_assets": -0.06091954022988506,
+    "return_on_equity": 0.1261904761904762,
+    "asset_turnover": 0.13218390804597702,
+    "receivables_turnover": 2.5555555555555554,
+    "inventory_turnover": 0.23333333333333334,
+    "payables_turnover": 0.3181818181818182,
+    "cost_to_income": 1.0869565217391304,
+    "log_total_assets": 14.369395671190711,
+    "log_total_revenue": 12.345834587905333,
+    "revenue_growth": -0.08,
+    "asset_growth": -0.24347826086956523,
+    "retained_earnings_to_assets": -0.5172413793103449
+  },
+  "altman_z_prime_prime": {
+    "score": 1.220093557872227,
+    "zone": "Grey Zone"
+  },
+  "model_prediction": {
+    "rating": "CCC_CC",
+    "confidence": 0.45862525701522827,
+    "is_investment_grade": false,
+    "top_classes": [
+      {
+        "class": "CCC_CC",
+        "probability": 0.45862525701522827
+      },
+      {
+        "class": "A",
+        "probability": 0.2531231641769409
+      },
+      {
+        "class": "AAA_AA",
+        "probability": 0.12355311214923859
+      }
+    ]
+  },
+  "shenanigans": {
+    "beneish_m_score": 4.216432954896456,
+    "beneish_is_manipulator": true,
+    "earnings_flags": [
+      {
+        "id": "EMS-1",
+        "name": "Premature Revenue Recognition",
+        "flagged": false,
+        "value": -0.11067193675889325,
+        "threshold": 0.1
+      },
+      {
+        "id": "EMS-2",
+        "name": "Bogus Revenue",
+        "flagged": false,
+        "value": -0.28695652173913044,
+        "threshold": 0.1
+      },
+      {
+        "id": "EMS-3",
+        "name": "One-Time Gains Boosting Income",
+        "flagged": false,
+        "value": 15000.0,
+        "threshold": 0.2
+      },
+      {
+        "id": "EMS-4",
+        "name": "Shifting Current Expenses to Later Period",
+        "flagged": false,
+        "value": 0.04695652173913034,
+        "threshold": -0.05
+      },
+      {
+        "id": "EMS-5",
+        "name": "Improper Capitalisation of Expenses",
+        "flagged": false,
+        "value": 0.4,
+        "threshold": 2.5
+      },
+      {
+        "id": "EMS-6",
+        "name": "Extended Depreciation / Amortisation",
+        "flagged": false,
+        "value": 0.002856515051636997,
+        "threshold": -0.15
+      },
+      {
+        "id": "EMS-7",
+        "name": "Understated Liabilities",
+        "flagged": false,
+        "value": -0.03896103896103886,
+        "threshold": -0.15
+      },
+      {
+        "id": "EMS-8",
+        "name": "Revenue Channel Stuffing",
+        "flagged": false,
+        "value": -0.18478260869565213,
+        "threshold": 0.1
+      }
+    ],
+    "cash_flow_flags": [
+      {
+        "id": "CFS-1",
+        "name": "Shifting Operating Cash Outflows to Investing",
+        "flagged": true,
+        "value": 2000.0,
+        "threshold": 0.8
+      },
+      {
+        "id": "CFS-2",
+        "name": "Financing Inflows Inflating Operating CF",
+        "flagged": false,
+        "value": 0.0,
+        "threshold": 0.5
+      },
+      {
+        "id": "CFS-3",
+        "name": "Boosting Operating CF with Asset Sales",
+        "flagged": false,
+        "value": 0.0,
+        "threshold": 0.3
+      },
+      {
+        "id": "CFS-4",
+        "name": "Receivables Factoring",
+        "flagged": false,
+        "value": -0.18181818181818182,
+        "threshold": -0.2
+      }
+    ],
+    "total_flags_raised": 2,
+    "overall_risk": "HIGH"
+  }
+}

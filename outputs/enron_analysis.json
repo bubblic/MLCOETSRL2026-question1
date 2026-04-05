@@ -1,0 +1,152 @@
+{
+  "company": "Enron Corp",
+  "ticker": "ENRNQ",
+  "fiscal_year": 2000,
+  "ratios": {
+    "debt_to_equity": 0.8918047079337402,
+    "debt_to_assets": 0.15616078652886128,
+    "debt_to_capital": 0.4714042121756763,
+    "debt_to_ebitda": 3.6428062678062676,
+    "interest_coverage": 2.3305489260143197,
+    "current_ratio": 1.0695275645990283,
+    "quick_ratio": 0.4344152643807646,
+    "cash_ratio": 0.048370062662817716,
+    "working_capital_to_assets": 0.030151290780574935,
+    "operating_cash_flow_ratio": 0.1682391044145603,
+    "gross_margin": 0.062229013086745576,
+    "operating_margin": 0.01937711456607368,
+    "net_margin": 0.009713361577156238,
+    "return_on_assets": 0.01494588034135841,
+    "return_on_equity": 0.08535309503051439,
+    "asset_turnover": 1.5386928842953758,
+    "receivables_turnover": 9.69497883801462,
+    "inventory_turnover": 99.17838405036726,
+    "payables_turnover": 9.66728035184617,
+    "cost_to_income": 0.9806228854339263,
+    "log_total_assets": 11.089851222101203,
+    "log_total_revenue": 11.520784501680495,
+    "revenue_growth": 1.5126894694854407,
+    "asset_growth": 0.9622839339744166,
+    "retained_earnings_to_assets": 0.04924965268766316
+  },
+  "altman_z_score": {
+    "score": 1.869581469682394,
+    "zone": "Grey Zone"
+  },
+  "model_prediction": {
+    "rating": "B",
+    "confidence": 0.9568896889686584,
+    "is_investment_grade": false,
+    "top_classes": [
+      {
+        "class": "B",
+        "probability": 0.9568896889686584
+      },
+      {
+        "class": "AAA_AA",
+        "probability": 0.025752270594239235
+      },
+      {
+        "class": "BB",
+        "probability": 0.01064841914921999
+      }
+    ]
+  },
+  "shenanigans": {
+    "beneish_m_score": 5.587041554750578,
+    "beneish_is_manipulator": true,
+    "beneish_threshold": -2.22,
+    "earnings_flags": [
+      {
+        "id": "EMS-1",
+        "name": "Premature Revenue Recognition",
+        "flagged": true,
+        "value": 0.3654783625184096,
+        "threshold": 0.1
+      },
+      {
+        "id": "EMS-2",
+        "name": "Bogus Revenue",
+        "flagged": false,
+        "value": -0.037702527061484886,
+        "threshold": 0.1
+      },
+      {
+        "id": "EMS-3",
+        "name": "One-Time Gains Boosting Income",
+        "flagged": false,
+        "value": 0.8922368696379995,
+        "threshold": 0.2
+      },
+      {
+        "id": "EMS-4",
+        "name": "Shifting Current Expenses to Later Period",
+        "flagged": false,
+        "value": 0.0006169021870175984,
+        "threshold": -0.05
+      },
+      {
+        "id": "EMS-5",
+        "name": "Improper Capitalisation of Expenses",
+        "flagged": true,
+        "value": 2.784795321637427,
+        "threshold": 2.5
+      },
+      {
+        "id": "EMS-6",
+        "name": "Extended Depreciation / Amortisation",
+        "flagged": false,
+        "value": -0.007450238730207823,
+        "threshold": -0.15
+      },
+      {
+        "id": "EMS-7",
+        "name": "Understated Liabilities",
+        "flagged": false,
+        "value": 0.04147571252368011,
+        "threshold": -0.15
+      },
+      {
+        "id": "EMS-8",
+        "name": "Revenue Channel Stuffing",
+        "flagged": false,
+        "value": -0.3657610682484429,
+        "threshold": 0.1
+      }
+    ],
+    "cash_flow_flags": [
+      {
+        "id": "CFS-1",
+        "name": "Shifting Operating Cash Outflows to Investing",
+        "flagged": false,
+        "value": 0.49822138522703496,
+        "threshold": 0.8
+      },
+      {
+        "id": "CFS-2",
+        "name": "Financing Inflows Inflating Operating CF",
+        "flagged": false,
+        "value": 0.11948106298388785,
+        "threshold": 0.5
+      },
+      {
+        "id": "CFS-3",
+        "name": "Boosting Operating CF with Asset Sales",
+        "flagged": false,
+        "value": 0.0,
+        "threshold": 0.3
+      },
+      {
+        "id": "CFS-4",
+        "name": "Receivables Factoring",
+        "flagged": false,
+        "value": 2.431023102310231,
+        "threshold": -0.2
+      }
+    ],
+    "total_flags_raised": 3,
+    "overall_risk": "HIGH"
+  },
+  "expected_m_score_above_threshold": true,
+  "m_score_validation_passed": true
+}

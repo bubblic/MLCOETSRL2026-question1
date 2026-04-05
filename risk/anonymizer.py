@@ -86,6 +86,22 @@ class EntityAnonymizer:
     # Public API
     # ------------------------------------------------------------------
 
+    def anonymize_text(self, text: str) -> str:
+        """Anonymize a single text string.
+
+        Convenience wrapper around :meth:`anonymize_pages` for callers
+        that have a plain string rather than a page dict (e.g. Kaggle
+        MD&A text or pre-extracted sections).
+
+        Args:
+            text: The text to anonymize.
+
+        Returns:
+            Anonymized text with entity and year placeholders.
+        """
+        result = self.anonymize_pages({0: text})
+        return result.get(0, text) or text
+
     def anonymize_pages(
         self,
         pages: Dict[int, Optional[str]],
