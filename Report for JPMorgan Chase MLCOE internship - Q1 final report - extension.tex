@@ -4324,17 +4324,57 @@ evolution, including the cash budget circularity.
 \centering
 \includegraphics[width=\textwidth]{report_latex_media/media/parameter_recovery_s4_fit.png}
 \caption{Parameter recovery, Scenario~4 (advanced policies + Bayesian
-OpEx + tax anomalies): one-step-ahead fit of the trained recovery
-model against the synthetic ground truth it was trained on.  Black
-markers are the synthetic observations produced by the generator model;
-red markers are the trained model's \texttt{forecast\_step}
-predictions, initialized from each preceding state.  The 2020 spike and
-2022 dip in the Tax panel correspond to the known one-time anomalies
-$\delta_{2020}=\$2\text{B}$ and $\delta_{2022}=-\$0.5\text{B}$, which
-the \texttt{TaxWithAnomalies} module reproduces exactly.  The slight
-noise in the OpEx panel reflects the injected aleatoric noise
-$\varepsilon_t\sim\mathcal{N}(0,\sigma^2)$.}
+OpEx + tax anomalies): \emph{deterministic} one-step-ahead fit of the
+trained recovery model against the synthetic ground truth it was
+trained on.  Black markers are the synthetic observations produced by
+the generator model; red markers are the trained model's
+\texttt{forecast\_step} predictions with \texttt{use\_mean\_opex=True}
+(posterior mean, no sampling), initialized from each preceding state.
+The 2020 spike and 2022 dip in the Tax panel correspond to the known
+one-time anomalies $\delta_{2020}=\$2\text{B}$ and
+$\delta_{2022}=-\$0.5\text{B}$, which the \texttt{TaxWithAnomalies}
+module reproduces exactly.  The slight noise in the OpEx panel reflects
+the injected aleatoric noise $\varepsilon_t\sim\mathcal{N}(0,\sigma^2)$.}
 \label{fig:param_recovery_fit_s4}
+\end{figure}
+
+The deterministic fit in Figure~\ref{fig:param_recovery_fit_s4} uses
+the posterior \emph{mean} of the Bayesian OpEx variational parameters
+and suppresses aleatoric noise.  To also visualize the \emph{predictive
+uncertainty} implied by the trained posterior, we repeat the same
+one-step-ahead fit but instead draw $N=500$ Monte Carlo samples from
+the OpEx posterior and noise distributions at each transition, then
+plot the sample mean together with a 95\% credible band.  The only
+code difference from the deterministic variant is passing
+\texttt{use\_mean\_opex=False} to \texttt{forecast\_step\_compiled} on
+a state tiled to $[N, 14]$ after a single
+\texttt{opex\_module.prepare\_mc} call.  Figure~\ref{fig:param_recovery_fit_s4_mc}
+shows the result.  As expected, the band is widest on OpEx itself and
+propagates into Net Income, Tax, Non-Current Liabilities, and Equity
+(which depend on OpEx through the income statement and cash budget),
+while COGS, cash, working-capital items, and non-current assets---which
+are deterministic functions of sales, cost ratio, and working-capital
+ratios at the 1-step horizon---collapse to a near-zero band.  This is
+the expected topology of uncertainty in the model and further confirms
+the recovered posterior behaves correctly.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{report_latex_media/media/parameter_recovery_s4_fit_mc.png}
+\caption{Parameter recovery, Scenario~4: \emph{Monte Carlo}
+one-step-ahead fit.  Same setup as Figure~\ref{fig:param_recovery_fit_s4}
+except the trained model is evaluated with
+\texttt{use\_mean\_opex=False} on a state tiled to $N=500$ samples,
+drawing from the Bayesian OpEx posterior
+$q(\beta_0),q(\beta_1)$ and the aleatoric noise
+$\mathcal{N}(0,\sigma^2)$.  The red line is the MC mean and the shaded
+red region is the 95\% credible band (2.5--97.5 percentiles across
+samples).  Panels whose value depends on OpEx at this 1-step horizon
+(OpEx, Net Income, Tax, Non-Current Liabilities, Equity) display the
+propagated uncertainty; panels that do not (COGS, NCA, Cash, AR, AP,
+Inventory, Effective ST Debt) have near-zero bands, as they are
+deterministic functions of the (exact) state and exogenous sales.}
+\label{fig:param_recovery_fit_s4_mc}
 \end{figure}
 
 \section{References}
