@@ -109,14 +109,15 @@
 % --- Header / Footer ---
 \pagestyle{fancy}
 \fancyhf{}
-\rhead{\color{jpblue}\textbf{JP Morgan --- Q1 Final Report}}
-\lhead{\color{jpblue}Confidential}
+\rhead{\color{jpblue}\textbf{JPMorganChase --- Question 1 Final Report}}
+% \lhead{\color{jpblue}Confidential}
 \rfoot{Page \thepage}
 \lfoot{\color{codegray}\today}
 
 % --- Section Formatting ---
-\titleformat{\section}{\large\bfseries\color{jpblue}}{}{0em}{}[\titlerule]
-\titleformat{\subsection}{\normalsize\bfseries\color{jpblue}}{}{0em}{}
+\titleformat{\section}{\large\bfseries\color{jpblue}}{\thesection}{0.75em}{}[\titlerule]
+\titleformat{\subsection}{\normalsize\bfseries\color{jpblue}}{\thesubsection}{0.75em}{}
+\titleformat{\subsubsection}{\normalsize\bfseries\color{jpblue}}{\thesubsubsection}{0.75em}{}
 
 % --- Hyperref ---
 \hypersetup{
@@ -141,11 +142,11 @@
   {\large\color{codegray} A Structural No-Plug Approach with Machine Learning\par}
   \vspace{2cm}
   \rule{0.6\textwidth}{0.4pt}\\[0.5cm]
-  {\large JP Morgan --- MLCOE Internship Project (Question 1)\par}
+  {\large JPMorganChase --- MLCOE TSRL Internship Project (Question 1)\par}
   \vspace{0.5cm}
   {\normalsize Jaebum (Albert) Chung\par}
   \vspace{0.3cm}
-  {\normalsize February 26, 2026\par}
+  {\normalsize April 6, 2026\par}
   \vspace{3cm}
   \begin{abstract}
     \noindent This report implements a structural financial statement forecasting model
@@ -207,7 +208,7 @@ company's overall financial health.
 
 Double-entry bookkeeping is the foundation of modern accounting. Its
 central rule is that every financial transaction must be recorded as two
-equal and opposite entries across accounts, so that the fundamental
+equal and opposite entries across ledger accounts, so that the fundamental
 accounting equation is preserved at all times:
 
 \[
@@ -259,71 +260,100 @@ reducing Cash on the Balance Sheet while simultaneously reducing the
 outstanding Debt liability. At every step, the equation holds.
 
 \paragraph{Connection to our model.}
-These two examples illustrate the principle that underpins the entire
-forecasting model in this report. In our implementation, the Statement
-of Cash Flows is realized as a \emph{Cash Budget} decomposed into
-five net liquidity balances: operating, capital expense, financing,
-owner transactions, and discretionary. Every revenue event, expense,
-and cash movement is explicitly routed through the appropriate Cash
-Budget module, and every accrual is tracked on the Balance Sheet.
-Because no ``plug'' variable forces the equation to balance, the
-accounting identity
-$\text{Assets} = \text{Liabilities} + \text{Equity}$ must
-\emph{emerge} from the correctness of the model's logic. If a single
-cash flow is misrouted or an accrual is omitted, the identity breaks
-and the error is immediately detectable---this is the core validation
-mechanism described in Section~\ref{sec:testing}.
+These examples reveal why double-entry bookkeeping makes
+\emph{driver-based} financial forecasting without plugs or circularity possible. Because every value flow is
+recorded on both sides of the ledger---every expense has a matching
+cash outflow, every credit sale has a matching receivable, every
+depreciation charge has a matching reduction in Non-Current
+Assets---the financial state at time $t+1$ is fully determined by the
+state at time $t$ together with the flows between them. Nothing escapes
+the ledger.
 
 \subsection{Proposed Methodology: A Structural ``No-Plug'' Approach}
 
-To address these limitations, this report implements a structural
-forecasting model based on the framework proposed by Pareja (2009). The
-core distinction of this method is the rejection of circular references
-and balancing plugs. Instead, the model relies on a fully integrated
-system where the Balance Sheet is derived endogenously from the Cash
-Budget and Income Statement.
+To address the limitations of plug-based financial forecasts, this report implements a
+structural forecasting model based on the framework proposed by
+Pareja~(2009) with the revenue as the primary driver. The core distinction of this method is the rejection of
+circular references and balancing plugs. Instead, the model derives
+next year's Balance Sheet and Income Statement endogenously from this
+year's state through a \emph{Cash Budget} and the projected revenue.
 
-In this approach, every line item is driven by specific causal factors
-(e.g., Receivables driven by Sales, Payables driven by Operating
-Expense) and the calculation of debt, and the ending cash balance is a
-calculated result of these flows rather than a residual plug.
+\paragraph{The three financial statements.}
+A company's financial position at any point in time is captured by three
+interconnected statements:
 
-In Pareja (2009)'s framework, all the policy variables are known, and
-the models are used to forecast the balance sheet based on predicted
-sales and purchases accounting for pricing and volume relationship and
-inflation. In our case, we do not know the policy variables, but know a
-company's past financial statements. Using simple linear equations and
-machine learning algorithms, we train the policy variables that will
-satisfy the historical financial data. We initially assume that the
-variables remain constant within our training data, and in later
-sections apply machine learning methods to account for probability
-distribution of certain variables to provide richer predictions.
+\begin{itemize}
+\item \textbf{Balance Sheet}: A snapshot of what the company owns
+  (Assets: non-current assets, receivables, inventory, cash, market
+  securities) and owes (Liabilities: payables, short-term debt,
+  long-term debt) plus the residual claim of owners (Equity).
+\item \textbf{Income Statement}: The flow of revenues and expenses over
+  a period, producing Net Income. Key elements include Sales, Cost of
+  Goods Sold (COGS), Operating Expenses (OpEx), Depreciation, Interest
+  Expense, and Income Tax.
+\item \textbf{Cash Budget} (Statement of Cash Flows): The flow of cash
+  in and out of the company, decomposed into operating, investing,
+  financing, and owner transaction activities. The ending cash balance
+  is the \emph{result} of these flows, not an input.
+\end{itemize}
 
-We have further refined the Pareja (2009) framework to better reflect
-the treasury strategies of modern multinational corporations like Apple
-or General Motors. Where the original model might treat Marketable
-Securities solely as a reservoir for excess cash, our implementation
-models these securities as a distinct portion of the
-company's liquidity strategy \hyperlink{ref:almeida14}{[Almeida(14)]}. This
-adjustment allows for a more realistic depiction of how large firms
-manage capital allocation between operational cash and interest-bearing
-assets.
+\paragraph{Forecast mechanism: driver + policies + Cash Budget.}
+The model uses \textbf{Sales Revenue} as the single primary forecast
+driver. Given a sales forecast, a set of \emph{policy ratios} determine
+every other element:
 
-Moreover, Pareja (2009) assumes long-term debt to always have 10-year
+\begin{itemize}
+\item Sales drives Revenue on the Income Statement, which determines
+  COGS (via a cost ratio), Receivables, Inventory, Payables, and
+  Advance Payments on the Balance Sheet.
+\item OpEx, Depreciation, and Interest Expense complete the Income
+  Statement, producing Net Income.
+\item The Cash Budget routes every revenue, expense, and accrual change
+  into the appropriate net liquidity balance (operating, capital
+  expense, financing, owner transactions, discretionary). The sum of
+  these flows determines the new Cash and Investments in Market
+  Securities balances.
+\item Debt rollover, equity financing, dividends, and buybacks are
+  computed from the Cash Budget's financing and owner transaction
+  modules, updating Liabilities and Equity.
+\end{itemize}
+
+Because every cash inflow and outflow is explicitly routed through the
+Cash Budget, the next year's Balance Sheet is fully determined---no
+element is left as a residual plug. The accounting identity
+$\text{Assets} = \text{Liabilities} + \text{Equity}$ must emerge from
+the correctness of the logic, which is what makes the model auditable
+and testable.
+
+\paragraph{Policy variables and training.}
+In Pareja~(2009)'s framework, all policy variables are assumed known.
+In our case, we do not know the policy variables but know a company's
+past financial statements. We train the policy ratios (e.g., \%AR,
+\%AP, \%TL, \%Cash, cost ratio, payout ratio, depreciation rate) from
+historical data using gradient-based optimization. Simple policies use
+static ratios; advanced policies use logit-linear time trends or
+Bayesian variational inference to capture evolving firm behavior and
+quantify uncertainty.
+
+\paragraph{Refinements to Pareja~(2009).}
+We have further refined the framework to better reflect the treasury
+strategies of modern multinational corporations like Apple or General
+Motors. Where the original model might treat Marketable Securities
+solely as a reservoir for excess cash, our implementation models these
+securities as a distinct portion of the company's liquidity strategy
+\hyperlink{ref:almeida14}{[Almeida(14)]}. This adjustment allows for a more
+realistic depiction of how large firms manage capital allocation between
+operational cash and interest-bearing assets.
+
+Moreover, Pareja~(2009) assumes long-term debt to always have 10-year
 maturity. In reality, various debt products with varying maturity
 schedules exist. We, therefore, use an average maturity value as a
 variable to be also trained.
 
-Once the relationships and policy variables connecting the financial
-statement elements are established, the methodology utilizes Sales
-Revenue as the single primary driver. All other elements---cost of
-goods sold, inventory, receivables, payables, and liquidity---are
-derived from Sales through trained policy ratios, while Purchases
-is computed endogenously from the inventory balance identity rather
-than forecast independently. By anchoring the forecast to this core
-operational activity, the model can accurately predict the evolution
-of the balance sheet and income statement while maintaining the
-necessary accounting linkages.
+Section~\ref{sec:part1} details the time evolution equations for every
+financial element, showing precisely how Sales, the policy ratios, and
+the Cash Budget connect to produce next year's Balance Sheet and Income
+Statement without any plug.
 
 \subsection{Testing and Validation Plan}
 
@@ -336,18 +366,19 @@ foundation of our validation strategy, which combines the accounting
 identity invariant with a comprehensive programmatic test suite. The
 full testing methodology is detailed in Section~\ref{sec:testing}.
 
-The following sections (\textbf{1. The Balance Sheet Elements},
-\textbf{2. Mathematical Equations Governing the Balance Sheet Elements,}
-and \textbf{3. Time Series Representation of the Balance Sheet)} are
-answers to the questions 1 and 2, submitted codes are answers to
-questions 3 and 4, and the remaining sections (\textbf{4. Training the
-Model} and \textbf{5. Applying Machine Learning}) provide answers to
-questions 5, 6, 7, 8. For Part 2, the answers to the questions a)
-{\textasciitilde} i) are directly mapped to its headings.
+The first three subsections of Part~1 (\emph{The Balance Sheet
+Elements}, \emph{Time Evolution of Financial Elements}, and \emph{Time
+Series Representation of the Balance Sheet}) answer questions~1 and~2;
+the submitted codes answer questions~3 and~4; and the remaining
+subsections (\emph{Training the Model}, \emph{Applying Machine
+Learning}, and \emph{Forecast Results}) answer questions~5 through~8.
+For Part~2, the answers to questions a)~through~i) are directly mapped
+to its subsection headings.
 
 \section{Part 1}
+\label{sec:part1}
 
-\subsection{1. The Balance Sheet Elements}
+\subsection{The Balance Sheet Elements}
 
 The elements of a balance sheet from \hyperlink{ref:pareja09}{Pareja(09)} are as follows:
 
@@ -392,7 +423,7 @@ various other assets including deferred tax, non-current account
 receivables, Goodwill, and other intangible assets. For the purpose of
 this simple modeling exercise, we first identify the elements listed in
 the above balance sheet, and lump all unaccounted-for elements as shown
-below, using GM's balance sheet as example:
+below, using Apple's balance sheet as example:
 
 \begin{itemize}
 \item
@@ -605,18 +636,42 @@ Current liabilities (\textbf{CLiab\textsubscript{t}})
 
 \begin{itemize}
 \item
-  ST debt, current accrued expenses, other current liabilities, and
-  current portion of the long-term debt and capital lease obligations
-  principals
+  Consists of the operational short-term obligations (Effective ST Debt)
+  plus the principal due this year on long-term loans.
 \item
-  \textbf{STLoan\textsubscript{t}} = ST debt\textsubscript{t} + current
-  accrued expenses\textsubscript{t} + other current
-  liabilities\textsubscript{t}
+  Effective ST Debt (\textbf{EffSTDebt\textsubscript{t}}): ST debt
+  (commercial paper), current accrued expenses, and other current
+  liabilities. Two policy variants are implemented:
+
+  \begin{itemize}
+  \item
+    \textbf{Simple policy} (\texttt{SimpleDebtPolicy}): ST debt is
+    deficit-driven---the model borrows short-term only to cover any
+    remaining liquidity shortfall after operating and investing
+    activities. EffSTDebt\textsubscript{t} = max(0,
+    deficit\textsubscript{t}).
+  \item
+    \textbf{Advanced policy} (\texttt{TrendDebtPolicy}): ST debt is
+    modeled as a logit-linear policy ratio of sales, capturing the
+    empirical pattern that firms like Apple scale short-term borrowing
+    with revenue:
+    EffSTDebt\textsubscript{t} = Sales\textsubscript{t} $\cdot$
+    $\sigma(\alpha + \beta \cdot t)$, where $\sigma$ is the sigmoid
+    function and $\alpha, \beta$ are trainable parameters.
+  \end{itemize}
 \item
-  \textbf{CLiab\textsubscript{t}} = \textbf{STLoan\textsubscript{t}} +
-  Total LT liability\textsubscript{t} / \textbf{AvgM} =
-  \textbf{STLoan\textsubscript{t}} + \textbf{NLiab\textsubscript{t}} /
-  (\textbf{AvgM} -- 1)
+  Current LT Debt (\textbf{CurrLTDebt\textsubscript{t}}): Current
+  portion of the long-term debt and capital lease obligations
+  principals.
+
+  \begin{itemize}
+  \item
+    CurrLTDebt\textsubscript{t} = Total LT liability\textsubscript{t} /
+    AvgM = NLiab\textsubscript{t} / (AvgM -- 1)
+  \end{itemize}
+\item
+  Total: CLiab\textsubscript{t} =
+  EffSTDebt\textsubscript{t} + CurrLTDebt\textsubscript{t}
 \end{itemize}
 
 Equity
@@ -645,71 +700,7 @@ Stockholder equity (\textbf{SE\textsubscript{t}})
   \end{itemize}
 \end{itemize}
 
-\subsubsection{Post Part 1}
-
-We further upgrade the models to better represent Apple's historical
-data, namely the effective ST debt in Current liabilities:
-
-Assets
-
-\emph{Same as before}
-
-Liabilities
-
-Account payables (\textbf{AP\textsubscript{t}})
-
-Advance payments from customers for sales
-(\textbf{AdvPS\textsubscript{t}})
-
-Non-current liabilities (\textbf{NLiab\textsubscript{t}})
-
-\begin{itemize}
-\item
-  Non-current employee benefits, non-current deferred revenue,
-  non-current accrued expenses, long-term debt and capital lease
-  obligations MINUS next year's principal, other non-current liabilities
-\item
-  \textbf{NLiab\textsubscript{t}} = Total LT liability\textsubscript{t}
-  * (1 -- 1/\textbf{AvgM})
-\end{itemize}
-
-Current liabilities (\textbf{CLiab\textsubscript{t}})
-
-\begin{itemize}
-\item
-  Consists of the operational short-term obligations (Effective ST Debt)
-  plus the principal due this year on long-term loans.
-\item
-  Effective ST Debt (\textbf{EffSTDebt\textsubscript{t}}): ST debt
-  (commercial paper), current accrued expenses, and other current
-  liabilities.
-
-  \begin{itemize}
-  \item
-    Modeled as a logit-linear policy ratio of sales:
-    EffSTDebt\textsubscript{t} = Sales\textsubscript{t} *
-    \%STDebt\textsubscript{t}
-  \end{itemize}
-\item
-  Current LT Debt (\textbf{CurrLTDebt\textsubscript{t}}): Current
-  portion of the long-term debt and capital lease obligations
-  principals.
-
-  \begin{itemize}
-  \item
-    CurrLTDebt\textsubscript{t} = Total LT liability\textsubscript{t} /
-    AvgM = NLiab\textsubscript{t} / (AvgM -- 1)
-  \end{itemize}
-\item
-  Total Current Liabilities Calculation: CLiab\textsubscript{t} =
-  EffSTDebt\textsubscript{t} + CurrLTDebt\textsubscript{t}
-\end{itemize}
-
-Equity
-
-\emph{Same as before}
-
-\subsection{2. Mathematical Equations Governing the Balance Sheet Elements}
+\subsection{Time Evolution of Financial Elements}
 
 We refer to \hyperlink{ref:pareja09}{Pareja(09)} for constructing the mathematical equations that
 link all the elements on the balance sheet without circularity or plugs.
@@ -728,11 +719,111 @@ on volume's price sensitivity. For the scope of this problem set, we
 lump these variables into an overarching sales driver whose evolution is
 modeled independently based on historical data. Sales serves as the primary driver because it is the most fundamental measure of a firm's economic activity---all other financial statement items are either costs of generating revenue, assets deployed to support revenue, or financing decisions to fund those assets. In the corporate finance literature, revenue-driven forecasting is standard practice \hyperlink{ref:koller20}{[Koller(20)]}. The limitation of this approach is that it does not model the underlying demand drivers (price elasticity, market size, competitive dynamics) that determine revenue growth. The sales forecast itself is generated via linear extrapolation of historical trends---a pragmatic choice given the 4--8 years of available data, though macroeconomic-sensitive models (e.g., LSTM with GDP and inflation inputs) would improve robustness.
 
-We begin by modeling the asset elements.
+\subsubsection{Forecast Flow Overview}
 
-\subsubsection{Assets}
+Before diving into the equations for each balance sheet element, it is
+helpful to trace how a single period's sales forecast ripples through
+all three financial statements to produce next year's Balance Sheet. The
+flow is as follows.
 
-\paragraph{Non-Current Assets (NCA)}
+\paragraph{Income Statement.}
+Revenue equals Sales\textsubscript{t} at the top of the Income
+Statement. From Revenue we subtract the operating costs:
+
+\begin{itemize}
+\item Cost of Goods Sold (COGS)
+\item Operating Expenses (OpEx, e.g., administrative and sales)
+\item Depreciation and amortization
+\end{itemize}
+
+This yields EBIT (Earnings Before Interest and Taxes). Stated
+sequentially:
+\[
+\text{EBIT} = \text{Revenue} - \text{COGS} - \text{OpEx} - \text{Depreciation}
+\]
+Next, we account for interest payments on outstanding debt and returns
+on short-term investments in market securities (see
+\eqref{eq:ms_return_derivation}), producing EBT (Earnings Before Tax):
+\[
+\text{EBT} = \text{EBIT} - \text{Interest} + \text{MSReturn}
+\]
+Income tax is assessed as a fixed percentage of EBT, giving Net Income:
+\[
+\text{Net Income} = \text{EBT} \cdot (1 - \text{\%IT})
+\]
+From Net Income, a fraction is allocated as next year's dividends, and
+the remainder accumulates into Retained Earnings (a component of
+Equity).
+
+\paragraph{Cash Budget.}
+Net Income is an accrual concept and does not correspond directly to
+cash generated. To track actual liquidity, we build a Cash Budget that
+records cash movements when they physically occur, independent of
+revenue recognition timing. The Cash Budget therefore serves the same
+role as the Statement of Cash Flows but is built prospectively: rather
+than reconciling Net Income to cash after the fact, it schedules every
+expected cash receipt and disbursement directly.
+
+Unlike the standard three-section Statement of Cash Flows, we decompose
+financing activities into two separate modules---External Financing
+(debt) and Transactions with Owners (equity and dividends)---and add a
+fifth module for Discretionary Transactions in market securities,
+reflecting how these are managed as a policy allocation rather than a
+residual. Each module produces a Net Liquidity Balance (NLB):
+
+\begin{itemize}
+\item \textbf{Operating Activities}: Inflows from sales (including
+  collections on receivables and advance payments) minus outflows for
+  purchases, OpEx, and income tax.
+\item \textbf{Investing Activities}: Capital expenditure outflows
+  (CapEx) for fixed asset investment.
+\item \textbf{External Financing}: Inflows from new short-term and
+  long-term borrowing, minus outflows for principal repayments and
+  interest expense.
+\item \textbf{Transactions with Owners}: Inflows from equity financing,
+  minus outflows for dividends paid and stock buybacks.
+\item \textbf{Discretionary Transactions}: Returns from short-term
+  investments in market securities. In our model, ST investments are a
+  policy allocation of total liquidity rather than an excess-cash
+  destination, so this module has no discretionary outflow.
+\end{itemize}
+
+The sum of the five NLBs determines the change in total liquidity (Cash
++ Investments in Market Securities) from one period to the next.
+
+\paragraph{Closing the loop.}
+With the Income Statement producing Net Income (and hence Retained
+Earnings) and the Cash Budget producing the change in total liquidity,
+every element of next year's Balance Sheet is determined:
+
+\begin{itemize}
+\item \textbf{Assets} evolve via working-capital ratios (AR, AP, Inv,
+  AdvPP, AdvPS) applied to next year's Sales and Purchases, the NCA
+  roll-forward (CapEx minus Depreciation), and the updated liquidity
+  balance from the Cash Budget.
+\item \textbf{Liabilities} evolve via the debt rollover schedule (new
+  borrowing from External Financing, principal payments, amortization
+  of long-term debt into current portion) and working-capital ratios
+  for AP and AdvPS.
+\item \textbf{Equity} evolves via the Retained Earnings accrual from
+  Net Income, minus dividends and buybacks, plus any new equity
+  financing.
+\end{itemize}
+
+No element is left as a residual plug---that is, no line item is set to
+whatever makes the balance sheet balance, which would otherwise mask
+errors in the model. Instead, the accounting identity
+$\text{Assets} = \text{Liabilities} + \text{Equity}$ emerges
+automatically at $t+1$ as a direct consequence of double-entry
+bookkeeping: every cash or accrual transaction affects at least two
+accounts by equal and opposite amounts, so the identity is structurally
+guaranteed, not verified after the fact.
+
+The remainder of this section provides the detailed equations for each
+financial element: the individual asset line items, the Cash Budget,
+the liability line items, Equity, and the Income Statement.
+
+\subsubsection{Non-Current Assets (NCA)}
 
 The balance of non-current assets evolves sequentially as existing fixed
 assets depreciate over their useful lifecycle and new capital
@@ -860,8 +951,12 @@ training. Note that \%AR is equivalent to DSO/365, where DSO (Days Sales Outstan
 
 Finally, the last element in our assets is total liquidity (TL).
 Following \hyperlink{ref:pareja09}{Pareja(09)}, we model the total liquidity available as a
-percentage of sales. Within the liquidity, we assume that a portion of
-it is invested in market securities (IMS):
+function of sales, split between cash and investments in market
+securities (IMS). Two policy variants are implemented:
+
+\paragraph{Simple policy (\texttt{SimpleLiquidityPolicy}).}
+Total liquidity is a static percentage of sales, with a fixed
+cash/liquidity split:
 
 \begin{equation}\label{eq:total_liquidity}
 \text{TL}_t = \text{\%TL} \cdot \text{Sales}_t
@@ -875,15 +970,31 @@ it is invested in market securities (IMS):
 \text{IMS}_t = (1 - \text{\%Cash}) \cdot \text{TL}_t
 \end{equation}
 
-We add \%TL and \%Cash to our variables to be trained.
+\paragraph{Advanced policy (\texttt{TrendLiquidityPolicy}).}
+Both the total liquidity ratio and the cash allocation evolve over time
+via logit-linear trends, with a baseline floor that is independent of
+sales:
 
-Before we move onto liabilities, it is helpful to generate a Liquidity
-Budget to model the flow of cash in and out of cash balance and
-short-term investment into market securities. We have updated the name
-from Cash Budget to Liquidity Budget to reflect our use of total
-liquidity to represent both cash and market securities investment.
+\begin{equation}\label{eq:total_liquidity_trend}
+\text{TL}_t = \beta_{\text{base}} + \text{Sales}_t \cdot \sigma(\alpha_{\text{TL}} + \beta_{\text{TL}} \cdot t)
+\end{equation}
 
-\subsubsection{Liquidity Budget}
+\begin{equation}\label{eq:cash_trend}
+\text{Cash}_t = \text{TL}_t \cdot \sigma(\alpha_{\text{Cash}} + \beta_{\text{Cash}} \cdot t)
+\end{equation}
+
+The baseline floor $\beta_{\text{base}}$ captures the minimum liquidity
+a firm maintains regardless of revenue (e.g., strategic cash reserves),
+while the logit-linear terms allow the sales-proportional component and
+the cash/IMS split to shift gradually over time.
+
+We add the liquidity policy parameters to our variables to be trained.
+
+Before we move onto liabilities, it is helpful to generate a Cash
+Budget to model the flow of cash in and out of the liquidity balance
+(cash and short-term investments in market securities).
+
+\subsubsection{Cash Budget}
 
 We can break down flows into/out of liquidity balance into net liquidity
 balances (NLB) pertaining to the following activities: operating,
@@ -987,7 +1098,7 @@ follows:
 
 We add AvgM, \%AvgSTInt and \%AvgLTInt to our variables to learn. We
 derive the expression for STLoan\textsubscript{t} and
-LTLoan\textsubscript{t} in \ul{2.3 Liabilities}.
+LTLoan\textsubscript{t} in the \emph{Liabilities} subsection.
 
 \paragraph{External Investment NLB}
 
@@ -1027,36 +1138,61 @@ where
 
 The equity financing proportion is trained from historical data, implicitly capturing the firm's revealed preference between debt and equity. This is consistent with the pecking order hypothesis (Myers \& Majluf, 1984), which predicts firms prefer internal funds, then debt, then equity---resulting in a low and relatively stable \%EF for profitable firms. The trained \%EF thus reflects the firm's historical position on the pecking order rather than an arbitrary split.
 
+Dividends are modeled with two policy variants:
+
+\paragraph{Simple policy (\texttt{SimpleDividendPolicy}).}
+Dividends are a fixed percentage of prior-year net income, with no
+memory of past payouts:
+
 \begin{equation}\label{eq:target_dividends}
-\text{Target Dividends}_{t-1} = \text{\%Payout ratio} \cdot \text{Net income}_{t-1}
+\text{Dividends}_{t-1} = \text{\%Payout ratio} \cdot \text{Net income}_{t-1}
 \end{equation}
 
+\paragraph{Advanced policy (\texttt{LintnerDividendPolicy}).}
 Rather than calculating dividends strictly as a fixed percentage of
-current net income, we apply the Lintner Model to account for dividend
-smoothing. Corporate management typically prefers stable dividend
-payouts to avoid signaling financial distress to investors. Therefore,
-the modeled dividend is represented as a weighted average between a
-target payout (driven by a baseline \%Payout\_Ratio) and the actual
-dividends paid in the prior period, regulated by an optimized
-Adjustment\_Speed parameter. So, the actual dividends equation becomes:
+current net income, we apply the Lintner partial-adjustment model to
+account for dividend smoothing. Corporate management typically prefers
+stable dividend payouts to avoid signaling financial distress to
+investors. Therefore, the modeled dividend is represented as a weighted
+average between a target payout (driven by a baseline \%Payout\_Ratio)
+and the actual dividends paid in the prior period, regulated by an
+optimized Adjustment\_Speed parameter:
 
 \begin{equation}\label{eq:lintner_dividends}
-\text{Dividends}_{t-1} = \text{Adj.\ Speed} \cdot \text{Target Dividends}_{t-1} + (1 - \text{Adj.\ Speed}) \cdot \text{Dividends}_{t-2}
-\end{equation}
-
-\begin{equation}\label{eq:stock_buybacks}
-\text{Stock buybacks}_t = \text{\%Buyback ratio} \cdot \text{Depreciation}_t + \text{Any excess cash after meeting liquidity target}
+\text{Dividends}_{t-1} = \text{Adj.\ Speed} \cdot (\text{\%PR} \cdot \text{NI}_{t-1}) + (1 - \text{Adj.\ Speed}) \cdot \text{Dividends}_{t-2}
 \end{equation}
 
 The Lintner (1956) partial-adjustment model remains empirically robust for mature dividend-paying firms (Brav et al., 2005). The key economic insight is that managers treat dividends as a commitment: cutting dividends signals financial distress, so firms smooth payouts to avoid involuntary future cuts. For mega-cap technology firms, the adjustment speed tends to be low (conservative smoothing), as these firms have ample retained earnings and prefer share buybacks for flexible capital return. The trained Adjustment\_Speed parameter captures this firm-specific conservatism.
+
+Stock buybacks are also modeled with two policy variants:
+
+\paragraph{Simple policy (\texttt{SimpleBuybackPolicy}).}
+Buybacks are proportional to depreciation, using the asset base as a
+scaling proxy:
+
+\begin{equation}\label{eq:stock_buybacks}
+\text{Stock buybacks}_t = \text{\%BB} \cdot \text{Depreciation}_t
+\end{equation}
+
+\paragraph{Advanced policy (\texttt{BaselineBuybackPolicy}).}
+An affine model that adds a fixed baseline component, capturing the
+observation that large firms often maintain a minimum buyback program
+independent of asset turnover:
+
+\begin{equation}\label{eq:stock_buybacks_advanced}
+\text{Stock buybacks}_t = \beta_{\text{base}} + \beta_{\text{ratio}} \cdot \text{Depreciation}_t
+\end{equation}
+
+In both variants, any excess cash remaining after meeting the liquidity
+target is also distributed as additional buybacks.
 
 For companies like Apple, their revenue generates tremendous amount of
 cash that they sometimes use the excess cash to buy back shares to
 spread the earnings to shareholders instead of paying a higher dividend
 which has tax implications. We add \%Equity financing (\%EF), \%Payout
 ratio (\%PR) and \%Buyback ratio (\%BB) to our variables to learn. We
-will define the equations for Net income\textsubscript{t} in \ul{2.4.
-Income Statement}.
+will define the equations for Net income\textsubscript{t} in the
+\emph{Income Statement} subsection.
 
 \paragraph{Final NLB}
 
@@ -1074,9 +1210,7 @@ because we have the target liquidity balance given by \eqref{eq:total_liquidity}
 
 $\text{TL}_t = \text{\%TL} \cdot \text{Sales}_t$ from \eqref{eq:total_liquidity}
 
-\subsubsection{Liabilities}
-
-\paragraph{Account Payables}
+\subsubsection{Account Payables}
 
 Account payables are modeled as a percentage of total purchases made
 this year, payable next year to the suppliers:
@@ -1102,8 +1236,6 @@ generation. Therefore, we define:
 We add \%AdvPS to our variables to be trained.
 
 \subsubsection{Current Liabilities}
-
-\emph{From Part 1:}
 
 To model the current liabilities, we first model the effective
 short-term loan (STLoan\textsubscript{t}) issued this year. Short-term
@@ -1149,12 +1281,12 @@ where
 \text{Total LT liability}_t = \text{LTLoan}_t + \text{NLiab}_{t-1}
 \end{equation}
 
-\emph{Post Part 1:}
-
-We adjust how we model the current liabilities to better fit Apple's
-historical data.
-
 \subsubsection{Modeling Effective Short-Term Debt}
+
+The simple deficit-driven formulation of short-term borrowing does not
+fit the historical behavior of cash-rich firms like Apple. The
+following subsubsection motivates the advanced (logit-linear) policy
+variant and derives the metric used throughout the forecasting model.
 
 \paragraph{The Problem}
 
@@ -1259,7 +1391,7 @@ We have most of what we need to learn the training variables except
 dividends and income tax, which will come from modeling the net income
 in the income statement.
 
-\subsubsection{Income Statement}
+\subsubsection{Income Statement: EBITDA and EBT}
 
 We have all the components needed from the previous sections to
 construct the elements related to net income.
@@ -1278,7 +1410,8 @@ depreciation (and amortization):
 \text{EBT}_t = \text{EBITDA}_t - \text{Depreciation}_t - \text{AvgSTInt}_t - \text{AvgLTInt}_t + \text{\%MSReturn} \cdot \text{IMS}_{t-1}
 \end{equation}
 
-\textbf{Derivation of historical \%MSReturn.}
+\subsubsection{Derivation of Historical \%MSReturn}
+
 The term $\text{\%MSReturn} \cdot \text{IMS}_{t-1}$ represents income
 from short-term investments in market securities.  In practice, not all
 companies separately disclose this line item in their income statement;
@@ -1304,7 +1437,7 @@ $\text{MSReturn}_t = \text{EBT}_t - \text{EBIT}_t$ and set
 interest expense to zero for those years, which lumps all non-operating
 items into MSReturn but preserves the EBT identity.
 
-\textbf{Forward projection.}
+\paragraph{Forward projection.}
 During forecasting, the model projects $\text{MSReturn}_t$ as a fixed
 percentage return on the prior period's IMS balance:
 $\text{\%MSReturn} \cdot \text{IMS}_{t-1}$.  The effective rate
@@ -1312,6 +1445,8 @@ $\text{\%MSReturn} \cdot \text{IMS}_{t-1}$.  The effective rate
 $\text{MSReturn}_t / \text{IMS}_{t-1}$, which absorbs the blended
 contribution of investment income and smaller non-operating items into a
 single rate parameter. This fixed-percentage return assumption is a simplification: for firms with large treasury portfolios, investment returns depend on duration, credit quality, and market conditions. The trained parameter captures the historical average net return after FX effects and mark-to-market adjustments.
+
+\subsubsection{Net Income and Dividends}
 
 Net income (NI\textsubscript{t}) is determined by subtracting the income
 tax:
@@ -1327,18 +1462,14 @@ $\text{Dividends}_t = \text{\%PR} \cdot \text{NI}_t$ from \eqref{eq:target_divid
 We now have everything we need to represent every element in the balance
 sheet as a time series.
 
-\subsection{3. Time Series Representation of the Balance Sheet}
+\subsection{Time Series Representation of the Balance Sheet}
 
 We re-write every element in the balance sheet as a time series that
 have been simplified by combining the equations above. The primary
 drivers are Sales\textsubscript{t} and Purchases\textsubscript{t}, which
 drive every element given the variables to be trained are learned.
 
-\begin{enumerate}
-\def\labelenumi{\arabic{enumi}.}
-\item
-  \ul{Variables to be trained}
-\end{enumerate}
+\paragraph{Variables to be trained}
 
 \begin{itemize}
 \item
@@ -1405,13 +1536,9 @@ drive every element given the variables to be trained are learned.
   year
 \item
   \%BB : Stock buyback as a percentage of asset depreciation this year
-
-  \begin{enumerate}
-  \def\labelenumi{\arabic{enumi}.}
-  \item
-    \ul{Parameter Constraints and Bounds}
-  \end{enumerate}
 \end{itemize}
+
+\paragraph{Parameter Constraints and Bounds}
 
 To ensure the model generates economically logical and mathematically
 stable financial statements, strict constraints are enforced on both the
@@ -1419,66 +1546,59 @@ trainable variables and the underlying equations. These constraints are
 implemented natively within the optimizer using TensorFlow Probability
 Bijectors.
 
-\subsubsection{1. Domain Constraints on Trainable Variables}
+\subsubsection{Domain Constraints on Trainable Variables}
 
 \begin{itemize}
 \item
-  \textbf{Strict Positivity (\$x \textgreater{} 0\$):} Variables that
+  \textbf{Strict Positivity ($x > 0$):} Variables that
   cannot logically be negative, such as the Depreciation Rate (\%Depr),
   Asset Growth (\%AG), and Interest Rates (\%AvgSTInt, \%AvgLTInt), are
   constrained using a Softplus activation function. This prevents the
   optimizer from testing negative rates during gradient descent.
 \item
-  \textbf{Percentage Bounds (\$0 \textless{} x \textless{} 1\$):}
+  \textbf{Percentage Bounds ($0 < x < 1$):}
   Variables representing fractions of a whole, such as the Income Tax
   Percentage (\%IT), Dividend Payout Ratio (\%PR), and the Lintner
-  Dividend Adjustment Speed (\$\textbackslash alpha\$), are constrained
+  Dividend Adjustment Speed ($\alpha$), are constrained
   using a Sigmoid function.
 \item
-  \textbf{Maturity Boundary (\$AvgM \textgreater{} 1.001\$):} Because
+  \textbf{Maturity Boundary ($\text{AvgM} > 1.001$):} Because
   the calculation for the current portion of long-term debt divides by
-  \$(AvgM - 1)\$, the average maturity must strictly exceed 1 year to
+  $(\text{AvgM} - 1)$, the average maturity must strictly exceed 1 year to
   prevent mathematical singularity and infinite liability generation.
   This is enforced using a chained bijector: a Softplus function shifted
   by a constant of 1.001.
-\end{itemize}
-
-\begin{itemize}
 \item
   \textbf{Trended Ratios:} Time-varying policies, such as the Cost Ratio
   (CR) and Effective Short-Term Debt percentage, are modeled as
   logit-linear trends. By wrapping the linear trend
-  \$(\textbackslash alpha + \textbackslash beta t)\$ in a sigmoid
+  $(\alpha + \beta t)$ in a sigmoid
   function, the forecasted ratios are strictly bounded between 0 and 1,
   even if extrapolated decades into the future.
 \end{itemize}
 
-\subsubsection{2. Logical Constraints on Equations}
+\subsubsection{Logical Constraints on Equations}
 
 \begin{itemize}
 \item
   \textbf{Non-Negative Borrowing:} A company cannot issue ``negative''
-  debt to reduce cash. In the Liquidity Budget equations, the issuance
+  debt to reduce cash. In the Cash Budget equations, the issuance
   of new short-term and long-term loans is constrained using a maximum
-  function: \$New\textbackslash\_Loan\_t = \textbackslash max(0,
-  Liquidity\textbackslash\_Deficit\_t)\$. If there is a cash surplus,
+  function: $\text{New\_Loan}_t = \max(0,
+  \text{Liquidity\_Deficit}_t)$. If there is a cash surplus,
   borrowing falls to exactly zero, and the excess cash cascades into
   stock buybacks.
 \item
   \textbf{Structural Identity Check:} The fundamental accounting
-  equation (\$Assets = Liabilities + Equity\$) is strictly evaluated at
-  every time step \$t\$. Rather than enforcing this via a loss function
-  penalty (which would allow minor deviations), it is enforced
-  structurally by the double-entry routing of the Cash Budget. The
-  simulation calculates a delta to verify that the mismatch is exactly
-  zero.
-
-  \begin{enumerate}
-  \def\labelenumi{\arabic{enumi}.}
-  \item
-    \ul{Variables from External Environment}
-  \end{enumerate}
+  equation ($\text{Assets} = \text{Liabilities} + \text{Equity}$) is
+  strictly evaluated at every time step $t$. Rather than enforcing
+  this via a loss function penalty (which would allow minor deviations),
+  it is enforced structurally by the double-entry routing of the Cash
+  Budget. The simulation calculates a delta to verify that the mismatch
+  is exactly zero.
 \end{itemize}
+
+\paragraph{Variables from External Environment}
 
 Since we assume a flat short-term and long-term interest for loans and
 return on market securities, the only external variable is inflation.
@@ -1487,12 +1607,11 @@ This flat-rate assumption is a first-order simplification. In practice, borrowin
 \begin{itemize}
 \item
   Inflation\textsubscript{t} : Average inflation at year t
+\end{itemize}
 
-  \begin{enumerate}
-  \def\labelenumi{\arabic{enumi}.}
-  \item
-    \ul{Assets}
-  \end{enumerate}
+\paragraph{Assets}
+
+\begin{itemize}
 \item
   Non-current assets
 
@@ -1557,12 +1676,11 @@ This flat-rate assumption is a first-order simplification. In practice, borrowin
     NLB\textsubscript{t} + External investment NLB\textsubscript{t} +
     Owners transactions NLB\textsubscript{t}
   \end{itemize}
+\end{itemize}
 
-  \begin{enumerate}
-  \def\labelenumi{\arabic{enumi}.}
-  \item
-    \ul{Liabilities}
-  \end{enumerate}
+\paragraph{Liabilities}
+
+\begin{itemize}
 \item
   Account payables
 
@@ -1686,11 +1804,7 @@ AvgSTInt\textsubscript{t-1} -- AvgLTInt\textsubscript{t-1} + \%MSReturn
   + excess cash after meeting liquidity target
 \end{itemize}
 
-\begin{enumerate}
-\def\labelenumi{\arabic{enumi}.}
-\item
-  \ul{Equity}
-\end{enumerate}
+\paragraph{Equity}
 
 \begin{itemize}
 \item
@@ -1737,7 +1851,7 @@ equity identity is satisfied because our model follows the double-entry
 principle with any inflows and outflows on the balance sheet as done by
 \hyperlink{ref:pareja09}{Pareja(09)}.
 
-\subsection{4. Training the Model}
+\subsection{Training the Model}
 
 Out of the variables to be trained, there are quite a few that are
 easily trained independently from other variables by looking at balance
@@ -1837,8 +1951,8 @@ running \texttt{run\_trainable\allowbreak{}\_model\allowbreak{}\_forecast\allowb
 It shows a modest prediction ability, which is unsurprising because we
 have lumped various balance sheet elements together to form several
 elements to be more consistent with models described in \hyperlink{ref:pareja07}{Pareja(07)} and
-\hyperlink{ref:pareja09}{Pareja(09)}, as we have explained in \textbf{1. The Balance Sheet
-Elements}. Also, there is a limitation of assuming a liquidity balance
+\hyperlink{ref:pareja09}{Pareja(09)}, as we have explained in the \emph{Balance Sheet
+Elements} subsection. Also, there is a limitation of assuming a liquidity balance
 (cash + investment in market securities) that varies linearly with
 sales, especially for a cash-rich company like Apple whose cash balance
 and stock buybacks are governed by the recent buyback programs in order
@@ -1849,7 +1963,7 @@ Our model can also forecast earnings because net income is automatically
 calculated when predicting the elements on the balance sheet, and is
 outputted as ``net\_income'' as shown above.
 
-\subsection{5. Applying Machine Learning}
+\subsection{Applying Machine Learning}
 
 As our model is rather a simple model based on \hyperlink{ref:pareja09}{Pareja(09)}, there is a lot
 of improvements that could make the model more performant. A short list
@@ -2045,171 +2159,7 @@ Year | Mean     | 2.5% CI  | 97.5% CI
 \includegraphics[width=\textwidth]{report_latex_media/media/image6.png}
 \includegraphics[width=\textwidth]{report_latex_media/media/image7.png}
 
-\subsection{6. Projected Balance Sheet, Income Statement, and Cash Budget}
-
-We describe how we calculate the cash budget and income statement which
-are related to the balance sheet.
-
-We can start with the revenue on the income statement which appears at
-the top.
-
-Revenue is equivalent to Sales\_t.
-
-It is followed by operating costs, which include:
-
-\begin{itemize}
-\item
-  Cost of goods sold (COGS)
-\item
-  Operational expenses (OpEx such as administrative and sales)
-\item
-  Depreciation and amortization
-\end{itemize}
-
-EBIT (earnings before interests and taxes) is calculated by
-
-EBIT = Revenue -- COGS -- OpEx -- Depreciation
-
-Then, we account for interest payments and ST investment returns
-(derived as $\text{EBT} - \text{EBIT} + \text{InterestExpense}$ from the
-income statement, see \eqref{eq:ms_return_derivation}), which
-are used to calculate EBT (earnings before taxes):
-
-EBT = EBIT -- interest payments + ST returns
-
-Then, we assess the income tax by multiplying EBT by the effective tax
-rate:
-
-Income Taxes = EBT * \%EffTax
-
-Then, net income is found by subtracting the income taxes from EBT:
-
-Net Income = EBT -- Income Taxes
-
-From the net income, we allocate a percentage of it for dividends to be
-paid out next year, and the rest goes to cumulated retained earnings
-(CRE) which is part of equity:
-
-Next year dividends = Net Income * \%Payout
-
-CRE\_t = CRE\_t-1 + Net Income
-
-Cash Budget has 5 modules: Operating Activities, Investing Activities,
-External Financing, Transactions with Owners, and Discretionary
-Transactions.
-
-\subsubsection{Module 1: Operating Activities}
-
-\paragraph{Cash Inflows}
-
-Inflows from sales
-
-\emph{Total inflows = Inflows from sales}
-
-\paragraph{Cash Outflows}
-
-Payments for purchases = COGS
-
-Operational Expenses = OpEx
-
-Income Tax
-
-\emph{Total outflows = COGS + OpEx + Income Tax}
-
-\paragraph{Operating Net Cash Balance}
-
-= Total inflows -- Total outflows
-
-= Sales -- COGS -- OpEx -- Income Tax
-
-\subsubsection{Module 2: Investing Activities}
-
-\paragraph{Cash Inflow}
-
-\emph{Total inflows = 0}
-
-\paragraph{Cash Outflow}
-
-Investment in fixed assets = CapEx
-
-\emph{Total outflows = CapEx}
-
-\paragraph{Investing Net Cash Balance}
-
-= Inflow -- Outflow
-
-= -CapEx
-
-\subsubsection{Module 3: External Financing}
-
-\paragraph{Cash Inflows}
-
-ST loan
-
-LT loan
-
-\emph{Total inflows = ST loan + LT loan}
-
-\paragraph{Cash Outflows}
-
-ST principal payment
-
-ST interest
-
-LT principal payment
-
-LT interest
-
-\emph{Total outflows = ST principal + ST interest + LT principal + LT
-interest}
-
-\paragraph{Financing Net Cash Balance}
-
-= Inflow -- Outflow
-
-= ST loan + LT loan -- ST principal -- LT principal -- ST interest -- LT
-interest
-
-\subsubsection{Module 4: Transactions with Owners}
-
-\paragraph{Cash Inflows}
-
-Invested equity = Equity financing
-
-\emph{Total Inflows = Invested equity}
-
-\paragraph{Cash Outflows}
-
-Dividends from last year
-
-Stock Buyback
-
-\emph{Total Outflows = Dividends from last year + Stock buyback}
-
-\paragraph{Owners' Transaction Net Cash Balance}
-
-= Inflows -- Outflows
-
-= Equity financing -- Dividends from last year -- Stock buyback
-
-\subsubsection{Module 5: Discretionary Transactions}
-
-\paragraph{Cash Inflows}
-
-Return from ST investments
-
-\emph{Total inflows = Return from ST investments}
-
-\paragraph{Cash Outflows}
-
-No outflow because our model's policy allocates a fraction of total
-liquidity to ST investments instead of allocating excess cash to it
-
-\paragraph{Discretionary Transaction Net Cash Balance}
-
-= Inflows -- Outflows
-
-= Return from ST investments
+\subsection{Forecast Results}
 
 The forecasted 10 years (with inflation = 3\%, sales growing linearly at
 the historical rate of training data) of Balance Sheet, Income
@@ -4304,7 +4254,12 @@ following OpEx and tax formulations:
 \text{Tax}_t = \text{EBT}_t \cdot \tau + \delta_t, \qquad \delta_t = \begin{cases} a_{\text{onetime}} & \text{if year } t \text{ has anomaly} \\ 0 & \text{otherwise} \end{cases}
 \end{equation}
 
-where $\beta_0, \beta_1$ have Normal variational posteriors with
+where $\Pi_t^{\text{cum}} = \prod_{s=1}^{t}(1 + \text{Inflation}_s)$ is
+the cumulative inflation factor (so that $\beta_0 \cdot \Pi_t^{\text{cum}}$
+is the closed-form equivalent of the recursive baseline
+$\text{OB}_{t-1} \cdot (1 + \text{Inflation}_t)$ from \eqref{eq:opex}),
+$\bar{S}$ is the mean historical sales (used to center the variable
+component), $\beta_0, \beta_1$ have Normal variational posteriors with
 trainable location and scale, $\sigma$ is the learned aleatoric noise,
 $\tau$ is the effective tax rate, and $\delta_t$ are known one-time
 payments (e.g., a \$2B settlement in 2020).
@@ -4447,8 +4402,8 @@ are fine)? Then analyze how these three statements connect with each
 other. You may start with revenue on the income statement.
 
 Response: We now include the 10-year forecasted Balance Sheet, Income
-Statement, and Cash Budget in \textbf{6. Projected Balance Sheet, Income
-Statement, and Cash Budget.}
+Statement, and Cash Budget in the \emph{Projected Balance Sheet, Income
+Statement, and Cash Budget} subsection.
 
 \emph{(4) Advance payment is defined as: AdvPP\_t = \%AdvPP *
 Purchase\_t+1}
@@ -4463,7 +4418,7 @@ next year, with the justification:
 
 \begin{itemize}
 \item
-  From 2.1.3. Advance Payments for Purchases : ``Advance payments to
+  From \emph{Advance Payments for Purchases}: ``Advance payments to
   suppliers for purchases (\$AdvPP\$) can be modeled as strictly
   proportional to the total purchases made during the current year. This
   approach relies on the simplifying assumption that current purchasing
@@ -4474,7 +4429,7 @@ Same is applied for advance payments from customers for sales (AdvPS):
 
 \begin{itemize}
 \item
-  From 2.3.2. Advance Payments for Future Sales: ``Advance payments
+  From \emph{Advance Payments for Future Sales}: ``Advance payments
   received from customers for future sales (\$AdvPC\$) are modeled as a
   direct proportion of the current year's total sales.
   This assumes that the volume of upfront customer payments scales
@@ -4562,15 +4517,15 @@ AP\textsubscript{t} = DPO / 365 * Purchases\textsubscript{t}
 (8) Can you specify the possible constraints for the variables and
 equations? Please add them to the report and implement them in the code.
 
-\textbf{Response:} Thank you. We have added a new section \ul{Parameter
-Constraints and Bounds}
+\textbf{Response:} Thank you. We have added a new subsection,
+\emph{Parameter Constraints and Bounds}.
 
 \emph{(9) After you have trained the model, can you also perform
 inference and simulate a firm's financial statements for several years?}
 
 \textbf{Response:} We now include the 10-year forecasted Balance Sheet,
-Income Statement, and Cash Budget in \textbf{6. Projected Balance Sheet,
-Income Statement, and Cash Budget.}
+Income Statement, and Cash Budget in the \emph{Projected Balance Sheet,
+Income Statement, and Cash Budget} subsection.
 
 (10) Remember to write test cases.
 
