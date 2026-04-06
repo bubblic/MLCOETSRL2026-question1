@@ -73,6 +73,7 @@
     showstringspaces=false,
     tabsize=2,
     literate={\_}{\_}1,
+    captionpos=b,
 }
 \lstdefinestyle{console}{
     backgroundcolor=\color{backcolour},
@@ -82,6 +83,7 @@
     frame=single,
     rulecolor=\color{codegray},
     showstringspaces=false,
+    captionpos=b,
 }
 \lstdefinestyle{python}{style=pythonstyle}
 \lstset{style=pythonstyle}
@@ -269,7 +271,7 @@ Assets), the financial state at time $t+1$ is fully determined by the
 state at time $t$ together with the flows between them. Nothing escapes
 the ledger.
 
-To make these mechanics tangible, we built an interactive visualisation
+To make these mechanics tangible, we built a simple interactive visualisation
 as a Claude Artifact (Figure~\ref{fig:double-entry}). It lets the reader
 select any of six representative transactions and trace their debit and
 credit legs simultaneously across the Income Statement, Cash Budget, and
@@ -2021,6 +2023,8 @@ CHECK: Assets$-$(L+E)   &   0.0 &   0.0 &   0.0 &   0.0 \\
 \end{tabular}
 \par\smallskip
 {\footnotesize All figures in \$ billions.}
+\caption{Four-year balance sheet and income statement forecast (FY\,2025--2028) for Apple, using constant single-year policy ratios derived from FY\,2024.}
+\label{tab:simple_forecast_demo}
 \end{table}
 
 Even without using any plugs, we see that the assets = liabilities +
@@ -2157,7 +2161,7 @@ parameters from Apple's 2018\textasciitilde2024 data and leave 2025 for backtest
 running \texttt{run\_trainable\allowbreak{}\_model\allowbreak{}\_forecast\allowbreak{}\_adv\allowbreak{}\_policies.py}:
 
 
-\begin{lstlisting}[style=console]
+\begin{lstlisting}[style=console, caption={Trained policy parameters for the advanced-policy model}, label=lst:params_simple_adv]
 Simple parameters:
 Final %AG: 0.00000
 Final %AM: 0.94058
@@ -2184,7 +2188,7 @@ OpEx Baseline (USD): 4.02e+10
 
 \noindent\rule{\textwidth}{0.4pt}
 
-\begin{lstlisting}[style=console]
+\begin{lstlisting}[style=console, caption={Trained structural parameters for the advanced-policy model}, label=lst:params_structural_adv]
 Structural parameters:
 
 Final %AvgSTInt: 0.00003
@@ -2200,7 +2204,6 @@ Avg Maturity Years: 15.3410
 \begin{table}[H]
 \centering
 \small
-\textbf{BACKTEST --- FY2025 (Out-of-Sample)}
 \vspace{0.5em}
 
 \begin{tabular}{l rrr}
@@ -2239,11 +2242,17 @@ Stock Buyback             &  90.7 &  77.6 & $-$14.5\% \\
 \end{tabular}
 \par\smallskip
 {\footnotesize All figures in \$ billions.}
+\caption{Backtest of the trained advanced-policy model against Apple's actual FY\,2025 results (out-of-sample). Error percentages are relative to actual values.}
+\label{tab:backtest_advpolicies}
 \end{table}
 
+\begin{figure}[H]\centering
 \includegraphics[width=\textwidth]{report_latex_media/media/advpolicies_result_1.png}
 \includegraphics[width=\textwidth]{report_latex_media/media/advpolicies_result_2.png}
 \includegraphics[width=\textwidth]{report_latex_media/media/advpolicies_result_3.png}
+\caption{Ten-year forecast from the trained advanced-policy model: Balance Sheet (top), Income Statement (middle), and Cash Budget (bottom).}
+\label{fig:advpolicies_forecast}
+\end{figure}
 
 The backtest shows mixed but informative results. On the income
 statement side, the model predicts Net Income within 0.6\% of the
@@ -2407,7 +2416,7 @@ below:
 
 \noindent\rule{\textwidth}{0.4pt}
 
-\begin{lstlisting}[style=console]
+\begin{lstlisting}[style=console, caption={Trained policy parameters with Bayesian OpEx}, label=lst:params_simple_bayesian]
 Simple parameters:
 
 Final %AG: 0.00000
@@ -2436,7 +2445,7 @@ OpEx aleatoric uncertainty (USD): 2.45e+09
 
 \noindent\rule{\textwidth}{0.4pt}
 
-\begin{lstlisting}[style=console]
+\begin{lstlisting}[style=console, caption={Trained structural parameters with Bayesian OpEx}, label=lst:params_structural_bayesian]
 Structural parameters:
 
 Final %AvgSTInt: 0.00003
@@ -2452,8 +2461,6 @@ Avg Maturity Years: 15.3390
 \begin{table}[H]
 \centering
 \footnotesize
-\textbf{BACKTEST --- FY2025 (Out-of-Sample)}
-\vspace{0.5em}
 
 \begin{tabular}{l rrrrr}
 \toprule
@@ -2491,12 +2498,18 @@ Stock Buyback             &  90.7 &  77.6 &  77.6 &  77.6 & $-$14.5\% \\
 \end{tabular}
 \par\smallskip
 {\scriptsize All figures in \$ billions. Confidence intervals reflect Bayesian OpEx uncertainty only; deterministic line items show identical lower/upper bounds.}
+\caption{Bayesian backtest of the advanced-policy model with Bayesian OpEx against Apple's actual FY\,2025 results, including 95\% confidence intervals from Monte Carlo sampling.}
+\label{tab:backtest_bayesian}
 \end{table}
 
 The Operation Expense learned with Bayesian Variational Inference is as
 follows:
 
+\begin{figure}[H]\centering
 \includegraphics[width=\textwidth]{report_latex_media/media/image4.png}
+\caption{Bayesian variational inference fit of operating expenses to historical data, showing the posterior mean and 95\% credible band.}
+\label{fig:bayesian_opex_fit}
+\end{figure}
 
 And the net income now has a confidence level due to the noise term, and
 we see that the uncertainty increases the further the forecast year as
@@ -2506,9 +2519,6 @@ uncertainty outside of the training range:
 \begin{table}[H]
 \centering
 \small
-\textbf{Net Income}
-\vspace{0.5em}
-
 \begin{tabular}{l rrr}
 \toprule
 \textbf{Year} & \textbf{Mean} & \textbf{2.5\% CI} & \textbf{97.5\% CI} \\
@@ -2527,11 +2537,17 @@ uncertainty outside of the training range:
 \end{tabular}
 \par\smallskip
 {\footnotesize All figures in USD.}
+\caption{Forecasted Apple net income (FY\,2025--2034) with 95\% Bayesian confidence intervals from the Bayesian OpEx model.}
+\label{tab:net_income_ci}
 \end{table}
 
+\begin{figure}[H]\centering
 \includegraphics[width=\textwidth]{report_latex_media/media/advpolicies_bayesian_result_1.png}
 \includegraphics[width=\textwidth]{report_latex_media/media/advpolicies_bayesian_result_2.png}
 \includegraphics[width=\textwidth]{report_latex_media/media/advpolicies_bayesian_result_3.png}
+\caption{Ten-year Bayesian forecast with 95\% Monte Carlo confidence intervals: Balance Sheet (top), Income Statement (middle), and Cash Budget (bottom).}
+\label{fig:bayesian_forecast}
+\end{figure}
 
 
 \subsection{Forecast Results}
@@ -2540,11 +2556,14 @@ The forecasted 10 years (with inflation = 3\%, sales growing linearly at
 the historical rate of training data) of Balance Sheet, Income
 Statement, and Cash Budget is attached below:
 
+\begin{figure}[H]\centering
 \includegraphics[width=\textwidth]{report_latex_media/media/image8.png}
 \includegraphics[width=\textwidth]{report_latex_media/media/image9.png}
-
 \includegraphics[width=\textwidth]{report_latex_media/media/image10.png}
 \includegraphics[width=\textwidth]{report_latex_media/media/image11.png}
+\caption{Final ten-year forecast with tax anomaly adjustment, Bayesian OpEx, and advanced policies: Balance Sheet, Income Statement, and Cash Budget.}
+\label{fig:final_forecast}
+\end{figure}
 
 \section{Part 2}
 
@@ -2577,7 +2596,7 @@ We use the following prompt with the identity check that assets =
 liabilities + equity:
 \end{quote}
 
-\begin{lstlisting}[style=python]
+\begin{lstlisting}[style=python, caption={Prompt template for LLM-only balance sheet forecasting}, label=lst:prompt_llm_forecast]
 prompt: Dict[str, Any] = {
     "task": "Forecast all required financial elements for future years. "
             "Return ONLY valid JSON (no markdown).",
@@ -2623,9 +2642,12 @@ The returned fields are further processed within
 \texttt{financial\_forecast/models/llm\_forecaster.py} to ensure the balance sheet
 identity holds. The forecasted values are plotted below:
 
+\begin{figure}[H]\centering
 \includegraphics[width=\textwidth]{report_latex_media/media/image14.png}
-
 \includegraphics[width=\textwidth]{report_latex_media/media/image15.png}
+\caption{LLM-only balance sheet forecast for Apple using DeepSeek\,V3.2, showing that the model fails to maintain the accounting identity $A = L + E$.}
+\label{fig:llm_only_forecast}
+\end{figure}
 
 We see in ``Stockholders' Equity'' graph that it drops to negative. This
 is because the LLM actually failed to return the projected balance sheet
@@ -2657,7 +2679,11 @@ of the European Commission State Aid Decision. This skewed the learned
 effective tax rate upwards during training, as evidenced by the
 consistent over-estimation of tax for one-step forecast model fit.
 
+\begin{figure}[H]\centering
 \noindent\begin{minipage}{0.48\textwidth}\centering\includegraphics[width=\linewidth]{report_latex_media/media/tax_withoutanomaly.png}\end{minipage}\hfill\begin{minipage}{0.48\textwidth}\centering\includegraphics[width=\linewidth]{report_latex_media/media/netincome_withoutanomaly.png}\end{minipage}
+\caption{One-step-ahead model fit before accounting for tax anomalies: effective tax rate (left) and net income (right). The consistent over-estimation of tax reflects upward bias from the unmodelled one-time charge.}
+\label{fig:fit_without_anomaly}
+\end{figure}
 
 To avoid this issue, we can ask LLM to notify us of any one-time tax
 payments like this so that we can appropriately handle it during
@@ -2671,7 +2697,7 @@ model consumption:
 
 Script: \texttt{run\_tax\_anomaly\_extraction.py} (using \texttt{TaxAnomalyExtractor} from \texttt{financial\_forecast/extraction/})
 
-\begin{lstlisting}[style=python]
+\begin{lstlisting}[style=python, caption={Prompt for identifying 10-K pages containing tax anomaly disclosures}, label=lst:prompt_tax_selection]
 DEFAULT_SELECTION_PROMPT = (
     "You are given pages from a Form 10-K annual report.\n"
     "Identify all pages that contain any of the following:\n"
@@ -2689,7 +2715,7 @@ DEFAULT_SELECTION_PROMPT = (
 )
 \end{lstlisting}
 
-\begin{lstlisting}[style=python]
+\begin{lstlisting}[style=python, caption={Prompt for extracting one-time tax anomaly amounts from 10-K pages}, label=lst:prompt_tax_extraction]
 DEFAULT_EXTRACTION_PROMPT = (
     "You are an expert financial analyst. Your task is to analyze the provided "
     "excerpts from a company's Form 10-K (MD&A and Financial Footnotes) and "
@@ -2715,17 +2741,19 @@ DEFAULT_EXTRACTION_PROMPT = (
 LLM was able to extract the one-time tax payment from this portion of
 10-K:
 
-2024 10-K page 24:
+2024 10-K page 24 and page 39:
 
+\begin{figure}[H]\centering
 \includegraphics[width=\textwidth]{report_latex_media/media/image18.png}
-
-And page 39:
-
+\par\medskip
 \includegraphics[width=\textwidth]{report_latex_media/media/image19.png}
+\caption{Excerpts from Apple's FY\,2024 Form 10-K showing one-time tax anomaly disclosures: page~24 (top) and page~39 (bottom).}
+\label{fig:10k_tax_pages}
+\end{figure}
 
 JSON output:
 
-\begin{lstlisting}[style=json]
+\begin{lstlisting}[style=json, caption={LLM-extracted tax anomaly data from Apple's FY\,2024 Form 10-K}, label=lst:tax_anomaly_output]
 {
     "selected_pages": [
         23, 24, 25, 26, 27, 41, 42, 43, 45, 46, 47
@@ -2751,21 +2779,30 @@ smaller for the effective tax rate \%IT:
 
 \paragraph{Before}
 
+\begin{figure}[H]\centering
 \includegraphics[width=\textwidth]{report_latex_media/media/image20.png}
-
 \includegraphics[width=\textwidth]{report_latex_media/media/image21.png}
-
+\caption{Training loss curves before accounting for tax anomalies.}
+\label{fig:training_loss_before_tax}
+\end{figure}
 
 Before accounting for tax anomalies, the training losses are:
 tax loss = 5.45e$-$01, net income loss = 3.37e$-$01.
 
 \paragraph{After}
 
+\begin{figure}[H]\centering
 \includegraphics[width=\textwidth]{report_latex_media/media/image22.png}
-
 \includegraphics[width=\textwidth]{report_latex_media/media/image23.png}
+\caption{Training loss curves after accounting for tax anomalies.}
+\label{fig:training_loss_after_tax}
+\end{figure}
 
+\begin{figure}[H]\centering
 \noindent\begin{minipage}{0.48\textwidth}\centering\includegraphics[width=\linewidth]{report_latex_media/media/tax_withanomaly.png}\end{minipage}\hfill\begin{minipage}{0.48\textwidth}\centering\includegraphics[width=\linewidth]{report_latex_media/media/netincome_withanomaly.png}\end{minipage}
+\caption{One-step-ahead model fit after accounting for tax anomalies: effective tax rate (left) and net income (right).}
+\label{fig:fit_with_anomaly}
+\end{figure}
 
 After accounting for tax anomalies, the training losses drop to:
 tax loss = 5.99e$-$02, net income loss = 1.69e$-$01.
@@ -2781,7 +2818,7 @@ For recommendation to CEO/CFO given our result, we feed the following
 prompt, and attach the historical and 10-year forecast of balance sheet
 and income statement:
 
-\begin{lstlisting}[style=python]
+\begin{lstlisting}[style=python, caption={Prompt template for strategic CEO/CFO recommendations from forecast data}, label=lst:prompt_ceo_advisor]
 CEO_ADVISOR_PROMPT = (
     "You are an elite Corporate Finance Advisor and Strategic Capital "
     "Expert at a top-tier investment bank. You specialize in advising "
@@ -3137,7 +3174,11 @@ the LLM query to also extract supplementary tables.
 The extraction step is broken down into three LLM agents for extraction
 and a Python script for actual calculation:
 
+\begin{figure}[H]\centering
 \includegraphics[width=\textwidth]{report_latex_media/media/image26.jpg}
+\caption{End-to-end extraction pipeline: from annual report PDF through LLM-based page identification and table extraction to Python ratio calculation.}
+\label{fig:extraction_pipeline}
+\end{figure}
 
 Input annual report pdf -\textgreater{} pdfplumber to extract raw text
 -\textgreater{} Feed raw text to efficient non-reasoning model to
@@ -3189,7 +3230,7 @@ Using \texttt{FinancialStatementExtractor} from \texttt{financial\_forecast/extr
 
 \paragraph{Step 1: Page number identifying step}
 
-\begin{lstlisting}[style=python]
+\begin{lstlisting}[style=python, caption={Step~1 prompt: identifying pages containing the target financial statement}, label=lst:prompt_step1]
 prompt = (
     "You are given multiple pages from an annual report. "
     f"Identify which pages contain the table "
@@ -3216,7 +3257,7 @@ Where:
 
 \paragraph{Step 2: Table extraction step}
 
-\begin{lstlisting}[style=python]
+\begin{lstlisting}[style=python, caption={Step~2 prompt: extracting the primary financial statement table}, label=lst:prompt_step2]
 prompt = (
     f"Find the table that corresponds to {query} and output it "
     f"in a nice tabular form from the following pages data.\n"
@@ -3237,13 +3278,17 @@ Where:
 
 Output from Step 2:
 
+\begin{figure}[H]\centering
 \includegraphics[width=3.94631in,height=4.18705in]{report_latex_media/media/image27.png}
+\caption{Example output from Step~2: the LLM reproduces the Consolidated Balance Sheet in tabular form from the raw page text.}
+\label{fig:step2_output}
+\end{figure}
 
 \paragraph{Supplementary tables extraction}
 
 \paragraph{Step 3: Page number identifying step}
 
-\begin{lstlisting}[style=python]
+\begin{lstlisting}[style=python, caption={Step~3 prompt: identifying pages with supplementary disclosures}, label=lst:prompt_step3]
 supplementary_query = (
     f"Supplementary disclosures, breakdowns, expansions, "
     f"and note tables for {query}. "
@@ -3280,7 +3325,7 @@ Where:
 
 \paragraph{Step 4: Table extraction step}
 
-\begin{lstlisting}[style=python]
+\begin{lstlisting}[style=python, caption={Step~4 prompt: extracting supplementary tables from identified pages}, label=lst:prompt_step4]
 prompt = (
     "You are extracting supplementary financial disclosures "
     "from annual report pages.\n"
@@ -3319,13 +3364,16 @@ Where:
 
 Output from Step 4:
 
+\begin{figure}[H]\centering
 \includegraphics[width=\textwidth]{report_latex_media/media/image28.png}
-
 \includegraphics[width=\textwidth]{report_latex_media/media/image29.png}
 \includegraphics[width=\textwidth]{report_latex_media/media/image30.png}
 \includegraphics[width=\textwidth]{report_latex_media/media/image31.png}
 \includegraphics[width=\textwidth]{report_latex_media/media/image32.png}
 \includegraphics[width=\textwidth]{report_latex_media/media/image33.png}
+\caption{Example output from Step~4: supplementary table extractions from the annual report.}
+\label{fig:step4_output}
+\end{figure}
 
 \paragraph{Step 5: Extracting relevant fields as JSON for ratio calculation}
 
@@ -3339,7 +3387,7 @@ retrieving fields that often requires summation of multiple elements, we
 ask LLM to copy the elements into an array instead of asking it to sum
 them up and return a single value. We use the following prompt:
 
-\begin{lstlisting}[style=python]
+\begin{lstlisting}[style=python, caption={Step~5 prompt (original): extracting normalized financial fields as JSON}, label=lst:prompt_step5_original]
 STATEMENT_CONFIGS: Dict[str, Dict[str, Any]] = {
     "consolidated-balance-sheet": {
         "suffix": ".consolidated-balance-sheet.llm.json",
@@ -3462,7 +3510,7 @@ incorrect summed results.
 So, we had to explicitly tell LLM to return the original source label
 and its value as an array of maps:
 
-\begin{lstlisting}[style=python]
+\begin{lstlisting}[style=python, caption={Step~5 prompt (improved): requiring source labels to prevent hallucination}, label=lst:prompt_step5_improved]
 fields_schema = ",\n".join(
     [
         f'  "{field}": [{{"source_label": number}}]'
@@ -3537,7 +3585,7 @@ Output example for GM's 2023 annual report:
 
 \paragraph{Before: LLM attempts to add the total debt by itself}
 
-\begin{lstlisting}[style=json]
+\begin{lstlisting}[style=json, caption={GM 2023 extraction (original): LLM attempts to sum debt components}, label=lst:extraction_before]
 {
     "year": "2023",
     "currency": "USD",
@@ -3555,7 +3603,7 @@ Output example for GM's 2023 annual report:
 
 \paragraph{After: LLM lists out all the original elements without summation}
 
-\begin{lstlisting}[style=json]
+\begin{lstlisting}[style=json, caption={GM 2023 extraction (improved): source labels prevent hallucinated summation}, label=lst:extraction_after]
 {
     "year": "2023",
     "currency": "USD",
@@ -3611,27 +3659,33 @@ ratios, and generates hallucination rate analysis via the
 The results are reproduced below for GM, LVMH, Tencent, Alibaba,
 JPMorgan Chase, Exxon Mobil, Volkswagen, Microsoft, and Google:
 
+\begin{figure}[H]\centering
 \includegraphics[width=\textwidth]{report_latex_media/media/image34.png}
-
 \includegraphics[width=\textwidth]{report_latex_media/media/image35.png}
-
 \includegraphics[width=\textwidth]{report_latex_media/media/image36.png}
+\caption{Hallucination analysis across 101 LLM extraction runs: GM (top), LVMH (middle), and Tencent (bottom).}
+\label{fig:hallucination_1}
+\end{figure}
 
+\begin{figure}[H]\centering
 \includegraphics[width=\textwidth]{report_latex_media/media/image37.png}
-
 \includegraphics[width=\textwidth]{report_latex_media/media/image38.png}
-
 \includegraphics[width=\textwidth]{report_latex_media/media/image39.png}
+\caption{Hallucination analysis (continued): Alibaba (top), JPMorgan Chase (middle), and ExxonMobil (bottom).}
+\label{fig:hallucination_2}
+\end{figure}
 
+\begin{figure}[H]\centering
 \includegraphics[width=\textwidth]{report_latex_media/media/image40.png}
-
 \includegraphics[width=\textwidth]{report_latex_media/media/image41.png}
-
 \includegraphics[width=\textwidth]{report_latex_media/media/image42.png}
+\caption{Hallucination analysis (continued): Volkswagen (top), Microsoft (middle), and Google (bottom).}
+\label{fig:hallucination_3}
+\end{figure}
 
 We also calculate the top 15 hallucinated fields as below:
 
-\begin{lstlisting}[style=console]
+\begin{lstlisting}[style=console, caption={Top 15 most hallucinated financial fields across 101 extraction runs}, label=lst:top_hallucinated_fields]
 - exxon_2024 | total_operating_cost | rate_non_null=0.2970 (90/303)
 - microsoft_2025 | depreciation_and_amortization | rate_non_null=0.1980 (60/303)
 - volkswagen_2024 | net_accounts_receivable | rate_non_null=0.1881 (38/202)
@@ -3679,7 +3733,7 @@ securities, as evidenced by the following 3 extraction runs:
 
 Run 1:
 
-\begin{lstlisting}[style=json]
+\begin{lstlisting}[style=json, caption={JPMorgan Chase marketable securities extraction --- Run 1}, label=lst:hallucination_run1]
 "marketable_securities": [
   {"Federal funds sold and securities purchased under resale agreements": 295001.0},
   {"Securities borrowed": 219546.0},
@@ -3689,7 +3743,7 @@ Run 1:
 
 Run 2:
 
-\begin{lstlisting}[style=json]
+\begin{lstlisting}[style=json, caption={JPMorgan Chase marketable securities extraction --- Run 2}, label=lst:hallucination_run2]
 "marketable_securities": [
   {"Federal funds sold and securities purchased under resale agreements": 295001.0},
   {"Securities borrowed": 219546.0},
@@ -3700,7 +3754,7 @@ Run 2:
 
 Run 5:
 
-\begin{lstlisting}[style=json]
+\begin{lstlisting}[style=json, caption={JPMorgan Chase marketable securities extraction --- Run 5}, label=lst:hallucination_run5]
 "marketable_securities": [
   {"Federal funds sold and securities purchased under resale agreements": 295001.0},
   {"Securities borrowed": 219546.0}
@@ -3717,7 +3771,11 @@ equities, short-term investments.
 
 We see that the hallucination rate practically goes to zero:
 
+\begin{figure}[H]\centering
 \noindent\begin{minipage}{0.48\textwidth}\centering\includegraphics[width=\linewidth]{report_latex_media/media/image43.png}\end{minipage}\hfill\begin{minipage}{0.48\textwidth}\centering\includegraphics[width=\linewidth]{report_latex_media/media/image44.png}\end{minipage}
+\caption{Hallucination rate for JPMorgan Chase short-term market securities before (left) and after (right) renaming the extraction field. The improved naming eliminates extraction variability.}
+\label{fig:hallucination_improvement}
+\end{figure}
 
 After obtaining the correct field values, calculating the various
 financial ratios is straightforward. We write a Python script for the
@@ -3729,7 +3787,7 @@ runs automatically after normalization via
 Calculated fields and financial ratios for GM are as follows for 2022
 and 2023 in the 2023 annual report:
 
-\begin{lstlisting}[style=json]
+\begin{lstlisting}[style=json, caption={Calculated financial ratios for GM (FY\,2022--2023)}, label=lst:ratios_gm]
 {
   "year": "2022",
   "currency": "USD",
@@ -3808,7 +3866,7 @@ Google:
 
 LVMH:
 
-\begin{lstlisting}[style=json]
+\begin{lstlisting}[style=json, caption={Calculated financial ratios for LVMH (FY\,2022--2024)}, label=lst:ratios_lvmh]
 {
   "year": "2022",
   "currency": "EUR",
@@ -3915,7 +3973,7 @@ LVMH:
 
 Tencent:
 
-\begin{lstlisting}[style=json]
+\begin{lstlisting}[style=json, caption={Calculated financial ratios for Tencent (FY\,2023--2024)}, label=lst:ratios_tencent]
 {
   "year": "2023",
   "currency": "CNY",
@@ -3988,7 +4046,7 @@ Tencent:
 
 Alibaba:
 
-\begin{lstlisting}[style=json]
+\begin{lstlisting}[style=json, caption={Calculated financial ratios for Alibaba (FY\,2024--2025)}, label=lst:ratios_alibaba]
 {
   "year": "2024",
   "currency": "CNY",
@@ -4061,7 +4119,7 @@ Alibaba:
 
 JPMorgan Chase:
 
-\begin{lstlisting}[style=json]
+\begin{lstlisting}[style=json, caption={Calculated financial ratios for JPMorgan Chase (FY\,2023--2024)}, label=lst:ratios_jpmorgan]
 {
   "year": "2023",
   "currency": "USD",
@@ -4134,7 +4192,7 @@ JPMorgan Chase:
 
 ExxonMobil:
 
-\begin{lstlisting}[style=json]
+\begin{lstlisting}[style=json, caption={Calculated financial ratios for ExxonMobil (FY\,2023--2024)}, label=lst:ratios_exxonmobil]
 {
   "year": "2023",
   "currency": "USD",
@@ -4207,7 +4265,7 @@ ExxonMobil:
 
 Volkswagen:
 
-\begin{lstlisting}[style=json]
+\begin{lstlisting}[style=json, caption={Calculated financial ratios for Volkswagen (FY\,2023--2024)}, label=lst:ratios_volkswagen]
 {
   "year": "2023",
   "currency": "EUR",
@@ -4280,7 +4338,7 @@ Volkswagen:
 
 Microsoft:
 
-\begin{lstlisting}[style=json]
+\begin{lstlisting}[style=json, caption={Calculated financial ratios for Microsoft (FY\,2024--2025)}, label=lst:ratios_microsoft]
 {
   "year": "2024",
   "currency": "USD",
@@ -4353,7 +4411,7 @@ Microsoft:
 
 Google:
 
-\begin{lstlisting}[style=json]
+\begin{lstlisting}[style=json, caption={Calculated financial ratios for Google (FY\,2023--2024)}, label=lst:ratios_google]
 {
   "year": "2023",
   "currency": "USD",
@@ -4640,7 +4698,7 @@ trainable location and scale, $\sigma$ is the learned aleatoric noise,
 $\tau$ is the effective tax rate, and $\delta_t$ are known one-time
 payments (e.g., a \$2B settlement in 2020).
 
-\begin{lstlisting}[style=console]
+\begin{lstlisting}[style=console, caption={Parameter recovery results for Scenario~4: all parameters recovered within tolerance}, label=lst:param_recovery_s4]
 Parameter Recovery — Scenario 4 (BayesianOpEx + Tax Anomalies)
 ---------------------------------------------------------------
 Parameter                     True     Recovered   Status
@@ -4936,7 +4994,11 @@ follows:}
 \emph{Can you plot the amount of debt and see whether the outcome is
 sensible?}
 
+\begin{figure}[H]\centering
 \noindent\begin{minipage}{0.48\textwidth}\centering\includegraphics[width=\linewidth]{report_latex_media/media/image12.png}\end{minipage}\hfill\begin{minipage}{0.48\textwidth}\centering\includegraphics[width=\linewidth]{report_latex_media/media/image13.png}\end{minipage}
+\caption{Forecasted debt levels for Apple: short-term effective debt (left) and non-current liabilities (right), demonstrating that the model avoids explosive debt spirals.}
+\label{fig:debt_levels}
+\end{figure}
 
 \textbf{Response:} We have plotted the forecasted debt levels (see above).
 The outcome is sensible and mathematically stable. We verified that the
@@ -5095,7 +5157,7 @@ We used Claude Code's Plan Mode to conduct a systematic code review
 before refactoring. The following prompt was used to leverage the tool
 effectively:
 
-\begin{lstlisting}[basicstyle=\ttfamily\scriptsize, breaklines=true]
+\begin{lstlisting}[basicstyle=\ttfamily\scriptsize, breaklines=true, captionpos=b, caption={Claude Code planning-mode prompt used for systematic code review before refactoring}, label=lst:code_review_prompt]
 Enter planning mode. Do not modify any files yet.
 
 I am a finance/quant intern candidate at JP Morgan and need a thorough,

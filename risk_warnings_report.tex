@@ -16,8 +16,13 @@
 \usepackage{fontenc}
 \usepackage{lmodern}
 \usepackage{parskip}
+\usepackage{microtype}
 \usepackage{tikz}
 \usetikzlibrary{shapes.geometric, arrows.meta, positioning}
+
+% --- Global typographic fixes ---
+\emergencystretch=2em          % extra stretch to avoid overfull \hbox
+\tolerance=1500                % accept slightly looser lines before overflow
 
 % --- Colour Definitions ---
 \definecolor{codeblue}{RGB}{30,100,200}
@@ -69,7 +74,7 @@
   output/.style={ellipse, minimum width=2.6cm, minimum height=1cm,
     align=center, draw=codegreen, fill=codegreen!12,
     font=\small\bfseries},
-  annotation/.style={font=\scriptsize\itshape, text=codegray},
+  annotation/.style={font=\scriptsize\itshape, text=codegray, align=center},
   arrow/.style={-{Stealth[length=6pt]}, thick, color=jpblue!70},
 }
 
@@ -276,12 +281,13 @@ of concern include:
   \item Forward guidance that is inconsistent with the balance sheet position
 \end{itemize}
 
-\subsection{Auditor or Director Changes}
+\subsection{Risk Factors}
 
-A change of auditor, particularly to a lesser-known firm or one occurring outside the
-normal rotation cycle, may indicate the previous auditor declined to continue.
-Similarly, the sudden resignation of a CFO or multiple directors is a strong
-insider-knowledge signal.
+The Risk Factors section is management-authored and lists the principal risks the
+company faces. In isolation, a single year's disclosure is often boilerplate.
+The real signal emerges from \textbf{year-on-year comparison}: new risks that did
+not appear in the prior filing, risks whose severity language has escalated, and
+previously disclosed risks that have been quietly removed.
 
 \begin{table}[H]
 \centering
@@ -305,12 +311,20 @@ Severity & \small Routine disclosure (low signal) &
 shift from routine to critical between consecutive annual reports.}
 \end{table}
 
-\noindent The extraction engine can detect such escalations by running
-Stage~2 extraction on consecutive annual reports for the same company and
-comparing the structured output. For example, a \texttt{debt\_covenants}
-result that returns \texttt{compliance\_status: ``in compliance''} in year
-$t-1$ but \texttt{compliance\_status: ``in breach''} in year $t$ represents
-a programmatically detectable escalation.
+\noindent The extraction engine (described in Section~III) can detect such
+escalations by running category-specific extraction on consecutive annual
+reports for the same company and comparing the structured output. For example,
+a \texttt{debt\_covenants} result that returns
+\texttt{compliance\_status: ``in compliance''} in year $t-1$ but
+\texttt{compliance\_status: ``in breach''} in year $t$ represents a
+programmatically detectable escalation.
+
+\subsection{Auditor or Director Changes}
+
+A change of auditor, particularly to a lesser-known firm or one occurring outside the
+normal rotation cycle, may indicate the previous auditor declined to continue.
+Similarly, the sudden resignation of a CFO or multiple directors is a strong
+insider-knowledge signal.
 
 % ============================================================
 \section{Question III: Automatic Extraction Engine}
@@ -324,6 +338,7 @@ LLM extraction calls are applied only to high-signal pages.
 
 \begin{figure}[H]
 \centering
+\resizebox{\textwidth}{!}{%
 \begin{tikzpicture}[node distance=1.6cm and 1.4cm]
   % Nodes
   \node[block] (pdf) {Stage 0\\PDF Parsing};
@@ -350,7 +365,8 @@ LLM extraction calls are applied only to high-signal pages.
   % Input
   \node[annotation, left=0.6cm of pdf] {\normalsize\textsf{Annual}\\
     \normalsize\textsf{Report PDF}};
-\end{tikzpicture}
+\end{tikzpicture}%
+}
 \caption{Four-stage extraction pipeline. LLM calls occur at Stages 1, 2, and 3.
 Stage~2 runs in parallel across detected categories using a thread pool.}
 \end{figure}
@@ -1411,9 +1427,9 @@ The following excerpts are from the Evergrande 2022 pipeline run.
 All annual reports used in this study are publicly available from the following sources:
 
 \begin{itemize}[leftmargin=1.5cm]
-  \item \textbf{SEC EDGAR:} \href{https://www.sec.gov/cgi-bin/browse-edgar}{\texttt{https://www.sec.gov/cgi-bin/browse-edgar}}
-  \item \textbf{HKEx披露易:} \href{https://www.hkexnews.hk}{\texttt{https://www.hkexnews.hk}}
-  \item \textbf{HKICPA Auditor Examples:} \href{https://www.hkicpa.org.hk/professionaltechnical/assurance/example_auditors/SME-FRS-Jul2009.pdf}{\texttt{https://www.hkicpa.org.hk/.../SME-FRS-Jul2009.pdf}}
+  \item \textbf{SEC EDGAR:} \url{https://www.sec.gov/cgi-bin/browse-edgar}
+  \item \textbf{HKEx披露易:} \url{https://www.hkexnews.hk}
+  \item \textbf{HKICPA Auditor Examples:} \url{https://www.hkicpa.org.hk/professionaltechnical/assurance/example_auditors/SME-FRS-Jul2009.pdf}
 \end{itemize}
 
 \end{document}
