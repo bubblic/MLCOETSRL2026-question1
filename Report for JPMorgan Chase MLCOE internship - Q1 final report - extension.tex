@@ -150,7 +150,7 @@
   \vspace{3cm}
   \begin{abstract}
     \noindent This report implements a structural financial statement forecasting model
-    based on the no-plug framework of Pareja (2009), where the balance sheet is derived
+    based on the no-plug framework of \hyperlink{ref:pareja09}{Pareja(09)}, where the balance sheet is derived
     endogenously from the cash budget and income statement without circular references.
     Policy variables are trained from historical data using gradient-based optimisation,
     and Bayesian extensions provide confidence intervals via Monte Carlo simulation.
@@ -652,12 +652,14 @@ Current liabilities (\textbf{CLiab\textsubscript{t}})
     deficit\textsubscript{t}).
   \item
     \textbf{Advanced policy} (\texttt{TrendDebtPolicy}): ST debt is
-    modeled as a logit-linear policy ratio of sales, capturing the
-    empirical pattern that firms like Apple scale short-term borrowing
-    with revenue:
-    EffSTDebt\textsubscript{t} = Sales\textsubscript{t} $\cdot$
-    $\sigma(\alpha + \beta \cdot t)$, where $\sigma$ is the sigmoid
-    function and $\alpha, \beta$ are trainable parameters.
+    modeled as an affine function of sales, capturing the empirical
+    pattern that firms like Apple scale short-term borrowing with
+    revenue while also maintaining a fixed baseline (e.g., revolving
+    facility minimums, notes payable):
+    EffSTDebt\textsubscript{t} = EffSTDebt\textsubscript{baseline} +
+    Sales\textsubscript{t} $\cdot$ \%STDebt, where both
+    EffSTDebt\textsubscript{baseline} and \%STDebt are trainable
+    non-negative parameters.
   \end{itemize}
 \item
   Current LT Debt (\textbf{CurrLTDebt\textsubscript{t}}): Current
@@ -948,6 +950,7 @@ We add \%Account receivables (\%AR) to the variables to learn in our
 training. Note that \%AR is equivalent to DSO/365, where DSO (Days Sales Outstanding) measures the average collection period. Similarly, the inventory ratio \%Inv\textsubscript{COGS} corresponds to DSI/365 (Days Sales of Inventory), and the payables ratio \%AP corresponds to DPO/365 (Days Payable Outstanding). Together, these three metrics define the Cash Conversion Cycle: $\text{CCC} = \text{DSO} + \text{DSI} - \text{DPO}$, a standard measure of working capital efficiency in corporate finance.
 
 \subsubsection{Total Liquidity}
+\label{sec:total_liquidity_policy}
 
 Finally, the last element in our assets is total liquidity (TL).
 Following \hyperlink{ref:pareja09}{Pareja(09)}, we model the total liquidity available as a
@@ -1136,9 +1139,9 @@ where
 \text{Equity financing}_t = \text{LTLoan}_t \cdot \text{\%EF} / (1 - \text{\%EF})
 \end{equation}
 
-The equity financing proportion is trained from historical data, implicitly capturing the firm's revealed preference between debt and equity. This is consistent with the pecking order hypothesis (Myers \& Majluf, 1984), which predicts firms prefer internal funds, then debt, then equity---resulting in a low and relatively stable \%EF for profitable firms. The trained \%EF thus reflects the firm's historical position on the pecking order rather than an arbitrary split.
+The equity financing proportion is trained from historical data, implicitly capturing the firm's revealed preference between debt and equity. This is consistent with the pecking order hypothesis \hyperlink{ref:myers84}{[Myers(84)]}, which predicts firms prefer internal funds, then debt, then equity---resulting in a low and relatively stable \%EF for profitable firms. The trained \%EF thus reflects the firm's historical position on the pecking order rather than an arbitrary split.
 
-Dividends are modeled with two policy variants:
+Dividends are modeled with two policy variants:\label{sec:dividends}
 
 \paragraph{Simple policy (\texttt{SimpleDividendPolicy}).}
 Dividends are a fixed percentage of prior-year net income, with no
@@ -1162,7 +1165,7 @@ optimized Adjustment\_Speed parameter:
 \text{Dividends}_{t-1} = \text{Adj.\ Speed} \cdot (\text{\%PR} \cdot \text{NI}_{t-1}) + (1 - \text{Adj.\ Speed}) \cdot \text{Dividends}_{t-2}
 \end{equation}
 
-The Lintner (1956) partial-adjustment model remains empirically robust for mature dividend-paying firms (Brav et al., 2005). The key economic insight is that managers treat dividends as a commitment: cutting dividends signals financial distress, so firms smooth payouts to avoid involuntary future cuts. For mega-cap technology firms, the adjustment speed tends to be low (conservative smoothing), as these firms have ample retained earnings and prefer share buybacks for flexible capital return. The trained Adjustment\_Speed parameter captures this firm-specific conservatism.
+The \hyperlink{ref:lintner56}{Lintner(56)} partial-adjustment model remains empirically robust for mature dividend-paying firms \hyperlink{ref:brav05}{[Brav(05)]}. The key economic insight is that managers treat dividends as a commitment: cutting dividends signals financial distress, so firms smooth payouts to avoid involuntary future cuts. For mega-cap technology firms, the adjustment speed tends to be low (conservative smoothing), as these firms have ample retained earnings and prefer share buybacks for flexible capital return. The trained Adjustment\_Speed parameter captures this firm-specific conservatism.
 
 Stock buybacks are also modeled with two policy variants:
 
@@ -1196,19 +1199,40 @@ will define the equations for Net income\textsubscript{t} in the
 
 \paragraph{Final NLB}
 
-We obtain the final net liquidity balance\textsubscript{t} by summing
-all the different activities' NLB\textsubscript{t}:
+We obtain the final net liquidity balance at time $t$ by summing
+all the different activities' NLBs:
 
 \begin{multline}\label{eq:final_nlb}
 \text{Final NLB}_t = \text{Operating NLB}_t + \text{CapEx NLB}_t + \text{Financing NLB}_t \\
 + \text{External investment NLB}_t + \text{Owners transaction NLB}_t
 \end{multline}
 
-This is how we obtain the net liquidity balance at time t without plugs
-or circularity. The unknown variables in the equation can be trained
-because we have the target liquidity balance given by \eqref{eq:total_liquidity}:
+By construction, the Final NLB is the period's net cash inflow---the
+change in total liquidity from year $t-1$ to year $t$---so it must
+equal the difference between this year's and last year's total
+liquidity balances:
 
-$\text{TL}_t = \text{\%TL} \cdot \text{Sales}_t$ from \eqref{eq:total_liquidity}
+\begin{equation}\label{eq:final_nlb_tl_closure}
+\text{Final NLB}_t = \text{TL}_t - \text{TL}_{t-1}
+\end{equation}
+
+This identity is what closes the loop and makes training possible.
+Because the liquidity policy (Section~\ref{sec:total_liquidity_policy})
+gives us an independent target for $\text{TL}_t$ via
+\eqref{eq:total_liquidity_trend}---namely
+$\text{TL}_t = \text{TL}_{\text{baseline}} + \text{Sales}_t \cdot
+\sigma(\alpha_{\text{TL}} + \beta_{\text{TL}} \cdot t)$---substituting
+this into \eqref{eq:final_nlb_tl_closure} yields a single scalar
+constraint that ties together every policy ratio appearing in the
+five NLBs. Specifically, the only free variable on the left-hand side
+is $\text{LTLoan}_t$ (buried inside $\text{Financing NLB}_t$), which
+can therefore be solved for endogenously as the residual financing
+needed to bring total liquidity to its policy target. Once
+$\text{LTLoan}_t$ is determined, every remaining quantity is fully
+specified and the rest of the balance sheet assembles mechanically.
+No plug is required---the ``balancing'' is done by a financing
+decision that has real economic meaning (how much long-term debt to
+raise this period), not by absorbing arbitrary residuals into cash.
 
 \subsubsection{Account Payables}
 
@@ -1297,9 +1321,8 @@ corporations (e.g., Apple) strategically carry significant commercial
 paper and revolving credit lines (\$45B--\$88B) despite holding massive
 cash reserves.
 
-The forecasted Current and non-current liabilities thus fall to zero:
+This means the short-term cash deficit is less than zero, i.e., cash surplus, which would result in no short-term borrowing for any year.
 
-\includegraphics[width=\textwidth]{report_latex_media/media/image1.png}
 
 \paragraph{Defining the Metric}
 
@@ -1325,25 +1348,25 @@ Which equates to the core components we are modeling:
 
 To reflect actual corporate financing behavior, effective short-term
 debt is now modeled as a policy-driven metric rather than a
-deficit-driven reaction. It is projected as a logit-linear ratio of
-sales, mirroring the methodology used for the cost ratio and target
-liquidity.
-
-\paragraph{Logit-Linear Trend} We calculate the target short-term debt
-  as a percentage of sales using a sigmoid function over the time index
-  t. This utilizes the learned parameters $\alpha$\textsubscript{ST\_Debt} and
-  $\beta$\textsubscript{ST\_Debt}:
-
-\begin{equation}\label{eq:pct_stdebt_sigmoid}
-\text{\%STDebt}_t = \text{sigmoid}(\alpha_{\text{ST\_Debt}} + t \cdot \beta_{\text{ST\_Debt}})
-\end{equation}
-
-\paragraph{Effective ST Debt Calculation} The actual target volume is
-  then derived directly from the forecasted sales for that period:
+deficit-driven reaction. It is projected as an affine function of
+sales, consisting of a fixed baseline and a sales-proportional
+component:
 
 \begin{equation}\label{eq:eff_st_debt_calc}
-\text{Effective ST Debt}_t = \text{Sales}_t \cdot \text{\%STDebt}_t
+\text{Effective ST Debt}_t = \text{EffSTDebt}_{\text{baseline}} + \text{Sales}_t \cdot \text{\%STDebt}
 \end{equation}
+
+Both $\text{EffSTDebt}_{\text{baseline}}$ and \%STDebt are trainable
+parameters constrained to be non-negative via a softplus bijector. The
+baseline component captures fixed short-term obligations that do not
+scale from zero with sales (e.g., revolving facility minimums, notes
+payable commitments), while the sales-proportional component captures
+working-capital-driven borrowing. This affine form was chosen over a
+pure sales ratio because the latter would asymptote to zero at zero
+sales---unrealistic for firms that carry a standing level of short-term
+paper---and over a logit-linear form because the latter saturates as
+sales grow, which is inappropriate for firms whose borrowing scales
+proportionally with revenue.
 
 \paragraph{Liquidity Cascade} Because short-term debt is now an
   established structural policy, it acts as an \emph{input} to the
@@ -1431,7 +1454,7 @@ residual is a close proxy for the true return on the securities
 portfolio.  For companies with significant foreign exchange exposure, it
 may also absorb FX gains/losses.
 
-When Yahoo Finance does not provide Interest Expense separately (as is
+When the company's 10-K filing does not provide Interest Expense separately (as is
 the case for some fiscal years), we fall back to
 $\text{MSReturn}_t = \text{EBT}_t - \text{EBIT}_t$ and set
 interest expense to zero for those years, which lumps all non-operating
@@ -1455,9 +1478,7 @@ tax:
 \text{NI}_t = \text{EBT} \cdot (1 - \text{\%IT})
 \end{equation}
 
-Next year's dividends were already modeled in \eqref{eq:target_dividends}
-
-$\text{Dividends}_t = \text{\%PR} \cdot \text{NI}_t$ from \eqref{eq:target_dividends}
+Next year's dividends were already modeled in the dividends section (p.~\pageref{sec:dividends}).
 
 We now have everything we need to represent every element in the balance
 sheet as a time series.
@@ -1501,9 +1522,16 @@ drive every element given the variables to be trained are learned.
     t
   \end{itemize}
 \item
-  \%TL : Total liquidity as a percentage of this year's sales
+  TL\textsubscript{baseline}, $\alpha_{\text{TL}}$, $\beta_{\text{TL}}$ :
+  Baseline floor and logit-linear trend parameters for total liquidity
+  with a sales-proportional component:
+  $\text{TL}_t = \text{TL}_{\text{baseline}} + \text{Sales}_t \cdot
+  \sigma(\alpha_{\text{TL}} + \beta_{\text{TL}} \cdot t)$
 \item
-  \%Cash : Cash as a percentage of total liquidity
+  $\alpha_{\text{Cash}}$, $\beta_{\text{Cash}}$ : Logit-linear trend
+  parameters for the cash share of total liquidity:
+  $\text{Cash}_t = \text{TL}_t \cdot \sigma(\alpha_{\text{Cash}} +
+  \beta_{\text{Cash}} \cdot t)$
 \item
   \%IT : Income tax as a percentage of net income this year
 \item
@@ -1513,8 +1541,10 @@ drive every element given the variables to be trained are learned.
   OB\textsubscript{T\_start} : Baseline OpEx that increases with this
   year's average inflation
 \item
-  $\alpha$\textsubscript{ST\_Debt} and $\beta$\textsubscript{ST\_Debt} : parameters
-  for sigmoid function for calculating Effective ST debt
+  EffSTDebt\textsubscript{baseline} and \%STDebt : Baseline and
+  sales-proportional parameters for calculating effective short-term
+  debt (Effective ST Debt\textsubscript{t} = EffSTDebt\textsubscript{baseline}
+  + Sales\textsubscript{t} $\cdot$ \%STDebt)
 \item
   \%AvgSTInt : Average short-term interest on the effective short-term
   loan
@@ -1526,16 +1556,23 @@ drive every element given the variables to be trained are learned.
   \%MSReturn : Effective percentage return on the investment in market
   securities, derived from historical $(\text{EBT} - \text{EBIT} + \text{InterestExpense}) / \text{IMS}$
 \item
-  \%EF : Equity financing as a percentage of total excess cash needed
-  after accounting for long-term investments and long-term obligations
+  $\alpha_{\text{EF}}$, $\beta_{\text{EF}}$ : Logit-linear parameters
+  for the equity financing mix, $\text{\%EF}_t = \sigma(\alpha_{\text{EF}}
+  + \beta_{\text{EF}} \cdot t)$, where \%EF is the fraction of long-term
+  financing raised as equity rather than debt
 \item
-  \%PR : Dividends payout ratio as a percentage of net income this year,
-  paid next year
+  \%PR : Target dividend payout ratio (fraction of net income) in the
+  Lintner partial-adjustment model
 \item
-  Adj. speed : Speed at which to adjust the dividends amount paid next
-  year
+  Adj.\ Speed : Lintner partial-adjustment speed controlling how
+  quickly actual dividends converge to the target payout
+  $\text{\%PR} \cdot \text{NI}_{t-1}$
 \item
-  \%BB : Stock buyback as a percentage of asset depreciation this year
+  BB\textsubscript{baseline} and BB\textsubscript{ratio} : Fixed
+  baseline and depreciation-proportional parameters for stock buyback
+  in the affine buyback policy
+  ($\text{BB}_t = \text{BB}_{\text{baseline}} + \text{BB}_{\text{ratio}}
+  \cdot \text{Depreciation}_t$)
 \end{itemize}
 
 \paragraph{Parameter Constraints and Bounds}
@@ -1602,7 +1639,7 @@ Bijectors.
 
 Since we assume a flat short-term and long-term interest for loans and
 return on market securities, the only external variable is inflation.
-This flat-rate assumption is a first-order simplification. In practice, borrowing costs depend on the firm's leverage and credit quality (Merton, 1974). As the forecast shows rising debt levels, a more complete model would incorporate credit spread widening---a natural extension that would link the cost of debt to the evolving debt-to-equity ratio. The current approach is conservative: it understates the cost of increased leverage, producing optimistic net income projections for high-debt scenarios.
+This flat-rate assumption is a first-order simplification. In practice, borrowing costs depend on the firm's leverage and credit quality \hyperlink{ref:merton74}{[Merton(74)]}. As the forecast shows rising debt levels, a more complete model would incorporate credit spread widening---a natural extension that would link the cost of debt to the evolving debt-to-equity ratio. The current approach is conservative: it understates the cost of increased leverage, producing optimistic net income projections for high-debt scenarios.
 
 \begin{itemize}
 \item
@@ -1853,87 +1890,121 @@ principle with any inflows and outflows on the balance sheet as done by
 
 \subsection{Training the Model}
 
-Out of the variables to be trained, there are quite a few that are
-easily trained independently from other variables by looking at balance
-sheets and income statements. We first note the primary driver for our
-model:
+The model's trainable parameters are split into two groups and trained
+in two sequential phases. \textbf{Policy-phase} parameters directly
+govern individual working-capital, liquidity, OpEx, dividend, and
+buyback line items, and can each be anchored to a corresponding
+observable series in the historical financial statements; they are
+trained independently by minimizing mean-squared error between
+predicted and observed values. \textbf{Structural-phase} parameters
+(interest rates, debt maturity, market securities return, equity
+financing mix) affect Net Income, Equity, and the liability side of
+the Balance Sheet only through the full multi-year forecast rollout
+via \texttt{forecast\_step} transitions; they are therefore trained
+jointly after the policy phase, with the policy parameters held fixed.
+
+The primary forecast driver for both phases is:
 
 \begin{itemize}
-\item
-  Sales\textsubscript{t} : Total revenue in balance sheet
+\item Sales\textsubscript{t} : Total revenue (Income Statement)
 \end{itemize}
 
-We can train the rest of the variables like the following:
+\paragraph{Policy-phase variables.}
+Grouped by the policy module that owns them:
 
 \begin{itemize}
-\item
-  \%AG, \%AM : Learn from change in all non-current assets in balance
-  sheet
-\item
-  \%Depr : Learn from depreciation in income statement and non-current
-  assets in balance sheet
-\item
-  $\alpha$\textsubscript{CR} , $\beta$\textsubscript{CR} : Learn from COGS and Sales
-  data
-\item
-  \%AR : Learn from Sales and account receivables data in balance sheet
-\item
-  \%AP : Learn from Purchases and account payables data in balance sheet
-\item
-  \%AdvPS : Learn from current deferred revenue data and current year's
-  Sales in balance sheet
-\item
-  \%AdvPP : Learn from Purchases and current other assets in balance
-  sheet
-\item
-  \%Inv : Learn from inventory data in balance sheet
-\item
-  \%Cash : Learn from short-term investments in balance sheet
-\item
-  \%TL : Learn from revenue and Cash Equivalents And Short Term
-  Investments in balance sheet
-\item
-  \%IT : Learn from net income and tax provision in income statement
-\item
-  \%OR, OB\textsubscript{T\_start} : Learn from inflation data and
-  operating expense in income statement
-\item
-  \%PR, Adj. Speed : Learn from common stock dividends in Cash Flow and
-  net income in income statement
-\item
-  \%BB : Learn from Repurchase Of Capital Stock and depreciation in Cash
-  Flow
+\item \textbf{Non-current assets (\texttt{CapexPolicy}).}
+  \%Depr (effective depreciation rate as a fraction of beginning NCA),
+  \%AM (maintenance CapEx multiplier on Depreciation), and \%AG
+  (growth CapEx as a fraction of Sales). Learned from historical NCA,
+  Depreciation, and Sales.
+
+\item \textbf{Cost ratio (\texttt{TrendCostRatioPolicy}).}
+  $\alpha_{\text{CR}}$, $\beta_{\text{CR}}$ --- logit-linear cost ratio
+  parameters such that
+  $\text{CR}_t = \sigma(\alpha_{\text{CR}} + \beta_{\text{CR}} \cdot t)$.
+  Learned from historical COGS and Sales.
+
+\item \textbf{Working capital (\texttt{WorkingCapitalPolicy}).}
+  \%AR (AR / Sales), \%AP (AP / Purchases), \%AdvPS (advance payments
+  from customers / Sales), \%AdvPP (advance payments to suppliers /
+  Purchases), and \%Inv (Inventory / COGS). Each learned from its
+  respective historical ratio.
+
+\item \textbf{Total liquidity (\texttt{TrendLiquidityPolicy}).}
+  $\text{TL}_{\text{baseline}}$, $\alpha_{\text{TL}}$,
+  $\beta_{\text{TL}}$ for total liquidity with a baseline floor and a
+  logit-linear sales-proportional component:
+  $\text{TL}_t = \text{TL}_{\text{baseline}} + \text{Sales}_t \cdot
+  \sigma(\alpha_{\text{TL}} + \beta_{\text{TL}} \cdot t)$. Plus
+  $\alpha_{\text{Cash}}$, $\beta_{\text{Cash}}$ for the cash share of
+  liquidity:
+  $\text{Cash}_t = \text{TL}_t \cdot
+  \sigma(\alpha_{\text{Cash}} + \beta_{\text{Cash}} \cdot t)$. Learned
+  from historical Cash, short-term investments, and Sales.
+
+\item \textbf{Effective short-term debt (\texttt{TrendDebtPolicy}).}
+  $\text{EffSTDebt}_{\text{baseline}}$ and \%STDebt for the affine ST
+  debt policy:
+  $\text{EffSTDebt}_t = \text{EffSTDebt}_{\text{baseline}} +
+  \text{Sales}_t \cdot \text{\%STDebt}$. Learned from historical
+  Effective ST Debt and Sales.
+
+\item \textbf{Operating expense (\texttt{SimpleOpEx}).}
+  \%OR (variable OpEx rate as a slope on sales deviation from the
+  historical mean) and $\text{OB}_{T\_\text{start}}$ (baseline OpEx,
+  accumulated with cumulative inflation). Learned from historical
+  OpEx, Sales, and inflation.
+
+\item \textbf{Income tax (\texttt{SimpleTax}).}
+  \%IT --- effective income tax rate. Learned from historical Net
+  Income and income tax provision.
+
+\item \textbf{Dividends (\texttt{LintnerDividendPolicy}).}
+  \%PR (target payout ratio as a fraction of Net Income) and
+  Adj.\ Speed (Lintner partial-adjustment speed---how quickly actual
+  dividends converge to the target). Learned from historical dividend
+  payouts and Net Income.
+
+\item \textbf{Stock buyback (\texttt{BaselineBuybackPolicy}).}
+  $\text{BB}_{\text{baseline}}$ (fixed baseline buyback amount) and
+  $\text{BB}_{\text{ratio}}$ (multiplier on Depreciation for the
+  variable component), giving an affine buyback model
+  $\text{BB}_t = \text{BB}_{\text{baseline}} + \text{BB}_{\text{ratio}}
+  \cdot \text{Depreciation}_t$. Learned from historical repurchases
+  and Depreciation.
 \end{itemize}
 
-Each of the variables above can be related to an element from Cash Flow,
-Balance Sheet, or Income Statement, and can be trained with a simple
-mean-square-error minimization for each.
+Each variable in this group can be trained independently against its
+corresponding observable series using mean-squared error minimization
+under Adam via TensorFlow's \texttt{GradientTape}.
 
-The following variables (i.e. structural parameters) can be trained
-together using the above trained variables:
+\paragraph{Structural-phase variables.}
+Trained jointly after the policy phase converges:
 
 \begin{itemize}
-\item
-  \%AvgSTInt : Average short-term interest on the effective short-term
-  loan
-\item
-  \%AvgLTInt : Average interest on total long-term liabilities
-\item
-  AvgM : Average maturity of total long-term liability
-\item
-  \%MSReturn : Effective percentage return on the investment in market
-  securities, derived from historical $(\text{EBT} - \text{EBIT} + \text{InterestExpense}) / \text{IMS}$
-\item
-  \%EF : Equity financing as a percentage of total excess cash needed
-  after accounting for long-term investments and long-term obligations
+\item \%AvgSTInt : Average interest rate on Effective Short-Term Debt.
+
+\item \%AvgLTInt : Average interest rate on total long-term liabilities.
+
+\item AvgM : Average maturity of the long-term debt portfolio.
+
+\item \%MSReturn : Effective return on Investments in Market
+  Securities, derived from historical
+  $(\text{EBT} - \text{EBIT} + \text{InterestExpense}) / \text{IMS}$.
+
+\item $\alpha_{\text{EF}}$, $\beta_{\text{EF}}$ : Logit-linear equity
+  financing mix such that
+  $\text{\%EF}_t = \sigma(\alpha_{\text{EF}} + \beta_{\text{EF}} \cdot t)$,
+  where \%EF is the fraction of long-term financing raised as equity
+  rather than debt.
 \end{itemize}
 
-Using net income, interest payments, return from investment in market
-securities, stockholders equity and current and non-current
-liabilities data, we can train AvgM, \%AvgSTInt, \%AvgLTInt, \%MSReturn,
-and \%EF concurrently via simple gradient while minimizing mean-square
-error between predicted and actual net income, stockholders equity,
-current liabilities, and non-current liabilities.
+These parameters affect Net Income, Equity, and the liability side of
+the Balance Sheet only through the forward rollout, so they are trained
+concurrently by rolling out the full forecast and minimizing MSE
+between predicted and observed Net Income, Stockholders' Equity,
+Current Liabilities, and Non-current Liabilities.
 
 The code has been implemented in \texttt{run\_trainable\allowbreak{}\_model\allowbreak{}\_forecast\allowbreak{}\_simple\allowbreak{}\_policies.py},
 which composes the \texttt{TrainableFinancialModel} with simple policy modules
@@ -4383,8 +4454,9 @@ deterministic functions of the (exact) state and exogenous sales.}
 Management: A Conceptual Framework and Survey'', Available at SSRN:
 \url{http://ssrn.com/abstract_id=2336367}
 
-\hypertarget{ref:benninga06}{}\hyperlink{ref:benninga06}{[Benninga(06)]} Benninga, Simon, (2006), Principles of Finance with
-Excel, Oxford, London.
+\hypertarget{ref:brav05}{}\hyperlink{ref:brav05}{[Brav(05)]} Brav, Alon, Graham, John~R., Harvey, Campbell~R., \&
+Michaely, Roni (2005). ``Payout Policy in the 21st Century,''
+\emph{Journal of Financial Economics}, 77(3), 483--527.
 
 \hypertarget{ref:durr20}{}\hyperlink{ref:durr20}{[Dürr(20)]} Dürr, O., Sick, B., \& Murina, E. (2020). Probabilistic
 deep learning: With Python, Keras and TensorFlow probability. Manning.
@@ -4396,9 +4468,22 @@ IAS 2: Inventories.
 \hypertarget{ref:koller20}{}\hyperlink{ref:koller20}{[Koller(20)]} Koller, T., Goedhart, M., \& Wessels, D. (2020).
 \emph{Valuation: Measuring and Managing the Value of Companies} (7th ed.). McKinsey \& Company.
 
+\hypertarget{ref:lintner56}{}\hyperlink{ref:lintner56}{[Lintner(56)]} Lintner, John (1956). ``Distribution of Incomes of
+Corporations Among Dividends, Retained Earnings, and Taxes,''
+\emph{American Economic Review}, 46(2), 97--113.
+
 \hypertarget{ref:liu23}{}\hyperlink{ref:liu23}{[Liu(23)]} Liu, Nelson F. et al, (2023), ``Lost in the Middle: How
 Language Models Use Long Contexts'',
 \url{https://arxiv.org/abs/2307.03172}
+
+\hypertarget{ref:merton74}{}\hyperlink{ref:merton74}{[Merton(74)]} Merton, Robert C. (1974). ``On the Pricing of
+Corporate Debt: The Risk Structure of Interest Rates,''
+\emph{Journal of Finance}, 29(2), 449--470.
+
+\hypertarget{ref:myers84}{}\hyperlink{ref:myers84}{[Myers(84)]} Myers, Stewart~C., \& Majluf, Nicholas~S. (1984).
+``Corporate Financing and Investment Decisions When Firms Have
+Information That Investors Do Not Have,'' \emph{Journal of Financial
+Economics}, 13(2), 187--221.
 
 \hypertarget{ref:pareja07}{}\hyperlink{ref:pareja07}{[Pareja(07)]} Vélez Pareja, Ignacio, (2007), ``Forecasting Financial
 Statement with No Plugs and No Circularity'', Available at SSRN:
