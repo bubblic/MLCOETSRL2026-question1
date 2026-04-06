@@ -8,6 +8,7 @@
 \usepackage{hyperref}
 \usepackage{listings}
 \usepackage{xcolor}
+\usepackage{caption}        % provides \ContinuedFloat for multi-page figures
 \usepackage[breakable,skins]{tcolorbox}
 \newtcolorbox{llmoutput}[1][]{
   colback=gray!5, colframe=gray!50,
@@ -2248,10 +2249,18 @@ Stock Buyback             &  90.7 &  77.6 & $-$14.5\% \\
 
 \begin{figure}[H]\centering
 \includegraphics[width=\textwidth]{report_latex_media/media/advpolicies_result_1.png}
-\includegraphics[width=\textwidth]{report_latex_media/media/advpolicies_result_2.png}
-\includegraphics[width=\textwidth]{report_latex_media/media/advpolicies_result_3.png}
-\caption{Ten-year forecast from the trained advanced-policy model: Balance Sheet (top), Income Statement (middle), and Cash Budget (bottom).}
+\caption{Ten-year forecast from the trained advanced-policy model (1 of 3).}
 \label{fig:advpolicies_forecast}
+\end{figure}
+
+\begin{figure}[H]\ContinuedFloat\centering
+\includegraphics[width=\textwidth]{report_latex_media/media/advpolicies_result_2.png}
+\caption[]{Advanced-policy forecast (2 of 3).}
+\end{figure}
+
+\begin{figure}[H]\ContinuedFloat\centering
+\includegraphics[width=\textwidth]{report_latex_media/media/advpolicies_result_3.png}
+\caption[]{Advanced-policy forecast (3 of 3).}
 \end{figure}
 
 The backtest shows mixed but informative results. On the income
@@ -2543,10 +2552,18 @@ uncertainty outside of the training range:
 
 \begin{figure}[H]\centering
 \includegraphics[width=\textwidth]{report_latex_media/media/advpolicies_bayesian_result_1.png}
-\includegraphics[width=\textwidth]{report_latex_media/media/advpolicies_bayesian_result_2.png}
-\includegraphics[width=\textwidth]{report_latex_media/media/advpolicies_bayesian_result_3.png}
-\caption{Ten-year Bayesian forecast with 95\% Monte Carlo confidence intervals: Balance Sheet (top), Income Statement (middle), and Cash Budget (bottom).}
+\caption{Ten-year Bayesian forecast with 95\% Monte Carlo confidence intervals (1 of 3).}
 \label{fig:bayesian_forecast}
+\end{figure}
+
+\begin{figure}[H]\ContinuedFloat\centering
+\includegraphics[width=\textwidth]{report_latex_media/media/advpolicies_bayesian_result_2.png}
+\caption[]{Bayesian forecast (2 of 3).}
+\end{figure}
+
+\begin{figure}[H]\ContinuedFloat\centering
+\includegraphics[width=\textwidth]{report_latex_media/media/advpolicies_bayesian_result_3.png}
+\caption[]{Bayesian forecast (3 of 3).}
 \end{figure}
 
 
@@ -2558,11 +2575,23 @@ Statement, and Cash Budget is attached below:
 
 \begin{figure}[H]\centering
 \includegraphics[width=\textwidth]{report_latex_media/media/image8.png}
-\includegraphics[width=\textwidth]{report_latex_media/media/image9.png}
-\includegraphics[width=\textwidth]{report_latex_media/media/image10.png}
-\includegraphics[width=\textwidth]{report_latex_media/media/image11.png}
-\caption{Final ten-year forecast with tax anomaly adjustment, Bayesian OpEx, and advanced policies: Balance Sheet, Income Statement, and Cash Budget.}
+\caption{Final ten-year forecast with tax anomaly adjustment, Bayesian OpEx, and advanced policies (1 of 4).}
 \label{fig:final_forecast}
+\end{figure}
+
+\begin{figure}[H]\ContinuedFloat\centering
+\includegraphics[width=\textwidth]{report_latex_media/media/image9.png}
+\caption[]{Final forecast (2 of 4).}
+\end{figure}
+
+\begin{figure}[H]\ContinuedFloat\centering
+\includegraphics[width=\textwidth]{report_latex_media/media/image10.png}
+\caption[]{Final forecast (3 of 4).}
+\end{figure}
+
+\begin{figure}[H]\ContinuedFloat\centering
+\includegraphics[width=\textwidth]{report_latex_media/media/image11.png}
+\caption[]{Final forecast (4 of 4).}
 \end{figure}
 
 
@@ -2781,9 +2810,13 @@ identity holds. The forecasted values are plotted below:
 
 \begin{figure}[H]\centering
 \includegraphics[width=\textwidth]{report_latex_media/media/image14.png}
-\includegraphics[width=\textwidth]{report_latex_media/media/image15.png}
-\caption{LLM-only balance sheet forecast for Apple using DeepSeek\,V3.2, showing that the model fails to maintain the accounting identity $A = L + E$.}
+\caption{LLM-only balance sheet forecast for Apple (1 of 2).}
 \label{fig:llm_only_forecast}
+\end{figure}
+
+\begin{figure}[H]\ContinuedFloat\centering
+\includegraphics[width=\textwidth]{report_latex_media/media/image15.png}
+\caption[]{LLM-only balance sheet forecast (2 of 2). The negative Stockholders' Equity results from enforcing $A = L + E$ on the LLM's inconsistent outputs.}
 \end{figure}
 
 We see in ``Stockholders' Equity'' graph that it drops to negative. This
@@ -2882,10 +2915,13 @@ LLM was able to extract the one-time tax payment from this portion of
 
 \begin{figure}[H]\centering
 \includegraphics[width=\textwidth]{report_latex_media/media/image18.png}
-\par\medskip
-\includegraphics[width=\textwidth]{report_latex_media/media/image19.png}
-\caption{Excerpts from Apple's FY\,2024 Form 10-K showing one-time tax anomaly disclosures: page~24 (top) and page~39 (bottom).}
+\caption{Apple FY\,2024 Form 10-K, page~24: tax anomaly disclosure.}
 \label{fig:10k_tax_pages}
+\end{figure}
+
+\begin{figure}[H]\ContinuedFloat\centering
+\includegraphics[width=\textwidth]{report_latex_media/media/image19.png}
+\caption[]{Apple FY\,2024 Form 10-K, page~39: tax anomaly disclosure (continued).}
 \end{figure}
 
 JSON output:
@@ -2918,9 +2954,13 @@ smaller for the effective tax rate \%IT:
 
 \begin{figure}[H]\centering
 \includegraphics[width=\textwidth]{report_latex_media/media/image20.png}
-\includegraphics[width=\textwidth]{report_latex_media/media/image21.png}
-\caption{Training loss curves before accounting for tax anomalies.}
+\caption{Training loss curves before accounting for tax anomalies (1 of 2).}
 \label{fig:training_loss_before_tax}
+\end{figure}
+
+\begin{figure}[H]\ContinuedFloat\centering
+\includegraphics[width=\textwidth]{report_latex_media/media/image21.png}
+\caption[]{Training loss before tax anomalies (2 of 2).}
 \end{figure}
 
 Before accounting for tax anomalies, the training losses are:
@@ -2930,9 +2970,13 @@ tax loss = 5.45e$-$01, net income loss = 3.37e$-$01.
 
 \begin{figure}[H]\centering
 \includegraphics[width=\textwidth]{report_latex_media/media/image22.png}
-\includegraphics[width=\textwidth]{report_latex_media/media/image23.png}
-\caption{Training loss curves after accounting for tax anomalies.}
+\caption{Training loss curves after accounting for tax anomalies (1 of 2).}
 \label{fig:training_loss_after_tax}
+\end{figure}
+
+\begin{figure}[H]\ContinuedFloat\centering
+\includegraphics[width=\textwidth]{report_latex_media/media/image23.png}
+\caption[]{Training loss after tax anomalies (2 of 2).}
 \end{figure}
 
 \begin{figure}[H]\centering
@@ -3503,13 +3547,33 @@ Output from Step 4:
 
 \begin{figure}[H]\centering
 \includegraphics[width=\textwidth]{report_latex_media/media/image28.png}
-\includegraphics[width=\textwidth]{report_latex_media/media/image29.png}
-\includegraphics[width=\textwidth]{report_latex_media/media/image30.png}
-\includegraphics[width=\textwidth]{report_latex_media/media/image31.png}
-\includegraphics[width=\textwidth]{report_latex_media/media/image32.png}
-\includegraphics[width=\textwidth]{report_latex_media/media/image33.png}
-\caption{Example output from Step~4: supplementary table extractions from the annual report.}
+\caption{Example output from Step~4: supplementary table extractions (1 of 6).}
 \label{fig:step4_output}
+\end{figure}
+
+\begin{figure}[H]\ContinuedFloat\centering
+\includegraphics[width=\textwidth]{report_latex_media/media/image29.png}
+\caption[]{Step~4 output (continued, 2 of 6).}
+\end{figure}
+
+\begin{figure}[H]\ContinuedFloat\centering
+\includegraphics[width=\textwidth]{report_latex_media/media/image30.png}
+\caption[]{Step~4 output (continued, 3 of 6).}
+\end{figure}
+
+\begin{figure}[H]\ContinuedFloat\centering
+\includegraphics[width=\textwidth]{report_latex_media/media/image31.png}
+\caption[]{Step~4 output (continued, 4 of 6).}
+\end{figure}
+
+\begin{figure}[H]\ContinuedFloat\centering
+\includegraphics[width=\textwidth]{report_latex_media/media/image32.png}
+\caption[]{Step~4 output (continued, 5 of 6).}
+\end{figure}
+
+\begin{figure}[H]\ContinuedFloat\centering
+\includegraphics[width=\textwidth]{report_latex_media/media/image33.png}
+\caption[]{Step~4 output (continued, 6 of 6).}
 \end{figure}
 
 \paragraph{Step 5: Extracting relevant fields as JSON for ratio calculation}
@@ -3798,26 +3862,50 @@ JPMorgan Chase, Exxon Mobil, Volkswagen, Microsoft, and Google:
 
 \begin{figure}[H]\centering
 \includegraphics[width=\textwidth]{report_latex_media/media/image34.png}
-\includegraphics[width=\textwidth]{report_latex_media/media/image35.png}
-\includegraphics[width=\textwidth]{report_latex_media/media/image36.png}
-\caption{Hallucination analysis across 101 LLM extraction runs: GM (top), LVMH (middle), and Tencent (bottom).}
+\caption{Hallucination analysis across 101 LLM extraction runs --- GM (1 of 3).}
 \label{fig:hallucination_1}
+\end{figure}
+
+\begin{figure}[H]\ContinuedFloat\centering
+\includegraphics[width=\textwidth]{report_latex_media/media/image35.png}
+\caption[]{Hallucination analysis --- LVMH (2 of 3).}
+\end{figure}
+
+\begin{figure}[H]\ContinuedFloat\centering
+\includegraphics[width=\textwidth]{report_latex_media/media/image36.png}
+\caption[]{Hallucination analysis --- Tencent (3 of 3).}
 \end{figure}
 
 \begin{figure}[H]\centering
 \includegraphics[width=\textwidth]{report_latex_media/media/image37.png}
-\includegraphics[width=\textwidth]{report_latex_media/media/image38.png}
-\includegraphics[width=\textwidth]{report_latex_media/media/image39.png}
-\caption{Hallucination analysis (continued): Alibaba (top), JPMorgan Chase (middle), and ExxonMobil (bottom).}
+\caption{Hallucination analysis --- Alibaba (1 of 3).}
 \label{fig:hallucination_2}
+\end{figure}
+
+\begin{figure}[H]\ContinuedFloat\centering
+\includegraphics[width=\textwidth]{report_latex_media/media/image38.png}
+\caption[]{Hallucination analysis --- JPMorgan Chase (2 of 3).}
+\end{figure}
+
+\begin{figure}[H]\ContinuedFloat\centering
+\includegraphics[width=\textwidth]{report_latex_media/media/image39.png}
+\caption[]{Hallucination analysis --- ExxonMobil (3 of 3).}
 \end{figure}
 
 \begin{figure}[H]\centering
 \includegraphics[width=\textwidth]{report_latex_media/media/image40.png}
-\includegraphics[width=\textwidth]{report_latex_media/media/image41.png}
-\includegraphics[width=\textwidth]{report_latex_media/media/image42.png}
-\caption{Hallucination analysis (continued): Volkswagen (top), Microsoft (middle), and Google (bottom).}
+\caption{Hallucination analysis --- Volkswagen (1 of 3).}
 \label{fig:hallucination_3}
+\end{figure}
+
+\begin{figure}[H]\ContinuedFloat\centering
+\includegraphics[width=\textwidth]{report_latex_media/media/image41.png}
+\caption[]{Hallucination analysis --- Microsoft (2 of 3).}
+\end{figure}
+
+\begin{figure}[H]\ContinuedFloat\centering
+\includegraphics[width=\textwidth]{report_latex_media/media/image42.png}
+\caption[]{Hallucination analysis --- Google (3 of 3).}
 \end{figure}
 
 We also calculate the top 15 hallucinated fields as below:
