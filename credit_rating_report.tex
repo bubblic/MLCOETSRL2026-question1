@@ -201,15 +201,15 @@
 \section*{Executive Summary}
 \addcontentsline{toc}{section}{Executive Summary}
 
-This report presents a credit rating assignment system that combines classical financial modelling with modern natural language processing.  The system ingests corporate annual reports — both their structured financial tables and their unstructured textual disclosures — and maps them to a rating scale consistent with those published by the major credit-rating agencies (CRAs): Standard \& Poor's (S\&P), Moody's, and Fitch.
+This report presents a credit rating assignment system that combines classical financial modelling with modern natural language processing.  The system ingests corporate annual reports, both their structured financial tables and their unstructured textual disclosures, and maps them to a rating scale consistent with those published by the major credit-rating agencies (CRAs): Standard \& Poor's (S\&P), Moody's, and Fitch.
 
 The report is organized around four questions set by the project brief:
 
 \begin{enumerate}[label=\textbf{(\alph*)}, leftmargin=2em]
-  \item \textbf{Mathematical form} — we trace a path from Altman's Z-Score through logistic regression to a two-tower deep hybrid that treats structured ratios and unstructured text as complementary signals.
-  \item \textbf{Data sourcing} — we describe a reproducible pipeline that draws from SEC EDGAR, Compustat/Bloomberg (financial ratios), and S\&P/Moody's/Fitch published ratings.
-  \item \textbf{Evergrande case study} — we apply the model to Evergrande's 2022 annual report and interpret the output in the context of the company's well-documented financial distress.
-  \item \textbf{Shenanigans detection} — we operationalize red-flag heuristics from Schilit's \textit{Financial Shenanigans} into an automated toolkit and validate it against known bankruptcy cases.
+  \item \textbf{Mathematical form}: we trace a path from Altman's Z-Score through logistic regression to a two-tower deep hybrid that treats structured ratios and unstructured text as complementary signals.
+  \item \textbf{Data sourcing}: we describe a reproducible pipeline that draws from SEC EDGAR, Compustat/Bloomberg (financial ratios), and S\&P/Moody's/Fitch published ratings.
+  \item \textbf{Evergrande case study}: we apply the model to Evergrande's 2022 annual report and interpret the output in the context of the company's well-documented financial distress.
+  \item \textbf{Shenanigans detection}: we operationalize red-flag heuristics from Schilit's \textit{Financial Shenanigans} into an automated toolkit and validate it against known bankruptcy cases.
 \end{enumerate}
 
 \newpage
@@ -289,7 +289,7 @@ The decision rules are:
 
 \noindent\textbf{Limitations.}  The Z-Score was estimated on a sample of 66 US manufacturing firms in the 1960s.  It (i)~does not produce a fine-grained rating, (ii)~ignores non-manufacturing sectors, (iii)~is blind to qualitative disclosures, and (iv)~cannot incorporate forward-looking language in the MD\&A.  We retain it as an interpretable sanity-check baseline.
 
-For non-listed firms (where market-cap data is unavailable) the \emph{Z''-Score} replaces $X_4$ with the \emph{book} value ratio and recalibrates the coefficients — relevant for Evergrande's Hong Kong-listed H-shares.
+For non-listed firms (where market-cap data is unavailable) the \emph{Z''-Score} replaces $X_4$ with the \emph{book} value ratio and recalibrates the coefficients, which is relevant for Evergrande's Hong Kong-listed H-shares.
 
 % ─────────────────────────────────────────────────────────────────────────────
 \subsection{Intermediate: Logistic / Ordinal Regression on Financial Ratios}
@@ -447,7 +447,7 @@ For regulatory use cases (and for JPMorgan's model risk management requirements)
   f(\mathbf{x}) = \phi_0 + \sum_{j=1}^{d} \phi_j x_j
 \end{equation}
 
-where $\phi_j$ is the Shapley value of feature $j$ — its average marginal contribution across all feature coalitions.  For the text tower, we use integrated gradients at the token level to highlight which phrases most influenced the rating.
+where $\phi_j$ is the Shapley value of feature $j$, its average marginal contribution across all feature coalitions.  For the text tower, we use integrated gradients at the token level to highlight which phrases most influenced the rating.
 
 \newpage
 
@@ -678,10 +678,10 @@ Class probabilities:
 \begin{keyinsight}
 \textbf{Expected result.}  The model should overwhelmingly assign Evergrande to the D or CCC class.  Key structured signals driving this prediction are:
 \begin{itemize}
-  \item Negative book equity — total liabilities exceed total assets (technical insolvency).
-  \item Interest coverage ratio $<0$ — operating losses cannot service debt.
+  \item Negative book equity: total liabilities exceed total assets (technical insolvency).
+  \item Interest coverage ratio $<0$: operating losses cannot service debt.
   \item Net Debt / EBITDA undefined or $\gg 10\times$ due to negative EBITDA.
-  \item Working capital deeply negative — current liabilities dwarf current assets.
+  \item Working capital deeply negative: current liabilities dwarf current assets.
 \end{itemize}
 
 Key text signals from the MD\&A:
@@ -972,7 +972,7 @@ This report has outlined a progressively sophisticated approach to automated cre
 \begin{enumerate}
   \item \textbf{Altman Z-Score} provides an auditable, finance-literate baseline that requires only five balance-sheet ratios.
   \item \textbf{Ordinal logistic regression} on 25 financial ratios captures a richer picture of leverage, liquidity, profitability, and efficiency while respecting the ordered structure of ratings.
-  \item \textbf{The two-tower hybrid} integrates structured financial features with unstructured MD\&A text via FinBERT, capturing the qualitative signals that analysts prize — going-concern language, management tone, and auditor qualifications.
+  \item \textbf{The two-tower hybrid} integrates structured financial features with unstructured MD\&A text via FinBERT, capturing the qualitative signals that analysts prize: going-concern language, management tone, and auditor qualifications.
   \item \textbf{The shenanigans toolkit} adds a fraud-detection layer that is orthogonal to the rating model: it produces early-warning signals based on Beneish M-Score, Schilit's EMS/CFS taxonomy, and NLP-based tone analysis.
 
 Applied to Evergrande's 2022 annual report, the full pipeline is expected to flag the company as D-rated with high confidence, consistent with its market status as a defaulted issuer since December 2021.

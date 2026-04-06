@@ -269,6 +269,30 @@ Assets), the financial state at time $t+1$ is fully determined by the
 state at time $t$ together with the flows between them. Nothing escapes
 the ledger.
 
+To make these mechanics tangible, we built an interactive visualisation
+as a Claude Artifact (Figure~\ref{fig:double-entry}). It lets the reader
+select any of six representative transactions and trace their debit and
+credit legs simultaneously across the Income Statement, Cash Budget, and
+Balance Sheet, together with the formal journal entry and a
+verification that $A = L + E$ is preserved.
+
+\begin{figure}[H]
+\centering
+% TODO: replace with a screenshot of the live artifact
+\includegraphics[width=\textwidth]{report_latex_media/media/double_entry_artifact.png}
+\caption{Interactive visualisation of double-entry bookkeeping across
+the three financial statements. Six transactions --- credit sale, cash
+collection, depreciation, net-income close to retained earnings, CapEx
+purchase, and debt repayment --- can be selected to trace their debit
+(\textcolor{red}{Dr}, red) and credit (\textcolor{blue}{Cr}, blue) legs
+simultaneously through the Income Statement, Cash Budget, and Balance
+Sheet. Each selection displays the formal journal entry and verifies
+that the accounting identity $A = L + E$ is preserved. The live
+interactive version is available at
+\url{https://claude.ai/public/artifacts/2706f0bf-ba12-4fa9-964a-6ba54ccc2838}.}
+\label{fig:double-entry}
+\end{figure}
+
 \subsection{Proposed Methodology: A Structural ``No-Plug'' Approach}
 
 To address the limitations of plug-based financial forecasts, this report implements a
@@ -1504,26 +1528,26 @@ drive every element given the variables to be trained are learned.
 
 \begin{itemize}
 \item
-  \%AG : Asset growth rate as a percentage of non-current assets
+  \%AG\, [$>0$] : Asset growth rate as a percentage of non-current assets
 \item
-  \%AM : Asset maintenance ratio as a percentage of depreciation
+  \%AM\, [$>0$] : Asset maintenance ratio as a percentage of depreciation
 \item
-  \%Depr : Depreciation rate as a percentage of non-current assets
+  \%Depr\, [$>0$] : Depreciation rate as a percentage of non-current assets
 \item
-  \%AdvPS : Advance payments from customers as a percentage of next
+  \%AdvPS\, [$>0$] : Advance payments from customers as a percentage of next
   year's sales
 \item
-  \%AdvPP : Advance payments to suppliers as a percentage of next year's
+  \%AdvPP\, [$>0$] : Advance payments to suppliers as a percentage of next year's
   purchases
 \item
-  \%AR : Account receivables as a percentage of this year's sales
+  \%AR\, [$>0$] : Account receivables as a percentage of this year's sales
 \item
-  \%AP : Account payables as a percentage of this year's purchases
+  \%AP\, [$>0$] : Account payables as a percentage of this year's purchases
 \item
-  \%Inv : Inventory target as a percentage of this year's sales
+  \%Inv\, [$>0$] : Inventory target as a percentage of this year's COGS
 \item
-  $\alpha$\textsubscript{CR} and $\beta$\textsubscript{CR} : Variables that make up
-  the Cost Ratio via logit model
+  $\alpha$\textsubscript{CR}, $\beta$\textsubscript{CR}\, [$\in \mathbb{R}$] :
+  Variables that make up the Cost Ratio via logit model
 
   \begin{itemize}
   \item
@@ -1532,54 +1556,55 @@ drive every element given the variables to be trained are learned.
     t
   \end{itemize}
 \item
-  TL\textsubscript{baseline}, $\alpha_{\text{TL}}$, $\beta_{\text{TL}}$ :
+  TL\textsubscript{baseline}, $\alpha_{\text{TL}}$, $\beta_{\text{TL}}$\, [$\in \mathbb{R}$] :
   Baseline floor and logit-linear trend parameters for total liquidity
   with a sales-proportional component:
   $\text{TL}_t = \text{TL}_{\text{baseline}} + \text{Sales}_t \cdot
   \sigma(\alpha_{\text{TL}} + \beta_{\text{TL}} \cdot t)$
 \item
-  $\alpha_{\text{Cash}}$, $\beta_{\text{Cash}}$ : Logit-linear trend
-  parameters for the cash share of total liquidity:
+  $\alpha_{\text{Cash}}$, $\beta_{\text{Cash}}$\, [$\in \mathbb{R}$] :
+  Logit-linear trend parameters for the cash share of total liquidity:
   $\text{Cash}_t = \text{TL}_t \cdot \sigma(\alpha_{\text{Cash}} +
   \beta_{\text{Cash}} \cdot t)$
 \item
-  \%IT : Income tax as a percentage of net income this year
+  \%IT\, [$\in(0,1)$] : Income tax as a percentage of net income this year
 \item
-  \%OR : Variable portion of OpEx that increases in proportion to this
+  \%OR\, [$\in \mathbb{R}$] : Variable portion of OpEx that increases in proportion to this
   year's sales
 \item
-  OB\textsubscript{T\_start} : Baseline OpEx that increases with this
+  OB\textsubscript{T\_start}\, [$\in \mathbb{R}$] : Baseline OpEx that increases with this
   year's average inflation
 \item
-  EffSTDebt\textsubscript{baseline} and \%STDebt : Baseline and
+  EffSTDebt\textsubscript{baseline}\, [$>0$] and \%STDebt\, [$>0$] : Baseline and
   sales-proportional parameters for calculating effective short-term
   debt (Effective ST Debt\textsubscript{t} = EffSTDebt\textsubscript{baseline}
   + Sales\textsubscript{t} $\cdot$ \%STDebt)
 \item
-  \%AvgSTInt : Average short-term interest on the effective short-term
+  \%AvgSTInt\, [$>0$] : Average short-term interest on the effective short-term
   loan
 \item
-  \%AvgLTInt : Average interest on total long-term liabilities
+  \%AvgLTInt\, [$>0$] : Average interest on total long-term liabilities
 \item
-  AvgM : Average maturity of total long-term liability
+  AvgM\, [$>1.001$] : Average maturity of total long-term liability
 \item
-  \%MSReturn : Effective percentage return on the investment in market
+  \%MSReturn\, [$\in \mathbb{R}$] : Effective percentage return on the investment in market
   securities, derived from historical $(\text{EBT} - \text{EBIT} + \text{InterestExpense}) / \text{IMS}$
 \item
-  $\alpha_{\text{EF}}$, $\beta_{\text{EF}}$ : Logit-linear parameters
-  for the equity financing mix, $\text{\%EF}_t = \sigma(\alpha_{\text{EF}}
+  $\alpha_{\text{EF}}$, $\beta_{\text{EF}}$\, [$\in \mathbb{R}$] :
+  Logit-linear parameters for the equity financing mix,
+  $\text{\%EF}_t = \sigma(\alpha_{\text{EF}}
   + \beta_{\text{EF}} \cdot t)$, where \%EF is the fraction of long-term
   financing raised as equity rather than debt
 \item
-  \%PR : Target dividend payout ratio (fraction of net income) in the
+  \%PR\, [$\in(0,1)$] : Target dividend payout ratio (fraction of net income) in the
   Lintner partial-adjustment model
 \item
-  Adj.\ Speed : Lintner partial-adjustment speed controlling how
+  Adj.\ Speed\, [$\in(0,1)$] : Lintner partial-adjustment speed controlling how
   quickly actual dividends converge to the target payout
   $\text{\%PR} \cdot \text{NI}_{t-1}$
 \item
-  BB\textsubscript{baseline} and BB\textsubscript{ratio} : Fixed
-  baseline and depreciation-proportional parameters for stock buyback
+  BB\textsubscript{baseline}, BB\textsubscript{ratio}\, [$\in \mathbb{R}$] :
+  Fixed baseline and depreciation-proportional parameters for stock buyback
   in the affine buyback policy
   ($\text{BB}_t = \text{BB}_{\text{baseline}} + \text{BB}_{\text{ratio}}
   \cdot \text{Depreciation}_t$)
@@ -1598,10 +1623,17 @@ Bijectors.
 \begin{itemize}
 \item
   \textbf{Strict Positivity ($x > 0$):} Variables that
-  cannot logically be negative, such as the Depreciation Rate (\%Depr),
-  Asset Growth (\%AG), and Interest Rates (\%AvgSTInt, \%AvgLTInt), are
-  constrained using a Softplus activation function. This prevents the
-  optimizer from testing negative rates during gradient descent.
+  cannot logically be negative --- the Depreciation Rate (\%Depr),
+  Asset Growth (\%AG), Asset Maintenance (\%AM), Interest Rates
+  (\%AvgSTInt, \%AvgLTInt), all working-capital ratios (\%AdvPS,
+  \%AdvPP, \%AR, \%AP, \%Inv), and the Effective Short-Term Debt
+  parameters (EffSTDebt\textsubscript{baseline}, \%STDebt) --- are
+  constrained using a Softplus activation function. Because both
+  ST-debt parameters are strictly positive, the linear form
+  $\text{EffSTDebt}_{\text{baseline}} + \text{Sales}_t \cdot
+  \text{\%STDebt}$ is guaranteed non-negative for any positive sales
+  level. This prevents the optimizer from testing negative values
+  during gradient descent.
 \item
   \textbf{Percentage Bounds ($0 < x < 1$):}
   Variables representing fractions of a whole, such as the Income Tax
@@ -1616,12 +1648,15 @@ Bijectors.
   This is enforced using a chained bijector: a Softplus function shifted
   by a constant of 1.001.
 \item
-  \textbf{Trended Ratios:} Time-varying policies, such as the Cost Ratio
-  (CR) and Effective Short-Term Debt percentage, are modeled as
-  logit-linear trends. By wrapping the linear trend
-  $(\alpha + \beta t)$ in a sigmoid
+  \textbf{Logit-Linear Trends ($\sigma(\alpha + \beta t) \in (0,1)$):}
+  Time-varying policies --- the Cost Ratio (CR), Total Liquidity
+  percentage (\%TL), Cash share of Liquidity (\%Cash), and Equity
+  Financing mix (\%EF) --- are modeled as logit-linear trends.
+  By wrapping the linear trend $(\alpha + \beta t)$ in a sigmoid
   function, the forecasted ratios are strictly bounded between 0 and 1,
-  even if extrapolated decades into the future.
+  even if extrapolated decades into the future. The underlying
+  $\alpha$ and $\beta$ parameters are unconstrained, giving the
+  optimizer full freedom in logit space.
 \end{itemize}
 
 \subsubsection{Logical Constraints on Equations}
@@ -1655,6 +1690,15 @@ This flat-rate assumption is a first-order simplification. In practice, borrowin
 \item
   Inflation\textsubscript{t} : Average inflation at year t
 \end{itemize}
+
+\subsubsection{Element-Wise Time-Series Equations}
+
+The following equations express every balance-sheet and income-statement
+element as a function of the trained variables,
+Sales\textsubscript{t}, Purchases\textsubscript{t}, and the previous
+period's state. Together they define the single-period state transition
+used by both the simple forward model and the gradient-based training
+loop.
 
 \paragraph{Assets}
 
@@ -1699,23 +1743,23 @@ This flat-rate assumption is a first-order simplification. In practice, borrowin
 
   \begin{itemize}
   \item
-    Target TL\textsubscript{t} = \%TL * Sales\textsubscript{t}
+    \textit{Simple:}\;
+    Target TL\textsubscript{t} = \%TL * Sales\textsubscript{t},\;
+    Cash\textsubscript{t} = \%Cash * TL\textsubscript{t},\;
+    IMS\textsubscript{t} = (1 -- \%Cash) * TL\textsubscript{t}
+  \item
+    \textit{Advanced:}\;
+    Target TL\textsubscript{t} =
+    TL\textsubscript{baseline} + Sales\textsubscript{t} *
+    $\sigma(\alpha_{\text{TL}} + \beta_{\text{TL}} \cdot t)$
 
     \begin{itemize}
     \item
-      Investments in market securities
-
-      \begin{itemize}
-      \item
-        IMS\textsubscript{t} = (1 - \%Cash) * TL\textsubscript{t}
-      \end{itemize}
+      Cash\textsubscript{t} = TL\textsubscript{t} *
+      $\sigma(\alpha_{\text{Cash}} + \beta_{\text{Cash}} \cdot t)$
     \item
-      Cash equivalent
-
-      \begin{itemize}
-      \item
-        Cash\textsubscript{t} = \%Cash * TL\textsubscript{t}
-      \end{itemize}
+      IMS\textsubscript{t} = TL\textsubscript{t} --
+      Cash\textsubscript{t}
     \end{itemize}
   \item
     Should be equivalent to: Final TL\textsubscript{t} = Operating
@@ -1743,31 +1787,38 @@ This flat-rate assumption is a first-order simplification. In practice, borrowin
     AdvPS\textsubscript{t} = \%AdvPS * Sales\textsubscript{t}
   \end{itemize}
 \item
-  Current liabilities
+  Effective short-term debt
 
   \begin{itemize}
   \item
-    CLiab\textsubscript{t}
+    \textit{Simple (deficit-driven):}\;
+    EffSTDebt\textsubscript{t} = max(0,
+    LiqDeficit\textsubscript{ST,t})
+  \item
+    \textit{Advanced (policy-driven):}\;
+    EffSTDebt\textsubscript{t} = EffSTDebt\textsubscript{baseline} +
+    Sales\textsubscript{t} * \%STDebt
+  \end{itemize}
+\item
+  Current portion of long-term debt
+
+  \begin{itemize}
+  \item
+    CurLTDebt\textsubscript{t} = (NewLTLoan\textsubscript{t} +
+    NCL\textsubscript{t-1}) / AvgM
   \end{itemize}
 \end{itemize}
 
-\begin{quote}
-= STLoan\textsubscript{t} + NLiab\textsubscript{t} / (AvgM -- 1)
-
-where
-\end{quote}
+The short-term liquidity deficit drives financing. In the simple model
+the deficit is absorbed by ST borrowing; in the advanced model it flows
+entirely to long-term financing:
 
 \begin{itemize}
 \item
-  STLoan\textsubscript{t} = max(0, STCashDeficit\textsubscript{t})
-\item
-  STCashDeficit\textsubscript{t} = TL\textsubscript{t} --
-  TL\textsubscript{t-1} -- Operating NLB\textsubscript{t} +
-  STLoan\textsubscript{t-1} * (1 + \%AvgSTInt) -- \%MSReturn *
-  IMS\textsubscript{t-1}
-\item
-  STLoan\textsubscript{t-1} = CLiab\textsubscript{t-1} -
-  NLiab\textsubscript{t-1} / (AvgM -- 1)
+  LiqDeficit\textsubscript{ST,t} = TL\textsubscript{t} --
+  (Cash\textsubscript{t-1} + IMS\textsubscript{t-1}) -- Operating
+  NLB\textsubscript{t} + EffSTDebt\textsubscript{t-1} * (1 +
+  \%AvgSTInt)
 \item
   Operating NLB\textsubscript{t} = AR\textsubscript{t-1} +
   AdvPS\textsubscript{t} + Sales\textsubscript{t} * (1 - \%AR - \%AdvPS)
@@ -1795,43 +1846,63 @@ where
 
   \begin{itemize}
   \item
-    NLiab\textsubscript{t}
+    NCL\textsubscript{t} = (NewLTLoan\textsubscript{t} +
+    NCL\textsubscript{t-1}) * (AvgM -- 1) / AvgM
   \end{itemize}
 \end{itemize}
 
 \begin{quote}
-= (LTLoan\textsubscript{t} + NLiab\textsubscript{t-1}) * (AvgM --
-1)/AvgM
-
 where
 \end{quote}
 
 \begin{itemize}
 \item
-  LTLoan\textsubscript{t} = (max(0, STCashDeficit\textsubscript{t} --
-  STLoan\textsubscript{t} -- CapEx NLB\textsubscript{t} +
-  NLiab\textsubscript{t} / (AvgM -- 1) + AvgLTInt\textsubscript{t} +
-  Dividends\textsubscript{t-1} + Stock buybacks\textsubscript{t}) * (1 -
-  \%EF)
+  LiqDeficit\textsubscript{LT,t} = LiqDeficit\textsubscript{ST,t} --
+  EffSTDebt\textsubscript{t} -- MSReturn\textsubscript{t} +
+  CapEx\textsubscript{t} + CurLTDebt\textsubscript{t-1} +
+  InterestLT\textsubscript{t} + Dividends\textsubscript{t} + Stock
+  buybacks\textsubscript{t}
 \item
-  CapEx NLB\textsubscript{t} = NCA\textsubscript{t-1} * \%Depr + \%AG *
+  NewLTLoan\textsubscript{t} = max(0,
+  LiqDeficit\textsubscript{LT,t}) * (1 -- \%EF\textsubscript{t})
+
+  \begin{itemize}
+  \item
+    \textit{Simple:}\; \%EF\textsubscript{t} = \%EF \quad (static)
+  \item
+    \textit{Advanced:}\; \%EF\textsubscript{t} =
+    $\sigma(\alpha_{\text{EF}} + \beta_{\text{EF}} \cdot t)$
+  \end{itemize}
+\item
+  CapEx\textsubscript{t} = NCA\textsubscript{t-1} * \%Depr + \%AG *
   Sales\textsubscript{t}
 \item
-  Dividends\textsubscript{t-1} = \%PR * NI\textsubscript{t-1}
+  Dividends\textsubscript{t}:
+
+  \begin{itemize}
+  \item
+    \textit{Simple:}\;
+    Dividends\textsubscript{t} = \%PR * NI\textsubscript{t-1}
+  \item
+    \textit{Advanced (Lintner):}\;
+    Dividends\textsubscript{t} = Adj.\ Speed * (\%PR *
+    NI\textsubscript{t-1}) + (1 -- Adj.\ Speed) *
+    Dividends\textsubscript{t-1}
+  \end{itemize}
 \item
   NI\textsubscript{t-1} : net income from last year
 \end{itemize}
 
 \begin{quote}
-= (1 - \%IT) * (Sales\textsubscript{t-1} -- COGS\textsubscript{t-1} --
+= (1 -- \%IT) * (Sales\textsubscript{t-1} -- COGS\textsubscript{t-1} --
 OpEx\textsubscript{t-1} -- Depreciation\textsubscript{t-1} --
-AvgSTInt\textsubscript{t-1} -- AvgLTInt\textsubscript{t-1} + \%MSReturn
-* (1 - \%Cash) * TL\textsubscript{t-1})
+InterestST\textsubscript{t-1} -- InterestLT\textsubscript{t-1} +
+MSReturn\textsubscript{t-1})
 \end{quote}
 
 \begin{itemize}
 \item
-  TL\textsubscript{t-1} = Total liquidity last year.
+  MSReturn\textsubscript{t} = \%MSReturn * IMS\textsubscript{t-1}
 \item
   COGS\textsubscript{t-1} = \%Inv * (Sales\textsubscript{t-2} --
   Sales\textsubscript{t-1}) + Purchases\textsubscript{t-1}
@@ -1841,14 +1912,25 @@ AvgSTInt\textsubscript{t-1} -- AvgLTInt\textsubscript{t-1} + \%MSReturn
 \item
   Depreciation\textsubscript{t} = NCA\textsubscript{t-1} * \%Depr
 \item
-  AvgSTInt\textsubscript{t} = \%AvgSTInt * (CLiab\textsubscript{t-t} --
-  NLiab\textsubscript{t-t} / (AvgM -- 1))
+  InterestST\textsubscript{t} = \%AvgSTInt *
+  EffSTDebt\textsubscript{t-1}
 \item
-  AvgLTInt\textsubscript{t} = \%AvgLTInt * (NLiab\textsubscript{t-1} /
-  (1 -- 1/AvgM))
+  InterestLT\textsubscript{t} = \%AvgLTInt * (NCL\textsubscript{t-1} +
+  CurLTDebt\textsubscript{t-1})
 \item
-  Stock buybacks\textsubscript{t} = \%BB * Depreciation\textsubscript{t}
-  + excess cash after meeting liquidity target
+  Stock buybacks\textsubscript{t}:
+
+  \begin{itemize}
+  \item
+    \textit{Simple:}\;
+    \%BB * Depreciation\textsubscript{t} + excess cash after meeting
+    liquidity target
+  \item
+    \textit{Advanced:}\;
+    BB\textsubscript{baseline} + BB\textsubscript{ratio} *
+    Depreciation\textsubscript{t} + excess cash after meeting liquidity
+    target
+  \end{itemize}
 \end{itemize}
 
 \paragraph{Equity}
@@ -1859,14 +1941,16 @@ AvgSTInt\textsubscript{t-1} -- AvgLTInt\textsubscript{t-1} + \%MSReturn
 
   \begin{itemize}
   \item
-    SE\textsubscript{t}
+    SE\textsubscript{t} = SE\textsubscript{t-1} +
+    EquityFinancing\textsubscript{t} + NI\textsubscript{t} --
+    Dividends\textsubscript{t} -- Stock buybacks\textsubscript{t}
   \end{itemize}
 \end{itemize}
 
 \begin{quote}
-= SE\textsubscript{t-1} + LTLoan\textsubscript{t} / (1 - \%EF) * \%EF +
-NI\textsubscript{t} -- \%PR * NI\textsubscript{t-1} -- \%BB * \%Depr *
-NCA\textsubscript{t-1} -- excess cash after meeting liquidity target
+where EquityFinancing\textsubscript{t} = max(0,
+LiqDeficit\textsubscript{LT,t}) * \%EF\textsubscript{t}
+(static or logit-linear; see NewLTLoan above)
 \end{quote}
 
 We see in all elements' equations that they are driven by Sales and
@@ -1877,11 +1961,16 @@ equity are increased/decreased the same. Thus, assets = liabilities +
 equity will always be satisfied. We can check with test values in our
 simple TensorFlow model.
 
+\subsection{Forward Model Implementation}
+
 This forward model has been implemented in Python in
 \texttt{run\_simple\_model\_forecast.py}, which composes
 the modular policy classes from the \texttt{financial\_forecast/} package
 using data from Apple's financial
-statements. The financial statements were first obtained from Yahoo
+statements. The demo below uses the \textbf{simple} policy variants
+throughout (static ratios, deficit-driven ST debt, fixed payout
+dividends); the advanced policies are exercised in the trained models of
+Section~2.5. The financial statements were first obtained from Yahoo
 finance as suggested by Question 4 (we wrote the script in
 \texttt{yahoofinance.py}), but we could only access past 4 years of
 data, which is not sufficient for training in the following section. We
@@ -2223,8 +2312,6 @@ of potential improvements is as follows:
   disclosed publicly into training the buyback ratio with a neural
   network
 \item
-  Endogenizing the Weighted Average Cost of Capital (WACC) as a function of the forecasted capital structure. Since WACC depends on the debt-to-equity ratio and cost of debt (both of which change across the forecast horizon), this would link borrowing costs to leverage and enable DCF-based valuation directly from the model output.
-\item
   Propagating uncertainty across all key drivers (sales growth, cost ratios, interest rates, CapEx intensity) via full Monte Carlo simulation, not just OpEx. Adding scenario analysis (base case, downside with revenue contraction, upside with margin expansion) would strengthen the forecast's decision-support value.
 \item
   Computing projected financial ratios (debt-to-equity, interest coverage, current ratio) from the forecast output and flagging years where they breach investment-grade thresholds, enabling proactive capital structure management.
@@ -2463,18 +2550,18 @@ Statement, and Cash Budget is attached below:
 
 \subsection{a) LLM Selection and Infrastructure Setup}
 
-My favorite LLM is DeepSeek V3.2 for reasoning which has 128k context
+Our favorite LLM is DeepSeek V3.2 for reasoning which has 128k context
 window and gpt-5-nano for non-reasoning task which has 400k context
-window. From my daily usage, DeepSeekV3.2 follows instructions well with
+window. From our daily usage, DeepSeekV3.2 follows instructions well with
 less hallucinations than other models from competitors. Gpt-5-nano, from
-my experience, is an inexpensive model that performs well for pretty
-complicated tasks but hallucinates more. I use Microsoft's Azure Foundry
+our experience, is an inexpensive model that performs well for pretty
+complicated tasks but hallucinates more. We use Microsoft's Azure Foundry
 to access these models via Azure API. We have set up an AWS Lambda
 function that makes the API calls so that we can hide the API keys for
 our Azure API. The AWS Lambda address is saved as an environment
-variable in a .env file, with its content being:
+variable in a .env file, with its content having the format of:
 
-{\small AZURE\_DEEPSEEK\_ENDPOINT=\url{https://dru54knwxa7sb4rlwrgws3kaze0jdvtj.lambda-url.us-west-1.on.aws/}}
+{\small AZURE\_DEEPSEEK\_ENDPOINT=\url{https://*****.lambda-url.us-west-1.on.aws/}}
 
 We have included the .env file in the zipped file attached with our
 report submission.
