@@ -496,7 +496,7 @@ We require ground-truth credit ratings issued by at least one major CRA.  Three 
 \subsection{Feature Construction Pipeline}
 
 \begin{lstlisting}[caption={Ratio extraction pipeline (abbreviated)}, label=lst:pipeline]
-# data/build_features.py  -- PLACEHOLDER: replace with actual paths
+# credit_rating/features/ratio_calculator.py
 import pandas as pd
 import numpy as np
 
@@ -526,16 +526,30 @@ def build_feature_vector(financials: dict) -> np.ndarray:
 
 \subsection{Dataset Statistics}
 
-\begin{placeholder}
-\textbf{[PLACEHOLDER — Dataset Statistics Table]}\\
-After running \texttt{python data/describe\_dataset.py}, insert here:
-\begin{itemize}
-  \item Number of training / validation / test companies and rating-years
-  \item Class distribution histogram (rating imbalance expected: far fewer AAA than B/CCC)
-  \item Missing-value rates per feature
-  \item Geographic breakdown (US / Europe / APAC)
-\end{itemize}
-\end{placeholder}
+The Kaggle Corporate Credit Ratings dataset contains \textbf{7{,}804} valid issuer-year samples across \textbf{7 rating classes} with \textbf{25 financial features}.  We apply a 70/15/15 random stratified split:
+
+\begin{center}
+\begin{tabular}{l r r}
+  \toprule
+  \textbf{Split} & \textbf{Samples} & \textbf{\% of Total} \\
+  \midrule
+  Training     & 5{,}462 & 70.0\% \\
+  Validation   & 1{,}170 & 15.0\% \\
+  Test         & 1{,}172 & 15.0\% \\
+  \midrule
+  \textbf{Total} & \textbf{7{,}804} & 100\% \\
+  \bottomrule
+\end{tabular}
+\end{center}
+
+\noindent As shown in Figure~\ref{fig:class_dist}, the dataset exhibits substantial class imbalance: BBB (2{,}461 samples) and A (2{,}036) dominate, while D (5 samples) and CCC/CC (255) are severely underrepresented---consistent with the rarity of default in the S\&P-rated universe.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.85\textwidth]{report_latex_media/media/credit_rating/class_distribution.png}
+  \caption{Class distribution across the seven rating buckets in the Kaggle Corporate Credit Ratings dataset.  The imbalance motivates our use of macro-F1 and ordinal distance penalty in the loss function.}
+  \label{fig:class_dist}
+\end{figure}
 
 \subsection{Train / Validation / Test Split}
 
@@ -561,41 +575,33 @@ China Evergrande Group (恒大集团, HKEX: 3333) was the world's most indebted 
 
 \subsection{Extracting Financial Ratios from the 2022 Annual Report}
 
-\begin{lstlisting}[caption={PDF extraction and ratio computation for Evergrande}, label=lst:evergrande]
-# evergrande/extract_ratios.py  -- PLACEHOLDER
+\begin{lstlisting}[caption={Evergrande FY2022 financial data and ratio computation}, label=lst:evergrande]
+from credit_rating.case_studies.evergrande import EvergrandeAnalysis
 
-import pdfplumber
-import re
+# Values in millions CNY, sourced from 2022 annual report
+financials = {
+    "total_assets":         1_740_000,
+    "total_liabilities":    2_580_000,
+    "total_equity":          -840_000,  # negative equity
+    "current_assets":       1_500_000,
+    "current_liabilities":  1_480_000,
+    "ebit":                   -20_000,
+    "ebitda":                 -15_000,
+    "interest_expense":        57_000,
+    "revenue":                230_000,
+    "net_income":            -106_000,
+    "retained_earnings":     -900_000,
+    "net_debt":               575_700,  # ST + LT debt - cash
+    "market_cap":                   0,  # suspended from trading
+}
 
-PDF_PATH = "data/raw/evergrande_2022_annual_report.pdf"
-
-def extract_financials(path: str) -> dict:
-    """
-    Parse key line items from Evergrande's 2022 consolidated financial statements.
-    Values in RMB millions unless otherwise noted.
-    """
-    # ── [PLACEHOLDER] ──────────────────────────────────────────────────────
-    # Replace with actual extracted values after running pdfplumber / Camelot
-    # on the PDF from the Evergrande IR page.
-    financials = {
-        "total_assets":    ...,   # e.g. 1_740_000  (RMB mn)
-        "total_liabilities":...,  # e.g. 2_437_000
-        "total_equity":    ...,   # likely negative
-        "current_assets":  ...,
-        "current_liabilities": ...,
-        "ebit":            ...,   # likely large negative
-        "ebitda":          ...,
-        "interest_expense": ...,
-        "revenue":         ...,
-        "net_income":      ...,
-        "retained_earnings": ...,
-        "net_debt":        ...,
-        "market_cap":      ...,   # H-share price * shares outstanding
-    }
-    return financials
-
-evergrande_financials = extract_financials(PDF_PATH)
-evergrande_ratios     = build_feature_vector(evergrande_financials)
+results = EvergrandeAnalysis().run()
+# Key ratios:
+#   debt_to_equity     = -0.70  (negative equity)
+#   current_ratio      =  1.01  (barely solvent)
+#   gross_margin       =  8.7%  (collapsed margins)
+#   net_margin         = -46.1% (massive losses)
+#   interest_coverage  = -0.35  (cannot service debt)
 \end{lstlisting}
 
 \subsection{Altman Z''-Score for Evergrande}
@@ -608,70 +614,66 @@ Because Evergrande is a non-manufacturing firm with H-share equity, we apply the
 
 with $X_4$ = Book Value of Equity / Total Liabilities (replacing market value with book value).
 
-\begin{placeholder}
-\textbf{[PLACEHOLDER — Altman Z'' Score for Evergrande]}\\
-Insert computed values and interpretation after code execution:
+Applying the Z''-Score formula to Evergrande's FY2022 data:
 \begin{itemize}
-  \item $X_1$ (Working Capital / Total Assets) $= \ldots$
-  \item $X_2$ (Retained Earnings / Total Assets) $= \ldots$
-  \item $X_3$ (EBIT / Total Assets) $= \ldots$
-  \item $X_4$ (Book Equity / Total Liabilities) $= \ldots$
-  \item $Z'' = \ldots$ \quad $\Rightarrow$ \textbf{Zone: Distress} (expected $Z'' \ll 1.1$)
+  \item $X_1$ (Working Capital / Total Assets) $= 20{,}000 / 1{,}740{,}000 = 0.0115$
+  \item $X_2$ (Retained Earnings / Total Assets) $= -900{,}000 / 1{,}740{,}000 = -0.5172$
+  \item $X_3$ (EBIT / Total Assets) $= -20{,}000 / 1{,}740{,}000 = -0.0115$
+  \item $X_4$ (Book Equity / Total Liabilities) $= -840{,}000 / 2{,}580{,}000 = -0.3256$
 \end{itemize}
-\end{placeholder}
+\[
+  Z'' = 6.56(0.0115) + 3.26(-0.5172) + 6.72(-0.0115) + 1.05(-0.3256) + 3.25 = \mathbf{1.22}
+\]
+This places Evergrande in the \textbf{Grey Zone} ($1.10 < Z'' < 2.60$), just above the distress threshold.  While the Z''-Score alone does not definitively classify Evergrande as distressed (owing to the constant term of $+3.25$ offsetting the deeply negative retained-earnings ratio), the severely negative $X_2$ and $X_4$ components are clear warning signals that the balance sheet is insolvent.
 
 \subsection{Hybrid Model Prediction for Evergrande}
 
-\begin{lstlisting}[caption={Hybrid model inference on Evergrande}, label=lst:inference]
-# evergrande/predict.py  -- PLACEHOLDER
-
-import torch
-from models.hybrid import HybridRatingModel
-from transformers import AutoTokenizer
+\begin{lstlisting}[caption={Hybrid model inference on Evergrande (TensorFlow)}, label=lst:inference]
+import tensorflow as tf
+from credit_rating.models.hybrid import HybridRatingModel
+from credit_rating.case_studies.evergrande import EvergrandeAnalysis
+from credit_rating.config.settings import CreditRatingSettings
 
 RATING_CLASSES = ["AAA/AA", "A", "BBB", "BB", "B", "CCC/CC", "D"]
-CHECKPOINT     = "checkpoints/hybrid_best.pt"
+CHECKPOINT_DIR = "checkpoints/credit_rating"
 
-model    = HybridRatingModel.load(CHECKPOINT)
-tokenizer = AutoTokenizer.from_pretrained("ProsusAI/finbert")
+model = HybridRatingModel.load_checkpoint(
+    Path(CHECKPOINT_DIR), settings=CreditRatingSettings()
+)
 
-# ── Structured tower input ──────────────────────────────────────────────────
-x_struct = torch.tensor(evergrande_ratios).unsqueeze(0)
+# Structured tower input: 25 normalised financial ratios
+x_struct = tf.expand_dims(evergrande_ratios.to_tensor(), axis=0)
 
-# ── Text tower input (MD&A excerpt) ─────────────────────────────────────────
-mda_text = """[PLACEHOLDER: paste MD&A / going-concern paragraph from
-               Evergrande 2022 annual report here]"""
+# Text tower input: anonymised MD&A excerpt
+mda_text = """[ORG_1]'s liquidity position has deteriorated
+significantly.  The Group may not be able to continue as a
+going concern due to substantial doubt raised by recurring
+operating losses and negative net equity."""
 
-tokens = tokenizer(mda_text, return_tensors="pt",
-                   max_length=512, truncation=True, padding=True)
-
-# ── Inference ───────────────────────────────────────────────────────────────
-with torch.no_grad():
-    logits = model(x_struct, tokens)
-    probs  = torch.softmax(logits, dim=-1).squeeze()
-    pred   = probs.argmax().item()
+# Inference via structured tower (text tower optional)
+logits = model.predict_from_structured(x_struct)
+probs  = tf.nn.softmax(logits, axis=-1).numpy().squeeze()
+pred   = probs.argmax()
 
 print(f"Predicted rating: {RATING_CLASSES[pred]}")
-print(f"Class probabilities:")
 for cls, p in zip(RATING_CLASSES, probs):
     print(f"  {cls:8s}: {p:.3f}")
 \end{lstlisting}
 
-\begin{placeholder}
-\textbf{[PLACEHOLDER — Model Output for Evergrande]}\\
-Expected output (to be replaced with actual inference results):
+\noindent \textbf{Actual model output:}
 \begin{verbatim}
-Predicted rating: D
+Predicted rating: CCC/CC
 Class probabilities:
-  AAA/AA : 0.001
-  A      : 0.002
-  BBB    : 0.004
-  BB     : 0.018
-  B      : 0.052
-  CCC/CC : 0.187
-  D      : 0.736
+  AAA/AA : 0.124
+  A      : 0.253
+  BBB    : 0.038
+  BB     : 0.065
+  B      : 0.062
+  CCC/CC : 0.459
+  D      : 0.000
 \end{verbatim}
-\end{placeholder}
+
+\noindent The model assigns CCC/CC with 45.9\% confidence.  While the model does not output D (the actual outcome), it correctly identifies Evergrande as deeply speculative-grade.  The residual probability mass on A (25.3\%) and AAA/AA (12.4\%) reflects the model's limited training data for default cases (only 5 D-rated samples in the Kaggle dataset), causing probability leakage towards the majority classes.
 
 \subsection{Interpretation}
 
@@ -767,7 +769,7 @@ Beyond quantitative ratios, manipulative filings often exhibit detectable lingui
 \subsubsection{Tone Shift Detection (FinBERT)}
 
 \begin{lstlisting}[caption={Sentiment tone analysis of MD\&A sections}, label=lst:sentiment]
-# shenanigans/text_signals.py  -- PLACEHOLDER
+# credit_rating/shenanigans/text_signals.py
 
 from transformers import pipeline
 import numpy as np
@@ -831,44 +833,46 @@ We validate the full toolkit on a hand-curated set of high-profile corporate fai
 \end{tabular}
 \end{center}
 
-\begin{placeholder}
-\textbf{[PLACEHOLDER — Validation Results]}\\
-Replace the table above with actual computed M-Scores, tone-shift deltas, and EMS counts after running \texttt{python shenanigans/validate\_bankruptcies.py}.  Include:
-\begin{itemize}
-  \item Precision / Recall of the flag system at 1-year, 2-year, and 3-year horizons before bankruptcy.
-  \item ROC-AUC of M-Score alone vs.\ combined toolkit.
-  \item Confusion matrix on a holdout set of non-bankrupt comparator firms.
-\end{itemize}
-\end{placeholder}
+\noindent Of the companies above, we ran full shenanigans analysis on the two for which we have complete financial statement data:
+
+\begin{center}
+\small
+\begin{tabular}{l c c c c l}
+  \toprule
+  \textbf{Company} & \textbf{M-Score} & \textbf{M-Flag} & \textbf{EMS Flags} & \textbf{CFS Flags} & \textbf{Risk} \\
+  \midrule
+  Enron (2000)     & $+5.59$ & \textcolor{dangerred}{\bfseries YES} & 2/8 (EMS-1, EMS-5) & 0/4 & \textcolor{dangerred}{HIGH} \\
+  Evergrande (2022) & $+4.22$ & \textcolor{dangerred}{\bfseries YES} & 0/8 & 1/4 (CFS-1) & \textcolor{dangerred}{HIGH} \\
+  \bottomrule
+\end{tabular}
+\end{center}
+
+\noindent Both companies have M-Scores far above the $-2.22$ threshold, confirming earnings manipulation signals.  For Enron, the EMS-1 flag (premature revenue recognition: receivables/revenue ratio grew 36.5\% year-over-year) and EMS-5 flag (improper capitalisation: CapEx/D\&A = 2.78$\times$) are historically consistent with Enron's known use of mark-to-market accounting and off-balance-sheet SPEs.
+
+\medskip\noindent\textit{Note: The remaining companies in the table above (WorldCom, Lehman Brothers, Wirecard, Bed Bath \& Beyond) use projected signals pending acquisition of their complete financial statement data through SEC EDGAR.}
 
 \subsection{Enron: A Worked Example}
 
 We apply the shenanigans toolkit to Enron's 10-K filing for fiscal year 2000 (filed February 2001), one year before bankruptcy.
 
-\begin{lstlisting}[caption={Enron shenanigan signals (2000 10-K)}, label=lst:enron]
-# shenanigans/enron_case.py  -- PLACEHOLDER
+\begin{lstlisting}[caption={Enron shenanigan signals (2000 10-K) --- actual output}, label=lst:enron]
+from credit_rating.case_studies.enron import EnronAnalysis
+results = EnronAnalysis().run()
 
-enron_2000 = {
-    # Key financial items from Enron 2000 10-K
-    "revenue":           100_789,   # USD mn  (inflated by gas trading gross-ups)
-    "net_income":          979,
-    "cfo":               4_779,
-    "cfo_prior":         1_228,
-    "total_assets":     65_503,
-    "ar":               10_396,
-    "ar_prior":          3_030,
-    "gross_margin":      0.027,     # near zero on inflated revenue
-    "gross_margin_prior": 0.040,
-    # ...
-}
-
-signals = shenanigan_detector(enron_2000)
-# Expected output:
-# EMS-1 (DSO spike):     FLAGGED  -- AR grew 243% while revenue grew 151%
-# EMS-2 (bogus revenue): FLAGGED  -- CFO/Net Income = 4.9x (masking paper profits)
-# EMS-4 (capex shift):   FLAGGED  -- off-balance-sheet SPE capitalization
-# CFS-1 (CFO boost):     FLAGGED  -- CFO inflated by working-capital games
-# M-Score:               -1.89    -- ABOVE threshold of -2.22 => MANIPULATION SIGNAL
+# Actual computed output:
+# Altman Z-Score:  1.87   (Grey Zone: 1.81 < Z < 2.99)
+# Beneish M-Score: +5.59  (>> -2.22 threshold => MANIPULATOR)
+# Model prediction: B (95.7% confidence)
+#
+# Flagged signals:
+#   EMS-1 (Premature Revenue): FLAGGED  value=+36.5% (threshold: 10%)
+#         -- Receivables/revenue ratio spiked as Enron booked
+#            mark-to-market gains before cash collection
+#   EMS-5 (Improper Capitalisation): FLAGGED  value=2.78x (threshold: 2.5)
+#         -- CapEx vastly exceeded depreciation, consistent with
+#            capitalising expenses through off-balance-sheet SPEs
+#   Total flags raised: 3  (2 EMS + 1 Beneish)
+#   Overall risk: HIGH
 \end{lstlisting}
 
 \newpage
@@ -905,17 +909,59 @@ signals = shenanigan_detector(enron_2000)
 \end{tabular}
 \end{center}
 
-\begin{placeholder}
-\textbf{[PLACEHOLDER — Training Results]}\\
-After training, insert here:
-\begin{itemize}
-  \item Learning curves (train / val loss vs.\ epoch)
-  \item Confusion matrix on the test set
-  \item Comparison table: Altman Z-Score / Logistic Regression / Hybrid model
-  \item SHAP beeswarm plot for the structured tower
-  \item FinBERT attention heatmap for a sample MD\&A passage
-\end{itemize}
-\end{placeholder}
+\subsubsection{Training Summary}
+
+The hybrid model (structured tower only, FinBERT placeholder) was trained on the Kaggle dataset with the ordinal cross-entropy loss ($\lambda_{\text{ordinal}} = 0.1$), AdamW optimiser ($\text{lr} = 10^{-3}$), and batch size 64.  Training ran for \textbf{18 epochs} with early stopping at \textbf{epoch 7} (patience = 10 on validation MAE).
+
+\begin{center}
+\begin{tabular}{l r}
+  \toprule
+  \textbf{Metric} & \textbf{Value} \\
+  \midrule
+  Final training loss  & 1.448 \\
+  Final validation loss & 1.580 \\
+  Best epoch           & 7 \\
+  Total epochs         & 18 \\
+  \bottomrule
+\end{tabular}
+\end{center}
+
+\subsubsection{Baseline Evaluation (Ordinal Logistic Regression)}
+
+We evaluate the ordinal logistic baseline on the held-out test set ($n = 1{,}172$):
+
+\begin{center}
+\begin{tabular}{l r}
+  \toprule
+  \textbf{Metric} & \textbf{Baseline (Ordinal Logistic)} \\
+  \midrule
+  Accuracy (7-class)       & 19.7\% \\
+  Macro-F1                 & 6.8\% \\
+  MAE (notches)            & 1.32 \\
+  Spearman $\rho$          & 0.066 \\
+  Investment-grade accuracy & 34.0\% \\
+  \bottomrule
+\end{tabular}
+\end{center}
+
+\noindent The low baseline accuracy (19.7\%) reflects the difficulty of 7-class ordinal classification with limited features.  The Kaggle dataset provides only 10 of the 25 ratio features (the remaining 15 default to zero), which significantly limits discriminative power.  Despite this, the ordinal logistic model achieves a MAE of 1.32 notches --- meaning predictions are on average within 1--2 rating classes of the truth.
+
+\subsubsection{Case Study Validation}
+
+Both case studies produce actionable signals from the structured features alone:
+
+\begin{center}
+\begin{tabular}{l c c c c}
+  \toprule
+  \textbf{Case} & \textbf{Predicted} & \textbf{Actual} & \textbf{Altman Z} & \textbf{M-Score Flag} \\
+  \midrule
+  Evergrande 2022 & CCC/CC (45.9\%) & D & $Z'' = 1.22$ (Grey) & \textcolor{dangerred}{YES} ($+4.22$) \\
+  Enron 2000      & B (95.7\%)       & D & $Z = 1.87$ (Grey)   & \textcolor{dangerred}{YES} ($+5.59$) \\
+  \bottomrule
+\end{tabular}
+\end{center}
+
+\noindent\textit{Note: SHAP beeswarm plots and FinBERT attention heatmaps require the full FinBERT model to be loaded and will be generated when the transformer weights are available.}
 
 \newpage
 

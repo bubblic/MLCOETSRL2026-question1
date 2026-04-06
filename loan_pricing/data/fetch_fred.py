@@ -14,10 +14,14 @@ from collections.abc import Sequence
 from pathlib import Path
 
 import pandas as pd
+from dotenv import load_dotenv
 
 from loan_pricing.config import ProjectConfig
 from loan_pricing.exceptions import DataFetchError
 from loan_pricing.logging_config import get_logger
+
+# Load .env so FRED_API_KEY is available even when not exported in the shell.
+load_dotenv()
 
 logger = get_logger(__name__)
 

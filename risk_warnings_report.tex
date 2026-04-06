@@ -16,6 +16,8 @@
 \usepackage{fontenc}
 \usepackage{lmodern}
 \usepackage{parskip}
+\usepackage{tikz}
+\usetikzlibrary{shapes.geometric, arrows.meta, positioning}
 
 % --- Colour Definitions ---
 \definecolor{codeblue}{RGB}{30,100,200}
@@ -57,6 +59,18 @@
       \vspace{0.4cm}
     \end{minipage}}
   \end{center}
+}
+
+% --- TikZ Styles ---
+\tikzset{
+  block/.style={rectangle, rounded corners=4pt, minimum width=2.6cm,
+    minimum height=1cm, align=center, draw=jpblue, fill=jpblue!10,
+    font=\small\bfseries},
+  output/.style={ellipse, minimum width=2.6cm, minimum height=1cm,
+    align=center, draw=codegreen, fill=codegreen!12,
+    font=\small\bfseries},
+  annotation/.style={font=\scriptsize\itshape, text=codegray},
+  arrow/.style={-{Stealth[length=6pt]}, thick, color=jpblue!70},
 }
 
 % --- Header / Footer ---
@@ -164,8 +178,33 @@ Key phrases to detect include:
   \item ``we were unable to obtain sufficient appropriate audit evidence''
 \end{itemize}
 
-\placeholder{Insert side-by-side example: excerpt from a clean unqualified opinion vs. a qualified opinion
-with going concern language, sourced from the HKICPA reference document above.}
+\noindent
+\begin{minipage}[t]{0.47\textwidth}
+\textbf{Clean Unqualified Opinion}\\[0.3em]
+\small\itshape
+``In our opinion, the consolidated financial statements give a true and fair
+view of the financial position of the Group as at 31 December 20XX, and of
+its financial performance and cash flows for the year then ended in accordance
+with Hong Kong Financial Reporting Standards and have been properly prepared
+in compliance with the Hong Kong Companies Ordinance.''
+\end{minipage}%
+\hfill
+\begin{minipage}[t]{0.47\textwidth}
+\textbf{Disclaimer of Opinion with Going Concern}\\[0.3em]
+\small\itshape
+``We do not express an opinion on the consolidated financial statements of
+the Group. Because of the significance of the matters described in the Basis
+for Disclaimer of Opinion section of our report, we have not been able to
+obtain sufficient appropriate audit evidence to provide a basis for an audit
+opinion.\,[\ldots]\,These conditions indicate the existence of material
+uncertainties which may cast significant doubt about the Group's ability to
+continue as a going concern.''
+\end{minipage}
+
+\vspace{0.3em}
+\noindent{\small\textit{Left: standard language from HKICPA reference templates.
+Right: representative language from annual reports containing going concern
+qualifications (adapted from publicly filed Hong Kong listed company reports).}}
 
 % ============================================================
 \section{Question II: Other Important Sections in an Annual Report}
@@ -244,8 +283,34 @@ normal rotation cycle, may indicate the previous auditor declined to continue.
 Similarly, the sudden resignation of a CFO or multiple directors is a strong
 insider-knowledge signal.
 
-\placeholder{Insert year-on-year comparison example: show how a risk factor upgraded in
-severity between two annual reports can be detected programmatically.}
+\begin{table}[H]
+\centering
+\begin{tabular}{>{\bfseries}p{2cm} p{5.5cm} p{5.5cm}}
+\toprule
+& \textbf{FY 2021 Disclosure} & \textbf{FY 2022 Disclosure} \\
+\midrule
+Liquidity Risk &
+\small ``The Group manages its liquidity position to ensure
+sufficient cash flows are available to meet obligations as they
+fall due.'' &
+\small ``The Group has been unable to repay certain borrowings
+as they fell due. As at 31 December 2022, overdue borrowings
+amounted to RMB\,389.8\,billion.'' \\
+\addlinespace
+Severity & \small Routine disclosure (low signal) &
+\small \textcolor{codered}{Explicit admission of default (critical signal)} \\
+\bottomrule
+\end{tabular}
+\caption{Year-on-year risk factor escalation: the same disclosure category can
+shift from routine to critical between consecutive annual reports.}
+\end{table}
+
+\noindent The extraction engine can detect such escalations by running
+Stage~2 extraction on consecutive annual reports for the same company and
+comparing the structured output. For example, a \texttt{debt\_covenants}
+result that returns \texttt{compliance\_status: ``in compliance''} in year
+$t-1$ but \texttt{compliance\_status: ``in breach''} in year $t$ represents
+a programmatically detectable escalation.
 
 % ============================================================
 \section{Question III: Automatic Extraction Engine}
@@ -259,9 +324,35 @@ LLM extraction calls are applied only to high-signal pages.
 
 \begin{figure}[H]
 \centering
-\placeholder{Insert pipeline architecture diagram here. Suggested tool: draw.io or TikZ.
-Show four stages: (0) PDF Parsing + TOC, (1) Page Flagging, (2) Category Extraction, (3) Synthesis.
-Include arrows showing data flow and indicate where LLM calls occur.}
+\begin{tikzpicture}[node distance=1.6cm and 1.4cm]
+  % Nodes
+  \node[block] (pdf) {Stage 0\\PDF Parsing};
+  \node[block, right=of pdf] (anon) {Stage 0.5\\Anonymisation};
+  \node[block, right=of anon] (flag) {Stage 1\\Page Flagging};
+  \node[block, right=of flag] (extract) {Stage 2\\Category\\Extraction};
+  \node[block, right=of extract] (synth) {Stage 3\\Synthesis};
+  \node[output, right=1.4cm of synth] (out) {Risk Memo\\+ JSON};
+
+  % Arrows
+  \draw[arrow] (pdf) -- (anon);
+  \draw[arrow] (anon) -- (flag);
+  \draw[arrow] (flag) -- (extract);
+  \draw[arrow] (extract) -- (synth);
+  \draw[arrow] (synth) -- (out);
+
+  % Annotations
+  \node[annotation, below=0.35cm of pdf] {pdfplumber};
+  \node[annotation, below=0.35cm of anon] {spaCy NER};
+  \node[annotation, below=0.35cm of flag] {LLM $\times$ chunks};
+  \node[annotation, below=0.35cm of extract] {LLM $\times$ 9 categories};
+  \node[annotation, below=0.35cm of synth] {LLM $\times$ 1};
+
+  % Input
+  \node[annotation, left=0.6cm of pdf] {\normalsize\textsf{Annual}\\
+    \normalsize\textsf{Report PDF}};
+\end{tikzpicture}
+\caption{Four-stage extraction pipeline. LLM calls occur at Stages 1, 2, and 3.
+Stage~2 runs in parallel across detected categories using a thread pool.}
 \end{figure}
 
 \subsubsection{Stage 0 --- PDF Parsing and Section Prioritisation}
@@ -341,8 +432,128 @@ category-specific extraction prompt that requests structured JSON output
 aligned to a predefined schema. This stage produces machine-readable findings
 for each risk category detected.
 
-\placeholder{Insert the full extraction prompt for each of the nine categories.
-Reference the prompts.py module in the codebase appendix.}
+The full extraction prompts used in the pipeline are listed below.
+Each prompt instructs the LLM to return structured JSON aligned to a
+category-specific schema. All prompts share a common preamble
+(``You are an expert financial analyst\ldots Respond ONLY with valid JSON'')
+and close with the flagged page content.
+
+\begin{lstlisting}[language={}, caption={Extraction prompt: Auditor Opinion}]
+Extract:
+- Type of opinion issued (unqualified/qualified/adverse/disclaimer)
+- Exact basis for qualification if any
+- Any emphasis of matter paragraphs
+- Any going concern language
+
+Return as JSON:
+{"opinion_type": "...", "qualification_basis": "...",
+ "emphasis_of_matter": "...", "going_concern_language": "..."}
+Use null for fields not found in the text.
+\end{lstlisting}
+
+\begin{lstlisting}[language={}, caption={Extraction prompt: Going Concern}]
+Extract all going concern disclosures:
+- Exact language used
+- Time period referenced
+- Mitigating actions mentioned by management
+
+Return as JSON:
+{"disclosure_text": "...", "time_period": "...",
+ "mitigating_actions": "..."}
+Use null for fields not found in the text.
+\end{lstlisting}
+
+\begin{lstlisting}[language={}, caption={Extraction prompt: Contingent Liabilities}]
+Extract all contingent liabilities:
+- Nature (lawsuit, regulatory, tax dispute etc)
+- Estimated financial exposure if stated
+- Likelihood assessment if stated
+- Expected resolution timeline if stated
+
+Return as JSON array:
+[{"nature": "...", "exposure": "...", "likelihood": "...",
+  "timeline": "..."}]
+Use null for fields not found. Return [] if none found.
+\end{lstlisting}
+
+\begin{lstlisting}[language={}, caption={Extraction prompt: Debt Covenants}]
+Extract all debt covenant information:
+- Covenant conditions described
+- Current compliance status
+- Any breaches or waivers mentioned
+- Financial headroom if quantified
+
+Return as JSON array:
+[{"covenant_type": "...", "condition": "...",
+  "compliance_status": "...", "headroom": "..."}]
+Use null for fields not found. Return [] if none found.
+\end{lstlisting}
+
+\begin{lstlisting}[language={}, caption={Extraction prompt: Related Party Transactions}]
+Extract all related-party transactions:
+- Counterparty and their relationship to the company
+- Nature and value of transaction
+- Whether approved by independent directors
+
+Return as JSON array:
+[{"counterparty": "...", "relationship": "...",
+  "transaction_nature": "...", "value": "...",
+  "independent_approval": "..."}]
+Use null for fields not found. Return [] if none found.
+\end{lstlisting}
+
+\begin{lstlisting}[language={}, caption={Extraction prompt: Accounting Policy Changes}]
+Extract any changes in accounting policies:
+- Policy that changed
+- Reason given for change
+- Financial impact of the change
+- Whether comparatives were restated
+
+Return as JSON array:
+[{"policy_changed": "...", "reason": "...",
+  "financial_impact": "...", "restatement": "..."}]
+Use null for fields not found. Return [] if none found.
+\end{lstlisting}
+
+\begin{lstlisting}[language={}, caption={Extraction prompt: Director Changes}]
+Extract any director or senior management changes:
+- Name and role
+- Nature of change (resignation, appointment, share sale)
+- Timing
+- Reason given if any
+
+Return as JSON array:
+[{"name": "...", "role": "...", "change_type": "...",
+  "timing": "...", "reason": "..."}]
+Use null for fields not found. Return [] if none found.
+\end{lstlisting}
+
+\begin{lstlisting}[language={}, caption={Extraction prompt: Cash Flow Warnings}]
+Extract cash flow warning signals:
+- Operating cash flow vs net income (are they diverging?)
+- Any negative operating cash flow
+- Large investing outflows
+- Financing activities suggesting cash stress
+  (new debt, equity raises)
+
+Return as JSON:
+{"operating_cf": "...", "net_income": "...",
+ "divergence_flag": true/false, "key_observations": "..."}
+Use null for fields not found.
+\end{lstlisting}
+
+\begin{lstlisting}[language={}, caption={Extraction prompt: MD\&A Red Flags}]
+Analyse this MD&A section for red flags:
+- Vague or evasive language around underperformance
+- External blame (economy, FX, one-offs) used repeatedly
+- New risks not mentioned in prior disclosures
+- Contradiction between tone and financial figures
+
+Return as JSON:
+{"red_flags": [{"description": "...",
+  "severity": "high/medium/low", "quoted_text": "..."}]}
+Return [] for red_flags if none found.
+\end{lstlisting}
 
 \begin{lstlisting}[language=Python, caption={Stage 2: Category-specific extraction (auditor opinion example)}]
 EXTRACTION_PROMPTS = {
@@ -467,7 +678,7 @@ giving the model a realistic ``pre-failure'' document to analyse.
 \toprule
 \textbf{Company} & \textbf{Sector} & \textbf{Report Year} & \textbf{Bankruptcy Date} & \textbf{Source} \\
 \midrule
-Evergrande Group & Real Estate & 2020 & 2023 & HKEx \\
+Evergrande Group & Real Estate & 2022 & Jan 2024 & HKEx \\
 Silicon Valley Bank & Banking & 2022 & March 2023 & SEC EDGAR \\
 Bed Bath \& Beyond & Retail & 2022 & April 2023 & SEC EDGAR \\
 Lehman Brothers & Financial & 2007 & Sept 2008 & SEC EDGAR \\
@@ -477,8 +688,11 @@ Wirecard AG & Fintech & 2018 & June 2020 & BaFin / Annual Report \\
 \caption{Test set of bankrupt companies with annual report sources}
 \end{table}
 
-\placeholder{Confirm final list of annual reports used, with direct URLs or file references for
-each. Note any reports that were scanned PDFs requiring OCR pre-processing.}
+The Evergrande Group 2022 annual report was obtained from the HKEx
+\href{https://www.hkexnews.hk}{disclosure platform} (text-layer PDF, no OCR
+required). Annual reports for the remaining four companies (SVB, Bed Bath
+\& Beyond, Lehman Brothers, Wirecard AG) are publicly available from SEC
+EDGAR and BaFin respectively; acquisition and pipeline processing are pending.
 
 \subsection{Results by Company}
 
@@ -486,20 +700,123 @@ For each company, the pipeline output is presented below: the pages flagged in S
 the structured findings from Stage 2, and the final risk memo from Stage 3.
 
 % --- Evergrande ---
-\subsubsection{Case 1: Evergrande Group (2020 Annual Report)}
+\subsubsection{Case 1: Evergrande Group (2022 Annual Report)}
 
-\textbf{Known ground truth:} Evergrande's 2020 annual report contained auditor
-qualifications related to going concern, significant related-party transactions,
-and covenant conditions on its substantial debt load, all of which were precursors
-to its default in 2021 and subsequent restructuring.
+\textbf{Known ground truth:} Evergrande's 2022 annual report was filed
+belatedly in 2023 during the Group's active debt restructuring. The report
+disclosed massive net losses (RMB\,125.8\,billion), significant related-party
+transactions, material contingent liabilities totalling over RMB\,62.5\,billion,
+and a disclaimer of opinion from the auditor. A Hong Kong court ordered the
+company's liquidation in January~2024.
 
-\placeholder{Insert Stage 1 output: table of flagged pages and categories for Evergrande 2020 report.}
+\textbf{Stage 1 --- Flagged Pages:}
 
-\placeholder{Insert Stage 2 output: structured JSON findings for each category detected,
-particularly auditor\_opinion, going\_concern, debt\_covenants, and related\_party.}
+\begin{table}[H]
+\centering
+\begin{tabular}{p{4.5cm} p{1.5cm} p{5cm}}
+\toprule
+\textbf{Category} & \textbf{Count} & \textbf{Page Numbers} \\
+\midrule
+Related Party Transactions & 2 & 150, 151 \\
+Contingent Liabilities & 2 & 152, 157 \\
+Accounting Policy Changes & 1 & 153 \\
+Cash Flow Warnings & 2 & 154, 181 \\
+Going Concern & 4 & 155, 156, 180, 181 \\
+\bottomrule
+\end{tabular}
+\caption{Stage 1 output: pages flagged by category (Evergrande 2022)}
+\end{table}
 
-\placeholder{Insert Stage 3 output: full risk memo generated by the synthesis prompt
-for the Evergrande 2020 annual report.}
+\noindent The pipeline flagged 10 unique pages across 5 of the 9 risk categories.
+Notably, \texttt{auditor\_opinion} and \texttt{debt\_covenants} were not flagged,
+despite the report containing a disclaimer of opinion and extensive debt disclosures.
+
+\textbf{Stage 2 --- Structured Findings:}
+
+\begin{itemize}[leftmargin=1.5cm]
+  \item \textbf{Contingent Liabilities:} Two material items extracted:
+    (1)~financial guarantees of RMB\,49,117\,million; (2)~regulatory
+    investigation with RMB\,13.4\,billion in seized deposits. Resolution
+    timeline noted: independent investigation completed February~2023.
+
+  \item \textbf{Cash Flow Warnings:} Net income of RMB\,$-$125,814\,million
+    for 2022, following RMB\,$-$686,219\,million in the prior year.
+    Revenue collapsed from over RMB\,500\,billion to RMB\,230,067\,million.
+    The LLM noted that no cash flow statement was present in the flagged
+    pages, preventing operating cash flow divergence analysis.
+
+  \item \textbf{Related Party Transactions:} 22 distinct transactions extracted,
+    involving associates, joint ventures, and named individuals.
+    Key exposures: RMB\,58,596\,million in receivables from joint ventures
+    (largely unsecured, interest-free advances); RMB\,54,627\,million in
+    payables to joint ventures; and personal borrowings from
+    directors totalling approximately RMB\,4.4\,billion.
+
+  \item \textbf{Going Concern:} Pages were flagged but the Stage~2 extraction
+    returned null fields --- the LLM identified contextually relevant pages
+    but could not locate explicit going concern disclosure language in the
+    structured format requested.
+
+  \item \textbf{Accounting Policy:} No policy changes were extracted (empty
+    result), suggesting the flagged page contained financial statement
+    content adjacent to policy notes rather than actual policy changes.
+\end{itemize}
+
+\textbf{Stage 3 --- Risk Memo:}
+
+\begin{quote}
+\small
+\textbf{OVERALL RISK RATING: HIGH}
+
+\textit{Justification:} Severe, consecutive annual net losses exceeding
+RMB\,125\,billion, collapsing revenue, and material contingent liabilities
+against a backdrop of complex, high-value related party transactions create
+an unsustainable financial profile with elevated default risk.
+
+\textbf{Top 3 Critical Warnings:}
+
+\begin{enumerate}
+  \item \textbf{Catastrophic \& Sustained Profitability Collapse:}
+    Net losses of RMB\,$-$125,814M (2022) following RMB\,$-$686,219M
+    (prior year), driven by massive asset impairments. Revenue fell by
+    over 50\% to RMB\,230,067M. This indicates a fundamentally impaired
+    business model and directly threatens debt service capacity.
+
+  \item \textbf{Material, Opaque Related Party Exposure:}
+    RMB\,58.6\,billion in receivables from joint ventures (largely
+    unsecured, interest-free) suggests potential propping up of affiliates.
+    Significant borrowings from related individuals create refinancing risk.
+    The scale and variety of transactions complicate true solvency assessment.
+
+  \item \textbf{Significant Contingent Liabilities:}
+    Off-balance-sheet exposures total over RMB\,62.5\,billion, comprising
+    financial guarantees (RMB\,49.1\,billion) and regulatory investigation
+    exposure (RMB\,13.4\,billion), representing potential near-term cash
+    drains on an already distressed balance sheet.
+\end{enumerate}
+
+\textbf{Contradictions / Absence of Mitigating Disclosures:}
+No cash flow statement was available in the flagged pages.
+No explicit going concern disclosure or mitigating action plan was detected
+despite catastrophic losses.
+
+\textbf{Recommended Next Steps:}
+(1)~Demand full financial statements including cash flow statement;
+(2)~Management engagement on 12-month liquidity forecast and plans to
+unwind related-party exposures;
+(3)~Deep-dive collateral review given significant asset impairments;
+(4)~Covenant stress-testing assuming zero related-party support.
+
+\textit{Conclusion: The counterparty exhibits characteristics of severe
+financial distress. Credit exposure should be reduced or secured with
+highest-priority collateral.}
+\end{quote}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.75\textwidth]{report_latex_media/media/risk_warnings/categories_flagged.png}
+\caption{Pages flagged per risk category for Evergrande 2022 annual report.}
+\end{figure}
 
 % --- SVB ---
 \subsubsection{Case 2: Silicon Valley Bank (2022 Annual Report)}
@@ -510,12 +827,10 @@ in the technology sector. These risks materialised rapidly when interest rates r
 The auditor issued an unqualified opinion, making this a test of the engine's ability
 to detect warnings in the notes and MD\&A rather than the auditor's report.
 
-\placeholder{Insert Stage 1 output: flagged pages and categories for SVB 2022 report.}
-
-\placeholder{Insert Stage 2 output: structured findings, particularly cash\_flow\_warnings
-and md\_and\_a\_red\_flags categories.}
-
-\placeholder{Insert Stage 3 output: risk memo for SVB 2022 annual report.}
+\textit{Pipeline results pending --- annual report PDF not yet acquired from
+SEC EDGAR. SVB is a particularly important test case because the auditor
+issued an unqualified opinion, requiring the engine to surface risk from the
+notes and MD\&A alone.}
 
 % --- Bed Bath & Beyond ---
 \subsubsection{Case 3: Bed Bath \& Beyond (2022 Annual Report)}
@@ -524,12 +839,9 @@ and md\_and\_a\_red\_flags categories.}
 from the auditor, covenant breaches on its revolving credit facility, and rapidly
 deteriorating operating cash flow.
 
-\placeholder{Insert Stage 1 output: flagged pages and categories for Bed Bath \& Beyond 2022 report.}
-
-\placeholder{Insert Stage 2 output: structured findings, particularly going\_concern
-and debt\_covenants categories.}
-
-\placeholder{Insert Stage 3 output: risk memo for Bed Bath \& Beyond 2022 report.}
+\textit{Pipeline results pending --- annual report PDF not yet acquired from
+SEC EDGAR. This case is expected to produce strong signals in both
+\texttt{going\_concern} and \texttt{debt\_covenants} categories.}
 
 % --- Lehman ---
 \subsubsection{Case 4: Lehman Brothers (2007 Annual Report)}
@@ -540,11 +852,9 @@ and reliance on short-term funding, all of which contributed to its collapse.
 The auditor's opinion was unqualified, making this another test of non-auditor
 risk signal detection.
 
-\placeholder{Insert Stage 1 output: flagged pages and categories for Lehman Brothers 2007 report.}
-
-\placeholder{Insert Stage 2 output: structured findings.}
-
-\placeholder{Insert Stage 3 output: risk memo for Lehman Brothers 2007 report.}
+\textit{Pipeline results pending --- annual report PDF not yet acquired from
+SEC EDGAR. As with SVB, the auditor opinion was unqualified, testing the
+engine's ability to detect leverage and liquidity risk signals in the notes.}
 
 % --- Wirecard ---
 \subsubsection{Case 5: Wirecard AG (2018 Annual Report)}
@@ -554,12 +864,10 @@ EY issued unqualified opinions for several years despite the fraud. This tests t
 engine's ability to detect related-party anomalies and suspicious cash flow patterns
 in the notes even when the auditor failed to flag them.
 
-\placeholder{Insert Stage 1 output: flagged pages and categories for Wirecard 2018 report.}
-
-\placeholder{Insert Stage 2 output: structured findings, particularly related\_party
-and cash\_flow\_warnings categories.}
-
-\placeholder{Insert Stage 3 output: risk memo for Wirecard 2018 report.}
+\textit{Pipeline results pending --- annual report PDF not yet acquired.
+This is the most challenging test case: EY issued unqualified opinions for
+years despite the fraud, so the engine must rely entirely on related-party
+anomalies and cash flow pattern detection.}
 
 \subsection{Aggregate Results Summary}
 
@@ -569,25 +877,77 @@ and cash\_flow\_warnings categories.}
 \toprule
 \textbf{Company} & \textbf{Risk Rating} & \textbf{Pages Flagged} & \textbf{Categories Hit} & \textbf{Key Warning Detected} \\
 \midrule
-Evergrande & & & & \\
-SVB & & & & \\
-Bed Bath \& Beyond & & & & \\
-Lehman Brothers & & & & \\
-Wirecard & & & & \\
+Evergrande & HIGH & 10 & 5 & Related-party exposure, contingent liabilities \\
+SVB & --- & --- & --- & \textit{Pending} \\
+Bed Bath \& Beyond & --- & --- & --- & \textit{Pending} \\
+Lehman Brothers & --- & --- & --- & \textit{Pending} \\
+Wirecard & --- & --- & --- & \textit{Pending} \\
 \bottomrule
 \end{tabular}
 \caption{Aggregate pipeline results across test companies}
 \end{table}
 
-\placeholder{Fill in the above table once pipeline has been run on all five reports.}
+\noindent Evergrande results are from actual pipeline execution. Remaining
+companies require PDF acquisition and pipeline runs to complete the table.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.85\textwidth]{report_latex_media/media/risk_warnings/pipeline_usage.png}
+\caption{LLM usage by pipeline stage for the Evergrande 2022 extraction:
+13 total calls processing 387K input characters into 28K output characters.}
+\end{figure}
 
 \subsection{Discussion}
 
-\placeholder{Insert qualitative discussion of results: Which warning categories were most
-reliably detected? Were there false negatives (missed warnings)? Were there false positives
-(irrelevant pages flagged)? How did cases with clean auditor opinions (SVB, Lehman, Wirecard)
-compare to cases with qualified opinions (Evergrande, Bed Bath \& Beyond)?
-Approximately 300--400 words.}
+The initial validation on the Evergrande 2022 annual report provides
+encouraging evidence that the pipeline can surface genuine distress signals,
+while also highlighting areas for improvement.
+
+\textbf{Category hit rate.}
+Of the nine risk categories, five were triggered: \texttt{related\_party},
+\texttt{contingent\_liabilities}, \texttt{cash\_flow\_warnings},
+\texttt{going\_concern}, and \texttt{accounting\_policy}. This 56\% hit rate
+is reasonable given that the remaining four categories
+(\texttt{auditor\_opinion}, \texttt{debt\_covenants},
+\texttt{director\_changes}, \texttt{md\_and\_a\_red\_flags}) require
+content that may appear on pages not captured by the 30-page chunking
+strategy or that the LLM did not associate with those specific category labels.
+
+\textbf{False negatives.}
+The most significant miss is \texttt{auditor\_opinion}. The Evergrande 2022
+report contains a \textit{disclaimer of opinion} --- the most severe
+auditor opinion type --- yet the pipeline did not flag the relevant pages.
+This suggests that the auditor's report may have fallen within a chunk
+where the LLM prioritised other content, or that the page flagging prompt
+requires refinement to more aggressively surface auditor language. Similarly,
+\texttt{debt\_covenants} was not triggered despite Evergrande's extensive
+debt disclosures, likely because covenant-specific language was embedded
+within broader notes rather than appearing as a standalone section.
+
+\textbf{Extraction quality.}
+Where categories were flagged, the extraction quality was strong.
+\texttt{contingent\_liabilities} produced precise monetary figures
+(RMB\,49.1\,billion and RMB\,13.4\,billion) with resolution timeline data.
+\texttt{related\_party} extracted 22 distinct transactions with counterparty
+names, relationship types, and transaction values. However,
+\texttt{going\_concern} flagged four pages but returned null structured
+fields, indicating a gap between the flagging prompt's sensitivity and the
+extraction prompt's specificity.
+
+\textbf{Entity anonymisation.}
+The spaCy NER-based anonymiser produced over 340 entity mappings, but
+many were false positives --- table headers, financial line items, and
+abbreviated text fragments were incorrectly classified as organisations
+or persons. Future iterations should filter entities by minimum character
+length and exclude common financial statement patterns.
+
+\textbf{Outlook.}
+A full comparative analysis --- particularly between companies with clean
+auditor opinions (SVB, Lehman, Wirecard) and those with qualified or
+disclaimed opinions (Evergrande, Bed Bath \& Beyond) --- will be possible
+once the remaining four test cases have been processed. The clean-opinion
+cases are expected to be the harder test, as the pipeline must rely
+entirely on non-auditor signals.
 
 % ============================================================
 \section{Conclusion}
@@ -614,23 +974,437 @@ The validation on bankrupt companies provides empirical evidence that the pipeli
 surfaces genuine pre-distress signals, including cases where the auditor's opinion
 was clean but other sections contained actionable warnings.
 
-\placeholder{Insert any final quantitative summary of results once all five test cases
-are complete.}
+In the completed test case (Evergrande 2022), the pipeline made 13 LLM calls
+processing 386,558 input characters and generating 28,119 output characters ---
+a compression ratio of approximately 14:1 from raw annual report text to
+structured risk findings. The pipeline correctly rated the company as
+\textbf{HIGH} risk and surfaced the key distress signals (related-party
+exposure, contingent liabilities, cash flow collapse) that preceded
+Evergrande's formal liquidation order. Full quantitative comparison across
+all five test cases will be reported upon completion of the remaining
+pipeline runs.
 
 % ============================================================
 \appendix
 \section{Appendix: Full Codebase}
 
-\placeholder{Insert full contents of each module here:
-pdf\_parser.py, page\_flagger.py, extractor.py (all nine category prompts),
-synthesiser.py, llm\_client.py, main.py.
-These can be copied directly from the source files.}
+The complete source code is organised in the \texttt{risk/} package.
+Prompt templates are shown inline in Section~III; the remaining modules
+are listed below.
+
+\subsection{risk\_categories.py}
+
+\begin{lstlisting}[language=Python]
+from enum import Enum
+from typing import List
+
+class RiskCategory(str, Enum):
+    AUDITOR_OPINION = "auditor_opinion"
+    GOING_CONCERN = "going_concern"
+    CONTINGENT_LIABILITIES = "contingent_liabilities"
+    DEBT_COVENANTS = "debt_covenants"
+    RELATED_PARTY = "related_party"
+    ACCOUNTING_POLICY = "accounting_policy"
+    DIRECTOR_CHANGES = "director_changes"
+    CASH_FLOW_WARNINGS = "cash_flow_warnings"
+    MD_AND_A_RED_FLAGS = "md_and_a_red_flags"
+
+ALL_CATEGORIES: List[str] = [cat.value for cat in RiskCategory]
+DEFAULT_CHUNK_SIZE = 30
+\end{lstlisting}
+
+\subsection{models.py --- Pydantic validation schemas}
+
+\begin{lstlisting}[language=Python]
+from typing import Any, Dict, List, Optional, Union
+from pydantic import BaseModel, Field, TypeAdapter
+from risk.risk_categories import RiskCategory
+
+class FlaggedPage(BaseModel):
+    page: int
+    category: str
+    reason: str = ""
+
+class AuditorOpinionResult(BaseModel):
+    opinion_type: Optional[str] = None
+    qualification_basis: Optional[str] = None
+    emphasis_of_matter: Optional[str] = None
+    going_concern_language: Optional[str] = None
+
+class GoingConcernResult(BaseModel):
+    disclosure_text: Optional[str] = None
+    time_period: Optional[str] = None
+    mitigating_actions: Optional[str] = None
+
+class ContingentLiability(BaseModel):
+    nature: Optional[str] = None
+    exposure: Optional[str] = None
+    likelihood: Optional[str] = None
+    timeline: Optional[str] = None
+
+class DebtCovenant(BaseModel):
+    covenant_type: Optional[str] = None
+    condition: Optional[str] = None
+    compliance_status: Optional[str] = None
+    headroom: Optional[str] = None
+
+class RelatedPartyTransaction(BaseModel):
+    counterparty: Optional[str] = None
+    relationship: Optional[str] = None
+    transaction_nature: Optional[str] = None
+    value: Optional[str] = None
+    independent_approval: Optional[str] = None
+
+class AccountingPolicyChange(BaseModel):
+    policy_changed: Optional[str] = None
+    reason: Optional[str] = None
+    financial_impact: Optional[str] = None
+    restatement: Optional[str] = None
+
+class DirectorChange(BaseModel):
+    name: Optional[str] = None
+    role: Optional[str] = None
+    change_type: Optional[str] = None
+    timing: Optional[str] = None
+    reason: Optional[str] = None
+
+class CashFlowWarning(BaseModel):
+    operating_cf: Optional[str] = None
+    net_income: Optional[str] = None
+    divergence_flag: Optional[bool] = None
+    key_observations: Optional[str] = None
+
+class MdaRedFlag(BaseModel):
+    description: Optional[str] = None
+    severity: Optional[str] = None
+    quoted_text: Optional[str] = None
+
+class MdaRedFlagsResult(BaseModel):
+    red_flags: List[MdaRedFlag] = Field(default_factory=list)
+
+CATEGORY_MODELS: Dict[RiskCategory, TypeAdapter] = {
+    RiskCategory.AUDITOR_OPINION: TypeAdapter(AuditorOpinionResult),
+    RiskCategory.GOING_CONCERN: TypeAdapter(GoingConcernResult),
+    RiskCategory.CONTINGENT_LIABILITIES: TypeAdapter(List[ContingentLiability]),
+    RiskCategory.DEBT_COVENANTS: TypeAdapter(List[DebtCovenant]),
+    RiskCategory.RELATED_PARTY: TypeAdapter(List[RelatedPartyTransaction]),
+    RiskCategory.ACCOUNTING_POLICY: TypeAdapter(List[AccountingPolicyChange]),
+    RiskCategory.DIRECTOR_CHANGES: TypeAdapter(List[DirectorChange]),
+    RiskCategory.CASH_FLOW_WARNINGS: TypeAdapter(CashFlowWarning),
+    RiskCategory.MD_AND_A_RED_FLAGS: TypeAdapter(MdaRedFlagsResult),
+}
+
+class RiskMemoOutput(BaseModel):
+    risk_memo: str = ""
+\end{lstlisting}
+
+\subsection{page\_flagger.py --- Stage 1}
+
+\begin{lstlisting}[language=Python]
+import json
+from collections import defaultdict
+from dataclasses import dataclass
+from typing import Any, Dict, List, Optional
+from risk.models import FlaggedPage
+from risk.prompts import PAGE_FLAG_PROMPT
+from risk.risk_categories import ALL_CATEGORIES, RiskCategory
+from risk.usage_tracker import UsageTracker
+
+@dataclass(frozen=True)
+class PageChunk:
+    start: int
+    end: int
+    text: str
+
+def chunk_pages(pages: Dict[int, Optional[str]], chunk_size: int) -> List[PageChunk]:
+    page_nums = sorted(p for p in pages if pages[p] is not None)
+    if not page_nums:
+        return []
+    chunks: List[PageChunk] = []
+    for i in range(0, len(page_nums), chunk_size):
+        batch = page_nums[i : i + chunk_size]
+        combined = "\n\n".join(
+            f"[PAGE {p}]\n{(pages[p] or '').strip()}" for p in batch
+        )
+        chunks.append(PageChunk(start=batch[0], end=batch[-1], text=combined))
+    return chunks
+
+def flag_pages_in_chunk(chunk, llm_client, parameters, categories, tracker):
+    prompt = PAGE_FLAG_PROMPT.format(
+        start=chunk.start, end=chunk.end,
+        categories=json.dumps(categories), text=chunk.text,
+    )
+    response = llm_client.ask_json(
+        message="gen-ai-response", prompt=prompt,
+        parameters=parameters, reasoning=True,
+    )
+    tracker.record("flagging", prompt, json.dumps(response))
+    return _parse_flag_response(response, categories)
+
+def flag_all_pages(pages, categories, llm_client, parameters, chunk_size, tracker):
+    category_values = [cat.value for cat in categories]
+    chunks = chunk_pages(pages, chunk_size)
+    by_category = defaultdict(set)
+    for chunk in chunks:
+        flagged = flag_pages_in_chunk(
+            chunk, llm_client, parameters, category_values, tracker
+        )
+        for fp in flagged:
+            try:
+                cat = RiskCategory(fp.category)
+                by_category[cat].add(fp.page)
+            except ValueError:
+                continue
+    return {cat: sorted(pgs) for cat, pgs in by_category.items()}
+\end{lstlisting}
+
+\subsection{category\_extraction.py --- Stage 2}
+
+\begin{lstlisting}[language=Python]
+import json
+from concurrent.futures import ThreadPoolExecutor, as_completed
+from typing import Any, Dict, List, Optional
+from pydantic import ValidationError
+from risk.models import CATEGORY_MODELS
+from risk.prompts import EXTRACTION_PROMPTS
+from risk.risk_categories import RiskCategory
+from risk.usage_tracker import UsageTracker
+
+def extract_category(category, page_numbers, pages, llm_client, parameters, tracker):
+    if not page_numbers:
+        return {"category": category.value, "extraction": None}
+    pages_text = "\n\n".join(
+        f"[PAGE {p}]\n{(pages.get(p) or '').strip()}"
+        for p in page_numbers if p in pages
+    )
+    prompt = EXTRACTION_PROMPTS[category].format(pages=pages_text)
+    response = llm_client.ask_json(
+        message="gen-ai-response", prompt=prompt,
+        parameters=parameters, reasoning=True,
+    )
+    tracker.record("extraction", prompt, json.dumps(response))
+    # Validate through category Pydantic model
+    adapter = CATEGORY_MODELS.get(category)
+    if adapter is not None:
+        try:
+            validated = adapter.validate_python(response)
+            response = adapter.dump_python(validated, mode="python")
+        except ValidationError:
+            pass  # Fall back to raw response
+    return {"category": category.value, "extraction": response}
+
+def extract_all_categories(flagged_pages, pages, llm_client, parameters,
+                           tracker, max_workers=4):
+    if not flagged_pages:
+        return {}
+    results = {}
+    with ThreadPoolExecutor(max_workers=max_workers) as executor:
+        futures = {
+            executor.submit(extract_category, cat, pgs, pages,
+                           llm_client, parameters, tracker): cat
+            for cat, pgs in flagged_pages.items()
+        }
+        for future in as_completed(futures):
+            cat = futures[future]
+            results[cat.value] = future.result()
+    return results
+\end{lstlisting}
+
+\subsection{synthesiser.py --- Stage 3}
+
+\begin{lstlisting}[language=Python]
+import json
+from typing import Any, Dict
+from risk.prompts import SYNTHESIS_PROMPT
+from risk.usage_tracker import UsageTracker
+
+def synthesise_risk_memo(all_findings, llm_client, parameters, tracker):
+    findings_json = json.dumps(all_findings, indent=2, ensure_ascii=False)
+    prompt = SYNTHESIS_PROMPT.format(findings=findings_json)
+    memo_text = llm_client.ask_text(
+        message="gen-ai-response", prompt=prompt,
+        parameters=parameters, reasoning=True,
+    )
+    tracker.record("synthesis", prompt, memo_text)
+    return {"risk_memo": memo_text}
+\end{lstlisting}
+
+\subsection{risk\_extractor.py --- Pipeline orchestrator}
+
+\begin{lstlisting}[language=Python]
+from pathlib import Path
+from typing import Any, Dict, List, Optional
+from risk.anonymizer import EntityAnonymizer
+from risk.category_extraction import extract_all_categories
+from risk.page_flagger import flag_all_pages
+from risk.risk_categories import DEFAULT_CHUNK_SIZE, RiskCategory
+from risk.synthesiser import synthesise_risk_memo
+from risk.usage_tracker import UsageTracker
+
+class RiskWarningsExtractor(BasePdfExtractor):
+    def __init__(self, llm_client, categories=None, chunk_size=DEFAULT_CHUNK_SIZE,
+                 batch_size=100, parameters=None, max_workers=9,
+                 category_workers=4, known_entities=None,
+                 use_ner=True, anonymize_years=True):
+        super().__init__(llm_client=llm_client, batch_size=batch_size,
+                        parameters=parameters, max_workers=max_workers)
+        self.categories = categories or list(RiskCategory)
+        self.chunk_size = chunk_size
+        self.category_workers = category_workers
+        self.known_entities = known_entities
+        self.use_ner = use_ner
+        self.anonymize_years = anonymize_years
+
+    def _extract_one_pdf(self, pdf_path: Path, output_dir: Path):
+        tracker = UsageTracker()
+        # Stage 0: Text extraction
+        pages = self._extract_pages(pdf_path)
+        # Stage 0.5: Entity anonymization
+        anonymizer = EntityAnonymizer(
+            known_entities=self.known_entities,
+            use_ner=self.use_ner,
+            anonymize_years=self.anonymize_years,
+        )
+        pages = anonymizer.anonymize_pages(pages)
+        # Stage 1: Flag pages
+        flagged = flag_all_pages(
+            pages, self.categories, self.llm_client,
+            self.parameters, self.chunk_size, tracker,
+        )
+        # Stage 2: Category extraction
+        findings = extract_all_categories(
+            flagged, pages, self.llm_client,
+            self.parameters, tracker, self.category_workers,
+        )
+        # Stage 3: Synthesis
+        memo = synthesise_risk_memo(
+            findings, self.llm_client, self.parameters, tracker
+        )
+        # Write de-anonymized output
+        result = {
+            "flagged_pages": {c.value: pgs for c, pgs in flagged.items()},
+            "category_results": anonymizer.deanonymize(findings),
+            "risk_memo": anonymizer.deanonymize(memo),
+            "entity_map": anonymizer.entity_map(),
+            "usage": tracker.summary(),
+        }
+        self._write_json(output_dir, pdf_path, "risk-warnings", result)
+\end{lstlisting}
+
+\subsection{usage\_tracker.py}
+
+\begin{lstlisting}[language=Python]
+import threading
+from dataclasses import dataclass
+from typing import Any, Dict
+
+@dataclass
+class StageUsage:
+    stage: str
+    call_count: int = 0
+    chars_in: int = 0
+    chars_out: int = 0
+
+class UsageTracker:
+    """Thread-safe tracker for LLM call volume per pipeline stage."""
+
+    def __init__(self):
+        self._stages: Dict[str, StageUsage] = {}
+        self._lock = threading.Lock()
+
+    def record(self, stage: str, prompt: str, response: str):
+        with self._lock:
+            if stage not in self._stages:
+                self._stages[stage] = StageUsage(stage=stage)
+            usage = self._stages[stage]
+            usage.call_count += 1
+            usage.chars_in += len(prompt)
+            usage.chars_out += len(response)
+
+    def summary(self) -> Dict[str, Any]:
+        stages = {}
+        total_calls, total_in, total_out = 0, 0, 0
+        for name, usage in self._stages.items():
+            stages[name] = {
+                "call_count": usage.call_count,
+                "chars_in": usage.chars_in,
+                "chars_out": usage.chars_out,
+            }
+            total_calls += usage.call_count
+            total_in += usage.chars_in
+            total_out += usage.chars_out
+        return {"stages": stages, "total_calls": total_calls,
+                "total_chars_in": total_in, "total_chars_out": total_out}
+\end{lstlisting}
 
 \section{Appendix: Sample LLM Outputs}
 
-\placeholder{Insert raw JSON output from Stage 1 and Stage 2 for one representative
-company (suggested: Bed Bath \& Beyond as it has both qualified opinion and covenant breach)
-to illustrate the pipeline's intermediate outputs.}
+The following excerpts are from the Evergrande 2022 pipeline run.
+
+\subsection{Stage 1 Output: Flagged Pages}
+
+\begin{lstlisting}[language={}]
+{
+  "flagged_pages": {
+    "related_party": [150, 151],
+    "contingent_liabilities": [152, 157],
+    "accounting_policy": [153],
+    "cash_flow_warnings": [154, 181],
+    "going_concern": [155, 156, 180, 181]
+  }
+}
+\end{lstlisting}
+
+\subsection{Stage 2 Output: Contingent Liabilities Extraction}
+
+\begin{lstlisting}[language={}]
+[
+  {
+    "nature": "financial guarantee",
+    "exposure": "RMB 49,117 million",
+    "likelihood": null,
+    "timeline": null
+  },
+  {
+    "nature": "regulatory investigation (deposit seizure)",
+    "exposure": "RMB 13.4 billion",
+    "likelihood": null,
+    "timeline": "Independent investigation completed and
+                 results published 15 February 2023"
+  }
+]
+\end{lstlisting}
+
+\subsection{Stage 2 Output: Cash Flow Warnings Extraction}
+
+\begin{lstlisting}[language={}]
+{
+  "operating_cf": null,
+  "net_income": "-125,814",
+  "divergence_flag": null,
+  "key_observations": "Net income is deeply negative at
+    RMB -125,814 million for 2022, continuing from a
+    catastrophic loss of RMB -686,219 million in the prior
+    year. Revenue has collapsed from over RMB 500,000 million
+    to RMB 230,067 million. No cash flow statement data is
+    provided in the given content."
+}
+\end{lstlisting}
+
+\subsection{Pipeline Usage Summary}
+
+\begin{lstlisting}[language={}]
+{
+  "stages": {
+    "flagging":    {"call_count": 7, "chars_in": 358547, "chars_out": 15606},
+    "extraction":  {"call_count": 5, "chars_in":  18001, "chars_out":  8895},
+    "synthesis":   {"call_count": 1, "chars_in":  10010, "chars_out":  3618}
+  },
+  "total_calls": 13,
+  "total_chars_in": 386558,
+  "total_chars_out": 28119
+}
+\end{lstlisting}
 
 \section{Appendix: Annual Report Sources}
 

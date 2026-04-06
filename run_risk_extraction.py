@@ -4,11 +4,76 @@ Uses an LLM to flag risk-relevant pages, extract structured findings
 per risk category, and synthesise a professional risk memo.
 
 Usage:
-    python run_risk_extraction.py
+    python run_risk_extraction.py --company evergrande
+    python run_risk_extraction.py --company svb --no-ner
 """
 
+import argparse
 import subprocess
 import sys
+
+
+COMPANY_CONFIGS = {
+    "evergrande": {
+        "known_entities": [
+            {
+                "type": "ORG",
+                "names": [
+                    "China Evergrande Group",
+                    "Evergrande Group",
+                    "Evergrande",
+                    "Hengda Real Estate Group",
+                ],
+            },
+        ],
+    },
+    "svb": {
+        "known_entities": [
+            {
+                "type": "ORG",
+                "names": [
+                    "SVB Financial Group",
+                    "Silicon Valley Bank",
+                    "SVB",
+                ],
+            },
+        ],
+    },
+    "bbby": {
+        "known_entities": [
+            {
+                "type": "ORG",
+                "names": [
+                    "Bed Bath & Beyond Inc.",
+                    "Bed Bath & Beyond",
+                    "BBBY",
+                ],
+            },
+        ],
+    },
+    "lehman": {
+        "known_entities": [
+            {
+                "type": "ORG",
+                "names": [
+                    "Lehman Brothers Holdings Inc.",
+                    "Lehman Brothers",
+                ],
+            },
+        ],
+    },
+    "wirecard": {
+        "known_entities": [
+            {
+                "type": "ORG",
+                "names": [
+                    "Wirecard AG",
+                    "Wirecard",
+                ],
+            },
+        ],
+    },
+}
 
 
 def _ensure_spacy_ner() -> None:
@@ -29,33 +94,63 @@ def _ensure_spacy_ner() -> None:
         print("spacy NER ready.")
 
 
-from risk.risk_extractor import RiskWarningsExtractor
-from financial_forecast.clients.azure_llm_client import AzureLLMClient
+def parse_args() -> argparse.Namespace:
+    parser = argparse.ArgumentParser(
+        description="Extract risk warnings from annual report PDFs.",
+    )
+    parser.add_argument(
+        "--company",
+        required=True,
+        choices=list(COMPANY_CONFIGS.keys()),
+        help="Company to process (must have a config in COMPANY_CONFIGS).",
+    )
+    parser.add_argument(
+        "--input-dir",
+        default=None,
+        help="Input directory containing PDFs. "
+             "Defaults to ./annual_reports/for_risk_warnings/{company}.",
+    )
+    parser.add_argument(
+        "--output-dir",
+        default=None,
+        help="Output directory for extracted JSON. "
+             "Defaults to ./extracted_json/risk_warnings/{company}.",
+    )
+    parser.add_argument(
+        "--no-ner",
+        action="store_true",
+        help="Disable spaCy NER (use only known entities).",
+    )
+    parser.add_argument(
+        "--no-anonymize-years",
+        action="store_true",
+        help="Disable year anonymisation.",
+    )
+    return parser.parse_args()
+
 
 if __name__ == "__main__":
+    args = parse_args()
 
-    _ensure_spacy_ner()
+    use_ner = not args.no_ner
+    if use_ner:
+        _ensure_spacy_ner()
 
-    company = "evergrande"
+    from risk.risk_extractor import RiskWarningsExtractor
+    from financial_forecast.clients.azure_llm_client import AzureLLMClient
+
+    config = COMPANY_CONFIGS[args.company]
+    input_dir = args.input_dir or f"./annual_reports/for_risk_warnings/{args.company}"
+    output_dir = args.output_dir or f"./extracted_json/risk_warnings/{args.company}"
 
     extractor = RiskWarningsExtractor(
         llm_client=AzureLLMClient(),
-        known_entities=[
-            {
-                "type": "ORG",
-                "names": [
-                    "China Evergrande Group",
-                    "Evergrande Group",
-                    "Evergrande",
-                    "Hengda Real Estate Group",
-                ],
-            },
-        ],
-        use_ner=True,
-        anonymize_years=True,
+        known_entities=config["known_entities"],
+        use_ner=use_ner,
+        anonymize_years=not args.no_anonymize_years,
     )
 
     extractor.run(
-        input_path=f"./annual_reports/for_risk_warnings/{company}",
-        output_dir=f"./extracted_json/risk_warnings/{company}",
+        input_path=input_dir,
+        output_dir=output_dir,
     )

@@ -8,6 +8,13 @@ Usage::
 
 from __future__ import annotations
 
+# TensorFlow must be imported before numpy/pandas on Windows to avoid
+# a DLL initialisation race in the native runtime.
+try:
+    import tensorflow as tf  # noqa: F401
+except ImportError:
+    pass
+
 from loan_pricing.logging_config import get_logger
 
 logger = get_logger(__name__)
