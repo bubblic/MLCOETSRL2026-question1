@@ -222,8 +222,8 @@ of Cash Flows, and the Balance Sheet.
 \paragraph{Example 1: A credit sale and subsequent collection
 (Income Statement $\to$ Balance Sheet $\to$ Cash Flow Statement).}
 A company sells \$1{,}000 of goods on credit. At the point of sale,
-the Income Statement records \$1{,}000 in Revenue, which---after
-taxes and expenses---flows into Net Income and ultimately into
+the Income Statement records \$1{,}000 in Revenue, which, after
+taxes and expenses, flows into Net Income and ultimately into
 Retained Earnings (a component of Equity). On the Balance Sheet,
 Accounts Receivable (an asset) increases by \$1{,}000. The equation
 remains balanced: assets rose by \$1{,}000 (AR) and equity rose by
@@ -232,7 +232,7 @@ the same amount (via Retained Earnings absorbing Net Income).
 When the customer later pays the \$1{,}000 in cash, the Cash Flow
 Statement records a \$1{,}000 operating cash inflow. On the Balance
 Sheet, Cash increases by \$1{,}000 while Accounts Receivable
-decreases by \$1{,}000---one asset replaced another, and Total Assets
+decreases by \$1{,}000. One asset replaced another, and Total Assets
 are unchanged. The equation still holds because this is a pure asset
 swap. Notice how a single economic event (a sale) creates an accrual
 on the Income Statement first, then resolves through the Cash Flow
@@ -244,7 +244,7 @@ A company borrows \$2{,}000 in long-term debt and immediately uses
 the proceeds to purchase equipment. The Cash Flow Statement records a
 \$2{,}000 inflow under financing activities (the borrowing) and a
 \$2{,}000 outflow under investing activities (the capital
-expenditure)---net cash impact is zero. On the Balance Sheet,
+expenditure), so the net cash impact is zero. On the Balance Sheet,
 Non-Current Assets (equipment) increase by \$2{,}000 and Long-Term
 Debt (a liability) increases by \$2{,}000. Both sides of the equation
 grew by the same amount, so it remains balanced.
@@ -255,17 +255,17 @@ Net Income as the asset is consumed) and Interest expense on the debt
 (reducing Net Income further). Both expenses flow back to the Balance
 Sheet: Depreciation reduces Non-Current Assets, and the lower Net
 Income reduces Retained Earnings. Meanwhile, the Cash Flow Statement
-captures the interest and principal payments as outflows---each
+captures the interest and principal payments as outflows, each
 reducing Cash on the Balance Sheet while simultaneously reducing the
 outstanding Debt liability. At every step, the equation holds.
 
 \paragraph{Connection to our model.}
 These examples reveal why double-entry bookkeeping makes
 \emph{driver-based} financial forecasting without plugs or circularity possible. Because every value flow is
-recorded on both sides of the ledger---every expense has a matching
+recorded on both sides of the ledger (every expense has a matching
 cash outflow, every credit sale has a matching receivable, every
 depreciation charge has a matching reduction in Non-Current
-Assets---the financial state at time $t+1$ is fully determined by the
+Assets), the financial state at time $t+1$ is fully determined by the
 state at time $t$ together with the flows between them. Nothing escapes
 the ledger.
 
@@ -319,7 +319,7 @@ every other element:
 \end{itemize}
 
 Because every cash inflow and outflow is explicitly routed through the
-Cash Budget, the next year's Balance Sheet is fully determined---no
+Cash Budget, the next year's Balance Sheet is fully determined: no
 element is left as a residual plug. The accounting identity
 $\text{Assets} = \text{Liabilities} + \text{Equity}$ must emerge from
 the correctness of the logic, which is what makes the model auditable
@@ -646,7 +646,7 @@ Current liabilities (\textbf{CLiab\textsubscript{t}})
   \begin{itemize}
   \item
     \textbf{Simple policy} (\texttt{SimpleDebtPolicy}): ST debt is
-    deficit-driven---the model borrows short-term only to cover any
+    deficit-driven: the model borrows short-term only to cover any
     remaining liquidity shortfall after operating and investing
     activities. EffSTDebt\textsubscript{t} = max(0,
     deficit\textsubscript{t}).
@@ -719,7 +719,7 @@ This is a different approach from \hyperlink{ref:pareja09}{Pareja(09)} where the
 price, the unit cost, and the volume sold based on market research data
 on volume's price sensitivity. For the scope of this problem set, we
 lump these variables into an overarching sales driver whose evolution is
-modeled independently based on historical data. Sales serves as the primary driver because it is the most fundamental measure of a firm's economic activity---all other financial statement items are either costs of generating revenue, assets deployed to support revenue, or financing decisions to fund those assets. In the corporate finance literature, revenue-driven forecasting is standard practice \hyperlink{ref:koller20}{[Koller(20)]}. The limitation of this approach is that it does not model the underlying demand drivers (price elasticity, market size, competitive dynamics) that determine revenue growth. The sales forecast itself is generated via linear extrapolation of historical trends---a pragmatic choice given the 4--8 years of available data, though macroeconomic-sensitive models (e.g., LSTM with GDP and inflation inputs) would improve robustness.
+modeled independently based on historical data. Sales serves as the primary driver because it is the most fundamental measure of a firm's economic activity: all other financial statement items are either costs of generating revenue, assets deployed to support revenue, or financing decisions to fund those assets. In the corporate finance literature, revenue-driven forecasting is standard practice \hyperlink{ref:koller20}{[Koller(20)]}. The limitation of this approach is that it does not model the underlying demand drivers (price elasticity, market size, competitive dynamics) that determine revenue growth. The sales forecast itself is generated via linear extrapolation of historical trends, a pragmatic choice given the 4--8 years of available data, though macroeconomic-sensitive models (e.g., LSTM with GDP and inflation inputs) would improve robustness.
 
 \subsubsection{Forecast Flow Overview}
 
@@ -767,8 +767,8 @@ than reconciling Net Income to cash after the fact, it schedules every
 expected cash receipt and disbursement directly.
 
 Unlike the standard three-section Statement of Cash Flows, we decompose
-financing activities into two separate modules---External Financing
-(debt) and Transactions with Owners (equity and dividends)---and add a
+financing activities into two separate modules, namely External Financing
+(debt) and Transactions with Owners (equity and dividends), and add a
 fifth module for Discretionary Transactions in market securities,
 reflecting how these are managed as a policy allocation rather than a
 residual. Each module produces a Net Liquidity Balance (NLB):
@@ -812,7 +812,7 @@ every element of next year's Balance Sheet is determined:
   financing.
 \end{itemize}
 
-No element is left as a residual plug---that is, no line item is set to
+No element is left as a residual plug. That is, no line item is set to
 whatever makes the balance sheet balance, which would otherwise mask
 errors in the model. Instead, the accounting identity
 $\text{Assets} = \text{Liabilities} + \text{Equity}$ emerges
@@ -861,7 +861,7 @@ component driven by sales expansion:
 
 By substituting \eqref{eq:depreciation} and \eqref{eq:capex} into \eqref{eq:nca_rollforward}, we can express
 the net change in non-current assets (ΔNCA\textsubscript{t}) purely in
-terms of our modeled variables. The growth component (\%AG $\times$ Sales) assumes constant capital intensity of incremental revenue---a reasonable first approximation for asset-light technology firms where growth CapEx scales with business volume. For capital-intensive industries, a non-linear formulation (e.g., step functions for capacity expansion) may be more appropriate. During model training, the optimizer
+terms of our modeled variables. The growth component (\%AG $\times$ Sales) assumes constant capital intensity of incremental revenue, a reasonable first approximation for asset-light technology firms where growth CapEx scales with business volume. For capital-intensive industries, a non-linear formulation (e.g., step functions for capacity expansion) may be more appropriate. During model training, the optimizer
 learns the parameters for the effective depreciation rate (\%Depr), the
 maintenance replacement ratio (\%AM), and the incremental asset growth
 coefficient (\%AG).
@@ -879,7 +879,7 @@ consumed by COGS:
 
 To ensure our predicted cost ratio remains strictly bounded between 0
 and 1 (a cost ratio outside this range would imply negative costs or costs exceeding revenue, neither of which is sustainable), we transform the historical cost ratio using the logit function
-and model it as a linear function of time (t). The logit-linear parameterization allows for gradual trend shifts---for example, a declining cost ratio may reflect economies of scale, supply chain efficiencies, or pricing power gains. The linear time trend is a parsimonious choice; in practice, cost ratios may exhibit mean reversion as competitive pressure limits sustained margin expansion.
+and model it as a linear function of time (t). The logit-linear parameterization allows for gradual trend shifts. For example, a declining cost ratio may reflect economies of scale, supply chain efficiencies, or pricing power gains. The linear time trend is a parsimonious choice; in practice, cost ratios may exhibit mean reversion as competitive pressure limits sustained margin expansion.
 
 \begin{equation}\label{eq:cost_ratio_logit}
 \text{logit}(\text{CR}_t) = \ln \left( \frac{\text{CR}_t}{1 - \text{CR}_t} \right) = \alpha_{\text{CR}} + \beta_{\text{CR}} \cdot t
@@ -917,7 +917,7 @@ Since Inv\textsubscript{t} and COGS\textsubscript{t} are both independently fore
 \text{Purchases}_t = \text{\%Inv} \cdot (\text{Sales}_t - \text{Sales}_{t-1}) + \text{COGS}_t
 \end{equation}
 
-Rather than being forecast independently, Purchases\textsubscript{t} is derived directly from the structural accounting identity — it is the quantity of goods that must have been purchased to arrive at the target inventory level given the period's COGS. This is distinct from a balance-sheet plug: no residual is being forced to reconcile a constraint; the identity holds by construction, and Purchases\textsubscript{t}​ is simply its remaining free variable.
+Rather than being forecast independently, Purchases\textsubscript{t} is derived directly from the structural accounting identity: it is the quantity of goods that must have been purchased to arrive at the target inventory level given the period's COGS. This is distinct from a balance-sheet plug: no residual is being forced to reconcile a constraint; the identity holds by construction, and Purchases\textsubscript{t}​ is simply its remaining free variable.
 
 We add \%Inventory (\%Inv\textsubscript{COGS}), $\alpha$\textsubscript{CR} and $\beta$\textsubscript{CR}
 to the variables to be trained.
@@ -973,10 +973,20 @@ cash/liquidity split:
 \text{IMS}_t = (1 - \text{\%Cash}) \cdot \text{TL}_t
 \end{equation}
 
+The simple policy has a notable limitation: it assumes that total
+liquidity scales linearly with sales at a fixed ratio, which is
+unrealistic for cash-rich firms whose liquidity trajectory is driven by
+strategic capital-return programs rather than by operational needs. Apple
+is a clear example. Its cash balance and stock buybacks over the past
+decade have been governed primarily by a multi-year buyback program
+designed to draw down excess cash, not by any stable relationship to
+revenue. A pure sales-proportional model cannot capture this secular
+decline in the cash-to-sales ratio.
+
 \paragraph{Advanced policy (\texttt{TrendLiquidityPolicy}).}
-Both the total liquidity ratio and the cash allocation evolve over time
-via logit-linear trends, with a baseline floor that is independent of
-sales:
+To address this, both the total liquidity ratio and the cash allocation
+evolve over time via logit-linear trends, with a baseline floor that is
+independent of sales:
 
 \begin{equation}\label{eq:total_liquidity_trend}
 \text{TL}_t = \beta_{\text{base}} + \text{Sales}_t \cdot \sigma(\alpha_{\text{TL}} + \beta_{\text{TL}} \cdot t)
@@ -1139,7 +1149,7 @@ where
 \text{Equity financing}_t = \text{LTLoan}_t \cdot \text{\%EF} / (1 - \text{\%EF})
 \end{equation}
 
-The equity financing proportion is trained from historical data, implicitly capturing the firm's revealed preference between debt and equity. This is consistent with the pecking order hypothesis \hyperlink{ref:myers84}{[Myers(84)]}, which predicts firms prefer internal funds, then debt, then equity---resulting in a low and relatively stable \%EF for profitable firms. The trained \%EF thus reflects the firm's historical position on the pecking order rather than an arbitrary split.
+The equity financing proportion is trained from historical data, implicitly capturing the firm's revealed preference between debt and equity. This is consistent with the pecking order hypothesis \hyperlink{ref:myers84}{[Myers(84)]}, which predicts firms prefer internal funds, then debt, then equity, resulting in a low and relatively stable \%EF for profitable firms. The trained \%EF thus reflects the firm's historical position on the pecking order rather than an arbitrary split.
 
 Dividends are modeled with two policy variants:\label{sec:dividends}
 
@@ -1207,8 +1217,8 @@ all the different activities' NLBs:
 + \text{External investment NLB}_t + \text{Owners transaction NLB}_t
 \end{multline}
 
-By construction, the Final NLB is the period's net cash inflow---the
-change in total liquidity from year $t-1$ to year $t$---so it must
+By construction, the Final NLB is the period's net cash inflow (the
+change in total liquidity from year $t-1$ to year $t$), so it must
 equal the difference between this year's and last year's total
 liquidity balances:
 
@@ -1219,9 +1229,9 @@ liquidity balances:
 This identity is what closes the loop and makes training possible.
 Because the liquidity policy (Section~\ref{sec:total_liquidity_policy})
 gives us an independent target for $\text{TL}_t$ via
-\eqref{eq:total_liquidity_trend}---namely
+\eqref{eq:total_liquidity_trend}, namely
 $\text{TL}_t = \text{TL}_{\text{baseline}} + \text{Sales}_t \cdot
-\sigma(\alpha_{\text{TL}} + \beta_{\text{TL}} \cdot t)$---substituting
+\sigma(\alpha_{\text{TL}} + \beta_{\text{TL}} \cdot t)$. Substituting
 this into \eqref{eq:final_nlb_tl_closure} yields a single scalar
 constraint that ties together every policy ratio appearing in the
 five NLBs. Specifically, the only free variable on the left-hand side
@@ -1230,7 +1240,7 @@ can therefore be solved for endogenously as the residual financing
 needed to bring total liquidity to its policy target. Once
 $\text{LTLoan}_t$ is determined, every remaining quantity is fully
 specified and the rest of the balance sheet assembles mechanically.
-No plug is required---the ``balancing'' is done by a financing
+No plug is required; the ``balancing'' is done by a financing
 decision that has real economic meaning (how much long-term debt to
 raise this period), not by absorbing arbitrary residuals into cash.
 
@@ -1363,8 +1373,8 @@ scale from zero with sales (e.g., revolving facility minimums, notes
 payable commitments), while the sales-proportional component captures
 working-capital-driven borrowing. This affine form was chosen over a
 pure sales ratio because the latter would asymptote to zero at zero
-sales---unrealistic for firms that carry a standing level of short-term
-paper---and over a logit-linear form because the latter saturates as
+sales (unrealistic for firms that carry a standing level of short-term
+paper) and over a logit-linear form because the latter saturates as
 sales grow, which is inappropriate for firms whose borrowing scales
 proportionally with revenue.
 
@@ -1639,7 +1649,7 @@ Bijectors.
 
 Since we assume a flat short-term and long-term interest for loans and
 return on market securities, the only external variable is inflation.
-This flat-rate assumption is a first-order simplification. In practice, borrowing costs depend on the firm's leverage and credit quality \hyperlink{ref:merton74}{[Merton(74)]}. As the forecast shows rising debt levels, a more complete model would incorporate credit spread widening---a natural extension that would link the cost of debt to the evolving debt-to-equity ratio. The current approach is conservative: it understates the cost of increased leverage, producing optimistic net income projections for high-debt scenarios.
+This flat-rate assumption is a first-order simplification. In practice, borrowing costs depend on the firm's leverage and credit quality \hyperlink{ref:merton74}{[Merton(74)]}. As the forecast shows rising debt levels, a more complete model would incorporate credit spread widening, a natural extension that would link the cost of debt to the evolving debt-to-equity ratio. The current approach is conservative: it understates the cost of increased leverage, producing optimistic net income projections for high-debt scenarios.
 
 \begin{itemize}
 \item
@@ -1877,11 +1887,52 @@ finance as suggested by Question 4 (we wrote the script in
 data, which is not sufficient for training in the following section. We
 managed to obtain older financial data by directly pulling from Apple's
 10-K filings. The script that we wrote and used for the data extraction
-is found in \texttt{sec-edgar-download-extractor.py}.
+is found in \texttt{run\_build\_financial\_statements\_sec.py}.
 
-The following is the output of the code when run with: \texttt{python run\_simple\_model\_forecast.py} :
+The following is the output of the code when run with
+\texttt{python run\_simple\allowbreak{}\_model\allowbreak{}\_forecast\allowbreak{}\_demo.py},
+which uses Apple's FY2024 balance sheet as the initial state,
+approximates every policy variable from the most recent year's ratios,
+holds them constant, and simply iterates four annual forecast steps:
 
-\includegraphics[width=4.67615in,height=0.9667in]{report_latex_media/media/image2.png}
+
+\begin{table}[H]
+\centering
+\small
+\begin{tabular}{l rrrr}
+\toprule
+\textbf{Line Item} & \textbf{FY2025} & \textbf{FY2026} & \textbf{FY2027} & \textbf{FY2028} \\
+\midrule
+\multicolumn{5}{l}{\textbf{Assets}} \\
+Non-Current Assets      & 211.2 & 211.0 & 210.9 & 210.8 \\
+Adv Payments (Purch)    &  17.5 &  18.4 &  19.3 &  20.2 \\
+Accounts Receivable     &  67.4 &  70.9 &  74.4 &  77.9 \\
+Inventory               &   6.5 &   6.9 &   7.2 &   7.5 \\
+Cash                    &  42.7 &  44.9 &  47.1 &  49.3 \\
+Invest in Mkt Sec       &   0.0 &   0.0 &   0.0 &   0.0 \\
+\textbf{Total Assets}   & \textbf{345.3} & \textbf{352.1} & \textbf{358.9} & \textbf{365.7} \\
+\addlinespace
+\multicolumn{5}{l}{\textbf{Liabilities}} \\
+Accounts Payable        &  71.2 &  74.7 &  78.4 &  82.1 \\
+Adv Payments (Sales)    &   9.0 &   9.4 &   9.9 &  10.4 \\
+Effective ST Debt       &   0.0 &   0.0 &   0.0 &   0.0 \\
+Current LT Debt         &  13.5 &  14.5 &  15.4 &  16.2 \\
+Non-Current Liabilities & 193.4 & 207.7 & 220.3 & 230.9 \\
+\textbf{Total Liabilities} & \textbf{287.1} & \textbf{306.4} & \textbf{324.1} & \textbf{339.5} \\
+\addlinespace
+\textbf{Equity}         & \textbf{58.2} & \textbf{45.7} & \textbf{34.8} & \textbf{26.2} \\
+\addlinespace
+\textbf{Total Liab + Equity} & \textbf{345.3} & \textbf{352.1} & \textbf{358.9} & \textbf{365.7} \\
+\midrule
+\multicolumn{5}{l}{\textbf{Income Statement}} \\
+Net Income              &  74.6 &  80.8 &  83.7 &  86.7 \\
+\addlinespace
+CHECK: Assets$-$(L+E)   &   0.0 &   0.0 &   0.0 &   0.0 \\
+\bottomrule
+\end{tabular}
+\par\smallskip
+{\footnotesize All figures in \$ billions.}
+\end{table}
 
 Even without using any plugs, we see that the assets = liabilities +
 equity identity is satisfied because our model follows the double-entry
@@ -1962,7 +2013,7 @@ Grouped by the policy module that owns them:
 
 \item \textbf{Dividends (\texttt{LintnerDividendPolicy}).}
   \%PR (target payout ratio as a fraction of Net Income) and
-  Adj.\ Speed (Lintner partial-adjustment speed---how quickly actual
+  Adj.\ Speed (Lintner partial-adjustment speed: how quickly actual
   dividends converge to the target). Learned from historical dividend
   payouts and Net Income.
 
@@ -2013,26 +2064,139 @@ this simple training model, \%AM = 100\% and Purchases are also used
 together with Sales as dual driver.
 
 In order to test the model's prediction capability, we train the
-parameters from Apple's 2018\textasciitilde2024 data, predict 2025 data,
-and compare it with the actual data. The following is the output after
-running \texttt{run\_trainable\allowbreak{}\_model\allowbreak{}\_forecast\allowbreak{}\_simple\allowbreak{}\_policies.py}:
+parameters from Apple's 2018\textasciitilde2024 data and leave 2025 for backtesting, and forecast 9 more years to observe the trend. The following is the output after
+running \texttt{run\_trainable\allowbreak{}\_model\allowbreak{}\_forecast\allowbreak{}\_adv\allowbreak{}\_policies.py}:
 
-\includegraphics[width=\textwidth]{report_latex_media/media/image3.png}
 
-It shows a modest prediction ability, which is unsurprising because we
-have lumped various balance sheet elements together to form several
-elements to be more consistent with models described in \hyperlink{ref:pareja07}{Pareja(07)} and
-\hyperlink{ref:pareja09}{Pareja(09)}, as we have explained in the \emph{Balance Sheet
-Elements} subsection. Also, there is a limitation of assuming a liquidity balance
-(cash + investment in market securities) that varies linearly with
-sales, especially for a cash-rich company like Apple whose cash balance
-and stock buybacks are governed by the recent buyback programs in order
-to reduce its cash balance instead of being proportional to asset
-depreciation, which is done here as done by \hyperlink{ref:pareja09}{Pareja(09)}.
+\begin{lstlisting}[style=console]
+Simple parameters:
+Final %AG: 0.00000
+Final %AM: 0.94058
+Final %Depr: 0.05552
+Final %AdvPS: 0.02126
+Final %AdvPP: 0.07840
+Final %AR: 0.15866
+Final %AP: 0.30796
+Final %Inv (COGS): 0.02939
+Total Liquidity (baseline + logit-linear): baseline=0.6012, alpha=-2.3463, beta=-0.411515
+  => %TL at t=0: 0.0874, %TL at t=6: 0.0080
+Cash % of Liquidity (logit-linear): alpha=-0.2235, beta=0.032375
+  => %Cash at t=0: 0.4444, %Cash at t=6: 0.4927
+Final %IT: 0.17023
+Final %PR: 0.99973
+Final DivAdjSpeed: 0.00370
+Stock Buyback (baseline + ratio*depr): baseline=1.5612, ratio=-6.674733
+Effective ST Debt (baseline + % of sales): baseline=0.0000, pct=0.17869
+Cost Ratio (logit-linear): alpha=0.3459, beta=-0.047524
+  => CR at t=0: 0.5856, CR at t=6: 0.5152
+OpEx Variable %: 0.0939
+OpEx Baseline (USD): 4.02e+10
+\end{lstlisting}
 
-Our model can also forecast earnings because net income is automatically
-calculated when predicting the elements on the balance sheet, and is
-outputted as ``net\_income'' as shown above.
+\noindent\rule{\textwidth}{0.4pt}
+
+\begin{lstlisting}[style=console]
+Structural parameters:
+
+Final %AvgSTInt: 0.00003
+Final %AvgLTInt: 0.01687
+Final %MSReturn: 0.07588
+Equity Financing (logit-linear): alpha=0.4894, beta=-0.006361
+Avg Maturity Years: 15.3410
+\end{lstlisting}
+
+\noindent\rule{\textwidth}{0.4pt}
+
+
+\begin{table}[H]
+\centering
+\small
+\textbf{BACKTEST --- FY2025 (Out-of-Sample)}
+\vspace{0.5em}
+
+\begin{tabular}{l rrr}
+\toprule
+\textbf{Line Item} & \textbf{Actual} & \textbf{Predicted} & \textbf{Error \%} \\
+\midrule
+\multicolumn{4}{l}{\textbf{Assets}} \\
+Non-Current Assets        & 211.3 & 211.3 & $+$0.0\% \\
+Adv Payments (Purchases)  &  14.6 &  16.3 & $+$12.0\% \\
+Accounts Receivable       &  73.0 &  66.0 & $-$9.5\% \\
+Inventory                 &   5.7 &   6.2 & $+$7.7\% \\
+Cash                      &  35.9 &  31.2 & $-$13.1\% \\
+Invest in Mkt Securities  &  18.8 &  31.1 & $+$65.9\% \\
+\textbf{Total Assets}     & \textbf{359.2} & \textbf{362.2} & $+$0.8\% \\
+\addlinespace
+\multicolumn{4}{l}{\textbf{Liabilities}} \\
+Accounts Payable          &  69.9 &  64.2 & $-$8.2\% \\
+Adv Payments (Sales)      &   9.1 &   8.8 & $-$2.3\% \\
+Effective ST Debt         &  74.4 &  74.4 & $+$0.0\% \\
+Non-Current Liabilities   & 119.9 & 125.5 & $+$4.6\% \\
+\textbf{Equity}           & \textbf{73.7} & \textbf{80.6} & $+$9.3\% \\
+\midrule
+\multicolumn{4}{l}{\textbf{Income Statement}} \\
+COGS                      & 209.3 & 209.5 & $+$0.1\% \\
+OpEx                      &  62.2 &  59.5 & $-$4.3\% \\
+Depreciation              &  11.7 &  11.8 & $+$0.6\% \\
+Interest Payments         &   0.0 &   2.4 & N/A \\
+ST Investment Returns     &  $-$0.3 &   2.7 & $+$932.8\% \\
+Tax                       &  20.7 &  23.1 & $+$11.5\% \\
+\textbf{Net Income}       & \textbf{112.0} & \textbf{112.6} & $+$0.6\% \\
+\addlinespace
+\multicolumn{4}{l}{\textbf{Cash Flow}} \\
+Dividends                 &  15.4 &  15.5 & $+$0.6\% \\
+Stock Buyback             &  90.7 &  77.6 & $-$14.5\% \\
+\bottomrule
+\end{tabular}
+\par\smallskip
+{\footnotesize All figures in \$ billions.}
+\end{table}
+
+\includegraphics[width=\textwidth]{report_latex_media/media/advpolicies_result_1.png}
+\includegraphics[width=\textwidth]{report_latex_media/media/advpolicies_result_2.png}
+\includegraphics[width=\textwidth]{report_latex_media/media/advpolicies_result_3.png}
+
+The backtest shows mixed but informative results. On the income
+statement side, the model predicts Net Income within 0.6\% of the
+actual figure, and COGS and Depreciation are nearly exact ($+$0.1\%
+and $+$0.6\%), suggesting that the trained cost ratio and CapEx
+parameters generalize well out of sample. Balance sheet aggregates
+are also close: Total Assets err by only $+$0.8\%.
+
+The larger item-level errors reflect known modelling simplifications.
+We have lumped various balance sheet elements together to be more
+consistent with the models described in
+\hyperlink{ref:pareja07}{Pareja(07)} and
+\hyperlink{ref:pareja09}{Pareja(09)}, as explained in the
+\emph{Balance Sheet Elements} subsection, so individual line items
+such as Accounts Receivable ($-$9.5\%) and Accounts Payable
+($-$8.2\%) absorb the aggregation mismatch even when the totals
+are accurate.
+
+The Interest Payments actual value is reported as zero because
+Apple's FY2025 10-K does not disclose a single comparable interest
+expense figure in the format our extraction pipeline expects, so the
+error percentage is not meaningful. Similarly, the ST Investment
+Returns actual value is $-$\$0.3B (a small net loss on the
+portfolio), while the model predicts \$2.7B, yielding a $+$932.8\%
+error. This is driven by the same liquidity-split limitation
+discussed below.
+
+The largest outlier is Investment in Market Securities ($+$65.9\%).
+This is a direct consequence of the logit-linear liquidity policy:
+the trend model captures the smooth, secular decline in Apple's
+total liquidity ratio but cannot reproduce the jagged year-to-year
+reallocation between cash and market securities, which is driven by
+discrete treasury decisions (e.g., shifting maturities in the bond
+portfolio) rather than a smooth function of sales or time. Cash
+itself is underestimated by 13.1\% for the same reason. Because
+the model overestimates the IMS balance, it also overestimates
+the return generated on those securities, explaining the ST
+Investment Returns miss. A richer liquidity model that
+distinguishes active rebalancing from trend-driven allocation
+would improve these individual estimates, though the total
+liquidity error remains modest.
+
 
 \subsection{Applying Machine Learning}
 
@@ -2059,11 +2223,11 @@ of potential improvements is as follows:
   disclosed publicly into training the buyback ratio with a neural
   network
 \item
-  Endogenizing the Weighted Average Cost of Capital (WACC) as a function of the forecasted capital structure. Since WACC depends on the debt-to-equity ratio and cost of debt---both of which change across the forecast horizon---this would link borrowing costs to leverage and enable DCF-based valuation directly from the model output.
+  Endogenizing the Weighted Average Cost of Capital (WACC) as a function of the forecasted capital structure. Since WACC depends on the debt-to-equity ratio and cost of debt (both of which change across the forecast horizon), this would link borrowing costs to leverage and enable DCF-based valuation directly from the model output.
 \item
   Propagating uncertainty across all key drivers (sales growth, cost ratios, interest rates, CapEx intensity) via full Monte Carlo simulation, not just OpEx. Adding scenario analysis (base case, downside with revenue contraction, upside with margin expansion) would strengthen the forecast's decision-support value.
 \item
-  Computing projected financial ratios (debt-to-equity, interest coverage, current ratio) from the forecast output and flagging years where they breach investment-grade thresholds---enabling proactive capital structure management.
+  Computing projected financial ratios (debt-to-equity, interest coverage, current ratio) from the forecast output and flagging years where they breach investment-grade thresholds, enabling proactive capital structure management.
 \end{itemize}
 
 For our model, we choose to implement Bayesian learning with Variational
@@ -2160,28 +2324,27 @@ below:
 Simple parameters:
 
 Final %AG: 0.00000
-Final %AM: 0.94062
-Final %Depr: 0.05553
+Final %AM: 0.94058
+Final %Depr: 0.05552
 Final %AdvPS: 0.02126
 Final %AdvPP: 0.07840
 Final %AR: 0.15866
-Final %AP: 0.30794
-Final %Inv: 0.01603
-Total Liquidity (baseline + logit-linear): baseline=0.6013, alpha=-2.3463, beta=-0.411579
-=> %TL at t=0: 0.0874, %TL at t=7: 0.0053
-Cash % of Liquidity (logit-linear): alpha=-0.2235, beta=0.032385
-=> %Cash at t=0: 0.4444, %Cash at t=7: 0.5008
-Final %IT: 0.17021
-Final %PR: 0.99969
-Final DivAdjSpeed (alpha): 0.00371
-Stock Buyback (baseline + ratio*depr): baseline=1.5540, ratio=-6.610795
-Effective ST Debt % of Sales (logit-linear): alpha=-1.7458, beta=0.059738
-=> %EffSTDebt at t=0: 0.1486, %EffSTDebt at t=7: 0.2095
-Cost Ratio (logit-linear): alpha=0.3459, beta=-0.0475
-=> CR at t=0: 0.5856, CR at t=7: 0.5034
-Bayesian OpEx Variable %: Mean=0.0923, Std=0.0155
-Bayesian OpEx Baseline (USD): Mean=3.91e+10, Std=8.09e+08
-OpEx aleatoric uncertainty (USD): 2.49e+09
+Final %AP: 0.30796
+Final %Inv (COGS): 0.02939
+Total Liquidity (baseline + logit-linear): baseline=0.6012, alpha=-2.3463, beta=-0.411515
+  => %TL at t=0: 0.0874, %TL at t=6: 0.0080
+Cash % of Liquidity (logit-linear): alpha=-0.2235, beta=0.032375
+  => %Cash at t=0: 0.4444, %Cash at t=6: 0.4927
+Final %IT: 0.17023
+Final %PR: 0.99973
+Final DivAdjSpeed: 0.00370
+Stock Buyback (baseline + ratio*depr): baseline=1.5612, ratio=-6.674733
+Effective ST Debt (baseline + % of sales): baseline=0.0000, pct=0.17869
+Cost Ratio (logit-linear): alpha=0.3459, beta=-0.047524
+  => CR at t=0: 0.5856, CR at t=6: 0.5152
+Bayesian OpEx Variable %: Mean=0.0930, Std=0.0161
+Bayesian OpEx Baseline (USD):   Mean=3.93e+10, Std=8.27e+08
+OpEx aleatoric uncertainty (USD): 2.45e+09
 \end{lstlisting}
 
 \noindent\rule{\textwidth}{0.4pt}
@@ -2189,15 +2352,59 @@ OpEx aleatoric uncertainty (USD): 2.49e+09
 \begin{lstlisting}[style=console]
 Structural parameters:
 
-Final %AvgSTInt: 0.03970
-Final %AvgLTInt: 0.00692
-Final AvgM: 15.36485
-Final %MSReturn: 0.01119
-Equity Financing % (logit-linear): alpha=0.5389, beta=0.018432
-=> %EF at t=0: 0.6316, %EF at t=7: 0.6610
+Final %AvgSTInt: 0.00003
+Final %AvgLTInt: 0.01687
+Final %MSReturn: 0.07587
+Equity Financing (logit-linear): alpha=0.4917, beta=-0.005617
+Avg Maturity Years: 15.3390
 \end{lstlisting}
 
 \noindent\rule{\textwidth}{0.4pt}
+
+
+\begin{table}[H]
+\centering
+\footnotesize
+\textbf{BACKTEST --- FY2025 (Out-of-Sample)}
+\vspace{0.5em}
+
+\begin{tabular}{l rrrrr}
+\toprule
+\textbf{Line Item} & \textbf{Actual} & \textbf{Pred.\ (Mean)} & \textbf{Lower 2.5\%} & \textbf{Upper 97.5\%} & \textbf{Error \%} \\
+\midrule
+\multicolumn{6}{l}{\textbf{Assets}} \\
+Non-Current Assets        & 211.3 & 211.3 & 211.3 & 211.3 & $+$0.0\% \\
+Adv Payments (Purch.)     &  14.6 &  16.3 &  16.3 &  16.3 & $+$12.0\% \\
+Accounts Receivable       &  73.0 &  66.0 &  66.0 &  66.0 & $-$9.5\% \\
+Inventory                 &   5.7 &   6.2 &   6.2 &   6.2 & $+$7.7\% \\
+Cash                      &  35.9 &  31.2 &  31.2 &  31.2 & $-$13.1\% \\
+Invest in Mkt Sec         &  18.8 &  31.1 &  31.1 &  31.1 & $+$65.9\% \\
+\textbf{Total Assets}     & \textbf{359.2} & \textbf{362.2} & \textbf{362.2} & \textbf{362.2} & $+$0.8\% \\
+\addlinespace
+\multicolumn{6}{l}{\textbf{Liabilities}} \\
+Accounts Payable          &  69.9 &  64.2 &  64.2 &  64.2 & $-$8.2\% \\
+Adv Payments (Sales)      &   9.1 &   8.8 &   8.8 &   8.8 & $-$2.3\% \\
+Effective ST Debt         &  74.4 &  74.4 &  74.4 &  74.4 & $+$0.0\% \\
+Non-Current Liabilities   & 119.9 & 125.4 & 123.6 & 127.2 & $+$4.6\% \\
+\textbf{Equity}           & \textbf{73.7} & \textbf{80.7} & \textbf{78.7} & \textbf{82.6} & $+$9.4\% \\
+\midrule
+\multicolumn{6}{l}{\textbf{Income Statement}} \\
+COGS                      & 209.3 & 209.5 & 209.5 & 209.5 & $+$0.1\% \\
+OpEx                      &  62.2 &  59.3 &  53.2 &  65.2 & $-$4.6\% \\
+Depreciation              &  11.7 &  11.8 &  11.8 &  11.8 & $+$0.6\% \\
+Interest Payments         &   0.0 &   2.4 &   2.4 &   2.4 & N/A \\
+ST Investment Returns     & $-$0.3 &   2.7 &   2.7 &   2.7 & $+$932.7\% \\
+Tax                       &  20.7 &  23.1 &  22.1 &  24.2 & $+$11.7\% \\
+\textbf{Net Income}       & \textbf{112.0} & \textbf{112.8} & \textbf{107.9} & \textbf{117.8} & $+$0.7\% \\
+\addlinespace
+\multicolumn{6}{l}{\textbf{Cash Flow}} \\
+Dividends                 &  15.4 &  15.5 &  15.5 &  15.5 & $+$0.6\% \\
+Stock Buyback             &  90.7 &  77.6 &  77.6 &  77.6 & $-$14.5\% \\
+\bottomrule
+\end{tabular}
+\par\smallskip
+{\scriptsize All figures in \$ billions. Confidence intervals reflect Bayesian OpEx uncertainty only; deterministic line items show identical lower/upper bounds.}
+\end{table}
 
 The Operation Expense learned with Bayesian Variational Inference is as
 follows:
@@ -2209,26 +2416,36 @@ we see that the uncertainty increases the further the forecast year as
 expected for Variational Inference model's increasing epistemic
 uncertainty outside of the training range:
 
-\begin{lstlisting}[style=console]
-Net Income
+\begin{table}[H]
+\centering
+\small
+\textbf{Net Income}
+\vspace{0.5em}
 
-Year | Mean     | 2.5% CI  | 97.5% CI
------|----------|----------|----------
-2025 | 1.09e+11 | 1.04e+11 | 1.14e+11
-2026 | 1.20e+11 | 1.15e+11 | 1.25e+11
-2027 | 1.30e+11 | 1.25e+11 | 1.35e+11
-2028 | 1.41e+11 | 1.35e+11 | 1.47e+11
-2029 | 1.52e+11 | 1.46e+11 | 1.58e+11
-2030 | 1.63e+11 | 1.57e+11 | 1.70e+11
-2031 | 1.75e+11 | 1.68e+11 | 1.81e+11
-2032 | 1.87e+11 | 1.80e+11 | 1.95e+11
-2033 | 2.00e+11 | 1.92e+11 | 2.07e+11
-2034 | 2.12e+11 | 2.04e+11 | 2.20e+11
-\end{lstlisting}
+\begin{tabular}{l rrr}
+\toprule
+\textbf{Year} & \textbf{Mean} & \textbf{2.5\% CI} & \textbf{97.5\% CI} \\
+\midrule
+2025 & 1.13e+11 & 1.08e+11 & 1.18e+11 \\
+2026 & 1.23e+11 & 1.18e+11 & 1.28e+11 \\
+2027 & 1.34e+11 & 1.28e+11 & 1.39e+11 \\
+2028 & 1.45e+11 & 1.39e+11 & 1.51e+11 \\
+2029 & 1.56e+11 & 1.50e+11 & 1.62e+11 \\
+2030 & 1.68e+11 & 1.61e+11 & 1.75e+11 \\
+2031 & 1.80e+11 & 1.73e+11 & 1.88e+11 \\
+2032 & 1.93e+11 & 1.86e+11 & 2.00e+11 \\
+2033 & 2.05e+11 & 1.98e+11 & 2.13e+11 \\
+2034 & 2.19e+11 & 2.10e+11 & 2.27e+11 \\
+\bottomrule
+\end{tabular}
+\par\smallskip
+{\footnotesize All figures in USD.}
+\end{table}
 
-\includegraphics[width=\textwidth]{report_latex_media/media/image5.png}
-\includegraphics[width=\textwidth]{report_latex_media/media/image6.png}
-\includegraphics[width=\textwidth]{report_latex_media/media/image7.png}
+\includegraphics[width=\textwidth]{report_latex_media/media/advpolicies_bayesian_result_1.png}
+\includegraphics[width=\textwidth]{report_latex_media/media/advpolicies_bayesian_result_2.png}
+\includegraphics[width=\textwidth]{report_latex_media/media/advpolicies_bayesian_result_3.png}
+
 
 \subsection{Forecast Results}
 
@@ -2353,7 +2570,7 @@ of the European Commission State Aid Decision. This skewed the learned
 effective tax rate upwards during training, as evidenced by the
 consistent over-estimation of tax for one-step forecast model fit.
 
-\noindent\begin{minipage}{0.48\textwidth}\centering\includegraphics[width=\linewidth]{report_latex_media/media/image16.png}\end{minipage}\hfill\begin{minipage}{0.48\textwidth}\centering\includegraphics[width=\linewidth]{report_latex_media/media/image17.png}\end{minipage}
+\noindent\begin{minipage}{0.48\textwidth}\centering\includegraphics[width=\linewidth]{report_latex_media/media/tax_withoutanomaly.png}\end{minipage}\hfill\begin{minipage}{0.48\textwidth}\centering\includegraphics[width=\linewidth]{report_latex_media/media/netincome_withoutanomaly.png}\end{minipage}
 
 To avoid this issue, we can ask LLM to notify us of any one-time tax
 payments like this so that we can appropriately handle it during
@@ -2451,11 +2668,9 @@ smaller for the effective tax rate \%IT:
 
 \includegraphics[width=\textwidth]{report_latex_media/media/image21.png}
 
-\noindent\begin{minipage}{0.48\textwidth}\centering\includegraphics[width=\linewidth]{report_latex_media/media/image16.png}\end{minipage}\hfill\begin{minipage}{0.48\textwidth}\centering\includegraphics[width=\linewidth]{report_latex_media/media/image17.png}\end{minipage}
 
-Before accounting for tax anomalies. The predicted net income is 1.09e11
-dollars, which is off by 2.68\%, or 3 billion dollars, from the actual
-value of 1.12e11 dollars.
+Before accounting for tax anomalies, the training losses are:
+tax loss = 5.45e$-$01, net income loss = 3.37e$-$01.
 
 \paragraph{After}
 
@@ -2463,12 +2678,15 @@ value of 1.12e11 dollars.
 
 \includegraphics[width=\textwidth]{report_latex_media/media/image23.png}
 
-\noindent\begin{minipage}{0.48\textwidth}\centering\includegraphics[width=\linewidth]{report_latex_media/media/image24.png}\end{minipage}\hfill\begin{minipage}{0.48\textwidth}\centering\includegraphics[width=\linewidth]{report_latex_media/media/image25.png}\end{minipage}
+\noindent\begin{minipage}{0.48\textwidth}\centering\includegraphics[width=\linewidth]{report_latex_media/media/tax_withanomaly.png}\end{minipage}\hfill\begin{minipage}{0.48\textwidth}\centering\includegraphics[width=\linewidth]{report_latex_media/media/netincome_withanomaly.png}\end{minipage}
 
-After accounting for tax anomalies. The predicted net income in 2025 is
-1.11e11 dollars, which is only off by 0.89\%, or 1 billion dollars, from
-the actual value of 1.12e11 dollars! The income tax MSE loss during
-training also drops by an order of magnitude.
+After accounting for tax anomalies, the training losses drop to:
+tax loss = 5.99e$-$02, net income loss = 1.69e$-$01.
+The tax loss falls by nearly an order of magnitude (from 0.545 to 0.060),
+because the model no longer needs to distort its baseline tax rate to
+accommodate one-time charges. The net income loss roughly halves
+(from 0.337 to 0.169), since the cleaner tax estimates flow directly
+into the income statement.
 
 \subsection{d) Strategic Recommendations for CEO/CFO}
 
@@ -4172,7 +4390,7 @@ end-to-end tests.
 
 The ``no-plug'' design of the forecast model means the fundamental
 accounting identity (\emph{Assets = Liabilities + Equity}) is not
-enforced by a balancing variable---it must \emph{emerge} from the
+enforced by a balancing variable; it must \emph{emerge} from the
 correctness of every cash flow, accrual, and valuation equation. This
 makes the identity a powerful test oracle: at every forecast step, we
 compute
@@ -4287,7 +4505,7 @@ The following strategies are applied across the test suite:
 
 \subsection{Parameter Recovery (Identifiability Testing)}
 
-The preceding tests verify \emph{structural} correctness---that the
+The preceding tests verify \emph{structural} correctness: that the
 accounting identity holds, outputs are finite, and parameters survive
 serialization.  However, they do not verify that the gradient-based
 training pipeline converges to the \emph{correct} parameter values.  A
@@ -4303,7 +4521,7 @@ is:
   \item Create a ``generator'' model and assign those values.
   \item Run \texttt{forecast\_step} in a loop from a cash-poor initial
     balance sheet, producing perfectly consistent synthetic financial
-    statements---including the full cash budget circularity (new ST/LT
+    statements, including the full cash budget circularity (new ST/LT
     borrowing, equity financing, interest feedback).
   \item Train a fresh ``recovery'' model on the synthetic data.
   \item Assert that recovered parameters match ground truth within
@@ -4360,7 +4578,7 @@ Bayesian + tax anomalies). (i) = initial value before training.
 \end{lstlisting}
 
 The results confirm three properties: (a)~the model is
-\emph{identifiable}---ground-truth parameters are uniquely recoverable
+\emph{identifiable}: ground-truth parameters are uniquely recoverable
 from data generated by those same parameters; (b)~the Adam optimizer
 converges to the correct minimum rather than a spurious local optimum;
 and (c)~the no-plug accounting framework correctly propagates all
@@ -4734,7 +4952,7 @@ six concrete advantages over NumPy:
   \texttt{GradientTape} computes gradients for over 50 coupled financial
   parameters without manual calculus. A NumPy implementation would
   require finite-difference approximation or hand-derived gradients for
-  every parameter---impractical given the interdependencies of the
+  every parameter, which is impractical given the interdependencies of the
   financial statements.
 
 \item \textbf{Graph compilation.}
@@ -4745,9 +4963,9 @@ six concrete advantages over NumPy:
 
 \item \textbf{Constrained trainable variables.}
   \texttt{tfp.util.TransformedVariable} with bijectors (Softplus,
-  Sigmoid, Chain) automatically enforces economic constraints---such as
+  Sigmoid, Chain) automatically enforces economic constraints (such as
   positivity for growth rates, or $[0, 1]$ bounds for payout
-  ratios---during gradient updates. NumPy has no equivalent; manual
+  ratios) during gradient updates. NumPy has no equivalent; manual
   clamping after each optimization step would be required.
 
 \item \textbf{Vectorized Monte Carlo simulation.}
@@ -4758,7 +4976,7 @@ six concrete advantages over NumPy:
 
 \item \textbf{Variational inference.}
   TensorFlow Probability enables Bayesian OpEx modeling with automatic
-  KL divergence gradients through sampling operations---computing the
+  KL divergence gradients through sampling operations. Computing the
   Evidence Lower Bound (ELBO) loss requires differentiating through
   stochastic nodes, which is not possible natively in NumPy.
 
@@ -4777,12 +4995,12 @@ codebase hierarchy.}
 guiding principles:
 
 \begin{enumerate}
-\item OOP principles---proper encapsulation, inheritance, polymorphism,
+\item OOP principles: proper encapsulation, inheritance, polymorphism,
   and abstraction
-\item Clean Code principles (Robert Martin)---meaningful naming,
+\item Clean Code principles (Robert Martin): meaningful naming,
   single-responsibility functions and classes, SOLID principles
 \item PEP~8 and PEP~20 compliance
-\item Pythonic style per Fluent Python---Python idioms over Java-style
+\item Pythonic style per Fluent Python: Python idioms over Java-style
   patterns
 \end{enumerate}
 
@@ -4836,8 +5054,8 @@ statement of cashflow will help the reader understanding why it can keep
 the balance sheet balanced.}
 
 \textbf{Response:} We have added a dedicated subsection in the
-Introduction---see Section~\ref{sec:double-entry}, \emph{The
-Double-Entry Principle}---which explains the principle with two worked
+Introduction (see Section~\ref{sec:double-entry}, \emph{The
+Double-Entry Principle}), which explains the principle with two worked
 examples: a credit sale (income statement to balance sheet) and a
 receivable collection (cash budget to balance sheet).
 
