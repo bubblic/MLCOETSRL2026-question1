@@ -104,7 +104,7 @@ class StructuralTrainer(BaseTrainer):
             scale_ncl = tf.math.reduce_std(ncl_t[1:]) + eps
             scale_equity = tf.math.reduce_std(equity_t[1:]) + eps
             scale_interest = finite_std(interest_t[1:])
-            scale_ms_return = tf.math.reduce_std(ms_return_t[1:]) + eps
+            scale_ms_return = finite_std(ms_return_t[1:])
         elif loss_scale_mode == "none":
             one = tf.constant(1.0, dtype=tf.float64)
             scale_ni = scale_eff_st = scale_curr_lt = scale_ncl = one
@@ -215,8 +215,17 @@ class StructuralTrainer(BaseTrainer):
                         (state_pred["interest_payment"] - interest_target)
                         / scale_interest
                     )
-                    loss_ms_return = tf.square(
-                        (state_pred["ms_return"] - ms_return_t[t + 1]) / scale_ms_return
+                    # MS return may be NaN for missing observations
+                    valid_ms_return = tf.cast(
+                        tf.math.is_finite(ms_return_t[t + 1]), tf.float64
+                    )
+                    ms_return_target = tf.where(
+                        tf.math.is_finite(ms_return_t[t + 1]),
+                        ms_return_t[t + 1],
+                        state_pred["ms_return"],
+                    )
+                    loss_ms_return = valid_ms_return * tf.square(
+                        (state_pred["ms_return"] - ms_return_target) / scale_ms_return
                     )
 
                     total_loss += (

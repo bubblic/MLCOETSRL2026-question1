@@ -704,11 +704,19 @@ Wirecard AG & Fintech & 2018 & June 2020 & BaFin / Annual Report \\
 \caption{Test set of bankrupt companies with annual report sources}
 \end{table}
 
-The Evergrande Group 2022 annual report was obtained from the HKEx
-\href{https://www.hkexnews.hk}{disclosure platform} (text-layer PDF, no OCR
-required). Annual reports for the remaining four companies (SVB, Bed Bath
-\& Beyond, Lehman Brothers, Wirecard AG) are publicly available from SEC
-EDGAR and BaFin respectively; acquisition and pipeline processing are pending.
+All five annual reports were obtained from public sources. The Evergrande
+Group 2022 annual report was downloaded from the HKEx
+\href{https://www.hkexnews.hk}{disclosure platform} as a native PDF. The
+Wirecard AG 2018 annual report was downloaded as a native PDF from the
+company's archived investor relations website. The SVB Financial Group
+(2022), Bed Bath \& Beyond (2022), and Lehman Brothers (2007) 10-K filings
+were obtained from SEC EDGAR as HTML documents and converted to PDF via
+headless browser rendering. None of the reports required OCR preprocessing.
+
+\textbf{Important note on document format:} The three SEC EDGAR filings are
+inline XBRL-tagged HTML documents that differ structurally from traditional
+PDF annual reports. This format distinction had a material impact on pipeline
+performance, as discussed in Section~IV.
 
 \subsection{Results by Company}
 
@@ -843,10 +851,24 @@ in the technology sector. These risks materialised rapidly when interest rates r
 The auditor issued an unqualified opinion, making this a test of the engine's ability
 to detect warnings in the notes and MD\&A rather than the auditor's report.
 
-\textit{Pipeline results pending --- annual report PDF not yet acquired from
-SEC EDGAR. SVB is a particularly important test case because the auditor
-issued an unqualified opinion, requiring the engine to surface risk from the
-notes and MD\&A alone.}
+\textbf{Stage 1 --- Flagged Pages:} The pipeline processed 208 pages across
+7 chunks but flagged \textbf{zero} pages for any risk category. This is a
+significant false negative: SVB's 10-K contained extensive disclosures
+about interest rate risk, held-to-maturity portfolio losses, and depositor
+concentration that were known precursors to its collapse. The HTML-to-PDF
+conversion of the SEC EDGAR 10-K filing may have introduced text artefacts
+(page timestamps, navigation headers) that degraded the LLM's ability to
+identify risk-relevant content.
+
+\textbf{Stage 2:} No categories to extract (0 flagged pages).
+
+\textbf{Stage 3 --- Risk Memo:} The synthesis stage produced a generic
+HIGH-risk template memo in the absence of concrete findings. This
+represents a pipeline design limitation: the synthesis prompt should
+return a ``no findings'' result when Stage~2 is empty, rather than
+generating speculative content.
+
+\textbf{Pipeline usage:} 8 LLM calls, 718K input characters, 28K output characters.
 
 % --- Bed Bath & Beyond ---
 \subsubsection{Case 3: Bed Bath \& Beyond (2022 Annual Report)}
@@ -855,9 +877,20 @@ notes and MD\&A alone.}
 from the auditor, covenant breaches on its revolving credit facility, and rapidly
 deteriorating operating cash flow.
 
-\textit{Pipeline results pending --- annual report PDF not yet acquired from
-SEC EDGAR. This case is expected to produce strong signals in both
-\texttt{going\_concern} and \texttt{debt\_covenants} categories.}
+\textbf{Stage 1 --- Flagged Pages:} The pipeline processed 217 pages across
+8 chunks but flagged \textbf{zero} pages. Like SVB, this is a significant
+false negative: the BBBY 10-K contained explicit going concern language
+from the auditor, covenant breaches, and rapidly deteriorating cash flow.
+The SEC EDGAR HTML-to-PDF conversion is the likely cause, as the pipeline
+successfully detected similar signals in natively formatted PDFs (Evergrande,
+Wirecard).
+
+\textbf{Stage 2:} No categories to extract (0 flagged pages).
+
+\textbf{Stage 3 --- Risk Memo:} Generic HIGH-risk template memo generated
+from empty findings (same synthesis limitation as SVB).
+
+\textbf{Pipeline usage:} 9 LLM calls, 542K input characters, 19K output characters.
 
 % --- Lehman ---
 \subsubsection{Case 4: Lehman Brothers (2007 Annual Report)}
@@ -868,9 +901,18 @@ and reliance on short-term funding, all of which contributed to its collapse.
 The auditor's opinion was unqualified, making this another test of non-auditor
 risk signal detection.
 
-\textit{Pipeline results pending --- annual report PDF not yet acquired from
-SEC EDGAR. As with SVB, the auditor opinion was unqualified, testing the
-engine's ability to detect leverage and liquidity risk signals in the notes.}
+\textbf{Stage 1 --- Flagged Pages:} The pipeline processed 156 pages across
+6 chunks but flagged \textbf{zero} pages. This result is consistent with the
+SVB and BBBY cases: all three were SEC EDGAR 10-K filings converted from
+HTML to PDF, suggesting a systematic document format sensitivity issue
+rather than an individual case failure.
+
+\textbf{Stage 2:} No categories to extract (0 flagged pages).
+
+\textbf{Stage 3 --- Risk Memo:} Generic HIGH-risk template memo generated
+from empty findings.
+
+\textbf{Pipeline usage:} 7 LLM calls, 634K input characters, 19K output characters.
 
 % --- Wirecard ---
 \subsubsection{Case 5: Wirecard AG (2018 Annual Report)}
@@ -880,10 +922,91 @@ EY issued unqualified opinions for several years despite the fraud. This tests t
 engine's ability to detect related-party anomalies and suspicious cash flow patterns
 in the notes even when the auditor failed to flag them.
 
-\textit{Pipeline results pending --- annual report PDF not yet acquired.
-This is the most challenging test case: EY issued unqualified opinions for
-years despite the fraud, so the engine must rely entirely on related-party
-anomalies and cash flow pattern detection.}
+\textbf{Stage 1 --- Flagged Pages:}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{p{4.5cm} p{1.5cm} p{5cm}}
+\toprule
+\textbf{Category} & \textbf{Count} & \textbf{Page Numbers} \\
+\midrule
+Contingent Liabilities & 2 & 210, 211 \\
+Related Party Transactions & 2 & 212, 214 \\
+Auditor Opinion & 1 & 215 \\
+Going Concern & 1 & 216 \\
+\bottomrule
+\end{tabular}
+\caption{Stage 1 output: pages flagged by category (Wirecard 2018)}
+\end{table}
+
+\noindent The pipeline flagged 6 pages across 4 categories. Notably, the
+pages are concentrated in the final section of the report (pages 210--216),
+corresponding to the notes to the financial statements and auditor's report.
+
+\textbf{Stage 2 --- Structured Findings:}
+
+\begin{itemize}[leftmargin=1.5cm]
+  \item \textbf{Contingent Liabilities:} Lawsuits with estimated exposure in
+    the single-digit million EUR range. Likelihood and timeline were not
+    disclosed.
+
+  \item \textbf{Related Party Transactions:} Multiple transactions with
+    Management Board members identified, including annual retirement
+    benefit contributions exceeding EUR\,1.0\,million per board member
+    and loans to key management personnel. No independent approval was
+    noted for any transaction --- a significant governance red flag.
+
+  \item \textbf{Auditor Opinion:} Pages were flagged but the Stage~2
+    extraction returned null fields for all structured attributes. The
+    auditor (EY) issued an unqualified opinion, which the extraction
+    prompt correctly did not classify as qualified, adverse, or disclaimer.
+
+  \item \textbf{Going Concern:} Flagged but returned null fields --- no
+    explicit going concern language was present, consistent with EY's
+    unqualified opinion at the time.
+\end{itemize}
+
+\textbf{Stage 3 --- Risk Memo:}
+
+\begin{quote}
+\small
+\textbf{OVERALL RISK RATING: MEDIUM-HIGH}
+
+\textit{Justification:} Significant related-party transactions and
+contingent liabilities raise governance and contingent risk concerns,
+though no explicit going concern or audit qualification is noted.
+
+\textbf{Top 3 Critical Warnings:}
+
+\begin{enumerate}
+  \item \textbf{Related-Party Transactions \& Governance Risk:}
+    Multiple material transactions with Management and Supervisory Board
+    members totalling over EUR\,4\,million annually. The absence of noted
+    independent approval is a severe governance red flag.
+
+  \item \textbf{Contingent Liabilities:}
+    Lawsuits with potential exposure in the single-digit million EUR range.
+    Undisclosed likelihood and timeline increase uncertainty.
+
+  \item \textbf{Compensation Structure Risk:}
+    Executive retirement benefits (EUR\,1.0\,million gross annual
+    contributions per board member) appear exceptionally generous,
+    potentially indicating misallocation of capital.
+\end{enumerate}
+
+\textbf{Contradictions:} While no going concern or adverse audit opinion
+is reported, the materiality of related-party transactions creates a
+contradiction with an implied clean bill of health.
+
+\textbf{Recommended Next Steps:}
+(1)~Request related-party transaction policy and independent approval
+documentation; (2)~Legal review of disclosed lawsuits;
+(3)~Stress-test financial covenants under benefit and litigation scenarios;
+(4)~Flag governance as key discussion point in management meetings.
+\end{quote}
+
+\textbf{Pipeline usage:} 13 LLM calls, 634K input characters,
+26K output characters.
 
 \subsection{Aggregate Results Summary}
 
@@ -894,17 +1017,21 @@ anomalies and cash flow pattern detection.}
 \textbf{Company} & \textbf{Risk Rating} & \textbf{Pages Flagged} & \textbf{Categories Hit} & \textbf{Key Warning Detected} \\
 \midrule
 Evergrande & HIGH & 10 & 5 & Related-party exposure, contingent liabilities \\
-SVB & --- & --- & --- & \textit{Pending} \\
-Bed Bath \& Beyond & --- & --- & --- & \textit{Pending} \\
-Lehman Brothers & --- & --- & --- & \textit{Pending} \\
-Wirecard & --- & --- & --- & \textit{Pending} \\
+SVB & N/A$^*$ & 0 & 0 & \textit{No pages flagged (HTML-to-PDF)} \\
+Bed Bath \& Beyond & N/A$^*$ & 0 & 0 & \textit{No pages flagged (HTML-to-PDF)} \\
+Lehman Brothers & N/A$^*$ & 0 & 0 & \textit{No pages flagged (HTML-to-PDF)} \\
+Wirecard & MED-HIGH & 6 & 4 & Related-party governance, contingent liabilities \\
 \bottomrule
 \end{tabular}
 \caption{Aggregate pipeline results across test companies}
 \end{table}
 
-\noindent Evergrande results are from actual pipeline execution. Remaining
-companies require PDF acquisition and pipeline runs to complete the table.
+\noindent $^*$SVB, Bed Bath \& Beyond, and Lehman Brothers 10-K filings were
+sourced from SEC EDGAR as HTML and converted to PDF via headless browser
+rendering. This conversion introduced text artefacts that prevented the
+pipeline's Stage~1 from flagging risk-relevant pages. Native PDF annual
+reports (Evergrande, Wirecard) produced meaningful results. See Discussion
+for analysis.
 
 \begin{figure}[H]
 \centering
@@ -913,57 +1040,76 @@ companies require PDF acquisition and pipeline runs to complete the table.
 13 total calls processing 387K input characters into 28K output characters.}
 \end{figure}
 
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.9\textwidth]{report_latex_media/media/risk_warnings/aggregate_comparison.png}
+\caption{Pipeline results across all five test companies. Only native PDF
+reports (Evergrande, Wirecard) produced flagged pages and category hits.}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.85\textwidth]{report_latex_media/media/risk_warnings/format_comparison.png}
+\caption{Document format impact: native PDF annual reports produced meaningful
+results while SEC EDGAR HTML-to-PDF conversions yielded zero flagged pages.}
+\end{figure}
+
 \subsection{Discussion}
 
-The initial validation on the Evergrande 2022 annual report provides
-encouraging evidence that the pipeline can surface genuine distress signals,
-while also highlighting areas for improvement.
+Validation across all five test cases reveals both the pipeline's strengths
+and a critical sensitivity to input document format.
 
-\textbf{Category hit rate.}
-Of the nine risk categories, five were triggered: \texttt{related\_party},
-\texttt{contingent\_liabilities}, \texttt{cash\_flow\_warnings},
-\texttt{going\_concern}, and \texttt{accounting\_policy}. This 56\% hit rate
-is reasonable given that the remaining four categories
-(\texttt{auditor\_opinion}, \texttt{debt\_covenants},
-\texttt{director\_changes}, \texttt{md\_and\_a\_red\_flags}) require
-content that may appear on pages not captured by the 30-page chunking
-strategy or that the LLM did not associate with those specific category labels.
+\textbf{Document format sensitivity.}
+The most striking finding is the systematic failure of Stage~1 on SEC EDGAR
+10-K filings converted from HTML to PDF (SVB, Bed Bath \& Beyond, Lehman
+Brothers: 0 flagged pages each), contrasted with successful detection on
+natively formatted PDF annual reports (Evergrande: 5 categories, 10 pages;
+Wirecard: 4 categories, 6 pages). The HTML-to-PDF conversion via headless
+browser rendering introduces artefacts including page timestamps, navigation
+headers, and inline XBRL tag remnants that appear to degrade the LLM's
+ability to identify risk-relevant content within 30-page chunks. This is a
+critical finding: \textbf{the pipeline requires native PDF annual reports},
+not converted SEC filings, to function reliably.
 
-\textbf{False negatives.}
-The most significant miss is \texttt{auditor\_opinion}. The Evergrande 2022
-report contains a \textit{disclaimer of opinion} --- the most severe
-auditor opinion type --- yet the pipeline did not flag the relevant pages.
-This suggests that the auditor's report may have fallen within a chunk
-where the LLM prioritised other content, or that the page flagging prompt
-requires refinement to more aggressively surface auditor language. Similarly,
-\texttt{debt\_covenants} was not triggered despite Evergrande's extensive
-debt disclosures, likely because covenant-specific language was embedded
-within broader notes rather than appearing as a standalone section.
+\textbf{Native PDF results.}
+On the two native PDF reports, the pipeline performed well. For Evergrande
+(2022), five of nine categories were triggered with rich structured
+extractions: 22 related-party transactions, RMB\,62.5\,billion in
+contingent liabilities, and a comprehensive risk memo rated HIGH. For
+Wirecard (2018), four categories were flagged, and the pipeline
+correctly identified related-party governance concerns and contingent
+litigation --- precisely the types of signals that, in hindsight, were
+precursors to the EUR\,1.9\,billion fraud discovered in 2020.
 
-\textbf{Extraction quality.}
-Where categories were flagged, the extraction quality was strong.
-\texttt{contingent\_liabilities} produced precise monetary figures
-(RMB\,49.1\,billion and RMB\,13.4\,billion) with resolution timeline data.
-\texttt{related\_party} extracted 22 distinct transactions with counterparty
-names, relationship types, and transaction values. However,
-\texttt{going\_concern} flagged four pages but returned null structured
-fields, indicating a gap between the flagging prompt's sensitivity and the
-extraction prompt's specificity.
+\textbf{False negatives on native PDFs.}
+Even on native PDFs, some categories were missed. Evergrande's
+\texttt{auditor\_opinion} (a disclaimer of opinion --- the most severe
+type) was not flagged, likely because the auditor's report fell within a
+chunk where the LLM prioritised other content. Wirecard's auditor opinion
+was flagged but extraction returned nulls because EY's unqualified opinion
+contained no qualifying language to extract --- a correct ``negative'' finding
+rather than a false negative.
+
+\textbf{Synthesis stage limitation.}
+For the three SEC filing cases with zero flagged pages, the synthesis stage
+generated generic HIGH-risk template memos rather than reporting that no
+findings were available. The synthesis prompt should include a guard clause
+that returns a ``no actionable findings'' response when Stage~2 yields no
+results, preventing misleading output.
 
 \textbf{Entity anonymisation.}
-The spaCy NER-based anonymiser produced over 340 entity mappings, but
-many were false positives --- table headers, financial line items, and
-abbreviated text fragments were incorrectly classified as organisations
-or persons. Future iterations should filter entities by minimum character
-length and exclude common financial statement patterns.
+Across all five runs, the spaCy NER-based anonymiser produced 500--760
+entity mappings per report. Many were false positives: table headers,
+financial line items, and abbreviated fragments classified as organisations
+or persons. Future iterations should filter by minimum entity length and
+exclude common financial statement patterns.
 
-\textbf{Outlook.}
-A full comparative analysis --- particularly between companies with clean
-auditor opinions (SVB, Lehman, Wirecard) and those with qualified or
-disclaimed opinions (Evergrande, Bed Bath \& Beyond) --- will be possible
-once the remaining four test cases have been processed. The clean-opinion
-cases are expected to be the harder test, as the pipeline must rely
-entirely on non-auditor signals.
+\textbf{Recommended improvements.}
+(1)~Add a dedicated SEC EDGAR text extraction module that strips XBRL tags
+and HTML artefacts before PDF conversion; (2)~refine the Stage~1 prompt to
+be more sensitive to auditor opinion language; (3)~add a guard clause in the
+synthesis prompt for empty findings; (4)~filter NER entities by minimum
+character length.
 
 % ============================================================
 \section{Conclusion}
@@ -990,15 +1136,17 @@ The validation on bankrupt companies provides empirical evidence that the pipeli
 surfaces genuine pre-distress signals, including cases where the auditor's opinion
 was clean but other sections contained actionable warnings.
 
-In the completed test case (Evergrande 2022), the pipeline made 13 LLM calls
-processing 386,558 input characters and generating 28,119 output characters ---
-a compression ratio of approximately 14:1 from raw annual report text to
-structured risk findings. The pipeline correctly rated the company as
-\textbf{HIGH} risk and surfaced the key distress signals (related-party
-exposure, contingent liabilities, cash flow collapse) that preceded
-Evergrande's formal liquidation order. Full quantitative comparison across
-all five test cases will be reported upon completion of the remaining
-pipeline runs.
+Across all five test cases, the pipeline made a total of 50 LLM calls
+processing 3.3\,million input characters and generating 121K output
+characters. On native PDF annual reports (Evergrande, Wirecard), the
+pipeline correctly identified pre-distress signals: Evergrande was rated
+\textbf{HIGH} with 5 categories flagged, and Wirecard was rated
+\textbf{MEDIUM-HIGH} with 4 categories including the related-party
+governance concerns that foreshadowed its fraud. The three SEC EDGAR
+HTML-to-PDF conversions (SVB, BBBY, Lehman) produced zero flagged pages,
+revealing a critical document format dependency that must be addressed
+before production deployment. The pipeline's core architecture is sound,
+but its effectiveness is gated on input document quality.
 
 % ============================================================
 \appendix

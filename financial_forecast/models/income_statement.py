@@ -72,9 +72,11 @@ class IncomeStatementModel(tf.Module):
         """Initialize interest/return rates from historical averages."""
         _f64 = lambda v: tf.constant(v, dtype=tf.float64)
         _EPS = 1e-12
-        self.market_securities_return_pct.assign(
-            _f64(float(tf.reduce_mean(s["ms_return"] / tf.maximum(s["ims"], _EPS))))
-        )
+        ratios = s["ms_return"] / tf.maximum(s["ims"], _EPS)
+        finite_mask = tf.math.is_finite(ratios)
+        if tf.reduce_any(finite_mask):
+            mean_ratio = tf.reduce_mean(tf.boolean_mask(ratios, finite_mask))
+            self.market_securities_return_pct.assign(_f64(float(mean_ratio)))
 
     def calculate_income(
         self,

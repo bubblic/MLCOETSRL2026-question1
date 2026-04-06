@@ -346,6 +346,21 @@ class BaseFinancialModel(tf.Module):
         for k in _REQUIRED_KEYS:
             d[k] = raw[k]
 
+        # # Replace NaN with 0 in balance sheet fields that enter the
+        # # recurrent state.  NaN (e.g. unreported current_lt_debt)
+        # # would otherwise propagate through forecast_step and corrupt
+        # # all structural parameter gradients.
+        # _NAN_FILL_KEYS = (
+        #     "nca", "advance_payments_purchases", "accounts_receivable",
+        #     "inventory", "cash", "ims", "accounts_payable",
+        #     "advance_payments_sales", "current_lt_debt",
+        #     "current_liabilities", "non_current_liabilities", "equity",
+        #     "net_income", "dividends",
+        # )
+        # for k in _NAN_FILL_KEYS:
+        #     if k in d:
+        #         d[k] = tf.where(tf.math.is_nan(d[k]), tf.zeros_like(d[k]), d[k])
+
         n_hist = len(d["sales"])
         if inflation is not None:
             if len(inflation) < n_hist:

@@ -192,16 +192,118 @@ def generate_extraction_summary(data: dict, output_path: Path) -> None:
     print(f"Saved: {output_path}")
 
 
+def generate_aggregate_comparison(all_data: dict, output_path: Path) -> None:
+    """Grouped bar chart comparing pipeline results across all 5 companies."""
+    companies = []
+    pages_flagged = []
+    cats_hit = []
+    total_calls = []
+
+    for company, data in all_data.items():
+        companies.append(company.upper() if len(company) <= 4 else company.capitalize())
+        flagged = data["flagged_pages"]
+        pages_flagged.append(sum(len(v) for v in flagged.values()))
+        cats_hit.append(len(flagged))
+        total_calls.append(data["usage"]["total_calls"])
+
+    x = np.arange(len(companies))
+    width = 0.25
+
+    fig, ax = plt.subplots(figsize=(10, 5))
+    bars1 = ax.bar(x - width, pages_flagged, width, label="Pages Flagged",
+                   color=JP_BLUE, edgecolor="white")
+    bars2 = ax.bar(x, cats_hit, width, label="Categories Hit",
+                   color=JP_BLUE_LIGHT, edgecolor="white")
+    bars3 = ax.bar(x + width, total_calls, width, label="LLM Calls",
+                   color=CODE_GREEN, edgecolor="white")
+
+    ax.set_xticks(x)
+    ax.set_xticklabels(companies, fontsize=11)
+    ax.set_ylabel("Count", fontsize=11)
+    ax.set_title("Pipeline Results Across All Five Test Companies",
+                 fontsize=13, color=JP_BLUE, fontweight="bold")
+    ax.legend(fontsize=10, framealpha=0.9)
+    ax.spines["top"].set_visible(False)
+    ax.spines["right"].set_visible(False)
+
+    for bars in [bars1, bars2, bars3]:
+        for bar in bars:
+            h = bar.get_height()
+            if h > 0:
+                ax.text(bar.get_x() + bar.get_width() / 2, h + 0.2,
+                        str(int(h)), ha="center", va="bottom", fontsize=9)
+
+    plt.tight_layout()
+    fig.savefig(output_path, dpi=200, bbox_inches="tight")
+    plt.close(fig)
+    print(f"Saved: {output_path}")
+
+
+def generate_format_comparison(all_data: dict, output_path: Path) -> None:
+    """Bar chart highlighting native PDF vs HTML-to-PDF performance."""
+    labels = []
+    pages = []
+    colors = []
+    formats = {"evergrande": "Native PDF", "wirecard": "Native PDF",
+               "svb": "HTML-to-PDF", "bbby": "HTML-to-PDF", "lehman": "HTML-to-PDF"}
+
+    for company, data in all_data.items():
+        name = company.upper() if len(company) <= 4 else company.capitalize()
+        fmt = formats.get(company, "Unknown")
+        labels.append(f"{name}\n({fmt})")
+        flagged = data["flagged_pages"]
+        pages.append(sum(len(v) for v in flagged.values()))
+        colors.append(JP_BLUE if fmt == "Native PDF" else CODE_RED)
+
+    fig, ax = plt.subplots(figsize=(9, 4.5))
+    bars = ax.bar(labels, pages, color=colors, edgecolor="white", width=0.6)
+    ax.set_ylabel("Pages Flagged", fontsize=11)
+    ax.set_title("Document Format Impact on Pipeline Effectiveness",
+                 fontsize=13, color=JP_BLUE, fontweight="bold")
+    ax.spines["top"].set_visible(False)
+    ax.spines["right"].set_visible(False)
+
+    for bar, count in zip(bars, pages):
+        ax.text(bar.get_x() + bar.get_width() / 2, bar.get_height() + 0.2,
+                str(count), ha="center", va="bottom", fontsize=11, fontweight="bold")
+
+    # Add legend
+    from matplotlib.patches import Patch
+    legend_elements = [Patch(facecolor=JP_BLUE, label="Native PDF"),
+                       Patch(facecolor=CODE_RED, label="HTML-to-PDF (SEC EDGAR)")]
+    ax.legend(handles=legend_elements, fontsize=10, framealpha=0.9)
+
+    plt.tight_layout()
+    fig.savefig(output_path, dpi=200, bbox_inches="tight")
+    plt.close(fig)
+    print(f"Saved: {output_path}")
+
+
 def main() -> None:
-    json_path = Path("extracted_json/risk_warnings/evergrande/ar2022.risk-warnings.llm.json")
+    import glob
+
     output_dir = Path("report_latex_media/media/risk_warnings")
     output_dir.mkdir(parents=True, exist_ok=True)
 
-    data = load_json(json_path)
+    # Load Evergrande data for per-company figures
+    eg_path = Path("extracted_json/risk_warnings/evergrande/ar2022.risk-warnings.llm.json")
+    eg_data = load_json(eg_path)
 
-    generate_categories_flagged(data, output_dir / "categories_flagged.png")
-    generate_pipeline_usage(data, output_dir / "pipeline_usage.png")
-    generate_extraction_summary(data, output_dir / "extraction_summary.png")
+    generate_categories_flagged(eg_data, output_dir / "categories_flagged.png")
+    generate_pipeline_usage(eg_data, output_dir / "pipeline_usage.png")
+    generate_extraction_summary(eg_data, output_dir / "extraction_summary.png")
+
+    # Load all company data for aggregate figures
+    companies = ["evergrande", "svb", "bbby", "lehman", "wirecard"]
+    all_data = {}
+    for company in companies:
+        files = glob.glob(f"extracted_json/risk_warnings/{company}/*.json")
+        if files:
+            all_data[company] = load_json(Path(files[0]))
+
+    if len(all_data) > 1:
+        generate_aggregate_comparison(all_data, output_dir / "aggregate_comparison.png")
+        generate_format_comparison(all_data, output_dir / "format_comparison.png")
 
     print(f"\nAll figures saved to {output_dir}/")
 

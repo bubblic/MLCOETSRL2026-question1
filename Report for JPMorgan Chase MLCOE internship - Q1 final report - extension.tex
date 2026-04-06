@@ -2565,6 +2565,143 @@ Statement, and Cash Budget is attached below:
 \label{fig:final_forecast}
 \end{figure}
 
+
+\subsection{Cross-Company Validation}\label{sec:cross_company}
+
+To demonstrate that the model generalizes beyond a single company, we applied
+the identical architecture---\texttt{Trainable\-Financial\-Model} with
+\texttt{BayesianOpEx}, \texttt{Monte\-Carlo\-Simulator}, and all advanced
+policies---to Microsoft\,(MSFT) and Pfizer\,(PFE). Only the trainable
+parameters were re-fitted on each company's FY\,2018--2024 financial
+statements; no structural changes were made to the model. FY\,2025 actuals
+serve as the one-step-ahead backtest in both cases. Full model-fit
+visualizations and ten-year projection figures are provided in
+Appendix~\ref{app:cross_company}.
+
+\subsubsection{Microsoft (MSFT)}
+
+Microsoft exhibits steady, high-growth financials similar to Apple, making it a
+natural validation candidate. Table~\ref{tab:backtest_msft} compares the
+one-step-ahead FY\,2025 prediction against actuals.
+
+\begin{table}[H]
+\centering
+\footnotesize
+
+\begin{tabular}{l rrr}
+\toprule
+\textbf{Line Item} & \textbf{Actual} & \textbf{Predicted} & \textbf{Error \%} \\
+\midrule
+\multicolumn{4}{l}{\textbf{Assets}} \\
+Non-Current Assets        & 427.9 & 427.3 & $-$0.1\% \\
+Adv Payments (Purch.)     &  25.7 &  25.3 & $-$1.6\% \\
+Accounts Receivable       &  69.9 &  64.6 & $-$7.6\% \\
+Inventory                 &   0.9 &   3.5 & $+$271.9\%$^{*}$ \\
+Cash                      &  30.2 &  25.4 & $-$15.9\% \\
+Invest in Mkt Sec         &  64.3 &  44.8 & $-$30.3\% \\
+\textbf{Total Assets}     & \textbf{619.0} & \textbf{590.9} & $-$4.5\% \\
+\addlinespace
+\multicolumn{4}{l}{\textbf{Liabilities}} \\
+Accounts Payable          &  27.7 &  24.4 & $-$11.9\% \\
+Adv Payments (Sales)      &  64.6 &  68.0 & $+$5.3\% \\
+Non-Current Liabilities   & 134.3 & 113.7 & $-$15.3\% \\
+\textbf{Equity}           & \textbf{343.5} & \textbf{336.7} & $-$2.0\% \\
+\midrule
+\multicolumn{4}{l}{\textbf{Income Statement}} \\
+COGS                      &  65.8 &  67.7 & $+$2.8\% \\
+OpEx                      &  65.4 &  66.1 & $+$1.2\% \\
+Depreciation              &  22.0 &  25.6 & $+$16.2\% \\
+Income Tax                &  21.8 &  20.4 & $-$6.3\% \\
+\textbf{Net Income}       & \textbf{101.8} & \textbf{100.5} & $-$1.3\% \\
+\addlinespace
+\multicolumn{4}{l}{\textbf{Cash Flow}} \\
+Dividends                 &  24.1 &  24.2 & $+$0.7\% \\
+Stock Buyback             &  18.4 &  33.4 & $+$81.1\% \\
+\bottomrule
+\end{tabular}
+\par\smallskip
+{\scriptsize All figures in \$ billions.
+$^{*}$\,Inventory error is large in percentage terms but represents only
+\$2.6\,B absolute difference on a \$619\,B balance sheet.}
+\caption{One-step-ahead backtest of the advanced-policy model with Bayesian OpEx
+against Microsoft's actual FY\,2025 results.}
+\label{tab:backtest_msft}
+\end{table}
+
+The model captures Microsoft's core income-statement dynamics well: net income
+is predicted within 1.3\%, COGS within 2.8\%, and operating expenses within
+1.2\%. Balance-sheet totals are within 5\%, with equity error at only 2.0\%.
+The largest deviations appear in investment in market securities ($-$30.3\%)
+and stock buyback ($+$81.1\%), reflecting a shift in Microsoft's
+capital-allocation strategy during FY\,2025 that the trend-based policies
+cannot fully capture from the training window alone.
+
+\subsubsection{Pfizer (PFE) --- Stress Test}
+
+Pfizer presents a deliberately challenging stress test for the model. Revenue
+surged from \$42\,B (FY\,2018) to \$101\,B (FY\,2022) during the COVID-19
+vaccine cycle, then contracted to \$63\,B by FY\,2024. This boom--bust pattern
+violates the model's assumption of smooth, trend-driven growth.
+
+\begin{table}[H]
+\centering
+\footnotesize
+
+\begin{tabular}{l rrr}
+\toprule
+\textbf{Line Item} & \textbf{Actual} & \textbf{Predicted} & \textbf{Error \%} \\
+\midrule
+\multicolumn{4}{l}{\textbf{Assets}} \\
+Non-Current Assets        & 165.3 & 171.9 & $+$4.0\% \\
+Adv Payments (Purch.)     &   2.8 &   4.8 & $+$72.5\% \\
+Accounts Receivable       &  11.9 &   9.3 & $-$21.5\% \\
+Inventory                 &  10.7 &  10.6 & $-$0.1\% \\
+Cash                      &   1.1 &   0.6 & $-$43.4\% \\
+Invest in Mkt Sec         &   9.2 &   5.8 & $-$36.4\% \\
+\textbf{Total Assets}     & \textbf{201.0} & \textbf{203.2} & $+$1.1\% \\
+\addlinespace
+\multicolumn{4}{l}{\textbf{Liabilities}} \\
+Accounts Payable          &   5.2 &   6.7 & $+$27.9\% \\
+Adv Payments (Sales)      &   0.8 &   1.7 & $+$118.4\% \\
+Non-Current Liabilities   &  84.4 &  91.3 & $+$8.2\% \\
+\textbf{Equity}           & \textbf{86.5} & \textbf{80.0} & $-$7.5\% \\
+\midrule
+\multicolumn{4}{l}{\textbf{Income Statement}} \\
+COGS                      &   9.5 &  24.5 & $+$159.2\% \\
+OpEx                      &  13.8 &  15.3 & $+$11.2\% \\
+Depreciation              &   6.6 &   6.7 & $+$1.9\% \\
+Income Tax                & $-$0.3 &   0.0 & N/A \\
+\textbf{Net Income}       & \textbf{7.8} & \textbf{0.5} & $-$93.2\% \\
+\addlinespace
+\multicolumn{4}{l}{\textbf{Cash Flow}} \\
+Dividends                 &   9.8 &   9.5 & $-$2.9\% \\
+Stock Buyback             &   0.0 &   4.6 & N/A \\
+\bottomrule
+\end{tabular}
+\par\smallskip
+{\scriptsize All figures in \$ billions.}
+\caption{Stress-test backtest of the advanced-policy model with Bayesian OpEx
+against Pfizer's actual FY\,2025 results, illustrating model limitations under
+regime-change conditions.}
+\label{tab:backtest_pfe}
+\end{table}
+
+As expected, the model struggles with Pfizer's post-pandemic normalization.
+COGS is overestimated by 159\% because the training window includes the
+high-manufacturing COVID years, biasing the learned cost ratio upward. Net
+income is consequently underestimated by 93\%. However, balance-sheet aggregates
+remain surprisingly robust: total assets are within 1.1\% and equity within
+7.5\%, suggesting that the structural accounting constraints---the identity
+$A = L + E$ and the debt amortization schedules---provide a stabilizing anchor
+even when income-statement parameters are poorly calibrated.
+
+This result highlights an important limitation: the model assumes historical
+trends are representative of future dynamics. For companies experiencing regime
+changes---such as Pfizer's COVID cycle---the training window must be carefully
+curated, or regime-aware extensions (e.g.\ change-point detection, windowed
+training) should be incorporated.
+
+
 \section{Part 2}
 
 \subsection{a) LLM Selection and Infrastructure Setup}
@@ -5207,5 +5344,47 @@ Introduction (see Section~\ref{sec:double-entry}, \emph{The
 Double-Entry Principle}), which explains the principle with two worked
 examples: a credit sale (income statement to balance sheet) and a
 receivable collection (cash budget to balance sheet).
+
+
+\section{Cross-Company Forecast Results}\label{app:cross_company}
+
+The following figures present the full model-fit and ten-year Bayesian forecast
+results for Microsoft and Pfizer, as discussed in
+Section~\ref{sec:cross_company}.
+
+\subsection{Microsoft (MSFT)}
+
+\begin{figure}[H]\centering
+\includegraphics[width=\textwidth]{training_results/msft/opex_probabilistic_fit_20260406_070422_monte_carlo.png}
+\caption{Bayesian variational inference fit of operating expenses for Microsoft,
+showing the posterior mean and 95\% credible band.}
+\label{fig:msft_opex_fit}
+\end{figure}
+
+\begin{figure}[H]\centering
+\includegraphics[width=\textwidth]{training_results/msft/all_elements_forecast_20260406_070419.png}
+\caption{Ten-year Bayesian forecast with 95\% Monte Carlo confidence intervals
+for Microsoft: historical fit (red) and forward projection (blue) of all
+balance-sheet, income-statement, and cash-flow elements.}
+\label{fig:msft_forecast}
+\end{figure}
+
+\subsection{Pfizer (PFE)}
+
+\begin{figure}[H]\centering
+\includegraphics[width=\textwidth]{training_results/pfe/opex_probabilistic_fit_20260406_081331_monte_carlo.png}
+\caption{Bayesian variational inference fit of operating expenses for Pfizer,
+showing the posterior mean and 95\% credible band.}
+\label{fig:pfe_opex_fit}
+\end{figure}
+
+\begin{figure}[H]\centering
+\includegraphics[width=\textwidth]{training_results/pfe/all_elements_forecast_20260406_081328.png}
+\caption{Ten-year Bayesian forecast with 95\% Monte Carlo confidence intervals
+for Pfizer: historical fit (red) and forward projection (blue) of all
+balance-sheet, income-statement, and cash-flow elements. The COVID-era revenue
+spike and subsequent contraction is visible in the income-statement panels.}
+\label{fig:pfe_forecast}
+\end{figure}
 
 \end{document}
