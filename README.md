@@ -26,7 +26,7 @@ python run_simple_model_forecast.py
 
 Demonstrates the Pareja (2009) Cash Budget construction as a pure forward
 simulation. Uses simple policies with parameters set from historical
-averages -- no gradient-based training. Produces a deterministic 10-year
+averages -- no gradient-based training. Produces a deterministic n-year
 balance sheet forecast and one-step-ahead historical fit.
 
 ### Trainable Model with Simple Policies

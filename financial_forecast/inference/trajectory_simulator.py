@@ -201,25 +201,25 @@ class TrajectorySimulator(ABC):
             ("CHECK: Assets-(L+E)", mean_check),
         ]
 
-        col_width = 14
-        label_width = 26
-        header = f"{'':>{label_width}}" + "".join(
-            f"{label:>{col_width}}" for label in year_labels
-        )
-        print("\n" + "=" * len(header))
-        print("FORECAST BALANCE SHEET " "\u2014 Mean across Monte Carlo samples (USD)")
-        print("=" * len(header))
+        header = "| Line Item | " + " | ".join(year_labels) + " |"
+        sep = "| --- | " + " | ".join("---:" for _ in year_labels) + " |"
+        blank_cells = " | ".join([""] * n_years)
+        print("\nFORECAST BALANCE SHEET \u2014 Mean across Monte Carlo samples (USD)\n")
         print(header)
-        print("-" * len(header))
+        print(sep)
         for label, data in rows:
+            label = label.strip()
             if data is None:
-                print(f"{label:>{label_width}}")
+                if label:
+                    print(f"| **{label}** | {blank_cells} |")
+                else:
+                    print(f"| | {blank_cells} |")
                 continue
-            values_str = "".join(
-                f"{float(value) * scale:>{col_width},.0f}" for value in data
-            )
-            print(f"{label:>{label_width}}{values_str}")
-        print("-" * len(header))
+            vals = " | ".join(f"${float(v) * scale:,.0f}" for v in data)
+            if label.isupper():
+                print(f"| **{label}** | {vals} |")
+            else:
+                print(f"| {label} | {vals} |")
 
         max_abs_check = float(tf.reduce_max(tf.abs(mean_check * scale)))
         print("\nBalance Sheet Identity Check " "(Assets = Liabilities + Equity):")

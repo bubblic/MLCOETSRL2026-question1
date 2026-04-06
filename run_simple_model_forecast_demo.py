@@ -77,10 +77,10 @@ if __name__ == "__main__":
         data=data,
         sales_forecast=LinearSalesForecast(
             data.financial_statements["sales"],
-            forecast_years=10,
+            forecast_years=4,
         ),
         inflation_forecast=ConstantInflationForecast(
             data.inflation,
-            forecast_years=10,
+            forecast_years=4,
         ),
     ).run()
