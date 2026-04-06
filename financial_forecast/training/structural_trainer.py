@@ -276,6 +276,11 @@ class StructuralTrainer(BaseTrainer):
 
         print("Structural Training Complete.")
         model.print_structural_summary(num_transitions + 1)
+        print("\nFinal structural losses:")
+        for key in structural_history:
+            if key.startswith("loss_") and structural_history[key]:
+                label = key.replace("loss_", "")
+                print(f"  {label:15s} {structural_history[key][-1]:.4e}")
         print("-" * 50)
 
         plot_structural_diagnostics(structural_history, show_plot)

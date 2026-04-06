@@ -221,6 +221,11 @@ class PolicyTrainer(BaseTrainer):
         print("-" * 50)
         print("Training Complete.")
         model.print_policy_summary(n_years)
+        print("\nFinal policy losses:")
+        for key in simple_history:
+            if key.startswith("loss_") and simple_history[key]:
+                label = key.replace("loss_", "")
+                print(f"  {label:15s} {simple_history[key][-1]:.4e}")
         print("-" * 50)
 
         self._plot_diagnostics(
