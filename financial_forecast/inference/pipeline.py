@@ -97,6 +97,7 @@ class ForecastPipeline:
         """Execute: trajectory forecast, historical fit, plot, export JSON."""
         trajectories = self._run_trajectory_forecast()
         fit_mean, fit_lower, fit_upper, fit_years = self._compute_historical_fit()
+        self._print_backtest_table(fit_mean, fit_lower, fit_upper, fit_years)
         self._plot_results(
             trajectories, fit_mean, fit_lower, fit_upper, fit_years
         )
@@ -144,6 +145,129 @@ class ForecastPipeline:
             json.dump(report, f, indent=2, ensure_ascii=False)
         print(f"\nForecast report saved to: {out_path}")
         return out_path
+
+    def _print_backtest_table(
+        self,
+        fit_mean: Dict[str, tf.Tensor],
+        fit_lower: Optional[Dict[str, tf.Tensor]],
+        fit_upper: Optional[Dict[str, tf.Tensor]],
+        fit_years: tf.Tensor,
+    ) -> None:
+        """Print markdown table comparing actual vs predicted for test years."""
+        model = self.model
+        test_years = model.test_years
+        if test_years == 0:
+            return
+
+        d = model.historical_data
+        n_hist = len(d["sales"])
+        is_mc = fit_lower is not None
+
+        total_assets_hist = (
+            d["nca"]
+            + d["advance_payments_purchases"]
+            + d["accounts_receivable"]
+            + d["inventory"]
+            + d["cash"]
+            + d["ims"]
+        )
+
+        # (display_label, fit_key, hist_tensor)  —  None fit_key = section header
+        backtest_items = [
+            ("ASSETS", None, None),
+            ("Non-Current Assets", "nca", d["nca"]),
+            ("Adv Payments (Purchases)", "advance_payments_purchases", d["advance_payments_purchases"]),
+            ("Accounts Receivable", "accounts_receivable", d["accounts_receivable"]),
+            ("Inventory", "inventory", d["inventory"]),
+            ("Cash", "cash", d["cash"]),
+            ("Invest in Mkt Securities", "investment_in_market_securities", d["ims"]),
+            ("**Total Assets**", "total_assets", total_assets_hist),
+            ("", None, None),
+            ("LIABILITIES", None, None),
+            ("Accounts Payable", "accounts_payable", d["accounts_payable"]),
+            ("Adv Payments (Sales)", "advance_payments_sales", d["advance_payments_sales"]),
+            ("Effective ST Debt", "effective_st_debt", d["effective_st_debt"]),
+            ("Non-Current Liabilities", "non_current_liabilities", d["non_current_liabilities"]),
+            ("**Equity**", "equity", d["equity"]),
+            ("", None, None),
+            ("INCOME STATEMENT", None, None),
+            ("COGS", "cogs", d["cogs"]),
+            ("OpEx", "opex", d["opex"]),
+            ("Depreciation", "depreciation", d["depreciation"]),
+            ("Interest Payments", "interest_payment", d["interest_payment"]),
+            ("ST Investment Returns", "ms_return", d["ms_return"]),
+            ("Tax", "tax", d["tax"]),
+            ("**Net Income**", "net_income", d["net_income"]),
+            ("", None, None),
+            ("CASH FLOW", None, None),
+            ("Dividends", "dividends", d["dividends"]),
+            ("Stock Buyback", "stock_buyback", d["stock_buyback"]),
+        ]
+
+        n_fit = len(fit_years)
+        dollar = lambda v: f"${v:,.0f}"
+
+        for ty in range(test_years):
+            fit_idx = n_fit - test_years + ty
+            hist_idx = n_hist - test_years + ty
+            year_label = f"FY{int(fit_years[fit_idx])}"
+
+            print(f"\nBACKTEST \u2014 {year_label} (Out-of-Sample)\n")
+
+            if is_mc:
+                n_data_cols = 5
+                header = "| Line Item | Actual | Predicted (Mean) | Lower (2.5%) | Upper (97.5%) | Error % |"
+                sep = "| --- | ---: | ---: | ---: | ---: | ---: |"
+            else:
+                n_data_cols = 3
+                header = "| Line Item | Actual | Predicted | Error % |"
+                sep = "| --- | ---: | ---: | ---: |"
+
+            print(header)
+            print(sep)
+
+            for label, fit_key, hist_tensor in backtest_items:
+                if fit_key is None:
+                    blank = " | ".join([""] * n_data_cols)
+                    if label:
+                        print(f"| **{label}** | {blank} |")
+                    else:
+                        print(f"| | {blank} |")
+                    continue
+
+                actual = float(hist_tensor[hist_idx])
+                predicted = float(fit_mean[fit_key][fit_idx])
+
+                if np.isnan(actual):
+                    if is_mc:
+                        lower_v = float(fit_lower[fit_key][fit_idx])
+                        upper_v = float(fit_upper[fit_key][fit_idx])
+                        print(
+                            f"| {label} | N/A | {dollar(predicted)}"
+                            f" | {dollar(lower_v)} | {dollar(upper_v)} | N/A |"
+                        )
+                    else:
+                        print(f"| {label} | N/A | {dollar(predicted)} | N/A |")
+                    continue
+
+                if abs(actual) > 1.0:
+                    error_pct = (predicted - actual) / abs(actual) * 100
+                    error_str = f"{error_pct:+.1f}%"
+                else:
+                    error_str = "N/A"
+
+                if is_mc:
+                    lower_v = float(fit_lower[fit_key][fit_idx])
+                    upper_v = float(fit_upper[fit_key][fit_idx])
+                    print(
+                        f"| {label} | {dollar(actual)} | {dollar(predicted)}"
+                        f" | {dollar(lower_v)} | {dollar(upper_v)} | {error_str} |"
+                    )
+                else:
+                    print(
+                        f"| {label} | {dollar(actual)}"
+                        f" | {dollar(predicted)} | {error_str} |"
+                    )
 
     def _run_trajectory_forecast(self) -> Dict[str, tf.Tensor]:
         """Run the model's trajectory simulator."""

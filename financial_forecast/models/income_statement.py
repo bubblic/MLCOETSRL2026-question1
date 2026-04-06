@@ -50,9 +50,8 @@ class IncomeStatementModel(tf.Module):
             dtype=tf.float64,
             name="avg_long_term_interest_pct",
         )
-        self.market_securities_return_pct = tfp.util.TransformedVariable(
-            initial_value=0.05,
-            bijector=tfb.Softplus(),
+        self.market_securities_return_pct = tf.Variable(
+            0.05,
             dtype=tf.float64,
             name="market_securities_return_pct",
         )
@@ -66,7 +65,7 @@ class IncomeStatementModel(tf.Module):
         return [
             *self.avg_short_term_interest_pct.trainable_variables,
             *self.avg_long_term_interest_pct.trainable_variables,
-            *self.market_securities_return_pct.trainable_variables,
+            self.market_securities_return_pct,
         ]
 
     def init_from_data(self, s: Dict[str, tf.Tensor]) -> None:
@@ -74,12 +73,7 @@ class IncomeStatementModel(tf.Module):
         _f64 = lambda v: tf.constant(v, dtype=tf.float64)
         _EPS = 1e-12
         self.market_securities_return_pct.assign(
-            _f64(
-                max(
-                    _EPS,
-                    float(tf.reduce_mean(s["ms_return"] / tf.maximum(s["ims"], _EPS))),
-                )
-            )
+            _f64(float(tf.reduce_mean(s["ms_return"] / tf.maximum(s["ims"], _EPS))))
         )
 
     def calculate_income(

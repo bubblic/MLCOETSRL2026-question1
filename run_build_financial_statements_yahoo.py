@@ -493,7 +493,7 @@ def write_module(ticker: str, source: str) -> str:
 
 if __name__ == "__main__":
 
-    ticker = "WMT"
+    ticker = "aapl"
 
     # -- Step 1: Fetch data from Yahoo Finance --
     print(f"Fetching Yahoo Finance data for {ticker}...")

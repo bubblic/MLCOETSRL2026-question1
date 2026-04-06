@@ -59,7 +59,7 @@ import numpy as np
 
 # ===== Configuration ==========================================================
 # Change these for each company.
-TICKER = "WMT"
+TICKER = "aapl"
 
 # Optional year range filter.  Set to None to use all available years.
 # The script automatically fetches one extra prior year for inventory
@@ -621,8 +621,11 @@ def build_financial_data(
     current_liabilities = []
     for i in range(len(years)):
         vals = [
-            nca[i], accounts_receivable[i], cash[i],
-            non_current_liabilities[i], equity[i],
+            nca[i],
+            accounts_receivable[i],
+            cash[i],
+            non_current_liabilities[i],
+            equity[i],
         ]
         if any(np.isnan(v) for v in vals):
             current_liabilities.append(float("nan"))
