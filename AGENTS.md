@@ -5,37 +5,46 @@
 > [`README.md`](README.md) for build/run instructions — this file exists to
 > explain *context that is not obvious from the code or git history*.
 
-## TL;DR — the two-repo setup
+## TL;DR — two repositories, one shared codebase
 
-This repository is **`bubblic/MLCOETSRL2026-question1`** (the `origin` remote).
-It is the **implementation home** for JP Morgan MLCOE TSRL 2026 Internship
-Question 1 (author: Jaebum "Albert" Chung).
+This codebase lives in **two GitHub repositories linked by a fork**, and this
+`AGENTS.md` is committed to **both** of them. **Do not infer which one you are
+in from this text — detect it at runtime (Step 0 below).**
 
-There is a companion repository, **`jaybhum/JPM_internship`**, which is a
-**fork of this repo**. That fork is where the **written proposal** is drafted
-and compiled. **This repo is where the TensorFlow program and the agentic
-workflow described in that proposal actually get built.**
+| Repository | Role |
+| --- | --- |
+| `bubblic/MLCOETSRL2026-question1` | **Implementation** — the TensorFlow program and the agentic-workflow code. |
+| `jaybhum/JPM_internship` *(a fork of the above)* | **Proposal** — where the written proposal is drafted and compiled. |
+
+Author: Jaebum "Albert" Chung (JP Morgan MLCOE TSRL 2026 Internship, Question 1).
+Work flows **proposal → implementation**: the fork describes intent; the
+implementation repo realizes it.
+
+### Step 0 — identify which repo you are in
+
+Branch *names* alone won't tell you (both repos can have a `main`); the
+**origin remote URL** is the reliable signal:
 
 ```
- jaybhum/JPM_internship  (fork)          bubblic/MLCOETSRL2026-question1  (this repo / origin)
- ──────────────────────────────          ───────────────────────────────────────────────────
- Proposal authoring & compiling   ──▶    Implementation: TensorFlow models + agentic workflow
- (the "what" and "why")                  (the "how" — runnable code, tests, LaTeX reports)
+git remote -v          # or:  git config --get remote.origin.url
 ```
 
-What this means for an agent working **here**:
+- origin contains **`bubblic/MLCOETSRL2026-question1`** → you are in the
+  **implementation** repo. New TensorFlow modeling and agentic-workflow code
+  belongs here, fitted into the existing `financial_forecast/` layout (below).
+  The proposal is **not** checked in here — it lives in the fork; ask the user
+  to paste any section you need rather than assuming its contents.
+- origin contains **`jaybhum/JPM_internship`** → you are in the **proposal
+  fork**. Authoring/proposal work lives here; treat the implementation repo as
+  upstream and keep the two in sync when you merge.
+- **anything else** (another fork, mirror, or fresh local clone) → don't guess;
+  ask the user which role this checkout plays.
 
-- **This repo is the source of truth for code.** New TensorFlow modeling and
-  agentic-workflow code belongs here, fitted into the existing
-  `financial_forecast/` package layout (see below) — not bolted on as
-  standalone scripts unless that matches an existing pattern.
-- **The proposal is not checked into this repo.** It lives in the
-  `jaybhum/JPM_internship` fork. When a task refers to "the proposal," ask the
-  user to paste the relevant section if you need its details; do not assume its
-  contents.
-- Work flows **proposal → implementation**: the fork describes intent, this
-  repo realizes it. If you change the design here in a way that diverges from
-  the proposal, flag it so the proposal can be kept in sync.
+> **Why this matters on merge:** because the fork merges back into the
+> implementation repo, shared files like this one must stay **identical and
+> identity-neutral** in both. Hardcoding "this repo is X" makes the file wrong
+> the moment it lands in the other repo — so describe both roles and detect,
+> never assert.
 
 ## What already exists here
 
@@ -104,4 +113,4 @@ file-by-file tree; the high-level shape is:
 
 ---
 *If the two-repo arrangement, ownership, or workflow above changes, update this
-file so the next agent inherits an accurate picture.*
+file (in **both** repos) so the next agent inherits an accurate picture.*

@@ -7,9 +7,12 @@ Project + multi-repo context for this repository lives in
 
 ## Quick reminders (most-violated rules)
 
-- **This repo** (`bubblic/MLCOETSRL2026-question1`) is the **implementation**
-  home for the TensorFlow program + agentic workflow. The **proposal** is
-  authored in the fork **`jaybhum/JPM_internship`** and is *not* checked in here.
+- **Two repos, one codebase.** This file is committed to both
+  `bubblic/MLCOETSRL2026-question1` (**implementation**) and its fork
+  `jaybhum/JPM_internship` (**proposal**). Don't assume which you're in — run
+  `git remote -v` and check the origin URL (see [AGENTS.md](AGENTS.md) →
+  *Step 0*). The TF/agentic code goes in the implementation repo; the proposal
+  isn't checked in there.
 - **Deep learning is TensorFlow only** — never PyTorch/JAX.
 - **Run pipelines from the repo root** via top-level `run_*.py` entry points
   (prefer a new `run_*.py` over `python -m ...`).
