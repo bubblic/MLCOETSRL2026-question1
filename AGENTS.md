@@ -1,116 +1,150 @@
 # AGENTS.md
 
 > Orientation for AI coding agents (Claude Code, Codex, Cursor, and any future
-> agent) working in this repository. Human contributors should start with
-> [`README.md`](README.md) for build/run instructions — this file exists to
-> explain *context that is not obvious from the code or git history*.
+> agent). **This file is committed identically to both repositories of this
+> project** (see below), so it must stay identity-neutral: **detect your
+> context (Step 0) before acting — never assume it from this text.** Human
+> contributors should start with [`README.md`](README.md) for build/run/test
+> instructions.
 
-## TL;DR — two repositories, one shared codebase
+## TL;DR — two repositories, two modes, one shared codebase
 
-This codebase lives in **two GitHub repositories linked by a fork**, and this
-`AGENTS.md` is committed to **both** of them. **Do not infer which one you are
-in from this text — detect it at runtime (Step 0 below).**
+This project spans **two GitHub repositories linked by a fork**, and this
+`AGENTS.md` lives in both:
 
 | Repository | Role |
 | --- | --- |
-| `bubblic/MLCOETSRL2026-question1` | **Implementation** — the TensorFlow program and the agentic-workflow code. |
-| `jaybhum/JPM_internship` *(a fork of the above)* | **Proposal** — where the written proposal is drafted and compiled. |
+| `bubblic/MLCOETSRL2026-question1` *(upstream original)* | **Code** — the TensorFlow simulator and the agentic-workflow software the proposal describes; this is where code gets **built**. |
+| `jaybhum/JPM_internship` *(a fork of the above)* | **Proposal** — where a six-month JPMorgan MLCOE internship proposal is researched and authored, on top of the simulator. |
 
 Author: Jaebum "Albert" Chung (JP Morgan MLCOE TSRL 2026 Internship, Question 1).
-Work flows **proposal → implementation**: the fork describes intent; the
-implementation repo realizes it.
+The Proposal repo defines intent through a **Research → Plan → Write** workflow;
+the Code repo **builds** that intent — but only **once it is signed off**.
 
-### Step 0 — identify which repo you are in
+### Terminology (read once — these are deliberately non-overlapping)
 
-Branch *names* alone won't tell you (both repos can have a `main`); the
-**origin remote URL** is the reliable signal:
+- **Proposal repo / Proposal mode** — authoring the internship proposal (in the
+  fork). Its phases are **Research → Plan → Write**.
+- **Code repo / Code mode** — the software (this simulator + the proposal's
+  agentic workflow). The activity here is **build**.
+- **"Write"** is a *proposal phase* (produce the **document**). **"Build"** is
+  *software work*. They are different activities in different places — **do not
+  conflate them.** We deliberately avoid the word *"implement,"* which used to
+  mean both and caused confusion.
+
+## Step 0 — detect your context
+
+Two independent signals. Check **both**.
+
+**(a) Which repository?** — the origin remote URL (branch *names* won't tell you
+this; both repos can have a `main`):
 
 ```
 git remote -v          # or:  git config --get remote.origin.url
 ```
 
-- origin contains **`bubblic/MLCOETSRL2026-question1`** → you are in the
-  **implementation** repo. New TensorFlow modeling and agentic-workflow code
-  belongs here, fitted into the existing `financial_forecast/` layout (below).
-  The proposal is **not** checked in here — it lives in the fork; ask the user
-  to paste any section you need rather than assuming its contents.
-- origin contains **`jaybhum/JPM_internship`** → you are in the **proposal
-  fork**. Authoring/proposal work lives here; treat the implementation repo as
-  upstream and keep the two in sync when you merge.
-- **anything else** (another fork, mirror, or fresh local clone) → don't guess;
-  ask the user which role this checkout plays.
+- origin contains **`bubblic/MLCOETSRL2026-question1`** → **Code repo**.
+- origin contains **`jaybhum/JPM_internship`** → **Proposal repo (fork)**.
+- anything else (another fork, mirror, or fresh clone) → don't guess; ask the user.
 
-> **Why this matters on merge:** because the fork merges back into the
-> implementation repo, shared files like this one must stay **identical and
-> identity-neutral** in both. Hardcoding "this repo is X" makes the file wrong
-> the moment it lands in the other repo — so describe both roles and detect,
-> never assert.
+**(b) Which mode?** — the current branch:
 
-## What already exists here
+```
+git branch --show-current
+```
 
-This is a mature codebase, not a blank slate. Before adding anything, check
-whether a module already covers it. See [`README.md`](README.md) for the full
-file-by-file tree; the high-level shape is:
+- branch matches **`claude/jpm-internship-proposal-*`** → **Proposal mode**
+  (see *Proposal mode* below).
+- otherwise → **Code mode** (see *The shared codebase* and *Code mode*).
 
-- **`financial_forecast/`** — the core TensorFlow package. Bayesian financial
-  forecasting for Apple (FY2018–FY2025 historicals), built around composable
-  policy modules (dividends, buybacks, debt, OpEx, tax, working capital, etc.),
-  a `training/` pipeline, and `inference/` simulators (deterministic +
-  Monte Carlo). This is where the modeling work concentrates.
-- **Agentic / LLM components already in place** (the foundation the proposal's
-  workflow builds on):
-  - `financial_forecast/clients/` — Azure-hosted LLM HTTP client + protocols.
-  - `financial_forecast/extraction/` — multi-stage LLM pipeline that pulls
-    financial statements and one-time tax anomalies out of 10-K PDFs
-    (page identification → extraction → normalization → ratios).
-  - `financial_forecast/reporting/advisor.py` — `DeepseekCEOAdvisor`, an
-    LLM that turns a forecast report into a CEO-facing recommendation.
-  - `financial_forecast/models/llm_forecaster.py` — LLM-based balance-sheet
-    forecaster.
-  - `risk/` — LLM-based risk-warning extraction/synthesis from filings.
-  - `send_reasoning_prompt.py` — standalone reasoning-model prompt harness.
-- **Bonus-question packages** — `credit_rating/`, `loan_pricing/`, `risk/`
-  (each self-contained; see their dirs and `bonusquestionplans/`).
-- **Reports** — LaTeX sources + compiled PDFs at the repo root
-  (`*_report.tex` / `*.pdf`). These are deliverables; regenerate the PDF when
-  you change the `.tex`.
-- **`run_*.py`** — top-level entry-point scripts, each runnable from the repo
-  root. **Prefer adding a new `run_*.py` entry point over `python -m ...`
-  invocation** for new pipelines.
-- **`tests/`** — pytest suite. Run and keep it green.
+> **Why both signals, and why identity-neutral:** because the fork merges back
+> into the Code repo, shared files like this one must be identical in both.
+> Hardcoding "this repo is X" or "we are in the Research phase" makes the file
+> wrong the moment it lands in the other repo or the phase advances. Describe
+> every role, detect at runtime, and assert nothing.
 
-## Conventions (apply to all agents, not just Claude)
+## The shared codebase (present in both repos)
 
-- **Deep learning is TensorFlow, always.** This project standardizes on
-  TensorFlow / TensorFlow-Probability (see `pyproject.toml`). Do **not**
-  introduce PyTorch, JAX, or another DL framework.
-- **Entry points run from the repo root.** Scripts assume the root as the
-  working directory and write reports to `training_results/` and `outputs/`.
-  Add new user-facing pipelines as top-level `run_*.py` scripts.
+A TensorFlow financial-statement simulator and related pipelines. Not a blank
+slate — check for an existing module before adding anything. Full file-by-file
+tree is in [`README.md`](README.md); the shape:
+
+- **`financial_forecast/`** — the **real, validated core**. Bayesian financial
+  forecasting for Apple (FY2018–FY2025 historicals), built from composable policy
+  modules (dividends, buybacks, debt, OpEx, tax, working capital…), a `training/`
+  pipeline, and `inference/` simulators (deterministic + Monte Carlo). It also
+  contains the existing **LLM / agentic pieces** the proposal's workflow builds
+  on: `clients/` (Azure LLM client), `extraction/` (multi-stage LLM pipeline that
+  pulls financial statements and tax anomalies out of 10-K PDFs),
+  `reporting/advisor.py` (`DeepseekCEOAdvisor`), and `models/llm_forecaster.py`.
+- **`loan_pricing/`, `credit_rating/`, `risk/`** — **exploratory sketches**, not
+  production. Do not treat them as validated; `risk/` also uses LLMs. Design notes
+  live in `bonusquestionplans/`.
+- **`run_*.py`** — top-level entry-point scripts, each runnable from the repo root.
+- **Reports** — LaTeX sources + compiled PDFs at the root (`*_report.tex` / `*.pdf`);
+  regenerate the PDF when you change the `.tex`.
+- **`tests/`** — pytest suite; keep it green.
+
+## Proposal mode  *(Proposal fork · `claude/jpm-internship-proposal-*` branches)*
+
+If Step 0 put you here, you are helping develop the internship proposal — **read
+this first**:
+
+- **Single source of truth:** [`proposal/README.md`](proposal/README.md), then
+  `proposal/RESEARCH.md`. That directory governs all proposal work.
+- **Workflow:** Research → Plan → Write. Last known phase is **Research**
+  — confirm the current phase via `proposal/README.md`.
+- **Do not** write or overhaul a polished proposal document, and **do not** start
+  building software, until research and planning are **explicitly signed off by
+  Jaebum**. (An earlier polished draft was written prematurely and has been
+  retired into `proposal/RESEARCH.md`.)
+- The `proposal/` directory is **not** present in the Code repo; it lives only in
+  the fork.
+
+## Code mode  *(Code repo · code branches)*
+
+If Step 0 put you here, this is where the proposal's TensorFlow program + agentic
+workflow get **built** — **but building is gated**:
+
+- **Net-new build work for the proposal's design is GATED on sign-off.** It waits
+  until Research → Plan is explicitly signed off by Jaebum. Check
+  `proposal/RESEARCH.md` in the fork (`jaybhum/JPM_internship`) for the current
+  phase, and confirm with Jaebum before starting net-new feature work.
+- **Ordinary maintenance of the existing codebase** — bug fixes, tests, refactors,
+  report regeneration, docs — is fine anytime and is not gated.
+- **Once building is greenlit:** fit new code into the existing
+  `financial_forecast/` layout (mirror its composable-OOP style), expose pipelines
+  as top-level `run_*.py` entry points, and add tests alongside.
+
+## Conventions (all agents, both repos)
+
+- **Deep learning is TensorFlow, always** (TensorFlow / TensorFlow-Probability —
+  see `pyproject.toml`). Do **not** introduce PyTorch, JAX, or another DL framework.
+- **Entry points run from the repo root** and write reports to `training_results/`
+  and `outputs/`. Prefer a new top-level `run_*.py` over `python -m ...`.
 - **Install editable:** `pip install -e .` (or `pip install -e ".[dev]"` for
-  pytest). Optional extras exist for `loan-pricing`, `credit-rating`, `risk`,
-  and `data` — see `pyproject.toml`.
-- **Tests:** `python -m pytest tests/ -v`. Add tests alongside new modeling or
-  workflow code.
-- **Style:** match the surrounding code — this codebase favors clean, composable
-  OOP (ABCs + small policy classes). Mirror existing naming and structure when
-  extending a package.
+  pytest). Optional extras: `loan-pricing`, `credit-rating`, `risk`, `data` —
+  see `pyproject.toml`.
+- **Tests:** `python -m pytest tests/ -v`.
+- **Style:** match the surrounding code — clean, composable OOP (ABCs + small
+  policy classes).
 
 ## Secrets & environment
 
-- LLM pipelines need `AZURE_DEEPSEEK_ENDPOINT` (and related credentials),
-  supplied via a local `.env` (git-ignored) or the shell environment.
-- **`.env` is not committed and must stay that way.** Never hard-code endpoints,
-  keys, or tokens into source or into this file.
+- LLM pipelines need `AZURE_DEEPSEEK_ENDPOINT` (and related credentials), supplied
+  via a local `.env` (git-ignored) or the shell environment.
+- **`.env` is never committed.** Never hard-code endpoints, keys, or tokens into
+  source or into this file.
 
 ## Pointers
 
-- [`README.md`](README.md) — install, every `run_*.py` script, full project tree,
-  Windows/CUDA setup notes.
+- [`README.md`](README.md) — install, every `run_*.py` script, full tree, Windows/CUDA notes.
 - [`pyproject.toml`](pyproject.toml) — dependencies, optional extras, tooling.
-- `bonusquestionplans/` — design notes for the bonus-question packages.
+- `proposal/README.md` → `proposal/RESEARCH.md` — proposal source of truth *(fork only)*.
+- `bonusquestionplans/` — design notes for the exploratory sketch packages.
 - `final_interview_prep/` — study/interview notes (context, not code).
 
 ---
-*If the two-repo arrangement, ownership, or workflow above changes, update this
-file (in **both** repos) so the next agent inherits an accurate picture.*
+*This file is identity-neutral by design and lives in both repos. If the
+two-repo arrangement, ownership, or workflow changes, update it in **both** repos
+so the next agent inherits an accurate picture.*
